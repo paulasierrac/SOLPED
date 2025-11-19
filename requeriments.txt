@@ -1,0 +1,13 @@
+# Básicos
+numpy
+pandas
+openpyxl
+XlsxWriter
+
+# Automatización en Windows / SAP GUI Scripting
+pywinauto
+pywin32   
+
+# SAP (RFC y HANA)
+pyrfc     
+pyhdb     
