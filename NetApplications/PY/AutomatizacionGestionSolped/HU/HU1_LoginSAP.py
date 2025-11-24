@@ -79,7 +79,7 @@ def conectar_sap(conexion, mandante, usuario, password, idioma="ES"):
         print(f" Error al conectar a SAP: {e}")
         return None
 
-def obtener_sesion_activa():
+def ObtenerSesionActiva():
     """Obtiene una sesión SAP ya iniciada (con usuario logueado)."""
     try:
         sap_gui_auto = win32com.client.GetObject("SAPGUI")
