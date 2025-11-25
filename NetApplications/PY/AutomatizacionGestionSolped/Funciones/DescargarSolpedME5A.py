@@ -6,9 +6,10 @@
 # Propiedad de Colsubsidio
 # Cambios: (Si Aplica)
 # ============================================
-import win32com.client  
+import win32com.client
 import time
 import os
+
 
 def DescargarSolpedME5A(session, estado):
 
@@ -16,7 +17,7 @@ def DescargarSolpedME5A(session, estado):
         raise ValueError("Sesión SAP no válida.")
 
     # Ruta destino – ejemplo estándar Colsubsidio
-    ruta_guardar = fr"C:\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
+    ruta_guardar = rf"C:\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
 
     # ============================
     # Abrir transacción ME5A
@@ -35,27 +36,39 @@ def DescargarSolpedME5A(session, estado):
     session.findById("wnd[0]/usr/btn%_S_BSART_%_APP_%-VALU_PUSH").press()
 
     # Tabla de selección
-    session.findById("wnd[1]/usr/tabsTAB_STRIP/tabpSIVA"
-                     "/ssubSCREEN_HEADER:SAPLALDB:3010/tblSAPLALDBSINGLE/"
-                     "ctxtRSCSEL_255-SLOW_I[1,0]").text = "ZSUA"
+    session.findById(
+        "wnd[1]/usr/tabsTAB_STRIP/tabpSIVA"
+        "/ssubSCREEN_HEADER:SAPLALDB:3010/tblSAPLALDBSINGLE/"
+        "ctxtRSCSEL_255-SLOW_I[1,0]"
+    ).text = "ZSUA"
 
-    session.findById("wnd[1]/usr/tabsTAB_STRIP/tabpSIVA"
-                     "/ssubSCREEN_HEADER:SAPLALDB:3010/tblSAPLALDBSINGLE/"
-                     "ctxtRSCSEL_255-SLOW_I[1,1]").text = "ZSOL"
+    session.findById(
+        "wnd[1]/usr/tabsTAB_STRIP/tabpSIVA"
+        "/ssubSCREEN_HEADER:SAPLALDB:3010/tblSAPLALDBSINGLE/"
+        "ctxtRSCSEL_255-SLOW_I[1,1]"
+    ).text = "ZSOL"
 
-    session.findById("wnd[1]/usr/tabsTAB_STRIP/tabpSIVA"
-                     "/ssubSCREEN_HEADER:SAPLALDB:3010/tblSAPLALDBSINGLE/"
-                     "ctxtRSCSEL_255-SLOW_I[1,2]").text = "ZSUB"
+    session.findById(
+        "wnd[1]/usr/tabsTAB_STRIP/tabpSIVA"
+        "/ssubSCREEN_HEADER:SAPLALDB:3010/tblSAPLALDBSINGLE/"
+        "ctxtRSCSEL_255-SLOW_I[1,2]"
+    ).text = "ZSUB"
 
-    session.findById("wnd[1]/usr/tabsTAB_STRIP/tabpSIVA"
-                     "/ssubSCREEN_HEADER:SAPLALDB:3010/tblSAPLALDBSINGLE/"
-                     "ctxtRSCSEL_255-SLOW_I[1,3]").text = "ZSU3"
-    session.findById("wnd[1]/usr/tabsTAB_STRIP/tabpSIVA"
-                     "/ssubSCREEN_HEADER:SAPLALDB:3010/tblSAPLALDBSINGLE/"
-                     "ctxtRSCSEL_255-SLOW_I[1,3]").setFocus
-    session.findById("wnd[1]/usr/tabsTAB_STRIP/tabpSIVA"
-                     "/ssubSCREEN_HEADER:SAPLALDB:3010/tblSAPLALDBSINGLE/"
-                     "ctxtRSCSEL_255-SLOW_I[1,3]").caretPosition = 4
+    session.findById(
+        "wnd[1]/usr/tabsTAB_STRIP/tabpSIVA"
+        "/ssubSCREEN_HEADER:SAPLALDB:3010/tblSAPLALDBSINGLE/"
+        "ctxtRSCSEL_255-SLOW_I[1,3]"
+    ).text = "ZSU3"
+    session.findById(
+        "wnd[1]/usr/tabsTAB_STRIP/tabpSIVA"
+        "/ssubSCREEN_HEADER:SAPLALDB:3010/tblSAPLALDBSINGLE/"
+        "ctxtRSCSEL_255-SLOW_I[1,3]"
+    ).setFocus
+    session.findById(
+        "wnd[1]/usr/tabsTAB_STRIP/tabpSIVA"
+        "/ssubSCREEN_HEADER:SAPLALDB:3010/tblSAPLALDBSINGLE/"
+        "ctxtRSCSEL_255-SLOW_I[1,3]"
+    ).caretPosition = 4
     session.findById("wnd[1]/tbar[0]/btn[0]").press()  # Aceptar selección
     session.findById("wnd[1]/tbar[0]/btn[8]").press()  # Ejecutar
 
@@ -76,22 +89,25 @@ def DescargarSolpedME5A(session, estado):
     # ============================
     # Guardar archivo
     # ============================
-    
-    ruta_guardar = fr"C:\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
+
+    ruta_guardar = rf"C:\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
     if os.path.exists(ruta_guardar):
         os.remove(ruta_guardar)
     session.findById("wnd[1]/tbar[0]/btn[0]").press()
     time.sleep(1)
 
-    session.findById("wnd[1]/usr/ctxtDY_PATH").text = r"C:\NetApplications\PY\AutomatizacionGestionSolped\Insumo"
-    session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = fr"expSolped{estado}.txt"
+    session.findById("wnd[1]/usr/ctxtDY_PATH").text = (
+        r"C:\NetApplications\PY\AutomatizacionGestionSolped\Insumo"
+    )
+    session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = rf"expSolped{estado}.txt"
     session.findById("wnd[1]/usr/ctxtDY_FILENAME").caretPosition = 10
     session.findById("wnd[1]/tbar[0]/btn[0]").press
     session.findById("wnd[1]/tbar[0]/btn[11]").press()  # Guardar
     time.sleep(1)
-    
-    print("Archivo exportado y guardado en:", ruta_guardar)
+
     session.findById("wnd[0]").sendVKey(12)
     time.sleep(0.5)
-    
-    print(f"Archivo exportado correctamente: {ruta_guardar}")  # luego reemplazar con WriteLog
+
+    print(
+        f"Archivo exportado correctamente: {ruta_guardar}"
+    )  # luego reemplazar con WriteLog
