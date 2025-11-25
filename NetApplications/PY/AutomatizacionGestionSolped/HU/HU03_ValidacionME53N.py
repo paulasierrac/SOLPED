@@ -1,84 +1,43 @@
 # =========================================
-# NombreDeLaIniciativa – HUxx: BuscarSolpedME53N
-# Autor: TuNombre, Empresa, Rol
+# NombreDeLaIniciativa – HU03: ValidacionME53N
+# Autor: Paula Sierra - NetApplications
 # Descripcion: Ejecuta la búsqueda de una SOLPED en la transacción ME53N
 # Ultima modificacion: 24/11/2025
 # Propiedad de Colsubsidio
 # Cambios: Versión inicial
 # =========================================
-import win32com.client # pyright: ignore[reportMissingModuleSource]
+import win32com.client  # pyright: ignore[reportMissingModuleSource]
 import time
 import getpass
 import subprocess
 import os
 import time
 from Funciones.EscribirLog import WriteLog
+from Config.settings import RUTAS
+from Funciones.ValidacionME53N import ValidacionME53N
 
-def BuscarSolpedME53N(session, config, numero_solped):
-    """
-    session: objeto de SAP GUI
-    config: diccionario In_Config con parámetros
-    numero_solped: número de la solped a consultar
-    """
+
+def EjecutarHU03(session):
+    """session: objeto de SAP GUI
+    Realiza la verificacion del SOLPED"""
 
     try:
         WriteLog(
-            activar_log=config["ActivarLog"],
-            path_log=config["PathLog"],
-            mensaje="Inicia HUxx - BuscarSolpedME53N",
-            estado="INFO"
+            mensaje="Inicia HU03",
+            estado="INFO",
+            task_name="HU03_ValidacionME53N",
+            path_log=RUTAS["PathLog"],
         )
-
-        # Validar sesión SAP
-        if session is None:
-            WriteLog(
-                activar_log=config["ActivarLog"],
-                path_log=config["PathLog"],
-                mensaje="Sesión SAP no disponible",
-                estado="ERROR"
-            )
-            raise Exception("Sesión SAP no disponible")
-
-        # Abrir transacción ME53N
-        session.findById("wnd[0]/tbar[0]/okcd").text = "/nME53N"
-        session.findById("wnd[0]").sendVKey(0)
-        time.sleep(1)
-
-        WriteLog(
-            activar_log=config["ActivarLog"],
-            path_log=config["PathLog"],
-            mensaje="Transacción ME53N abierta",
-            estado="INFO"
-        )
-
-        # Ingresar número de SOLPED
-        campo_solped = "wnd[0]/usr/ctxtRM06E-BANFN"
-        session.findById(campo_solped).text = numero_solped
-        session.findById("wnd[0]").sendVKey(0)
-        time.sleep(1)
-
-        WriteLog(
-            activar_log=config["ActivarLog"],
-            path_log=config["PathLog"],
-            mensaje=f"Solped {numero_solped} consultada exitosamente",
-            estado="INFO"
-        )
-
+        numero_solped = 1300139306
+        ValidacionME53N(session, numero_solped)
         return True
 
     except Exception as e:
         WriteLog(
-            activar_log=config.get("ActivarLog", True),
-            path_log=config.get("PathLog", "Audit/Logs/error_hu.txt"),
-            mensaje=f"Error en HUxx_BuscarSolpedME53N: {e}",
-            estado="ERROR"
+            mensaje=f"Error en HU03_BuscarSolpedME53N: {e}",
+            estado="ERROR",
+            task_name="HU03_ValidacionME53N",
+            path_log=RUTAS["PathLogError"],
         )
+
         return False
-
-
-# def buscar_SolpedME53N(session):        
-#     if session:
-#         session.findById("wnd[0]/tbar[0]/okcd").text = ""
-#         session.findById("wnd[0]").sendVKey(0)
-#         print("Transacción ME5A abierta con éxito.")
-
