@@ -13,13 +13,19 @@ import subprocess
 import os
 import time
 from Funciones.EscribirLog import WriteLog
+from Funciones.GeneralME53N import (
+    AbrirTransaccion,
+    ColsultarSolped,
+    procesarTablaME5A,
+    ObtenerItemTextME53N,
+    ObtenerItemsME53N,
+    TablaItemsDataFrame,
+)
 from Config.settings import RUTAS
 from Funciones.ValidacionME53N import ValidacionME53N
 
 
 def EjecutarHU03(session):
-    """session: objeto de SAP GUI
-    Realiza la verificacion del SOLPED"""
 
     try:
         WriteLog(
@@ -28,8 +34,33 @@ def EjecutarHU03(session):
             task_name="HU03_ValidacionME53N",
             path_log=RUTAS["PathLog"],
         )
-        numero_solped = 1300139306
-        ValidacionME53N(session, numero_solped)
+
+        dfsolpeds = procesarTablaME5A("expSolped03.txt")
+        solped_unicos = dfsolpeds["PurchReq"].unique().tolist()
+        solped_unicos.pop(0)
+        print(solped_unicos)
+        AbrirTransaccion(session, "ME53N")
+
+        for solped in solped_unicos:
+            ColsultarSolped(session, solped)
+            dtItems = ObtenerItemsME53N(session, solped)
+
+            print(dtItems)
+
+            num_filas = dtItems.shape[0]
+            print(f"Solped {solped} tiene {num_filas} filas")
+
+            lista_dicts = dtItems.to_dict(orient="records")
+
+            for i, fila in enumerate(lista_dicts):
+                # fila es un diccionario con los datos de cada ítem
+                texto = ObtenerItemTextME53N(session, solped)
+                print(texto)
+
+            # texto = ObtenerItemTextME53N(session, solped)
+            # estado = "Con Aplica" if texto.strip() else "Sin Texto"
+            # dfsolpeds.loc[dfsolpeds["PurchReq"] == solped, "Estado"] = estado
+
         return True
 
     except Exception as e:
@@ -39,5 +70,4 @@ def EjecutarHU03(session):
             task_name="HU03_ValidacionME53N",
             path_log=RUTAS["PathLogError"],
         )
-
         return False

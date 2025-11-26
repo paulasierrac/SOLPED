@@ -13,15 +13,16 @@ from Funciones.EscribirLog import WriteLog
 from Config.settings import RUTAS
 
 
-def ValidacionME53N(session, numero_solped):
+def AbrirTransaccion(session, transaccion):
     """session: objeto de SAP GUI
-    Realiza la verificacion del SOLPED"""
+    transaccion: transaccion a buscar
+    Realiza la busqueda de la transaccion requerida"""
 
     try:
         WriteLog(
             mensaje="ValidacionME53N",
             estado="INFO",
-            task_name="HU03_ValidacionME53N",
+            task_name="ColsultarSolped",
             path_log=RUTAS["PathLog"],
         )
 
@@ -31,7 +32,7 @@ def ValidacionME53N(session, numero_solped):
             WriteLog(
                 mensaje="Sesión SAP no disponible",
                 estado="ERROR",
-                task_name="HU03_ValidacionME53N",
+                task_name="ColsultarSolped",
                 path_log=RUTAS["PathLog"],
             )
             raise Exception("Sesión SAP no disponible")
@@ -44,7 +45,7 @@ def ValidacionME53N(session, numero_solped):
         WriteLog(
             mensaje="Transacción ME53N abierta",
             estado="INFO",
-            task_name="HU03_ValidacionME53N",
+            task_name="ColsultarSolped",
             path_log=RUTAS["PathLog"],
         )
         print("Transacción ME53N abierta")
@@ -74,7 +75,7 @@ def ValidacionME53N(session, numero_solped):
         WriteLog(
             mensaje="Solped {numero_solped} consultada exitosamente",
             estado="INFO",
-            task_name="HU03_ValidacionME53N",
+            task_name="ColsultarSolped",
             path_log=RUTAS["PathLog"],
         )
         # ---------------- Exportar tabla a txt----------------
@@ -141,9 +142,9 @@ def ValidacionME53N(session, numero_solped):
         return True
     except Exception as e:
         WriteLog(
-            mensaje=f"Error en HU03_BuscarSolpedME53N: {e}",
+            mensaje=f"Error en ColsultarSolped: {e}",
             estado="ERROR",
-            task_name="HU03_ValidacionME53N",
+            task_name="ColsultarSolped",
             path_log=RUTAS["PathLogError"],
         )
 
