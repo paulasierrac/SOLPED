@@ -31,10 +31,13 @@ from Config.settings import RUTAS
 
 def EjecutarHU03(session, nombre_archivo):
     try:
+        task_name = "HU03_ValidacionME53N"
+
+        # === Inicio HU03 ===
         WriteLog(
-            mensaje="Inicia HU03 - Validacion ME53N",
+            mensaje="Inicio HU03 - Validación ME53N",
             estado="INFO",
-            task_name="HU03_ValidacionME53N",
+            task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
 
@@ -42,33 +45,35 @@ def EjecutarHU03(session, nombre_archivo):
         TraerSAPAlFrente_Opcion()
 
         # Leer el archivo con las SOLPEDs a procesar
-        dfsolpeds = procesarTablaME5A(nombre_archivo)
+        df_solpeds = procesarTablaME5A(nombre_archivo)
 
-        if dfsolpeds.empty:
+        if df_solpeds.empty:
             print("ERROR: No se pudo cargar el archivo o esta vacio")
             WriteLog(
-                mensaje="Archivo expSolped03.txt vacio o no se pudo cargar",
+                mensaje="El archivo expSolped03.txt está vacío o no se pudo cargar",
                 estado="ERROR",
-                task_name="HU03_ValidacionME53N",
+                task_name=task_name,
                 path_log=RUTAS["PathLogError"],
             )
             return False
 
-        # Verificar que tenemos las columnas necesarias
+        # === Validación de columnas ===
         columnas_requeridas = ["Estado", "Observaciones"]
-        for col in columnas_requeridas:
-            if col not in dfsolpeds.columns:
-                print(f"ERROR: Columna requerida '{col}' no encontrada en el DataFrame")
+        for columna in columnas_requeridas:
+            if columna not in df_solpeds.columns:
+                print(
+                    f"ERROR: Columna requerida '{columna}' no encontrada en el DataFrame"
+                )
                 WriteLog(
-                    mensaje=f"Columna {col} no encontrada en DataFrame",
+                    mensaje=f"No se encontró la columna requerida: {columna}",
                     estado="ERROR",
-                    task_name="HU03_ValidacionME53N",
+                    task_name=task_name,
                     path_log=RUTAS["PathLogError"],
                 )
                 return False
 
-        # Obtener SOLPEDs unicas
-        solped_unicos = dfsolpeds["PurchReq"].unique().tolist()
+        # === Limpieza de SOLPEDs válidas ===
+        solped_unicos = df_solpeds["PurchReq"].unique().tolist()
 
         # Filtrar SOLPEDs validas (excluir encabezados)
         solped_unicos_filtradas = []
@@ -103,12 +108,12 @@ def EjecutarHU03(session, nombre_archivo):
 
         # Informacion inicial del archivo
         print("RESUMEN INICIAL DEL ARCHIVO:")
-        print(f"   - Total filas: {len(dfsolpeds)}")
+        print(f"   - Total filas: {len(df_solpeds)}")
         print(f"   - SOLPEDs unicas validas: {len(solped_unicos)}")
 
         # Mostrar distribucion inicial de estados
-        if "Estado" in dfsolpeds.columns:
-            estados_iniciales = dfsolpeds["Estado"].value_counts()
+        if "Estado" in df_solpeds.columns:
+            estados_iniciales = df_solpeds["Estado"].value_counts()
             print(f"   - Distribucion inicial de estados:")
             for estado, count in estados_iniciales.items():
                 print(f"     {estado}: {count}")
@@ -138,7 +143,7 @@ def EjecutarHU03(session, nombre_archivo):
             try:
                 # 1. Marcar SOLPED como "En Proceso"
                 resultado_estado = ActualizarEstado(
-                    dfsolpeds, nombre_archivo, solped, nuevo_estado="En Proceso"
+                    df_solpeds, nombre_archivo, solped, nuevo_estado="En Proceso"
                 )
 
                 if not resultado_estado:
@@ -152,7 +157,7 @@ def EjecutarHU03(session, nombre_archivo):
                 if not resultado_consulta:
                     print(f"ERROR: No se pudo consultar SOLPED {solped} en SAP")
                     ActualizarEstadoYObservaciones(
-                        dfsolpeds,
+                        df_solpeds,
                         nombre_archivo,
                         solped,
                         nuevo_estado="Error Consulta",
@@ -169,7 +174,7 @@ def EjecutarHU03(session, nombre_archivo):
                 if dtItems is None or dtItems.empty:
                     contadores["sin_items"] += 1
                     ActualizarEstadoYObservaciones(
-                        dfsolpeds,
+                        df_solpeds,
                         nombre_archivo,
                         solped,
                         nuevo_estado="Sin Items",
@@ -208,7 +213,7 @@ def EjecutarHU03(session, nombre_archivo):
 
                     # Marcar item como "Procesando"
                     ActualizarEstado(
-                        dfsolpeds, nombre_archivo, solped, numero_item, "Procesando"
+                        df_solpeds, nombre_archivo, solped, numero_item, "Procesando"
                     )
 
                     time.sleep(0.5)
@@ -305,7 +310,7 @@ def EjecutarHU03(session, nombre_archivo):
 
                         # Actualizar estado y observaciones en el archivo principal
                         ActualizarEstadoYObservaciones(
-                            dfsolpeds,
+                            df_solpeds,
                             nombre_archivo,
                             solped,
                             numero_item,
@@ -334,7 +339,7 @@ def EjecutarHU03(session, nombre_archivo):
                             "Texto no encontrado en el editor SAP - No se puede validar"
                         )
                         ActualizarEstadoYObservaciones(
-                            dfsolpeds,
+                            df_solpeds,
                             nombre_archivo,
                             solped,
                             numero_item,
@@ -372,7 +377,7 @@ def EjecutarHU03(session, nombre_archivo):
                     contadores["con_errores"] += 1
 
                 ActualizarEstadoYObservaciones(
-                    dfsolpeds,
+                    df_solpeds,
                     nombre_archivo,
                     solped,
                     nuevo_estado=estado_final_solped,
@@ -387,7 +392,7 @@ def EjecutarHU03(session, nombre_archivo):
                 contadores["con_errores"] += 1
                 observaciones_error = f"Error durante procesamiento: {str(e)[:100]}"
                 ActualizarEstadoYObservaciones(
-                    dfsolpeds,
+                    df_solpeds,
                     nombre_archivo,
                     solped,
                     nuevo_estado="Error",
@@ -441,12 +446,15 @@ def EjecutarHU03(session, nombre_archivo):
 
         print("\n")
 
+        # ======================================================
+        # === Finalización HU03 ===
+        # ======================================================
         WriteLog(
             mensaje=f"HU03 completado exitosamente. "
             f"SOLPEDs: {contadores['procesadas_exitosamente']}/{contadores['total_solpeds']}, "
             f"Items validados: {contadores['items_validados']}/{contadores['items_procesados']}",
             estado="INFO",
-            task_name="HU03_ValidacionME53N",
+            task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
         return True
@@ -455,7 +463,7 @@ def EjecutarHU03(session, nombre_archivo):
         WriteLog(
             mensaje=f"Error en EjecutarHU03: {e}",
             estado="ERROR",
-            task_name="HU03_ValidacionME53N",
+            task_name=task_name,
             path_log=RUTAS["PathLogError"],
         )
         traceback.print_exc()

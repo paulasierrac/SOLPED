@@ -2,7 +2,7 @@
 # Función Local: GeneralME53N
 # Autor: Paula Sierra - NetApplications
 # Descripcion: Archivo Base funciones necesarias transaccion ME53N
-# Ultima modificacion: 24/11/2025
+# Ultima modificacion: 30/11/2025
 # Propiedad de Colsubsidio
 # Cambios: Correcciones en ObtenerItemTextME53N y campos concepto_compra
 # ============================================
@@ -61,7 +61,7 @@ def procesarTablaME5A(name):
             path_log=RUTAS["PathLog"],
         )
 
-        path = f"C:\\Users\\CGRPA009\\Documents\\SOLPED-main\\SOLPED\\NetApplications\\PY\\AutomatizacionGestionSolped\\Insumo\\{name}"
+        path = f"C:\\Users\\CGRPA009\\Documents\\SOLPED-main\\SOLPED\\NetApplications\\PY\\AutomatizacionGestionSolped\\Insumo\\TablasME5A\\{name}"
 
         # INTENTAR LEER CON DIFERENTES CODIFICACIONES
         lineas = []
@@ -263,7 +263,7 @@ def procesarTablaME5A(name):
 def GuardarTablaME5A(df, name):
     """Guarda el DataFrame de vuelta al TXT con formato de tabla"""
     try:
-        path = f"C:\\Users\\CGRPA009\\Documents\\SOLPED-main\\SOLPED\\NetApplications\\PY\\AutomatizacionGestionSolped\\Insumo\\{name}"
+        path = f"C:\\Users\\CGRPA009\\Documents\\SOLPED-main\\SOLPED\\NetApplications\\PY\\AutomatizacionGestionSolped\\Insumo\\TablasME5A\\{name}"
 
         # ASEGURAR QUE TIENE LAS COLUMNAS NECESARIAS
         columnas_requeridas = ["Estado", "Observaciones"]
@@ -1108,9 +1108,6 @@ def DeterminarEstadoFinal(datos_texto: Dict, validaciones: Dict) -> Tuple[str, s
     return estado, observaciones
 
 
-# Tambien actualizar ExtraerDatosTexto para detectar estos casos
-
-
 def ExtraerDatosTexto(texto: str) -> Dict:
     """Extrae campos estructurados del texto capturado
     AJUSTADO: Detecta si el texto es solo descripcion"""
@@ -1241,9 +1238,6 @@ def ExtraerDatosTexto(texto: str) -> Dict:
                 break
 
     return datos
-
-
-# Actualizar GenerarObservaciones para incluir el tipo de texto
 
 
 def GenerarObservaciones(datos_texto: Dict, validaciones: Dict) -> str:
