@@ -1,0 +1,33 @@
+
+================================================================================
+REPORTE DE VALIDACION - SOLPED: 1300139267, ITEM: 20
+================================================================================
+
+DATOS EXTRAIDOS DEL TEXTO:
+  Razon Social: FABRICAMOS SU SUDADERA LTDA.
+  NIT: 800221644-3
+  Correo: fss2@fss.com.co
+  Concepto: UNIFORMES DE ARQUERO , BUZO Y PANTALONETA FÚTBOL 5...
+  Cantidad: 2
+  Valor Unitario: 115.000
+  Valor Total: 230.000
+  Responsable: sandra.torresma@colsubsidio.com, laura.alvarezh@colsubsidio.com
+  CECO: 302040023
+
+VALIDACIONES:
+  EXITO CANTIDAD:
+      Texto: 2
+      Tabla: 2.0
+  ERROR VALOR_UNITARIO:
+      Texto: 115.000
+      Tabla: 300.0
+      Difiere en $114,700.00
+  ERROR VALOR_TOTAL:
+  ERROR FECHA_ENTREGA:
+  ERROR CONCEPTO:
+      Texto: UNIFORMES DE ARQUERO , BUZO Y PANTALONETA FÚTBOL 5...
+      Tabla: UNIFORMES DEPORTIVOS EMPRESARIALES
+      Solo 1 palabras coinciden (minimo: 2)
+
+1/5 campos coinciden, 4/4 campos obligatorios presentes
+================================================================================

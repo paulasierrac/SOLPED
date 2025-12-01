@@ -85,7 +85,7 @@ def Main_GestionSolped():
         # ================================
         # 4. Ejecutar HU03 – Validación ME53N
         # ================================
-        archivos_validar = ["expSolped03.txt", "expSolped05.txt"]
+        archivos_validar = ["expSolped05.txt", "expSolped03.txt"]
 
         for archivo in archivos_validar:
             WriteLog(
