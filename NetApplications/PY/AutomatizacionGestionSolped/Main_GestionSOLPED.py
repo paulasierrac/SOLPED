@@ -42,7 +42,7 @@ def Main_GestionSolped():
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        EjecutarHU00()
+        # EjecutarHU00()
 
         # ================================
         # 2. Obtener sesión SAP
@@ -73,7 +73,7 @@ def Main_GestionSolped():
             path_log=RUTAS["PathLog"],
         )
 
-        EjecutarHU02(session)
+        # EjecutarHU02(session)
 
         WriteLog(
             mensaje="HU02 finalizada correctamente.",

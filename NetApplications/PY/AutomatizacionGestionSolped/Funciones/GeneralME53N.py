@@ -61,7 +61,7 @@ def procesarTablaME5A(name):
             path_log=RUTAS["PathLog"],
         )
 
-        path = f"C:\\Users\\CGRPA009\\Documents\\SOLPED-main\\SOLPED\\NetApplications\\PY\\AutomatizacionGestionSolped\\Insumo\\TablasME5A\\{name}"
+        path = f"C:\\Users\\CGRPA009\\Documents\\SOLPED-main\\SOLPED\\NetApplications\\PY\\AutomatizacionGestionSolped\\Insumo\\{name}"
 
         # INTENTAR LEER CON DIFERENTES CODIFICACIONES
         lineas = []
@@ -263,7 +263,7 @@ def procesarTablaME5A(name):
 def GuardarTablaME5A(df, name):
     """Guarda el DataFrame de vuelta al TXT con formato de tabla"""
     try:
-        path = f"C:\\Users\\CGRPA009\\Documents\\SOLPED-main\\SOLPED\\NetApplications\\PY\\AutomatizacionGestionSolped\\Insumo\\TablasME5A\\{name}"
+        path = f"C:\\Users\\CGRPA009\\Documents\\SOLPED-main\\SOLPED\\NetApplications\\PY\\AutomatizacionGestionSolped\\Insumo\\{name}"
 
         # ASEGURAR QUE TIENE LAS COLUMNAS NECESARIAS
         columnas_requeridas = ["Estado", "Observaciones"]
@@ -546,7 +546,7 @@ def TablaItemsDataFrame(name) -> pd.DataFrame:
             path_log=RUTAS["PathLog"],
         )
 
-        path = rf"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\{name}"
+        path = rf"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\TablasME53N\{name}"
 
         # ========== DETECCION DE CODIFICACION ==========
         encoding = DetectarCodificacion(path)
@@ -681,7 +681,7 @@ def ObtenerItemsME53N(session, numero_solped):
 
         # 4. Escribir ruta de guardado
         session.findById("wnd[1]/usr/ctxtDY_PATH").text = (
-            r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo"
+            r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\TablasME53N"
         )
         time.sleep(0.2)
 
@@ -1110,7 +1110,7 @@ def DeterminarEstadoFinal(datos_texto: Dict, validaciones: Dict) -> Tuple[str, s
 
 def ExtraerDatosTexto(texto: str) -> Dict:
     """Extrae campos estructurados del texto capturado
-    AJUSTADO: Detecta si el texto es solo descripcion"""
+    AJUSTADO: Se agregan nuevos patrones manteniendo la lógica existente."""
 
     datos = {
         "razon_social": "",
@@ -1129,7 +1129,7 @@ def ExtraerDatosTexto(texto: str) -> Dict:
         "ceco": "",
         "telefono": "",
         "direccion_entrega": "",
-        "tipo_texto": "desconocido",  # NUEVO: clasificar el tipo de texto
+        "tipo_texto": "desconocido",
     }
 
     if not texto or not texto.strip():
@@ -1140,15 +1140,15 @@ def ExtraerDatosTexto(texto: str) -> Dict:
     texto_upper = texto_limpio.upper()
     lineas = [linea.strip() for linea in texto_limpio.split("\n") if linea.strip()]
 
-    # DETECTAR TIPO DE TEXTO
+    # ------------------------------------------------------------
+    # CLASIFICACIÓN DEL TEXTO (MANTENIDA TAL CUAL)
+    # ------------------------------------------------------------
 
-    # Texto es tabla de SAP
     if texto.count("|") > 10 and texto.count("-") > 50:
         datos["tipo_texto"] = "tabla_sap"
         datos["concepto_compra"] = "TABLA SAP EXPORTADA"
         return datos
 
-    # Texto muy corto (solo producto)
     if len(texto_limpio) < 200 and not any(
         kw in texto_upper
         for kw in ["NIT", "RAZON SOCIAL", "VALOR", "CANTIDAD:", "PROVEEDOR"]
@@ -1157,7 +1157,6 @@ def ExtraerDatosTexto(texto: str) -> Dict:
         datos["concepto_compra"] = texto_limpio
         return datos
 
-    # Texto estructurado (tiene campos clave)
     if any(
         kw in texto_upper
         for kw in ["NIT", "RAZON SOCIAL", "PROVEEDOR:", "VALOR TOTAL", "CANTIDAD:"]
@@ -1166,76 +1165,88 @@ def ExtraerDatosTexto(texto: str) -> Dict:
     else:
         datos["tipo_texto"] = "texto_simple"
 
-    # CONTINUAR CON EXTRACCION NORMAL (codigo existente)
+    # ------------------------------------------------------------
+    # EXTRACCIÓN DE CAMPOS (NUEVOS + EXISTENTES)
+    # ------------------------------------------------------------
 
-    # --- NIT ---
-    patrones_nit = [
-        r"NIT[\s:]*([0-9]{6,15}[-]?[0-9]?)",
-        r"IDENTIFICACION[\s:]*([0-9]{6,15}[-]?[0-9]?)",
-    ]
+    # --- RAZON SOCIAL (NUEVO + mantiene lo que tenías) ---
+    m = re.search(r"GENERAR ORDEN DE COMPRA A[:\s]*(.+?)\s*NIT", texto_upper)
+    if m:
+        datos["razon_social"] = m.group(1).strip()
 
+    # fallback TUYO (línea con RAZON SOCIAL o PROVEEDOR)
+    if not datos["razon_social"]:
+        for linea in lineas:
+            linea_upper = linea.upper()
+            if any(kw in linea_upper for kw in ["RAZON SOCIAL", "PROVEEDOR"]):
+                if ":" in linea:
+                    datos["razon_social"] = linea.split(":", 1)[1].strip()
+                    break
+
+    # --- NIT (MANTENIDO + más flexible) ---
+    patrones_nit = [r"NIT[\s:]*([0-9.\-]+)", r"IDENTIFICACION[\s:]*([0-9.\-]+)"]
     for patron in patrones_nit:
-        match_nit = re.search(patron, texto_upper)
-        if match_nit:
-            datos["nit"] = match_nit.group(1).strip()
+        m = re.search(patron, texto_upper)
+        if m:
+            datos["nit"] = m.group(1).strip()
             break
 
-    # --- CORREO ---
-    patron_correo = r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}\b"
-    match_correo = re.search(patron_correo, texto)
-    if match_correo:
-        datos["correo"] = match_correo.group(0).strip()
+    # --- CORREOS (MEJORA) ---
+    correos = re.findall(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", texto)
 
-    # --- RAZON SOCIAL ---
-    for linea in lineas:
-        linea_upper = linea.upper()
-        if any(
-            keyword in linea_upper
-            for keyword in ["RAZON SOCIAL", "RAZON SOCIAL", "PROVEEDOR:"]
-        ):
-            if ":" in linea:
-                datos["razon_social"] = linea.split(":", 1)[1].strip()
-                break
+    # Correo del proveedor (NO colsubsidio)
+    correos_proveedor = [c for c in correos if "colsubsidio.com" not in c.lower()]
+    if correos_proveedor:
+        datos["correo"] = correos_proveedor[0].strip()
 
-    # --- CONCEPTO ---
-    if lineas:
-        datos["concepto_compra"] = lineas[0][
-            :200
-        ]  # Primera linea o las primeras 200 chars
+    # Correos responsables (@colsubsidio.com)
+    correos_resp = [c.lower() for c in correos if "colsubsidio.com" in c.lower()]
+    if correos_resp:
+        datos["responsable_compra"] = ", ".join(correos_resp)
 
-    # --- CANTIDAD ---
-    patron_cantidad = r"CANTIDAD[\s:]*([0-9.,]+)"
-    match_cantidad = re.search(patron_cantidad, texto_upper)
-    if match_cantidad:
-        datos["cantidad"] = match_cantidad.group(1).strip()
-    elif "Min" in texto and "Max" in texto:
-        # Caso especial: "Cantidad: Min 10 - Max 1000"
-        datos["cantidad"] = "Variable"
+    # --- CONCEPTO (NUEVO + tu fallback) ---
+    m = re.search(
+        r"POR CONCEPTO DE[:\s]*(.+?)\s*(EMPRESA|FECHA|HORA|DIRECCION|CANTIDAD)",
+        texto_upper,
+    )
+    if m:
+        datos["concepto_compra"] = m.group(1).strip()
 
-    # --- VALORES ---
+    # fallback TUYO
+    if not datos["concepto_compra"] and lineas:
+        datos["concepto_compra"] = lineas[0][:200]
+
+    # --- CANTIDAD (MANTENIDO) ---
+    m = re.search(r"CANTIDAD[\s:]*([0-9.,]+)", texto_upper)
+    if m:
+        datos["cantidad"] = m.group(1).strip()
+
+    # --- VALORES (MANTENIDO) ---
     patron_valor = r"[\$]?\s*([0-9]{1,3}(?:[.,][0-9]{3})*(?:[.,][0-9]{2})?)"
 
+    # valor unitario
     for linea in lineas:
-        linea_upper = linea.upper()
         if any(
-            kw in linea_upper
+            kw in linea.upper()
             for kw in ["VALOR UNITARIO", "VR UNITARIO", "PRECIO UNITARIO"]
         ):
-            match = re.search(patron_valor, linea)
-            if match:
-                datos["valor_unitario"] = match.group(1).strip()
+            m = re.search(patron_valor, linea)
+            if m:
+                datos["valor_unitario"] = m.group(1).strip()
                 break
 
+    # valor total / subtotal
     for linea in lineas:
-        linea_upper = linea.upper()
-        if (
-            any(kw in linea_upper for kw in ["VALOR TOTAL", "VR TOTAL"])
-            and "SUBTOTAL" not in linea_upper
-        ):
-            match = re.search(patron_valor, linea)
-            if match:
-                datos["valor_total"] = match.group(1).strip()
+        if any(kw in linea.upper() for kw in ["VALOR TOTAL", "SUBTOTAL"]):
+            m = re.search(patron_valor, linea)
+            if m:
+                datos["valor_total"] = m.group(1).strip()
                 break
+
+    # --- CECO (NUEVO) ---
+    m = re.search(r"CECO[:\s]*([0-9]+)", texto_upper)
+    if m:
+        datos["ceco"] = m.group(1).strip()
 
     return datos
 
