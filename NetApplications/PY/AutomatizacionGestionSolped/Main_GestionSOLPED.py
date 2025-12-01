@@ -45,13 +45,12 @@ def Main_GestionSOLPED():
             path_log=RUTAS["PathLog"],
         )
         print(">>> 5. Iniciando HU03…")
-        EjecutarHU03(session)
+        # Nombre del archivo de entrada
+        nombre_archivo = "expSolped03.txt"
+        EjecutarHU03(session, nombre_archivo)
+        nombre_archivo = "expSolped05.txt"
+        EjecutarHU03(session, nombre_archivo)
         print(">>> 6. HU03 Finalizada")
-        # WriteLog(activar_log=config["ActivarLog"],path_log=config["PathLog"],mensaje="Inicia HU02",estado="INFO")
-
-        # EjecutarHU02(config)
-
-        # WriteLog( activar_log=config["ActivarLog"],path_log=config["PathLog"],mensaje="Finaliza automatización",estado="INFO")
 
     except Exception as e:
         error_text = traceback.format_exc()

@@ -2,6 +2,10 @@ import win32com.client
 import time
 import pyautogui
 import subprocess
+import win32clipboard
+import pyperclip
+import win32gui
+import win32con
 
 
 def ObtenerSesionActiva():
@@ -16,80 +20,93 @@ def ObtenerSesionActiva():
         return None
 
 
+def ObtenerTextoDelPortapapeles():
+    """Obtener texto del portapapeles con manejo correcto de codificación"""
+    try:
+        # Abrir portapapeles
+        win32clipboard.OpenClipboard()
+        try:
+            # Obtener texto con CF_UNICODETEXT (maneja mejor caracteres especiales)
+            texto = win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)
+            return texto if texto else ""
+        finally:
+            win32clipboard.CloseClipboard()
+    except Exception as e:
+        print(f"Error al leer portapapeles: {e}")
+        return ""
+
+
+# ========== OPCIÓN 1: Usar pyautogui para simular Alt+Tab ==========
+def TraerSAPAlFrente_Opcion1():
+    """Usar Alt+Tab para traer SAP al frente"""
+    try:
+        pyautogui.hotkey("alt", "tab")
+        time.sleep(0.5)
+        print("✓ SAP traído al frente (Opción 1 - Alt+Tab)")
+    except Exception as e:
+        print(f"Error en Opción 4: {e}")
+
+
 session = ObtenerSesionActiva()
 
 if session:
     try:
 
-        ruta = r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped03.txt"
-        salida = r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\purch_req_unicos.txt"
-        # Leer archivo con codificación robusta
+        # Probar la opción más directa primero
+        TraerSAPAlFrente_Opcion1()
+
+        # 1) Obtener el objeto del editor
+        editor = session.findById(
+            "wnd[0]/usr/subSUB0:SAPLMEGUI:0015/"
+            "subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/"
+            "subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:3303/"
+            "tabsREQ_ITEM_DETAIL/tabpTABREQDT13/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/"
+            "subTEXTS:SAPLMMTE:0200/subEDITOR:SAPLMMTE:0201/"
+            "cntlTEXT_EDITOR_0201/shellcont/shell"
+        )
+
+        # 2) Asegurar que el editor tiene el foco
+        editor.SetFocus()
+        time.sleep(0.5)
+
+        # 3) Seleccionar TODO el texto
+        pyautogui.hotkey("ctrl", "a")
+        time.sleep(0.3)
+
+        # 4) Copiar al portapapeles
+        pyautogui.hotkey("ctrl", "c")
+        time.sleep(0.5)
+
+        # 5) Obtener texto del portapapeles con codificación correcta
+        texto_completo = ObtenerTextoDelPortapapeles()
+
+        # 6) Limpiar caracteres problemáticos si los hay
+        texto_limpio = texto_completo.encode("utf-8", errors="replace").decode("utf-8")
+
+        print("=" * 80)
+        print("TEXTO COMPLETO DEL EDITOR:")
+        print("=" * 80)
+        print(texto_limpio)
+        print("=" * 80)
+
+        # 7) Guardar en archivo con UTF-8 explícito
+        path = r"C:\Users\CGRPA009\Documents\texto_sap.txt"
         try:
-            texto = open(ruta, "r", encoding="utf-8").read()
-        except:
-            texto = open(ruta, "r", encoding="latin-1").read()
+            with open(path, "w", encoding="utf-8") as f:
+                f.write(texto_limpio)
+            print(f"\nArchivo guardado en: {path}")
+        except Exception as e:
+            print(f"Error al guardar archivo: {e}")
 
-        lineas = texto.splitlines()
+        # # 8) Restaurar posición (click al inicio)
+        # pyautogui.hotkey("ctrl", "Home")
+        # time.sleep(0.2)
 
-        tabla = []
+        # # 9) Deshacer la selección (click en algún lado)
+        # pyautogui.press("escape")
 
-        for linea in lineas:
-            # ignorar líneas de guiones
-            if linea.startswith("-") or linea.strip() == "":
-                continue
+        print("\nProceso completado correctamente.")
 
-            # separar las columnas por el caracter |
-            columnas = [col.strip() for col in linea.split("|") if col.strip() != ""]
-
-            tabla.append(columnas)
-
-        purch_reqs = []
-        # Mostrar tabla (lista de listas)
-        for fila in tabla:
-            purch_req = fila[0]
-            item = fila[1]
-            req_date = fila[2]
-            material = fila[3]
-            created_by = fila[4]
-            short_text = fila[5]
-            # print(purch_req)
-
-            purch_reqs.append(purch_req)
-
-        # 3. Quitar duplicados
-        purch_reqs_unicos = sorted(set(purch_reqs))  # ordenados y sin duplicados
-
-        # 4. Guardarlos en un TXT
-        with open(salida, "w", encoding="utf-8") as f:
-            for pr in purch_reqs_unicos:
-                f.write(pr + "\n")
-
-        print("Proceso completado.")
-        print("Total únicos:", len(purch_reqs_unicos))
-        print("Archivo generado:", salida)
-
-        # --------------------------------------Recorriendo Valores Unico----------------------------------------------------
-
-        ruta_unicos = r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\purch_req_unicos.txt"
-
-        with open(ruta_unicos, "r", encoding="utf-8") as f:
-            for linea in f:
-                numero_solped = linea.strip()
-                print("Procesando:", numero_solped)
-
-        # # 1) Obtener el objeto del editor
-        # editor = session.findById(
-        #     "wnd[0]/usr/subSUB0:SAPLMEGUI:0015/"
-        #     "subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/"
-        #     "subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:3303/"
-        #     "tabsREQ_ITEM_DETAIL/tabpTABREQDT13/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/"
-        #     "subTEXTS:SAPLMMTE:0200/subEDITOR:SAPLMMTE:0201/"
-        #     "cntlTEXT_EDITOR_0201/shellcont/shell"
-        # )
-
-        # # 1. Tomar el texto completo del editor
-        # texto = editor.text
-        # print(texto)
         # # 2. Guardarlo directamente en un archivo
         # path = r"C:\Users\CGRPA009\Documents\texto_sap.txt"
         # with open(path, "w", encoding="utf-8") as f:

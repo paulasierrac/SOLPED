@@ -31,4 +31,6 @@ SAP_CONFIG = {
 RUTAS = {
     "PathLog": get_env_variable("PATHLOG"),
     "PathLogError": get_env_variable("PATHLOGERROR"),
+    "PathResultados": get_env_variable("PATHRESULTADOS"),
+    "PathReportes": get_env_variable("PATHREPORTES"),
 }
