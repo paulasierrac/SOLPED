@@ -18,3 +18,5 @@ session.findById("wnd[0]/usr/pwdRSYST-BCODE").text = 'sT1f%4L*'
 session.findById("wnd[0]/usr/txtRSYST-LANGU").text = "ES"
 session.findById("wnd[0]").sendVKey(0)
 print(" Conectado correctamente a SAP.") 
+
+#     purebas commit 
