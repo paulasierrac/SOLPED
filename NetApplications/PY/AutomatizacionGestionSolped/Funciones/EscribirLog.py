@@ -12,7 +12,8 @@ import os
 import getpass
 import socket
 
-def WriteLog(mensaje: str, estado: str ,task_name: str, path_log: str):
+
+def WriteLog(mensaje: str, estado: str, task_name: str, path_log: str):
     """
     mensaje  : Texto del log
     estado   : INFO, DEBUG, WARN, ERROR
@@ -29,11 +30,20 @@ def WriteLog(mensaje: str, estado: str ,task_name: str, path_log: str):
     nombre_maquina = socket.gethostname()
     usuario = getpass.getuser()
 
-    # === Nombre del archivo por día ===
-    nombre_archivo = f"Log_{nombre_maquina}_{usuario}_{fecha_archivo}.log"
+    # ------------------------------------------------------------------
+    # 1. Determinar si path_log es carpeta o archivo
+    # ------------------------------------------------------------------
+    base, extension = os.path.splitext(path_log)
 
-    # === Construcción de ruta completa ===
-    ruta_archivo = os.path.join(path_log, nombre_archivo)
+    if extension:
+        # → es un archivo: "C:/.../error.log"
+        carpeta_logs = os.path.dirname(path_log)
+        ruta_archivo = path_log
+    else:
+        # → es carpeta: "C:/.../Logs"
+        carpeta_logs = path_log
+        nombre_archivo = f"Log_{nombre_maquina}_{usuario}_{fecha_archivo}.log"
+        ruta_archivo = os.path.join(carpeta_logs, nombre_archivo)
 
     # === Asegurar que la carpeta existe ===
     os.makedirs(path_log, exist_ok=True)

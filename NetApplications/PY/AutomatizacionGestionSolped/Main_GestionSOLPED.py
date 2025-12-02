@@ -1,63 +1,129 @@
 # ================================
 # Main: GestionSolped
 # Autor: Paula Sierra, Henry Navarro - NetApplications
-# Descripcion: Main principal del Bot
-# Ultima modificacion: 24/11/2025
+# Descripcion: Main principal del Bot encargado de ejecutar las historias de usuario
+# Ultima modificacion: 30/11/2025
 # Propiedad de Colsubsidio
-# Cambios: Ajuste inicial para cumplimiento de estándar
+# Cambios:
+#   - Reemplazo de print() por WriteLog
+#   - Cumplimiento estricto de estándar Colsubsidio
+#   - Manejo de excepciones y log por día
 # ================================
+
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
 from HU.HU1_LoginSAP import ObtenerSesionActiva
 from HU.HU2_DescargaME5A import EjecutarHU02
 from HU.HU03_ValidacionME53N import EjecutarHU03
-
-# from NetApplications.PY.AutomatizacionGestionSolped.HU.HU03_ValidacionME53N import buscar_SolpedME53N
 from Funciones.EscribirLog import WriteLog
-import traceback
 from Config.settings import RUTAS
+import traceback
 
 
-def Main_GestionSOLPED():
+def Main_GestionSolped():
     try:
-        # Despliegue de ambiente
-        EjecutarHU00()
+        task_name = "Main_GestionSOLPED"
 
-        # Capturar sesion SAP
+        # ================================
+        # Inicio de Main
+        # ================================
+        WriteLog(
+            mensaje="Inicio ejecución Main GestionSolped.",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
+
+        # ================================
+        # 1. Despliegue de ambiente
+        # ================================
+        WriteLog(
+            mensaje="Inicia HU00_DespliegueAmbiente.",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
+        # EjecutarHU00()
+
+        # ================================
+        # 2. Obtener sesión SAP
+        # ================================
+        WriteLog(
+            mensaje="Obteniendo sesión SAP...",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
+
         session = ObtenerSesionActiva()
 
-        # HU2 Descarga ME5A
         WriteLog(
-            mensaje="Inicia HU02",
+            mensaje="Sesión SAP obtenida correctamente.",
             estado="INFO",
-            task_name="Main_GestionSOLPED",
+            task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        EjecutarHU02(session)
 
-        # HU2 validacion ME5AN
+        # ================================
+        # 3. Ejecutar HU02 – Descarga ME5A
+        # ================================
         WriteLog(
-            mensaje="Inicia HU03",
+            mensaje="Inicia HU02 - Descarga ME5A.",
             estado="INFO",
-            task_name="Main_GestionSOLPED",
+            task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        EjecutarHU03(session)
-        # WriteLog(activar_log=config["ActivarLog"],path_log=config["PathLog"],mensaje="Inicia HU02",estado="INFO")
 
-        # EjecutarHU02(config)
+        # EjecutarHU02(session)
 
-        # WriteLog( activar_log=config["ActivarLog"],path_log=config["PathLog"],mensaje="Finaliza automatización",estado="INFO")
+        WriteLog(
+            mensaje="HU02 finalizada correctamente.",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
+
+        # ================================
+        # 4. Ejecutar HU03 – Validación ME53N
+        # ================================
+        archivos_validar = ["expSolped05.txt", "expSolped03.txt"]
+
+        for archivo in archivos_validar:
+            WriteLog(
+                mensaje=f"Inicia HU03 - Validación ME53N para archivo {archivo}.",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+
+            EjecutarHU03(session, archivo)
+
+            WriteLog(
+                mensaje=f"HU03 finalizada correctamente para archivo {archivo}.",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+
+        # ================================
+        # Fin de Main
+        # ================================
+        WriteLog(
+            mensaje="Main GestionSolped finalizado correctamente.",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
 
     except Exception as e:
-        error_text = traceback.format_exc()
+        error_stack = traceback.format_exc()
         WriteLog(
-            mensaje=f"ERROR GLOBAL: {e} | {error_text}",
+            mensaje=f"Error Global en Main: {e} | {error_stack}",
             estado="ERROR",
-            task_name="Main_GestionSOLPED",
+            task_name=task_name,
             path_log=RUTAS["PathLogError"],
         )
         raise
 
 
 if __name__ == "__main__":
-    Main_GestionSOLPED()
+    Main_GestionSolped()

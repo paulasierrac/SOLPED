@@ -3,24 +3,20 @@
 import os
 from dotenv import load_dotenv
 
-# Cargar variables desde .env
+# Cargar .env
 load_dotenv()
 
 
 def get_env_variable(key: str, required: bool = True):
-    """
-    Obtiene una variable de entorno. 
-    Si `required=True` y no existe, lanza un error más claro.
-    """
     value = os.getenv(key)
 
     if required and not value:
-        raise EnvironmentError(f"La variable de entorno '{key}' no está definida en el archivo .env")
+        raise EnvironmentError(f"La variable '{key}' no está definida en .env")
 
     return value
 
 
-# === Configuración SAP ===
+# ========= CONFIG SAP ==========
 SAP_CONFIG = {
     "user": get_env_variable("SAP_USUARIO"),
     "password": get_env_variable("SAP_PASSWORD"),
@@ -31,7 +27,10 @@ SAP_CONFIG = {
 }
 
 
+# ========= RUTAS =========
 RUTAS = {
     "PathLog": get_env_variable("PATHLOG"),
-    "PathLogError": get_env_variable("PATHLOGERROR")
+    "PathLogError": get_env_variable("PATHLOGERROR"),
+    "PathResultados": get_env_variable("PATHRESULTADOS"),
+    "PathReportes": get_env_variable("PATHREPORTES"),
 }
