@@ -20,6 +20,236 @@ import pyautogui
 import chardet
 from datetime import datetime
 from typing import Dict, List, Tuple
+import smtplib
+import os
+from Funciones.EmailSender import EmailSender
+from typing import List, Union
+
+
+def NotificarRevisionManualSolped(
+    destinatarios: Union[str, List[str]],
+    numero_solped: Union[int, str],
+    validaciones: str,
+    task_name: str = "RevisionManualSolped",
+) -> bool:
+    """
+    Envía una notificación de revisión manual para un SOLPED específico,
+    formateando automáticamente el asunto y el cuerpo.
+
+    Args:
+        destinatarios: Un email (str) o una lista de emails (List[str]).
+        numero_solped: El número de la solicitud de pedido (SOLPED).
+        validaciones: Texto que contiene las razones de la validación.
+        task_name: Nombre de la tarea para los logs.
+
+    Returns:
+        bool: True si el envío fue exitoso, False en caso contrario.
+    """
+
+    # 1. Preparar el Asunto
+    asunto_template = f"El Solped {numero_solped} Necesita revisión manual"
+
+    # 2. Preparar el Cuerpo del Mensaje (Formato HTML)
+    cuerpo_template = f"""
+        <html>
+            <body style="font-family: Arial, sans-serif;">
+                <h2 style="color: #CC0000;">⚠️ Solicitud de Revisión Manual Requerida</h2>
+                <p>El Solped <strong>{numero_solped}</strong> necesita ser validado por las siguientes razones:</p>
+                
+                <div style="border: 1px solid #ddd; padding: 15px; margin: 15px 0; background-color: #f9f9f9;">
+                    <p style="white-space: pre-wrap;">{validaciones}</p>
+                </div>
+
+                <p>Por favor, ingrese al sistema para realizar las correcciones o ajustes necesarios.</p>
+                <br>
+                <p>Atentamente,<br>Sistema de Notificaciones</p>
+            </body>
+        </html>
+    """
+
+    # Asegurar que destinatarios sea una lista si viene como string
+    if isinstance(destinatarios, str):
+        destinatario_principal = destinatarios
+        cc_list = None
+    else:
+        # Usamos el primer elemento como destinatario principal y el resto como CC (o podrías ajustar esta lógica)
+        if destinatarios:
+            destinatario_principal = destinatarios[0]
+            cc_list = destinatarios[1:] if len(destinatarios) > 1 else None
+        else:
+            # Manejar el caso de lista vacía si fuera necesario
+            print("Error: La lista de destinatarios está vacía.")
+            return False
+
+    # 3. Llamar a la función de envío personalizada
+    return EnviarCorreoPersonalizado(
+        destinatario=destinatario_principal,
+        asunto=asunto_template,
+        cuerpo=cuerpo_template,
+        task_name=task_name,
+        cc=cc_list,
+        adjuntos=None,  # No se esperan adjuntos para esta notificación
+    )
+
+
+def EnviarNotificacionCorreo(
+    codigo_correo: int, task_name: str = "Notificacion", adjuntos: list = None
+):
+    """
+    Envía notificaciones por correo según el código especificado
+
+    Args:
+        codigo_correo: Código del correo a enviar (1=Inicio, 2=Éxito, 3=Error, etc.)
+        task_name: Nombre de la tarea para logs
+        adjuntos: Lista de rutas de archivos a adjuntar (opcional)
+
+    Returns:
+        bool: True si se envió correctamente, False en caso contrario
+    """
+    try:
+        WriteLog(
+            mensaje=f"Enviando notificación con código {codigo_correo}...",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
+
+        # Log de adjuntos si existen
+        if adjuntos:
+            WriteLog(
+                mensaje=f"Adjuntos a enviar: {', '.join(adjuntos)}",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+
+        # Crear EmailSender con configuración por defecto
+        sender = EmailSender()
+
+        # Enviar correo según código con adjuntos
+        resultados = sender.procesar_excel_y_enviar(
+            archivo_excel=RUTAS.get(
+                "ArchivoCorreos",
+                r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\EnvioCorreos.xlsx",
+            ),
+            codigo_correo=codigo_correo,
+            columna_codigo="codemailparameter",
+            columna_destinatario="toemailparameter",  # Nombre correcto
+            columna_asunto="asuntoemailparameter",  # Nombre correcto
+            columna_cuerpo="bodyemailparameter",  # Nombre correcto
+            columna_cc="ccemailparameter",  # Nombre correcto
+            columna_bcc="bccemailparameter",  # Nombre correcto
+            adjuntos_dinamicos=adjuntos,
+        )
+
+        if resultados["exitosos"] > 0:
+            WriteLog(
+                mensaje=f"Notificación enviada correctamente. Exitosos: {resultados['exitosos']}",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+            return True
+        else:
+            WriteLog(
+                mensaje=f"No se pudo enviar la notificación. Fallidos: {resultados['fallidos']}",
+                estado="WARNING",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+            return False
+
+    except Exception as e:
+        error_stack = traceback.format_exc()
+        WriteLog(
+            mensaje=f"Error al enviar notificación: {e} | {error_stack}",
+            estado="ERROR",
+            task_name=task_name,
+            path_log=RUTAS["PathLogError"],
+        )
+        return False
+
+
+def EnviarCorreoPersonalizado(
+    destinatario: str,
+    asunto: str,
+    cuerpo: str,
+    task_name: str = "EnvioPersonalizado",
+    adjuntos: list = None,
+    cc: list = None,
+    bcc: list = None,
+) -> bool:
+    """
+    Envía un correo electrónico con estructura personalizada, sin usar el Excel de correos.
+
+    Args:
+        destinatario: Email del destinatario (cadena de texto).
+        asunto: Asunto del correo (cadena de texto).
+        cuerpo: Cuerpo del mensaje (puede ser HTML).
+        task_name: Nombre de la tarea para logs.
+        adjuntos: Lista de rutas de archivos a adjuntar (opcional).
+        cc: Lista de correos en copia (opcional).
+        bcc: Lista de correos en copia oculta (opcional).
+
+    Returns:
+        bool: True si se envió correctamente, False en caso contrario.
+    """
+    try:
+        WriteLog(
+            mensaje=f"Preparando envío personalizado para {destinatario}...",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
+
+        # Log de adjuntos
+        if adjuntos:
+            WriteLog(
+                mensaje=f"Adjuntos a enviar: {', '.join(adjuntos)}",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+
+        # Crear EmailSender con configuración por defecto
+        sender = EmailSender()
+
+        # Llamar al método de envío directo de la clase EmailSender
+        exito = sender.enviar_correo(
+            destinatario=destinatario,
+            asunto=asunto,
+            cuerpo=cuerpo,
+            cc=cc,
+            bcc=bcc,
+            adjuntos=adjuntos,
+        )
+
+        if exito:
+            WriteLog(
+                mensaje=f"Correo personalizado enviado exitosamente a {destinatario}.",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+            return True
+        else:
+            WriteLog(
+                mensaje=f"Fallo al enviar el correo personalizado a {destinatario}.",
+                estado="WARNING",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+            return False
+
+    except Exception as e:
+        error_stack = traceback.format_exc()
+        WriteLog(
+            mensaje=f"Error fatal en el envío personalizado: {e} | {error_stack}",
+            estado="ERROR",
+            task_name=task_name,
+            path_log=RUTAS["PathLogError"],
+        )
+        return False
 
 
 def TraerSAPAlFrente_Opcion():

@@ -6,6 +6,7 @@
 # Propiedad de Colsubsidio
 # Cambios: (Si Aplica)
 # ============================================
+import pyautogui
 import win32com.client
 import time
 import os
@@ -85,7 +86,7 @@ def DescargarSolpedME5A(session, estado):
 
     # Exportar
     session.findById("wnd[0]/tbar[1]/btn[45]").press()
-
+    time.sleep(5)
     # ============================
     # Guardar archivo
     # ============================
@@ -107,7 +108,9 @@ def DescargarSolpedME5A(session, estado):
 
     session.findById("wnd[0]").sendVKey(12)
     time.sleep(0.5)
-
+    pyautogui.press("f3")
+    time.sleep(0.5)
+    pyautogui.press("f12")
     print(
         f"Archivo exportado correctamente: {ruta_guardar}"
     )  # luego reemplazar con WriteLog
