@@ -2,9 +2,13 @@
 
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
 # Cargar .env
 load_dotenv()
+
+# Ruta base del proyecto
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 
 def get_env_variable(key: str, required: bool = True):
@@ -33,4 +37,23 @@ RUTAS = {
     "PathLogError": get_env_variable("PATHLOGERROR"),
     "PathResultados": get_env_variable("PATHRESULTADOS"),
     "PathReportes": get_env_variable("PATHREPORTES"),
+    # Archivo de configuración de correos
+    "ArchivoCorreos": os.path.join(BASE_DIR, "Insumo", "EnvioCorreos.xlsx"),
+    # Rutas de archivos
+    "PathInsumos": os.path.join(BASE_DIR, "Insumo"),
+    "PathSalida": os.path.join(BASE_DIR, "Salida"),
+    "PathTemp": os.path.join(BASE_DIR, "Temp"),
+    "PathResultado": os.path.join(BASE_DIR, "Resultado"),
 }
+
+# Crear carpetas si no existen
+for key, path in RUTAS.items():
+    if key.startswith("Path") and key not in [
+        "PathLog",
+        "PathLogError",
+        "ArchivoCorreos",
+    ]:
+        os.makedirs(path, exist_ok=True)
+
+# Crear carpeta de logs
+os.makedirs(os.path.dirname(RUTAS["PathLog"]), exist_ok=True)

@@ -1,135 +1,302 @@
 
-=====Solped: 1300139306 Item: 10 Registro: 2025-11-30 22:40:57 =====
+=====Solped: 50988227 Item: 10 Registro: 2025-12-04 21:38:38 =====
+# ================================
+# Main: GestionSolped
+# Autor: Paula Sierra, Henry Navarro - NetApplications
+# Descripcion: Main principal del Bot encargado de ejecutar las historias de usuario
+# Ultima modificacion: 30/11/2025
+# Propiedad de Colsubsidio
+# Cambios:
+#   - Reemplazo de print() por WriteLog
+#   - Cumplimiento estricto de estándar Colsubsidio
+#   - Manejo de excepciones y log por día
+# ================================
+
+from HU.HU00_DespliegueAmbiente import EjecutarHU00
+from HU.HU1_LoginSAP import ObtenerSesionActiva
+from HU.HU2_DescargaME5A import EjecutarHU02
+from HU.HU03_ValidacionME53N import EjecutarHU03
+from Funciones.EscribirLog import WriteLog
+from Funciones.GeneralME53N import (
+    EnviarNotificacionCorreo,
+    EnviarCorreoPersonalizado,
+    NotificarRevisionManualSolped,
+)
+from Config.settings import RUTAS
+import traceback
+
+
+def Main_GestionSolped():
+    try:
+        task_name = "Main_GestionSOLPED"
+
+        # ================================
+        # Inicio de Main
+        # ================================
+        WriteLog(
+            mensaje="Inicio ejecución Main GestionSolped.",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
+
+        # # Enviar correo de inicio (código 1)
+        # # EnviarNotificacionCorreo(codigo_correo=1, task_name=task_name)
+        # archivo_descargado = rf"{RUTAS['PathReportes']}/Reporte_1300139268_10.txt"
+        # # Enviar correo de inicio (código 2 adjunto)
+        # EnviarNotificacionCorreo(
+        #     codigo_correo=54, task_name=task_name, adjuntos=[archivo_descargado]
+        # )
+
+        # exito_personalizado = EnviarCorreoPersonalizado(
+        #     destinatario="soporte_critico@netapplications.com.co",
+        #     asunto="Alerta Crítica: El servicio X ha fallado",
+        #     cuerpo=(
+        #         "<h1>Error Inesperado</h1>"
+        #         "<p>El proceso de sincronización ha fallado en la etapa de validación de datos.</p>"
+        #         "<p><strong>Revisar logs en:</strong> \\\\servidor\\logs\\errores.txt</p>"
+        #     ),
+        #     task_name=task_name,
+        #     adjuntos=["C:/Archivos/log_error_20251204.txt"],
+        #     cc=["paula.sierra@netapplications.com.co"],
+        # )
+
+        # if exito_personalizado:
+        #     print(f"Notificación enviada exitosamente exito_personalizado.")
+        # else:
+        #     print(f"Fallo al enviar la notificación exito_personalizado.")
+
+        # NUMERO_SOLPED = "8000012345"
+        # DESTINOS = ["usuario.revision@empresa.com", "supervisor@empresa.com"]
+        # RAZONES_VALIDACION = (
+        #     "1. El centro de costo asignado no es válido para el tipo de material.\n"
+        #     "2. La cantidad solicitada supera el límite sin aprobación especial."
+        # )
+
+        # # Llamada a la función
+        # exito_notificacion = NotificarRevisionManualSolped(
+        #     destinatarios=DESTINOS,
+        #     numero_solped=NUMERO_SOLPED,
+        #     validaciones=RAZONES_VALIDACION,
+        # )
+
+        # exito_notificacion = NotificarRevisionManualSolped(
+        #     destinatarios=["usuario.revision@empresa.com", "supervisor@empresa.com"],
+        #     numero_solped="8000012345",
+        #     validaciones=(
+        #         "1. El centro de costo asignado no es válido para el tipo de material.\n"
+        #         "2. La cantidad solicitada supera el límite sin aprobación especial."
+        #     ),
+        # )
+
+        # if exito_notificacion:
+        #     print(f"Notificación enviada exitosamente para SOLPED {NUMERO_SOLPED}.")
+        # else:
+        #     print(f"Fallo al enviar la notificación para SOLPED {NUMERO_SOLPED}.")
+        # ================================
+        # 1. Despliegue de ambiente
+        # ================================
+        WriteLog(
+            mensaje="Inicia HU00_DespliegueAmbiente.",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
+        # EjecutarHU00()
+
+        # ================================
+        # 2. Obtener sesión SAP
+        # ================================
+        WriteLog(
+            mensaje="Obteniendo sesión SAP...",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
+
+        session = ObtenerSesionActiva()
+
+        WriteLog(
+            mensaje="Sesión SAP obtenida correctamente.",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
+
+        # ================================
+        # 3. Ejecutar HU02 – Descarga ME5A
+        # ================================
+        WriteLog(
+            mensaje="Inicia HU02 - Descarga ME5A.",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
+
+        # EjecutarHU02(session)
+
+        WriteLog(
+            mensaje="HU02 finalizada correctamente.",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
+
+        # ================================
+        # 4. Ejecutar HU03 – Validación ME53N
+        # ================================
+        archivos_validar = ["expSolped05.txt", "expSolped03.txt"]
+
+        for archivo in archivos_validar:
+            WriteLog(
+                mensaje=f"Inicia HU03 - Validación ME53N para archivo {archivo}.",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+
+            EjecutarHU03(session, archivo)
+
+            WriteLog(
+                mensaje=f"HU03 finalizada correctamente para archivo {archivo}.",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+
+        # Notificación de finalización HU02 con archivo descargado (código 2)
+
+        # ================================
+        # Fin de Main
+        # ================================
+        WriteLog(
+            mensaje="Main GestionSolped finalizado correctamente.",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
+
+    except Exception as e:
+        error_stack = traceback.format_exc()
+        WriteLog(
+            mensaje=f"Error Global en Main: {e} | {error_stack}",
+            estado="ERROR",
+            task_name=task_name,
+            path_log=RUTAS["PathLogError"],
+        )
+        raise
+
+
+if __name__ == "__main__":
+    Main_GestionSolped()
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139338 Item: 10 Registro: 2025-12-04 21:38:50 =====
+Cristal O Brisa 600 Ml
+--------------------------------------------------------------------------------
+
+=====Solped: 50988227 Item: 10 Registro: 2025-12-04 21:47:34 =====
+caso 1
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139338 Item: 10 Registro: 2025-12-04 21:47:46 =====
+Cristal O Brisa 600 Ml
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139306 Item: 10 Registro: 2025-12-04 21:57:50 =====
 Lunes A Viernes De  6Pm A 10Pm
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139306 Item: 20 Registro: 2025-11-30 22:41:06 =====
+=====Solped: 1300139306 Item: 20 Registro: 2025-12-04 21:57:53 =====
 Lunes A Viernes De 6Pm A 10Pm
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139306 Item: 10 Registro: 2025-11-30 22:51:32 =====
-Lunes A Viernes De  6Pm A 10Pm
---------------------------------------------------------------------------------
-
-=====Solped: 1300139306 Item: 20 Registro: 2025-11-30 22:51:41 =====
-Lunes A Viernes De 6Pm A 10Pm
---------------------------------------------------------------------------------
-
-=====Solped: 1300139306 Item: 30 Registro: 2025-11-30 22:51:49 =====
+=====Solped: 1300139306 Item: 30 Registro: 2025-12-04 21:57:56 =====
 Azúcar Refinada Incauca, Gelatina Vegetal
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139306 Item: 40 Registro: 2025-11-30 22:51:58 =====
+=====Solped: 1300139306 Item: 40 Registro: 2025-12-04 21:57:59 =====
 Maíz Pira Pop Corn, Sal Refisal .
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139306 Item: 50 Registro: 2025-11-30 22:52:07 =====
+=====Solped: 1300139306 Item: 50 Registro: 2025-12-04 21:58:02 =====
 Pincho Con Fresas Maxi, Masmelos Mellos,  Cobertura De
 Chocolate M&M Chispitas De Colores
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139306 Item: 60 Registro: 2025-11-30 22:52:15 =====
+=====Solped: 1300139306 Item: 60 Registro: 2025-12-04 21:58:05 =====
 Pan Bimbo, Carne Zenú, Lechuga, Tomate, Queso, Salsas
 Frico: Tomate Mayonesa ,Mostaza Y Piña
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139294 Item: 10 Registro: 2025-11-30 22:52:40 =====
-Azúcar Refinada Incauca, Gelatina Vegetal
-Azúcar Refinada Incauca, Gelatina Vegetal
-Azúcar Refinada Incauca, Gelatina Vegetal
-Azúcar Refinada Incauca, Gelatina Vegetal
-Azúcar Refinada Incauca, Gelatina Vegetal
-Azúcar Refinada Incauca, Gelatina Vegetal
-Azúcar Refinada Incauca, Gelatina Vegetal
---------------------------------------------------------------------------------
-
-=====Solped: 1300139294 Item: 20 Registro: 2025-11-30 22:52:49 =====
-Maíz Pira Pop Corn, Sal Refisal .
-Maíz Pira Pop Corn, Sal Refisal .
-Maíz Pira Pop Corn, Sal Refisal .
-Maíz Pira Pop Corn, Sal Refisal .
-Maíz Pira Pop Corn, Sal Refisal .
-Maíz Pira Pop Corn, Sal Refisal .
---------------------------------------------------------------------------------
-
-=====Solped: 1300139294 Item: 30 Registro: 2025-11-30 22:52:58 =====
-Pincho Con Fresas Maxi, Masmelos Mellos,  Cobertura De
-Chocolate M&M Chispitas De Colores
-Pincho Con Fresas Maxi, Masmelos Mellos,  Cobertura De
-Chocolate M&M Chispitas De Colores
-Pincho Con Fresas Maxi, Masmelos Mellos,  Cobertura De
-Chocolate M&M Chispitas De Colores
-Pincho Con Fresas Maxi, Masmelos Mellos,  Cobertura De
-Chocolate M&M Chispitas De Colores
-Pincho Con Fresas Maxi, Masmelos Mellos,  Cobertura De
-Chocolate M&M Chispitas De Colores
---------------------------------------------------------------------------------
-
-=====Solped: 1300139294 Item: 40 Registro: 2025-11-30 22:53:07 =====
-Tortilla Bimbo,Carne Zenú, Lechuga, Tomate, Queso, Salsas
-Frico: Tomate, Mayonesa ,Mostaza Y Piña
---------------------------------------------------------------------------------
-
-=====Solped: 1300139294 Item: 50 Registro: 2025-11-30 22:53:16 =====
-Lunes A Viernes De  6Pm A 10Pm
-Lunes A Viernes De  6Pm A 10Pm
---------------------------------------------------------------------------------
-
-=====Solped: 1300139294 Item: 60 Registro: 2025-11-30 22:53:24 =====
-Salchicha Lunch De Zenú. Pan Bimbo Salsas Fruco: Tomate ,
-Mayonesa Mostaza , Piña Papas Y Queso.
-Salchicha Lunch De Zenú. Pan Bimbo Salsas Fruco: Tomate ,
-Mayonesa Mostaza , Piña Papas Y Queso.
-Salchicha Lunch De Zenú. Pan Bimbo Salsas Fruco: Tomate ,
-Mayonesa Mostaza , Piña Papas Y Queso.
-Salchicha Lunch De Zenú. Pan Bimbo Salsas Fruco: Tomate ,
-Mayonesa Mostaza , Piña Papas Y Queso.
---------------------------------------------------------------------------------
-
-=====Solped: 1300139294 Item: 70 Registro: 2025-11-30 22:53:33 =====
-Jugos Coca- Cola  O Hit( Sabores Surtidos)
-Jugos Coca- Cola  O Hit( Sabores Surtidos)
-Jugos Coca- Cola  O Hit( Sabores Surtidos)
---------------------------------------------------------------------------------
-
-=====Solped: 1300139294 Item: 80 Registro: 2025-11-30 22:53:42 =====
-Lunes A Viernes De 6Pm A 10Pm
---------------------------------------------------------------------------------
-
-=====Solped: 1300139304 Item: 10 Registro: 2025-11-30 22:54:07 =====
-Jugos Coca- Cola  O Hit( Sabores Surtidos)
---------------------------------------------------------------------------------
-
-=====Solped: 1300139304 Item: 20 Registro: 2025-11-30 22:54:16 =====
-Lunes A Viernes De  6Pm A 10Pm
---------------------------------------------------------------------------------
-
-=====Solped: 1300139305 Item: 10 Registro: 2025-11-30 22:54:41 =====
-Azúcar Refinada Incauca, Gelatina Vegetal
---------------------------------------------------------------------------------
-
-=====Solped: 1300139305 Item: 20 Registro: 2025-11-30 22:54:50 =====
-Maíz Pira Pop Corn, Sal Refisal .
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 10 Registro: 2025-11-30 22:57:01 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
+=====Solped: 1300139268 Item: 10 Registro: 2025-12-04 22:11:15 =====
+SE SOLICITA GENERAR ORDEN DE COMPRA  A:
+PROVEEDOR: EL PROFE ULLOA SAS
+NIT: 900923601
+CORREO gerencia@elprofeulloa.com
+POR CONCEPTO DE: SERVICIO DE VEEDURIA 4 HORAS ;
+CON CORTE AL 25 DE FEBRERO
 
-POR CONCEPTO DE: UNIFORMES DE FÚTBOL 5 FEMENINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
 
-SE ADJUNTA COTIZACION*
+VALOR UNITARIO: $ 93.814
+CANTIDAD: 1
+SUBTOTAL: $ 93.814
+IVA: $ 17.824
+TOTAL: $ 111.638
 
-CANTIDAD:                             15
-VALOR UNITARIO:              $    99.000
-SUBTOTAL:                    $ 1.485.000
-VALOR TOTAL+ IVA 19%         $ 1.767.150
+UES: ASESORIAS # 4
+CENTRO DE COSTO: 302040023
+COORDINADOR: LAURA GISELLA ALVAREZ HIGUITA (As)
+CORREO COORDINADOR laura.alvarezh@colsubsidio.com
 
+ELABORA KAREN MATIZ
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139268 Item: 20 Registro: 2025-12-04 22:11:19 =====
+SE SOLICITA GENERAR ORDEN DE COMPRA  A:
+PROVEEDOR: EL PROFE ULLOA SAS
+NIT: 900923601
+CORREO gerencia@elprofeulloa.com
+POR CONCEPTO DE: SERVICIO DE VEEDURIA 5 HORAS ;
+CON CORTE AL 25 DE FEBRERO
+
+
+VALOR UNITARIO: $ 105.361
+CANTIDAD: 2
+SUBTOTAL: $ 210.722
+IVA: $ 40.037
+TOTAL: $ 250.759
+
+UES: ASESORIAS # 4
+CENTRO DE COSTO: 302040023
+COORDINADOR: LAURA GISELLA ALVAREZ HIGUITA (As)
+CORREO COORDINADOR laura.alvarezh@colsubsidio.com
+
+ELABORA KAREN MATIZ
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139269 Item: 10 Registro: 2025-12-04 22:11:35 =====
+GENERAR ORDEN DE COMPRA A:
+
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO: PAR MANCUERNAS DE 5 LB encauchetadas
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
+
+
+SE ADJUNTA COTIZACIÓN -
+
+CANTIDAD:                       1
+VALOR UNITARIO :          $ 80.000
+VALOR SUBTOTAL :          $ 80.000
+VALOR TOTAL  + 19% IVA    $ 95.200
 
 CECO:302040023
 COORDINADOR: LAURA ALVAREZ
@@ -138,25 +305,51 @@ CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarez
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139267 Item: 20 Registro: 2025-11-30 22:57:07 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
+=====Solped: 1300139269 Item: 20 Registro: 2025-12-04 22:11:40 =====
+GENERAR ORDEN DE COMPRA A:
 
-POR CONCEPTO DE: UNIFORMES DE ARQUERO , BUZO Y PANTALONETA FÚTBOL 5 FEMENINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO:PAR MANCUERNAS DE 10LB encauchetadas
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
 
 
-SE ADJUNTA COTIZACION*
+SE ADJUNTA COTIZACIÓN -
 
-CANTIDAD:                             2
-VALOR UNITARIO:              $  115.000
-SUBTOTAL:                    $  230.000
-VALOR TOTAL+ IVA 19%         $  273.700
+CANTIDAD:                         1
+VALOR UNITARIO :          $ 160.000
+VALOR SUBTOTAL :          $ 160.000
+VALOR TOTAL  + 19% IVA    $ 190.400
 
+CECO:302040023
+COORDINADOR: LAURA ALVAREZ
+PROMOTOR: SMTM
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139269 Item: 30 Registro: 2025-12-04 22:11:44 =====
+GENERAR ORDEN DE COMPRA A:
+
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO: PAR MANCUERNAS 2.5 kg hexagonal con barra cromadas
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
+
+
+SE ADJUNTA COTIZACIÓN -
+
+CANTIDAD:                       1
+VALOR UNITARIO :          $ 80.000
+VALOR SUBTOTAL :          $ 80.000
+VALOR TOTAL  + 19% IVA    $ 95.200
 
 CECO:302040023
 COORDINADOR: LAURA ALVAREZ
@@ -165,24 +358,217 @@ CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarez
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139267 Item: 30 Registro: 2025-11-30 22:57:10 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
+=====Solped: 1300139269 Item: 40 Registro: 2025-12-04 22:11:49 =====
+GENERAR ORDEN DE COMPRA A:
 
-POR CONCEPTO DE:  SUDADERAS MATERIAL FASTRACK FÚTBOL 5 FEMENINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO: PAR MANCUERNAS 5 kg hexagonal con barra cromadas
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
 
-SE ADJUNTA COTIZACION*
 
-CANTIDAD:                             17
-VALOR UNITARIO:              $   172.000
-SUBTOTAL:                    $ 2.924.000
-VALOR TOTAL+ IVA 19%         $ 3.479.560
+SE ADJUNTA COTIZACIÓN -
 
+CANTIDAD:                         1
+VALOR UNITARIO :          $ 150.000
+VALOR SUBTOTAL :          $ 150.000
+VALOR TOTAL  + 19% IVA    $ 178.500
+
+CECO:302040023
+COORDINADOR: LAURA ALVAREZ
+PROMOTOR: SMTM
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139269 Item: 50 Registro: 2025-12-04 22:11:53 =====
+GENERAR ORDEN DE COMPRA A:
+
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO: colchoneta 100x50x3cm de gym
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
+
+
+SE ADJUNTA COTIZACIÓN -
+
+CANTIDAD:                        3
+VALOR UNITARIO :          $  69.000
+VALOR SUBTOTAL :          $ 207.000
+VALOR TOTAL  + 19% IVA    $ 246.330
+
+CECO:302040023
+COORDINADOR: LAURA ALVAREZ
+PROMOTOR: SMTM
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139269 Item: 60 Registro: 2025-12-04 22:11:58 =====
+GENERAR ORDEN DE COMPRA A:
+
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO: kit toalla 70 x 40, botilito de agua grande de 700ml y tulas impermeable con logos empresariales
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
+
+
+SE ADJUNTA COTIZACIÓN -
+
+CANTIDAD:                          30
+VALOR UNITARIO :          $    65.000
+VALOR SUBTOTAL :          $  1.950.000
+VALOR TOTAL  + 19% IVA    $  2.320.500
+
+CECO:302040023
+COORDINADOR: LAURA ALVAREZ
+PROMOTOR: SMTM
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139270 Item: 10 Registro: 2025-12-04 22:12:14 =====
+GENERAR ORDEN DE COMPRA A: PREMIAR DE COLOMBIA
+NIT: 900582590-5
+CORREO: premiardecolombia@gmail.com ; albabecerra@hotmail.com
+
+POR CONCEPTO DE:   TROFEO EN ACRILICO 21 CM
+EMPRESA:           SUMMUM PROJECTS S.A.S.
+FECHA DEL EVENTO:  PREMIACION TORNEO DE TENIS DE MESA
+
+CANTIDAD:                     1
+VALOR UNITARIO:             $ 80.867
+VALOR TOTAL:                $ 80.867
+VALOR + IVA:                $ 96.232
+
+
+CECO:302040023
+COORDINADOR: LAURA ALVAREZ
+PROMOTOR: SMTM
+ELABORO: LAURA ALVAREZ
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139270 Item: 20 Registro: 2025-12-04 22:12:19 =====
+GENERAR ORDEN DE COMPRA A: PREMIAR DE COLOMBIA
+NIT: 900582590-5
+CORREO: premiardecolombia@gmail.com ; albabecerra@hotmail.com
+
+POR CONCEPTO DE:   TROFEO EN ACRILICO 18 CM
+EMPRESA:           SUMMUM PROJECTS S.A.S.
+FECHA DEL EVENTO:  PREMIACION TORNEO DE TENIS DE MESA
+
+CANTIDAD:                     1
+VALOR UNITARIO:             $ 76.496
+VALOR TOTAL:                $ 76.496
+VALOR + IVA:                $ 91.030
+
+
+CECO:302040023
+COORDINADOR: LAURA ALVAREZ
+PROMOTOR: SMTM
+ELABORO: LAURA ALVAREZ
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139270 Item: 30 Registro: 2025-12-04 22:12:23 =====
+GENERAR ORDEN DE COMPRA A: PREMIAR DE COLOMBIA
+NIT: 900582590-5
+CORREO: premiardecolombia@gmail.com ; albabecerra@hotmail.com
+
+POR CONCEPTO DE:   TROFEO EN ACRILICO 15CM
+EMPRESA:           SUMMUM PROJECTS S.A.S.
+FECHA DEL EVENTO:  PREMIACION TORNEO DE TENIS DE MESA
+
+CANTIDAD:                     1
+VALOR UNITARIO:             $ 64.000
+VALOR TOTAL:                $ 64.000
+VALOR + IVA:                $ 73.160
+
+
+CECO:302040023
+COORDINADOR: LAURA ALVAREZ
+PROMOTOR: SMTM
+ELABORO: LAURA ALVAREZ
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139268 Item: 10 Registro: 2025-12-04 22:20:53 =====
+SE SOLICITA GENERAR ORDEN DE COMPRA  A:
+PROVEEDOR: EL PROFE ULLOA SAS
+NIT: 900923601
+CORREO gerencia@elprofeulloa.com
+POR CONCEPTO DE: SERVICIO DE VEEDURIA 4 HORAS ;
+CON CORTE AL 25 DE FEBRERO
+
+
+VALOR UNITARIO: $ 93.814
+CANTIDAD: 1
+SUBTOTAL: $ 93.814
+IVA: $ 17.824
+TOTAL: $ 111.638
+
+UES: ASESORIAS # 4
+CENTRO DE COSTO: 302040023
+COORDINADOR: LAURA GISELLA ALVAREZ HIGUITA (As)
+CORREO COORDINADOR laura.alvarezh@colsubsidio.com
+
+ELABORA KAREN MATIZ
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139268 Item: 20 Registro: 2025-12-04 22:20:58 =====
+SE SOLICITA GENERAR ORDEN DE COMPRA  A:
+PROVEEDOR: EL PROFE ULLOA SAS
+NIT: 900923601
+CORREO gerencia@elprofeulloa.com
+POR CONCEPTO DE: SERVICIO DE VEEDURIA 5 HORAS ;
+CON CORTE AL 25 DE FEBRERO
+
+
+VALOR UNITARIO: $ 105.361
+CANTIDAD: 2
+SUBTOTAL: $ 210.722
+IVA: $ 40.037
+TOTAL: $ 250.759
+
+UES: ASESORIAS # 4
+CENTRO DE COSTO: 302040023
+COORDINADOR: LAURA GISELLA ALVAREZ HIGUITA (As)
+CORREO COORDINADOR laura.alvarezh@colsubsidio.com
+
+ELABORA KAREN MATIZ
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139269 Item: 10 Registro: 2025-12-04 22:21:14 =====
+GENERAR ORDEN DE COMPRA A:
+
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO: PAR MANCUERNAS DE 5 LB encauchetadas
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
+
+
+SE ADJUNTA COTIZACIÓN -
+
+CANTIDAD:                       1
+VALOR UNITARIO :          $ 80.000
+VALOR SUBTOTAL :          $ 80.000
+VALOR TOTAL  + 19% IVA    $ 95.200
 
 CECO:302040023
 COORDINADOR: LAURA ALVAREZ
@@ -191,24 +577,51 @@ CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarez
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139267 Item: 40 Registro: 2025-11-30 22:57:13 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
+=====Solped: 1300139269 Item: 20 Registro: 2025-12-04 22:21:19 =====
+GENERAR ORDEN DE COMPRA A:
 
-POR CONCEPTO DE:  UNIFORME BALONCESTO MASCULINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO:PAR MANCUERNAS DE 10LB encauchetadas
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
 
-SE ADJUNTA COTIZACION*
 
-CANTIDAD:                            14
-VALOR UNITARIO:              $  105.000
-SUBTOTAL:                    $1.470.000
-VALOR TOTAL+ IVA 19%         $1.749.300
+SE ADJUNTA COTIZACIÓN -
 
+CANTIDAD:                         1
+VALOR UNITARIO :          $ 160.000
+VALOR SUBTOTAL :          $ 160.000
+VALOR TOTAL  + 19% IVA    $ 190.400
+
+CECO:302040023
+COORDINADOR: LAURA ALVAREZ
+PROMOTOR: SMTM
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139269 Item: 30 Registro: 2025-12-04 22:21:24 =====
+GENERAR ORDEN DE COMPRA A:
+
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO: PAR MANCUERNAS 2.5 kg hexagonal con barra cromadas
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
+
+
+SE ADJUNTA COTIZACIÓN -
+
+CANTIDAD:                       1
+VALOR UNITARIO :          $ 80.000
+VALOR SUBTOTAL :          $ 80.000
+VALOR TOTAL  + 19% IVA    $ 95.200
 
 CECO:302040023
 COORDINADOR: LAURA ALVAREZ
@@ -217,575 +630,80 @@ CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarez
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139267 Item: 50 Registro: 2025-11-30 22:57:17 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
+=====Solped: 1300139269 Item: 40 Registro: 2025-12-04 22:21:28 =====
+GENERAR ORDEN DE COMPRA A:
 
-POR CONCEPTO DE: SUDADERAS BALONCESTO MASCULINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO: PAR MANCUERNAS 5 kg hexagonal con barra cromadas
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
 
-SE ADJUNTA COTIZACION*
 
-CANTIDAD:                             14
-VALOR UNITARIO:              $   172.000
-SUBTOTAL:                    $ 2.408.000
-VALOR TOTAL+ IVA 19%         $ 2.865.520
+SE ADJUNTA COTIZACIÓN -
 
+CANTIDAD:                         1
+VALOR UNITARIO :          $ 150.000
+VALOR SUBTOTAL :          $ 150.000
+VALOR TOTAL  + 19% IVA    $ 178.500
 
 CECO:302040023
 COORDINADOR: LAURA ALVAREZ
 PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139267 Item: 60 Registro: 2025-11-30 22:57:20 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
+=====Solped: 1300139269 Item: 50 Registro: 2025-12-04 22:21:33 =====
+GENERAR ORDEN DE COMPRA A:
 
-POR CONCEPTO DE: UNIFORME FUTBOL 5 MASCULINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO: colchoneta 100x50x3cm de gym
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
 
-SE ADJUNTA COTIZACION*
 
-CANTIDAD:                             10
-VALOR UNITARIO:              $    99.000
-SUBTOTAL:                    $   990.000
-VALOR TOTAL+ IVA 19%         $ 1.178.100
+SE ADJUNTA COTIZACIÓN -
 
+CANTIDAD:                        3
+VALOR UNITARIO :          $  69.000
+VALOR SUBTOTAL :          $ 207.000
+VALOR TOTAL  + 19% IVA    $ 246.330
 
 CECO:302040023
 COORDINADOR: LAURA ALVAREZ
 PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139267 Item: 70 Registro: 2025-11-30 22:57:23 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
+=====Solped: 1300139269 Item: 60 Registro: 2025-12-04 22:21:37 =====
+GENERAR ORDEN DE COMPRA A:
 
-POR CONCEPTO DE: UNIFORME ARQUERO FUTBOL 5 MASCULINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                            1
-VALOR UNITARIO:              $ 115.000
-SUBTOTAL:                    $ 115.000
-VALOR TOTAL+ IVA 19%         $ 136.850
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO: kit toalla 70 x 40, botilito de agua grande de 700ml y tulas impermeable con logos empresariales
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
 
 
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 80 Registro: 2025-11-30 22:57:26 =====
-    GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
+SE ADJUNTA COTIZACIÓN -
 
-POR CONCEPTO DE: SUDADERA FUTBOL 5 MASCULINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                             11
-VALOR UNITARIO:              $   172.000
-SUBTOTAL:                    $ 1.892.000
-VALOR TOTAL+ IVA 19%         $ 2.251.480
-
+CANTIDAD:                          30
+VALOR UNITARIO :          $    65.000
+VALOR SUBTOTAL :          $  1.950.000
+VALOR TOTAL  + 19% IVA    $  2.320.500
 
 CECO:302040023
 COORDINADOR: LAURA ALVAREZ
 PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 90 Registro: 2025-11-30 22:57:29 =====
- GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE: UNIFORMES DE FUTBOL 11 MASTER
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                              23
-VALOR UNITARIO:              $     99.000
-SUBTOTAL:                    $  2.277.000
-VALOR TOTAL+ IVA 19%         $  2.709.630
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 100 Registro: 2025-11-30 22:57:32 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE: UNIFORME ARQUERO FÚTBOL 11 MASTER
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                              2
-VALOR UNITARIO:              $   115.000
-SUBTOTAL:                    $   230.000
-VALOR TOTAL+ IVA 19%         $   273.700
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 110 Registro: 2025-11-30 22:57:35 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE: SUDADERA FÚTBOL 11 MASTER
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                                25
-VALOR UNITARIO:              $      172.000
-SUBTOTAL:                    $    4.300.000
-VALOR TOTAL+ IVA 19%         $    5.117.000
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 120 Registro: 2025-11-30 22:57:39 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE: UNIFORME BALONCESTO FEMENINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                               12
-VALOR UNITARIO:              $      99.000
-SUBTOTAL:                    $   1.188.000
-VALOR TOTAL+ IVA 19%         $   1.413.720
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 130 Registro: 2025-11-30 22:57:42 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE: SUDADERA BALONCESTO FEMENINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                                12
-VALOR UNITARIO:              $      172.000
-SUBTOTAL:                    $    2.064.000
-VALOR TOTAL+ IVA 19%         $    2.456.160
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 10 Registro: 2025-11-30 23:27:12 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE: UNIFORMES DE FÚTBOL 5 FEMENINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                             15
-VALOR UNITARIO:              $    99.000
-SUBTOTAL:                    $ 1.485.000
-VALOR TOTAL+ IVA 19%         $ 1.767.150
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 20 Registro: 2025-11-30 23:27:18 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE: UNIFORMES DE ARQUERO , BUZO Y PANTALONETA FÚTBOL 5 FEMENINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                             2
-VALOR UNITARIO:              $  115.000
-SUBTOTAL:                    $  230.000
-VALOR TOTAL+ IVA 19%         $  273.700
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 30 Registro: 2025-11-30 23:27:21 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE:  SUDADERAS MATERIAL FASTRACK FÚTBOL 5 FEMENINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                             17
-VALOR UNITARIO:              $   172.000
-SUBTOTAL:                    $ 2.924.000
-VALOR TOTAL+ IVA 19%         $ 3.479.560
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 40 Registro: 2025-11-30 23:27:25 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE:  UNIFORME BALONCESTO MASCULINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                            14
-VALOR UNITARIO:              $  105.000
-SUBTOTAL:                    $1.470.000
-VALOR TOTAL+ IVA 19%         $1.749.300
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 50 Registro: 2025-11-30 23:27:28 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE: SUDADERAS BALONCESTO MASCULINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                             14
-VALOR UNITARIO:              $   172.000
-SUBTOTAL:                    $ 2.408.000
-VALOR TOTAL+ IVA 19%         $ 2.865.520
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 60 Registro: 2025-11-30 23:27:31 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE: UNIFORME FUTBOL 5 MASCULINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                             10
-VALOR UNITARIO:              $    99.000
-SUBTOTAL:                    $   990.000
-VALOR TOTAL+ IVA 19%         $ 1.178.100
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 70 Registro: 2025-11-30 23:27:34 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE: UNIFORME ARQUERO FUTBOL 5 MASCULINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                            1
-VALOR UNITARIO:              $ 115.000
-SUBTOTAL:                    $ 115.000
-VALOR TOTAL+ IVA 19%         $ 136.850
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 80 Registro: 2025-11-30 23:27:37 =====
-    GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE: SUDADERA FUTBOL 5 MASCULINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                             11
-VALOR UNITARIO:              $   172.000
-SUBTOTAL:                    $ 1.892.000
-VALOR TOTAL+ IVA 19%         $ 2.251.480
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 90 Registro: 2025-11-30 23:27:40 =====
- GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE: UNIFORMES DE FUTBOL 11 MASTER
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                              23
-VALOR UNITARIO:              $     99.000
-SUBTOTAL:                    $  2.277.000
-VALOR TOTAL+ IVA 19%         $  2.709.630
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 100 Registro: 2025-11-30 23:27:43 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE: UNIFORME ARQUERO FÚTBOL 11 MASTER
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                              2
-VALOR UNITARIO:              $   115.000
-SUBTOTAL:                    $   230.000
-VALOR TOTAL+ IVA 19%         $   273.700
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 110 Registro: 2025-11-30 23:27:47 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE: SUDADERA FÚTBOL 11 MASTER
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                                25
-VALOR UNITARIO:              $      172.000
-SUBTOTAL:                    $    4.300.000
-VALOR TOTAL+ IVA 19%         $    5.117.000
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 120 Registro: 2025-11-30 23:27:50 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE: UNIFORME BALONCESTO FEMENINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                               12
-VALOR UNITARIO:              $      99.000
-SUBTOTAL:                    $   1.188.000
-VALOR TOTAL+ IVA 19%         $   1.413.720
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139267 Item: 130 Registro: 2025-11-30 23:27:53 =====
-GENERAR ORDEN DE COMPRA A: FABRICAMOS SU SUDADERA LTDA.
-NIT:800221644-3
-CORREO: fss2@fss.com.co
-
-POR CONCEPTO DE: SUDADERA BALONCESTO FEMENINO
-EMPRESA: CAMARA DE REPRESENTANTES
-FECHAS: 8 DE ABRIL DE 2024
-HORA: 8:00 AM
-DIRECCION: INSTALACIONES DE CAMARA DE REPRESENTANTES
-
-SE ADJUNTA COTIZACION*
-
-CANTIDAD:                                12
-VALOR UNITARIO:              $      172.000
-SUBTOTAL:                    $    2.064.000
-VALOR TOTAL+ IVA 19%         $    2.456.160
-
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
-
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
 --------------------------------------------------------------------------------

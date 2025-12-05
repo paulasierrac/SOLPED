@@ -6,6 +6,7 @@
 # Propiedad de Colsubsidio
 # Cambios: (Si Aplica)
 # ============================================
+import pyautogui
 import win32com.client
 import time
 import os
@@ -17,7 +18,7 @@ def DescargarSolpedME5A(session, estado):
         raise ValueError("Sesión SAP no válida.")
 
     # Ruta destino – ejemplo estándar Colsubsidio
-    ruta_guardar = rf"C:\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
+    ruta_guardar = rf"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
 
     # ============================
     # Abrir transacción ME5A
@@ -85,19 +86,19 @@ def DescargarSolpedME5A(session, estado):
 
     # Exportar
     session.findById("wnd[0]/tbar[1]/btn[45]").press()
-
+    time.sleep(5)
     # ============================
     # Guardar archivo
     # ============================
 
-    ruta_guardar = rf"C:\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
+    ruta_guardar = rf"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
     if os.path.exists(ruta_guardar):
         os.remove(ruta_guardar)
     session.findById("wnd[1]/tbar[0]/btn[0]").press()
     time.sleep(1)
 
     session.findById("wnd[1]/usr/ctxtDY_PATH").text = (
-        r"C:\NetApplications\PY\AutomatizacionGestionSolped\Insumo"
+        r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo"
     )
     session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = rf"expSolped{estado}.txt"
     session.findById("wnd[1]/usr/ctxtDY_FILENAME").caretPosition = 10
@@ -107,7 +108,9 @@ def DescargarSolpedME5A(session, estado):
 
     session.findById("wnd[0]").sendVKey(12)
     time.sleep(0.5)
-
+    pyautogui.press("f3")
+    time.sleep(0.5)
+    pyautogui.press("f12")
     print(
         f"Archivo exportado correctamente: {ruta_guardar}"
     )  # luego reemplazar con WriteLog

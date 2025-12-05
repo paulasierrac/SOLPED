@@ -25,6 +25,7 @@ from Funciones.GeneralME53N import (
     ActualizarEstado,
     ActualizarEstadoYObservaciones,
     ProcesarYValidarItem,
+    GuardarTablaME5A,
 )
 from Config.settings import RUTAS
 
@@ -46,6 +47,7 @@ def EjecutarHU03(session, nombre_archivo):
 
         # Leer el archivo con las SOLPEDs a procesar
         df_solpeds = procesarTablaME5A(nombre_archivo)
+        GuardarTablaME5A(df_solpeds, nombre_archivo)
 
         if df_solpeds.empty:
             print("ERROR: No se pudo cargar el archivo o esta vacio")
