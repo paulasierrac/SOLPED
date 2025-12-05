@@ -153,7 +153,7 @@ def Main_GestionSolped():
                 path_log=RUTAS["PathLog"],
             )
 
-            # EjecutarHU03(session, archivo)
+            EjecutarHU03(session, archivo)
 
             WriteLog(
                 mensaje=f"HU03 finalizada correctamente para archivo {archivo}.",

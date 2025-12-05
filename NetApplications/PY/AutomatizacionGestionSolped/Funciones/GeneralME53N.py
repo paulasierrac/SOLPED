@@ -278,10 +278,11 @@ def ObtenerTextoDelPortapapeles():
         return ""
 
 
-def procesarTablaME5A(name):
+def procesarTablaME5A(name, dias=None):
     """name: nombre del txt a utilizar
     return data frame
-    Procesa txt estructura ME5A y devuelve un df con manejo de columnas dinamico"""
+    Procesa txt estructura ME5A y devuelve un df con manejo de columnas dinamico.
+    dias: int|None -> número de días a mantener (si None, no aplica filtro por fecha)"""
 
     try:
         WriteLog(
@@ -471,10 +472,35 @@ def procesarTablaME5A(name):
 
         print(f"EXITO: Archivo procesado: {len(df)} filas de datos")
         print(f"   - Columnas: {list(df.columns)}")
+
         if not df.empty:
             print(f"   - SOLPEDs: {df['PurchReq'].nunique()}")
             if "Estado" in df.columns:
                 print(f"   - Estados unicos: {df['Estado'].value_counts().to_dict()}")
+
+        # Normalizar formato fecha
+        df["ReqDate_fmt"] = pd.to_datetime(
+            df["ReqDate"], errors="coerce", dayfirst=True
+        )
+
+        df["ReqDate_fmt"] = pd.to_datetime(
+            df["ReqDate"], errors="coerce", dayfirst=True
+        )
+
+        if dias is not None:
+            hoy = pd.Timestamp.today().normalize()
+            limite = hoy - pd.Timedelta(days=int(dias))
+            filas_antes = len(df)
+            df = df[df["ReqDate_fmt"] >= limite].reset_index(drop=True)
+            filas_despues = len(df)
+            print(
+                f"EXITO: Filtrado por ReqDate últimos {dias} días -> {filas_despues}/{filas_antes}"
+            )
+        else:
+            print("INFO: No se aplicó filtro por ReqDate (dias=None)")
+
+        # opcional: eliminar columna auxiliar
+        df.drop(columns=["ReqDate_fmt"], inplace=True)
 
         return df
 
@@ -1034,6 +1060,15 @@ def ObtenerItemTextME53N(session, numero_solped, numero_item):
         return ""
 
 
+def FormatoMoneda(valor):
+    """Convierte un número en formato moneda $xx,xxx.xx"""
+    try:
+        valor = float(valor)
+        return f"${valor:,.2f}"
+    except:
+        return str(valor)
+
+
 def ValidarContraTabla(
     datos_texto: Dict, df_items: pd.DataFrame, item_num: str = ""
 ) -> Dict:
@@ -1042,7 +1077,7 @@ def ValidarContraTabla(
         "cantidad": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
         "valor_unitario": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
         "valor_total": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
-        "fecha_entrega": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
+        # "fecha_entrega": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
         "concepto": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
         "campos_obligatorios": {"presentes": 0, "total": 0, "faltantes": []},
         "resumen": "",
@@ -1061,11 +1096,48 @@ def ValidarContraTabla(
             df_items["Item"].astype(str).str.strip() == str(item_num).strip()
         ]
         if item_df.empty:
-            item_df = df_items.iloc[[0]]  # CORREGIDO: usar primera fila si no encuentra
+            item_df = df_items.iloc[[0]]  # usar primera fila si no encuentra
 
     if item_df.empty:
         validaciones["resumen"] = "Item no encontrado en tabla - No se puede validar"
         return validaciones
+
+    # ------------------------------------------------------------------
+    # VALIDACIÓN DE CAMPOS OBLIGATORIOS DE LA TABLA SAP ME53N
+    # ------------------------------------------------------------------
+    campos_obligatorios_me53n = [
+        "Material",
+        "Short Text",
+        "Quantity",
+        "Un",
+        "Valn Price",
+        "Crcy",
+        "Total Val.",
+        "Deliv.Date",
+        "Fix. Vend.",
+        "Plant",
+        "PGr",
+        "POrg",
+        "Matl Group",
+    ]
+
+    faltantes_me53n = []
+
+    fila = item_df.iloc[0]
+
+    for campo in campos_obligatorios_me53n:
+        if campo not in item_df.columns:
+            faltantes_me53n.append(campo)
+        else:
+            val = fila.get(campo, "")
+            if val is None or str(val).strip() in ["", "nan", "None"]:
+                faltantes_me53n.append(campo)
+
+    validaciones["campos_me53n"] = {
+        "presentes": len(campos_obligatorios_me53n) - len(faltantes_me53n),
+        "total": len(campos_obligatorios_me53n),
+        "faltantes": faltantes_me53n,
+    }
 
     # --- VALIDAR CANTIDAD ---
     if datos_texto["cantidad"]:
@@ -1089,8 +1161,14 @@ def ValidarContraTabla(
         valor_texto = LimpiarNumero(datos_texto["valor_unitario"])
         if "Valn Price" in item_df.columns:
             valor_tabla = LimpiarNumero(str(item_df["Valn Price"].iloc[0]))
-            validaciones["valor_unitario"]["texto"] = datos_texto["valor_unitario"]
-            validaciones["valor_unitario"]["tabla"] = str(valor_tabla)
+            # validaciones["valor_unitario"]["texto"] = datos_texto["valor_unitario"]
+            # validaciones["valor_unitario"]["tabla"] = str(valor_tabla)
+
+            validaciones["valor_unitario"]["texto"] = FormatoMoneda(
+                datos_texto["valor_unitario"]
+            )
+            validaciones["valor_unitario"]["tabla"] = FormatoMoneda(valor_tabla)
+
             # Tolerancia del 1%
             if valor_tabla > 0:
                 diferencia_relativa = abs(valor_texto - valor_tabla) / valor_tabla
@@ -1102,15 +1180,33 @@ def ValidarContraTabla(
                 diferencia = abs(valor_texto - valor_tabla)
                 validaciones["valor_unitario"][
                     "diferencia"
-                ] = f"Difiere en ${diferencia:,.2f}"
+                ] = f"Difiere en {FormatoMoneda(diferencia)}"
+                # validaciones["valor_unitario"][
+                #     "diferencia"
+                # ] = f"Difiere en ${diferencia:,.2f}"
 
     # --- VALIDAR VALOR TOTAL ---
     if datos_texto["valor_total"]:
         valor_texto = LimpiarNumero(datos_texto["valor_total"])
+
+        # ACEPTAR AMBOS CAMPOS DE SAP
+        columna_total = None
         if "Total Value" in item_df.columns:
-            valor_tabla = LimpiarNumero(str(item_df["Total Value"].iloc[0]))
-            validaciones["valor_total"]["texto"] = datos_texto["valor_total"]
-            validaciones["valor_total"]["tabla"] = str(valor_tabla)
+            columna_total = "Total Value"
+        elif "Total Val." in item_df.columns:
+            columna_total = "Total Val."
+
+        if columna_total:
+            valor_tabla = LimpiarNumero(str(item_df[columna_total].iloc[0]))
+
+            # validaciones["valor_total"]["texto"] = datos_texto["valor_total"]
+            # validaciones["valor_total"]["tabla"] = str(valor_tabla)
+
+            validaciones["valor_total"]["texto"] = FormatoMoneda(
+                datos_texto["valor_total"]
+            )
+            validaciones["valor_total"]["tabla"] = FormatoMoneda(valor_tabla)
+
             # Tolerancia del 1%
             if valor_tabla > 0:
                 diferencia_relativa = abs(valor_texto - valor_tabla) / valor_tabla
@@ -1122,19 +1218,27 @@ def ValidarContraTabla(
                 diferencia = abs(valor_texto - valor_tabla)
                 validaciones["valor_total"][
                     "diferencia"
-                ] = f"Difiere en ${diferencia:,.2f}"
+                ] = f"Difiere en {FormatoMoneda(diferencia)}"
 
-    # --- VALIDAR FECHA DE ENTREGA ---
-    if datos_texto["fecha_prestacion"] and "Deliv.Date" in item_df.columns:
-        fecha_texto = datos_texto["fecha_prestacion"]
-        fecha_tabla = str(item_df["Deliv.Date"].iloc[0]) if not item_df.empty else ""
-        validaciones["fecha_entrega"]["texto"] = fecha_texto
-        validaciones["fecha_entrega"]["tabla"] = fecha_tabla
-        validaciones["fecha_entrega"]["match"] = NormalizarFecha(
-            fecha_texto
-        ) == NormalizarFecha(fecha_tabla)
-        if not validaciones["fecha_entrega"]["match"]:
-            validaciones["fecha_entrega"]["diferencia"] = "Fechas no coinciden"
+                # validaciones["valor_total"][
+                #     "diferencia"
+                # ] = f"Difiere en ${diferencia:,.2f}"
+        else:
+            # Si no existe ninguna columna válida
+            validaciones["valor_total"]["tabla"] = "Campo no encontrado en SAP"
+            validaciones["valor_total"]["match"] = False
+
+    # # --- VALIDAR FECHA DE ENTREGA ---
+    # if datos_texto["fecha_prestacion"] and "Deliv.Date" in item_df.columns:
+    #     fecha_texto = datos_texto["fecha_prestacion"]
+    #     fecha_tabla = str(item_df["Deliv.Date"].iloc[0]) if not item_df.empty else ""
+    #     validaciones["fecha_entrega"]["texto"] = fecha_texto
+    #     validaciones["fecha_entrega"]["tabla"] = fecha_tabla
+    #     validaciones["fecha_entrega"]["match"] = NormalizarFecha(
+    #         fecha_texto
+    #     ) == NormalizarFecha(fecha_tabla)
+    #     if not validaciones["fecha_entrega"]["match"]:
+    #         validaciones["fecha_entrega"]["diferencia"] = "Fechas no coinciden"
 
     # --- VALIDAR CONCEPTO ---
     if datos_texto["concepto_compra"] and "Short Text" in item_df.columns:
@@ -1194,7 +1298,7 @@ def ValidarContraTabla(
         "cantidad",
         "valor_unitario",
         "valor_total",
-        "fecha_entrega",
+        # "fecha_entrega",
         "concepto",
     ]
     campos_validados = sum(
@@ -1334,6 +1438,24 @@ def DeterminarEstadoFinal(datos_texto: Dict, validaciones: Dict) -> Tuple[str, s
     else:
         estado = "Falta informacion critica"
         observaciones = GenerarObservaciones(datos_texto, validaciones)
+
+    # =============================================================
+    #  VALIDACIÓN DE CAMPOS OBLIGATORIOS SAP (ME53N)
+    #  SI FALTAN → ESTADO = "Verificar manualmente"
+    # =============================================================
+    campos_me = validaciones.get("campos_me53n", {})
+
+    if campos_me and campos_me.get("faltantes"):
+        faltantes = campos_me["faltantes"]
+
+        # agregar a observaciones
+        if observaciones:
+            observaciones += " | "
+
+        observaciones += f"Faltan campos SAP: {', '.join(faltantes)}"
+
+        # cambiar estado final
+        return "Verificar manualmente", observaciones
 
     return estado, observaciones
 
@@ -1530,36 +1652,90 @@ def GenerarReporteValidacion(
     solped: str, item: str, datos_texto: Dict, validaciones: Dict
 ) -> str:
     """Genera un reporte legible de la validacion"""
+
     reporte = f"\n{'='*80}\n"
     reporte += f"REPORTE DE VALIDACION - SOLPED: {solped}, ITEM: {item}\n"
     reporte += f"{'='*80}\n\n"
 
-    # Datos extraidos
+    # ===================================================================================
+    # 1. CAMPOS OBLIGATORIOS SAP ME53N
+    # ===================================================================================
+    if "campos_me53n" in validaciones:
+        datos_me53n = validaciones["campos_me53n"]
+        reporte += "CAMPOS OBLIGATORIOS SAP ME53N:\n"
+        reporte += f"  Presentes: {datos_me53n['presentes']}/{datos_me53n['total']}\n"
+
+        if datos_me53n["faltantes"]:
+            reporte += "  Faltantes:\n"
+            for campo in datos_me53n["faltantes"]:
+                reporte += f"    - {campo}\n"
+        else:
+            reporte += "  ✓ Todos los campos obligatorios ME53N están presentes.\n"
+
+        reporte += "\n"
+
+    # ===================================================================================
+    # 2. ADVERTENCIA POR TEXTO SIN ESTRUCTURA
+    # ===================================================================================
+    if datos_texto.get("tipo_texto") in ["solo_descripcion", "vacio", "tabla_sap"]:
+        reporte += (
+            "ADVERTENCIA IMPORTANTE:\n"
+            "  Este ítem contiene solo descripción o no tiene estructura completa.\n"
+            "  → No fue posible extraer todos los campos estructurados.\n"
+            "  → Validar manualmente la información.\n"
+            "  → Revisar cantidad, valor unitario, valor total y NIT directamente en SAP.\n\n"
+        )
+
+    # ===================================================================================
+    # 3. DATOS EXTRAÍDOS DEL TEXTO
+    # ===================================================================================
     reporte += "DATOS EXTRAIDOS DEL TEXTO:\n"
-    reporte += f"  Razon Social: {datos_texto['razon_social'] or 'No encontrado'}\n"
-    reporte += f"  NIT: {datos_texto['nit'] or 'No encontrado'}\n"
-    reporte += f"  Correo: {datos_texto['correo'] or 'No encontrado'}\n"
-    reporte += f"  Concepto: {datos_texto['concepto_compra'][:50] or 'No encontrado'}...\n"  # CORREGIDO: concepto_compra
-    reporte += f"  Cantidad: {datos_texto['cantidad'] or 'No encontrado'}\n"
-    reporte += f"  Valor Unitario: {datos_texto['valor_unitario'] or 'No encontrado'}\n"
-    reporte += f"  Valor Total: {datos_texto['valor_total'] or 'No encontrado'}\n"
+    reporte += f"  Razon Social: {datos_texto.get('razon_social') or 'No encontrado'}\n"
+    reporte += f"  NIT: {datos_texto.get('nit') or 'No encontrado'}\n"
+    reporte += f"  Correo: {datos_texto.get('correo') or 'No encontrado'}\n"
     reporte += (
-        f"  Responsable: {datos_texto['responsable_compra'] or 'No encontrado'}\n"
+        f"  Concepto: {datos_texto.get('concepto_compra')[:50] or 'No encontrado'}...\n"
     )
-    reporte += f"  CECO: {datos_texto['ceco'] or 'No encontrado'}\n\n"
+    reporte += f"  Cantidad: {datos_texto.get('cantidad') or 'No encontrado'}\n"
+    reporte += (
+        f"  Valor Unitario: {datos_texto.get('valor_unitario') or 'No encontrado'}\n"
+    )
+    reporte += f"  Valor Total: {datos_texto.get('valor_total') or 'No encontrado'}\n"
+    reporte += (
+        f"  Responsable: {datos_texto.get('responsable_compra') or 'No encontrado'}\n"
+    )
+    reporte += f"  CECO: {datos_texto.get('ceco') or 'No encontrado'}\n\n"
 
-    # Validaciones
+    # ===================================================================================
+    # 4. CAMPOS OBLIGATORIOS EXTRAÍDOS DEL TEXTO
+    # ===================================================================================
+    if "campos_obligatorios" in validaciones:
+        oblig = validaciones["campos_obligatorios"]
+        reporte += "CAMPOS OBLIGATORIOS (Segun Texto Extraído):\n"
+        reporte += f"  Presentes: {oblig['presentes']}/{oblig['total']}\n"
+
+        if oblig["faltantes"]:
+            reporte += "  Faltantes:\n"
+            for campo in oblig["faltantes"]:
+                reporte += f"    - {campo}\n"
+        else:
+            reporte += "  ✓ Todos los campos obligatorios del texto están presentes.\n"
+
+        reporte += "\n"
+
+    # ===================================================================================
+    # 5. VALIDACIONES DETALLADAS
+    # ===================================================================================
     reporte += "VALIDACIONES:\n"
-    for campo, validacion in validaciones.items():
-        # Saltar resumen general
-        if campo == "resumen":
-            continue
 
-        # Validar que sea un dict
+    for campo, validacion in validaciones.items():
+
+        if campo in ["resumen", "campos_obligatorios", "campos_me53n"]:
+            continue  # ya fueron procesados
+
         if not isinstance(validacion, dict):
             continue
 
-        # Solo procesar si contiene 'match'
         if "match" not in validacion:
             continue
 
@@ -1573,8 +1749,11 @@ def GenerarReporteValidacion(
             reporte += f"      Tabla: {validacion['tabla']}\n"
 
         if validacion.get("diferencia"):
-            reporte += f"      {validacion.get('diferencia')}\n"
+            reporte += f"      {validacion['diferencia']}\n"
 
+    # ===================================================================================
+    # 6. RESUMEN FINAL
+    # ===================================================================================
     reporte += f"\n{validaciones['resumen']}\n"
     reporte += f"{'='*80}\n"
 
@@ -1599,8 +1778,10 @@ def ProcesarYValidarItem(
     estado_final, observaciones = DeterminarEstadoFinal(datos_texto, validaciones)
     # Evitar generar reportes completos cuando el texto no tiene estructura
     if datos_texto.get("tipo_texto") in ["vacio", "solo_descripcion", "tabla_sap"]:
-        reporte = f"Item {item_num} sin datos estructurados. Tipo de texto: {datos_texto.get('tipo_texto')}"
-        return datos_texto, validaciones, reporte, estado_final, observaciones
+        observaciones = (
+            f"Texto sin estructura completa ({datos_texto.get('tipo_texto')}). "
+            "Solo contiene descripción."
+        )
 
     # 4. Generar reporte
     reporte = GenerarReporteValidacion(solped, item_num, datos_texto, validaciones)
