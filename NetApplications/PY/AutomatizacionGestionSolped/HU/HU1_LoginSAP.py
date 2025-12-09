@@ -24,6 +24,7 @@ def abrir_sap_logon():
 def conectar_sap(conexion, mandante, usuario, password, idioma="ES"):
 
     abrir_sap = abrir_sap_logon()
+    time.sleep(3)
     if abrir_sap:
         print(" SAP Logon 750 ya se encuentra abierto")
     else:

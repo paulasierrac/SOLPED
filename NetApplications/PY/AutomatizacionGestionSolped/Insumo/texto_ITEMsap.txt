@@ -1,0 +1,158 @@
+
+=====Solped: 1300139269 Item: 10 Registro: 2025-12-09 16:06:01 =====
+GENERAR ORDEN DE COMPRA A:
+
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO: PAR MANCUERNAS DE 5 LB encauchetadas
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
+
+
+SE ADJUNTA COTIZACIÓN -
+
+CANTIDAD:                       1
+VALOR UNITARIO :          $ 80.000
+VALOR SUBTOTAL :          $ 80.000
+VALOR TOTAL  + 19% IVA    $ 95.200
+
+CECO:302040023
+COORDINADOR: LAURA ALVAREZ
+PROMOTOR: SMTM
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139269 Item: 20 Registro: 2025-12-09 16:06:06 =====
+GENERAR ORDEN DE COMPRA A:
+
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO:PAR MANCUERNAS DE 10LB encauchetadas
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
+
+
+SE ADJUNTA COTIZACIÓN -
+
+CANTIDAD:                         1
+VALOR UNITARIO :          $ 160.000
+VALOR SUBTOTAL :          $ 160.000
+VALOR TOTAL  + 19% IVA    $ 190.400
+
+CECO:302040023
+COORDINADOR: LAURA ALVAREZ
+PROMOTOR: SMTM
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139269 Item: 30 Registro: 2025-12-09 16:06:10 =====
+GENERAR ORDEN DE COMPRA A:
+
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO: PAR MANCUERNAS 2.5 kg hexagonal con barra cromadas
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
+
+
+SE ADJUNTA COTIZACIÓN -
+
+CANTIDAD:                       1
+VALOR UNITARIO :          $ 80.000
+VALOR SUBTOTAL :          $ 80.000
+VALOR TOTAL  + 19% IVA    $ 95.200
+
+CECO:302040023
+COORDINADOR: LAURA ALVAREZ
+PROMOTOR: SMTM
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139269 Item: 40 Registro: 2025-12-09 16:06:15 =====
+GENERAR ORDEN DE COMPRA A:
+
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO: PAR MANCUERNAS 5 kg hexagonal con barra cromadas
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
+
+
+SE ADJUNTA COTIZACIÓN -
+
+CANTIDAD:                         1
+VALOR UNITARIO :          $ 150.000
+VALOR SUBTOTAL :          $ 150.000
+VALOR TOTAL  + 19% IVA    $ 178.500
+
+CECO:302040023
+COORDINADOR: LAURA ALVAREZ
+PROMOTOR: SMTM
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139269 Item: 50 Registro: 2025-12-09 16:06:19 =====
+GENERAR ORDEN DE COMPRA A:
+
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO: colchoneta 100x50x3cm de gym
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
+
+
+SE ADJUNTA COTIZACIÓN -
+
+CANTIDAD:                        3
+VALOR UNITARIO :          $  69.000
+VALOR SUBTOTAL :          $ 207.000
+VALOR TOTAL  + 19% IVA    $ 246.330
+
+CECO:302040023
+COORDINADOR: LAURA ALVAREZ
+PROMOTOR: SMTM
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139269 Item: 60 Registro: 2025-12-09 16:06:24 =====
+GENERAR ORDEN DE COMPRA A:
+
+PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
+NIT:       900420798
+CORREO:    <ventas@macrodeportes.com
+POR CONCEPTO: kit toalla 70 x 40, botilito de agua grande de 700ml y tulas impermeable con logos empresariales
+EMPRESA: RAMA JUDICIAL
+FECHA: 7 DE MARZO DE 2024
+DIRECCION: CR 7 # 27 - 18 PS 17
+HORA: 4:00 PM
+
+
+SE ADJUNTA COTIZACIÓN -
+
+CANTIDAD:                          30
+VALOR UNITARIO :          $    65.000
+VALOR SUBTOTAL :          $  1.950.000
+VALOR TOTAL  + 19% IVA    $  2.320.500
+
+CECO:302040023
+COORDINADOR: LAURA ALVAREZ
+PROMOTOR: SMTM
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+--------------------------------------------------------------------------------
