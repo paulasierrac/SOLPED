@@ -53,11 +53,13 @@ def NotificarRevisionManualSolped(
     cuerpo_template = f"""
         <html>
             <body style="font-family: Arial, sans-serif;">
-                <h2 style="color: #CC0000;">⚠️ Solicitud de Revisión Manual Requerida</h2>
+                <h2 style="color: #CC0000;">Solicitud de Revisión Manual Requerida</h2>
                 <p>El Solped <strong>{numero_solped}</strong> necesita ser validado por las siguientes razones:</p>
                 
                 <div style="border: 1px solid #ddd; padding: 15px; margin: 15px 0; background-color: #f9f9f9;">
-                    <p style="white-space: pre-wrap;">{validaciones}</p>
+                    <div style="padding: 10px; margin: 10px 0; background-color: #f4f4f4; border-radius: 6px;">
+                        {convertir_validaciones_a_lista(validaciones)}
+                    </div>
                 </div>
 
                 <p>Por favor, ingrese al sistema para realizar las correcciones o ajustes necesarios.</p>
@@ -260,6 +262,27 @@ def TraerSAPAlFrente_Opcion():
         print("SAP traido al frente (Opcion - Alt+Tab)")
     except Exception as e:
         print(f"Error en Opcion 4: {e}")
+
+
+def convertir_validaciones_a_lista(texto):
+    """
+    Convierte el bloque de texto de validaciones en una lista HTML <ul><li>.
+    Cada item debe comenzar con '📋 ITEM' u otro marcador detectable.
+    """
+    lineas = [l.strip() for l in texto.split("\n") if l.strip()]
+
+    lista_html = "<ul style='font-size:14px; line-height:1.5;'>"
+
+    for linea in lineas:
+        # Detectar inicio de item
+        if linea.startswith("-ITEM"):
+            lista_html += f"<li><strong>{linea}</strong></li>"
+        else:
+            lista_html += f"<li>{linea}</li>"
+
+    lista_html += "</ul>"
+
+    return lista_html
 
 
 def ObtenerTextoDelPortapapeles():

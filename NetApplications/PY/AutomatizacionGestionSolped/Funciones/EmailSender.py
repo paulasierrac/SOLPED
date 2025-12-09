@@ -353,9 +353,9 @@ if __name__ == "__main__":
     )
 
     if exito_personalizado:
-        print("✅ Envío personalizado exitoso (Método Nuevo).")
+        print("Envío personalizado exitoso (Método Nuevo).")
     else:
-        print("❌ Envío personalizado fallido (Método Nuevo).")
+        print("Envío personalizado fallido (Método Nuevo).")
 
     # --- PRUEBA 2: Usando el método enviar_correo ORIGINAL (Envío Individual) ---
     # Nota: Esta prueba es redundante si se usa la Prueba 1, pero se incluye para probar la función original.
