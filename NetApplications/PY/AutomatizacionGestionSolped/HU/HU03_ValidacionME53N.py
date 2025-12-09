@@ -2,9 +2,11 @@
 # NombreDeLaIniciativa – HU03: ValidacionME53N
 # Autor: Paula Sierra - NetApplications
 # Descripcion: Ejecuta la búsqueda de una SOLPED en la transacción ME53N
-# Ultima modificacion: 24/11/2025
+# Ultima modificacion: 08/12/2025
 # Propiedad de Colsubsidio
-# Cambios: Versión con validación completa y uso correcto de validaciones
+# Cambios:
+#   - Versión con validación completa y uso correcto de validaciones
+#   - Notificaciones automáticas a responsables de Colsubsidio
 # =========================================
 import win32com.client  # pyright: ignore[reportMissingModuleSource]
 import time
@@ -26,6 +28,7 @@ from Funciones.GeneralME53N import (
     ActualizarEstadoYObservaciones,
     ProcesarYValidarItem,
     GuardarTablaME5A,
+    NotificarRevisionManualSolped,
 )
 from Config.settings import RUTAS
 
@@ -134,13 +137,41 @@ def EjecutarHU03(session, nombre_archivo):
             "items_validados": 0,
             "items_sin_texto": 0,
             "items_verificar_manual": 0,
+            "notificaciones_enviadas": 0,
+            "notificaciones_fallidas": 0,
         }
+
+        # ========================================================
+        # MODO DESARROLLO - REDIRIGIR CORREOS
+        # ========================================================
+        MODO_DESARROLLO = True  # ⚠️ Cambiar a False en producción
+        EMAIL_DESARROLLO = "paula.sierra@netapplications.com.co"
+
+        if MODO_DESARROLLO:
+            print(f"\n{'='*60}")
+            print(f"⚠️  MODO DESARROLLO ACTIVO")
+            print(f"📧 Todos los correos se enviarán a: {EMAIL_DESARROLLO}")
+            print(f"{'='*60}\n")
+            WriteLog(
+                mensaje=f"MODO DESARROLLO: Correos redirigidos a {EMAIL_DESARROLLO}",
+                estado="WARNING",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+
+        # Almacenar SOLPEDs que requirieron revisión para reporte final
+        solpeds_con_problemas = []
 
         # Procesar cada SOLPED
         for solped in solped_unicos:
             print(f"\n{'='*80}")
             print(f"PROCESANDO SOLPED: {solped}")
             print(f"{'='*80}")
+
+            # Variables para notificación
+            correos_responsables = []
+            resumen_validaciones = []
+            requiere_notificacion = False
 
             try:
                 # 1. Marcar SOLPED como "En Proceso"
@@ -223,6 +254,7 @@ def EjecutarHU03(session, nombre_archivo):
                     # Obtener texto del editor SAP
                     texto = ObtenerItemTextME53N(session, solped, numero_item)
                     print(texto)
+
                     # Procesar y validar el texto
                     if texto and texto.strip():
                         contador_con_texto += 1
@@ -237,6 +269,22 @@ def EjecutarHU03(session, nombre_archivo):
                         ) = ProcesarYValidarItem(
                             session, solped, numero_item, texto, dtItems
                         )
+
+                        # ========================================================
+                        # CAPTURAR CORREOS DE COLSUBSIDIO PARA NOTIFICACIÓN
+                        # ========================================================
+                        responsable = datos_texto.get("responsable_compra", "")
+                        if responsable and "@colsubsidio.com" in responsable.lower():
+                            # Puede venir con múltiples correos separados por coma
+                            correos_encontrados = [
+                                email.strip()
+                                for email in responsable.split(",")
+                                if "@colsubsidio.com" in email.lower()
+                            ]
+                            correos_responsables.extend(correos_encontrados)
+                            print(
+                                f"📧 Correo responsable detectado: {', '.join(correos_encontrados)}"
+                            )
 
                         # Imprimir resumen de validacion DETALLADO
                         print(f"RESULTADO VALIDACION:")
@@ -288,12 +336,12 @@ def EjecutarHU03(session, nombre_archivo):
                         print(f"  Detalles de validacion:")
                         for campo in campos_validacion:
                             if campo in validaciones and validaciones[campo]["texto"]:
-                                estado = (
+                                estado_val = (
                                     "COINCIDE"
                                     if validaciones[campo]["match"]
                                     else "NO COINCIDE"
                                 )
-                                print(f"    {campo}: {estado}")
+                                print(f"    {campo}: {estado_val}")
                                 print(f"      Texto: {validaciones[campo]['texto']}")
                                 print(f"      Tabla: {validaciones[campo]['tabla']}")
                                 if validaciones[campo].get("diferencia"):
@@ -320,6 +368,36 @@ def EjecutarHU03(session, nombre_archivo):
                             observaciones,
                         )
 
+                        # ========================================================
+                        # CONSTRUIR RESUMEN PARA NOTIFICACIÓN
+                        # ========================================================
+                        if estado_final != "Registro validado para orden de compra":
+                            requiere_notificacion = True
+
+                            # Construir texto de validación del item
+                            item_info = f"\n📋 ITEM {numero_item}:\n"
+                            item_info += f"   Estado: {estado_final}\n"
+                            item_info += f"   Observaciones: {observaciones}\n"
+
+                            # Agregar campos clave
+                            if datos_texto.get("nit"):
+                                item_info += f"   NIT: {datos_texto['nit']}\n"
+                            if datos_texto.get("razon_social"):
+                                item_info += (
+                                    f"   Razón Social: {datos_texto['razon_social']}\n"
+                                )
+                            if datos_texto.get("concepto_compra"):
+                                concepto_corto = datos_texto["concepto_compra"][:100]
+                                item_info += f"   Concepto: {concepto_corto}...\n"
+
+                            # Agregar problemas de validación
+                            if validaciones.get("campos_obligatorios", {}).get(
+                                "faltantes"
+                            ):
+                                item_info += f"   ⚠️ Campos faltantes: {', '.join(validaciones['campos_obligatorios']['faltantes'])}\n"
+
+                            resumen_validaciones.append(item_info)
+
                         # Contar segun el resultado
                         if estado_final == "Registro validado para orden de compra":
                             contador_validados += 1
@@ -337,7 +415,7 @@ def EjecutarHU03(session, nombre_archivo):
                     else:
                         # Sin texto en el editor
                         contadores["items_sin_texto"] += 1
-                        observaciones = (
+                        observaciones_item = (
                             "Texto no encontrado en el editor SAP - No se puede validar"
                         )
                         ActualizarEstadoYObservaciones(
@@ -346,9 +424,17 @@ def EjecutarHU03(session, nombre_archivo):
                             solped,
                             numero_item,
                             "Sin Texto",
-                            observaciones,
+                            observaciones_item,
                         )
                         print(f"Item {numero_item}: Sin texto - No validado")
+
+                        # También requiere notificación
+                        requiere_notificacion = True
+                        resumen_validaciones.append(
+                            f"\n📋 ITEM {numero_item}:\n"
+                            f"   Estado: Sin Texto\n"
+                            f"   Observaciones: {observaciones_item}\n"
+                        )
 
                 # 6. Actualizar estado final de la SOLPED completa
                 if (
@@ -359,6 +445,7 @@ def EjecutarHU03(session, nombre_archivo):
                     estado_final_solped = "Registro validado para orden de compra"
                     observaciones_solped = f"Todos los items validados ({contador_validados}/{items_procesados_en_solped})"
                     contadores["procesadas_exitosamente"] += 1
+                    requiere_notificacion = False  # No notificar si todo está OK
 
                 elif contador_validados > 0 and contador_verificar_manual == 0:
                     # Algunos validados, otros sin texto
@@ -389,6 +476,140 @@ def EjecutarHU03(session, nombre_archivo):
                 print(f"\nEXITO: SOLPED {solped} completada")
                 print(f"  Estado final: {estado_final_solped}")
                 print(f"  Resumen: {observaciones_solped}")
+
+                # ========================================================
+                # ENVIAR NOTIFICACIÓN SI ES NECESARIO (UNA POR SOLPED)
+                # ========================================================
+                if requiere_notificacion and correos_responsables:
+                    # Eliminar duplicados de correos
+                    correos_unicos = list(set(correos_responsables))
+
+                    # ========================================================
+                    # MODO DESARROLLO - REDIRIGIR CORREOS
+                    # ========================================================
+                    if MODO_DESARROLLO:
+                        correos_originales = correos_unicos.copy()
+                        correos_unicos = [EMAIL_DESARROLLO]
+                        print(f"\n{'='*60}")
+                        print(f"📧 NOTIFICACIÓN (MODO DESARROLLO)")
+                        print(f"{'='*60}")
+                        print(
+                            f"Destinatarios originales: {', '.join(correos_originales)}"
+                        )
+                        print(f"Redirigido a: {EMAIL_DESARROLLO}")
+                    else:
+                        print(f"\n{'='*60}")
+                        print(f"📧 ENVIANDO NOTIFICACIÓN DE REVISIÓN MANUAL")
+                        print(f"{'='*60}")
+                        print(f"Destinatarios: {', '.join(correos_unicos)}")
+
+                    # Construir texto completo de validaciones
+                    texto_validaciones = f"SOLPED: {solped}\n"
+
+                    # Agregar info de modo desarrollo
+                    if MODO_DESARROLLO:
+                        texto_validaciones += (
+                            f"\n⚠️ MODO DESARROLLO - CORREO DE PRUEBA\n"
+                        )
+                        texto_validaciones += f"Destinatarios originales: {', '.join(correos_originales)}\n"
+                        texto_validaciones += f"{'='*60}\n\n"
+
+                    texto_validaciones += f"Estado Final: {estado_final_solped}\n"
+                    texto_validaciones += f"Total Items: {items_procesados_en_solped}\n"
+                    texto_validaciones += f"Items Validados: {contador_validados}\n"
+                    texto_validaciones += (
+                        f"Items Requieren Revisión: {contador_verificar_manual}\n"
+                    )
+                    texto_validaciones += f"Items Sin Texto: {items_procesados_en_solped - contador_con_texto}\n"
+                    texto_validaciones += f"\n{'='*60}\n"
+                    texto_validaciones += f"DETALLE POR ITEM:\n"
+                    texto_validaciones += "".join(resumen_validaciones)
+
+                    # Enviar notificación
+                    try:
+                        exito_notificacion = NotificarRevisionManualSolped(
+                            destinatarios=correos_unicos,
+                            numero_solped=solped,
+                            validaciones=texto_validaciones,
+                            task_name=task_name,
+                        )
+
+                        if exito_notificacion:
+                            if MODO_DESARROLLO:
+                                print(
+                                    f"✅ [DESARROLLO] Correo enviado a {EMAIL_DESARROLLO}"
+                                )
+                                print(f"   (Original: {', '.join(correos_originales)})")
+                            else:
+                                print(
+                                    f"✅ Notificación enviada correctamente a {len(correos_unicos)} destinatario(s)"
+                                )
+                            contadores["notificaciones_enviadas"] += 1
+
+                            # Guardar info para reporte final
+                            solpeds_con_problemas.append(
+                                {
+                                    "solped": solped,
+                                    "estado": estado_final_solped,
+                                    "items_total": items_procesados_en_solped,
+                                    "items_ok": contador_validados,
+                                    "items_revisar": contador_verificar_manual,
+                                    "items_sin_texto": items_procesados_en_solped
+                                    - contador_con_texto,
+                                    "responsables": (
+                                        correos_originales
+                                        if MODO_DESARROLLO
+                                        else correos_unicos
+                                    ),
+                                    "detalle": resumen_validaciones,
+                                }
+                            )
+                        else:
+                            print(f"❌ Error al enviar notificación")
+                            contadores["notificaciones_fallidas"] += 1
+
+                    except Exception as e_notif:
+                        print(f"❌ Error al enviar notificación: {e_notif}")
+                        contadores["notificaciones_fallidas"] += 1
+                        WriteLog(
+                            mensaje=f"Error al enviar notificación para SOLPED {solped}: {e_notif}",
+                            estado="WARNING",
+                            task_name=task_name,
+                            path_log=RUTAS["PathLog"],
+                        )
+
+                    print(f"{'='*60}\n")
+
+                elif requiere_notificacion and not correos_responsables:
+                    mensaje_advertencia = f"SOLPED {solped} requiere revisión pero NO se encontró correo @colsubsidio.com"
+
+                    if MODO_DESARROLLO:
+                        print(f"⚠️  [DESARROLLO] {mensaje_advertencia}")
+                        print(f"   Se enviaría notificación genérica en producción")
+                    else:
+                        print(f"⚠️  {mensaje_advertencia}")
+
+                    WriteLog(
+                        mensaje=f"SOLPED {solped}: Requiere revisión pero sin correo de responsable",
+                        estado="WARNING",
+                        task_name=task_name,
+                        path_log=RUTAS["PathLog"],
+                    )
+
+                    # Guardar para reporte final aunque no tenga responsable
+                    solpeds_con_problemas.append(
+                        {
+                            "solped": solped,
+                            "estado": estado_final_solped,
+                            "items_total": items_procesados_en_solped,
+                            "items_ok": contador_validados,
+                            "items_revisar": contador_verificar_manual,
+                            "items_sin_texto": items_procesados_en_solped
+                            - contador_con_texto,
+                            "responsables": [],
+                            "detalle": resumen_validaciones,
+                        }
+                    )
 
             except Exception as e:
                 contadores["con_errores"] += 1
@@ -426,6 +647,9 @@ def EjecutarHU03(session, nombre_archivo):
         print(f"  Items validados para OC: {contadores['items_validados']}")
         print(f"  Items para verificar manual: {contadores['items_verificar_manual']}")
         print(f"  Items sin texto: {contadores['items_sin_texto']}")
+        print(f"\nNOTIFICACIONES:")
+        print(f"  Notificaciones enviadas: {contadores['notificaciones_enviadas']}")
+        print(f"  Notificaciones fallidas: {contadores['notificaciones_fallidas']}")
 
         # Recargar archivo para mostrar estados finales
         df_final = procesarTablaME5A(nombre_archivo)
@@ -448,13 +672,401 @@ def EjecutarHU03(session, nombre_archivo):
 
         print("\n")
 
+        # ========================================================
+        # ENVIAR REPORTE FINAL GENERAL A NETAPPLICATIONS
+        # ========================================================
+        if solpeds_con_problemas:
+            print(f"\n{'='*80}")
+            if MODO_DESARROLLO:
+                print(f"📧 GENERANDO REPORTE FINAL CONSOLIDADO (MODO DESARROLLO)")
+            else:
+                print(f"📧 GENERANDO REPORTE FINAL CONSOLIDADO")
+            print(f"{'='*80}")
+
+            # Construir reporte consolidado
+            reporte_final = f"REPORTE CONSOLIDADO - VALIDACIÓN ME53N\n"
+            reporte_final += f"Fecha: {time.strftime('%Y-%m-%d %H:%M:%S')}\n"
+            reporte_final += f"Archivo procesado: {nombre_archivo}\n"
+
+            if MODO_DESARROLLO:
+                reporte_final += f"\n{'='*60}\n"
+                reporte_final += f"⚠️ MODO DESARROLLO ACTIVO\n"
+                reporte_final += f"Este es un correo de prueba.\n"
+                reporte_final += (
+                    f"En producción se enviaría a los destinatarios reales.\n"
+                )
+                reporte_final += f"{'='*60}\n"
+
+            reporte_final += f"\n{'='*60}\n"
+            reporte_final += f"RESUMEN GENERAL:\n"
+            reporte_final += f"{'='*60}\n"
+            reporte_final += (
+                f"Total SOLPEDs procesadas: {contadores['total_solpeds']}\n"
+            )
+            reporte_final += f"SOLPEDs con problemas: {len(solpeds_con_problemas)}\n"
+            reporte_final += f"SOLPEDs exitosas: {contadores['procesadas_exitosamente'] - len(solpeds_con_problemas)}\n"
+            reporte_final += (
+                f"Total items procesados: {contadores['items_procesados']}\n"
+            )
+            reporte_final += f"Items validados: {contadores['items_validados']}\n"
+            reporte_final += (
+                f"Items para verificar: {contadores['items_verificar_manual']}\n"
+            )
+            reporte_final += f"Items sin texto: {contadores['items_sin_texto']}\n"
+            reporte_final += (
+                f"Notificaciones enviadas: {contadores['notificaciones_enviadas']}\n"
+            )
+            reporte_final += (
+                f"Notificaciones fallidas: {contadores['notificaciones_fallidas']}\n\n"
+            )
+
+            reporte_final += f"{'='*60}\n"
+            reporte_final += f"DETALLE DE SOLPEDS CON PROBLEMAS:\n"
+            reporte_final += f"{'='*60}\n\n"
+
+            for idx, solped_info in enumerate(solpeds_con_problemas, 1):
+                reporte_final += f"\n{idx}. SOLPED: {solped_info['solped']}\n"
+                reporte_final += f"   Estado: {solped_info['estado']}\n"
+                reporte_final += f"   Items Total: {solped_info['items_total']}\n"
+                reporte_final += f"   Items Validados: {solped_info['items_ok']}\n"
+                reporte_final += (
+                    f"   Items Requieren Revisión: {solped_info['items_revisar']}\n"
+                )
+                reporte_final += (
+                    f"   Items Sin Texto: {solped_info['items_sin_texto']}\n"
+                )
+
+                if solped_info["responsables"]:
+                    if MODO_DESARROLLO:
+                        reporte_final += f"   Responsables (no notificados - modo desarrollo): {', '.join(solped_info['responsables'])}\n"
+                    else:
+                        reporte_final += f"   Responsables notificados: {', '.join(solped_info['responsables'])}\n"
+                else:
+                    reporte_final += f"   ⚠️ Sin responsable identificado\n"
+
+                reporte_final += f"\n   DETALLE DE ITEMS:\n"
+                reporte_final += "".join(solped_info["detalle"])
+                reporte_final += f"\n   {'-'*60}\n"
+
+            # Enviar correo consolidado a NetApplications
+            try:
+                from Funciones.GeneralME53N import EnviarCorreoPersonalizado
+
+                if MODO_DESARROLLO:
+                    asunto_final = f"[DESARROLLO] 📊 Reporte Consolidado - {len(solpeds_con_problemas)} SOLPEDs requieren atención"
+                else:
+                    asunto_final = f"📊 Reporte Consolidado Validación ME53N - {len(solpeds_con_problemas)} SOLPEDs"
+
+                cuerpo_final = f"""
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 20px;">
+        <tr>
+            <td align="center">
+                <table width="700" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+                """
+
+                # Banner de modo desarrollo
+                if MODO_DESARROLLO:
+                    cuerpo_final += f"""
+                    <!-- Banner Desarrollo -->
+                    <tr>
+                        <td style="background-color: #fff3cd; border-left: 5px solid #ffc107; padding: 20px 40px;">
+                            <table width="100%" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <td width="50">
+                                        <div style="font-size: 36px;">⚠️</div>
+                                    </td>
+                                    <td>
+                                        <h3 style="margin: 0 0 5px 0; color: #856404; font-size: 18px;">MODO DESARROLLO</h3>
+                                        <p style="margin: 0; color: #856404; font-size: 14px;">
+                                            Este es un correo de prueba. Los destinatarios reales NO fueron notificados.
+                                        </p>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    """
+
+                cuerpo_final += f"""
+                    <!-- Header -->
+                    <tr>
+                        <td style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); padding: 40px 40px 30px 40px;">
+                            <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 600; text-align: center;">
+                                📊 Reporte Consolidado
+                            </h1>
+                            <p style="margin: 10px 0 0 0; color: #ecf0f1; font-size: 16px; text-align: center; opacity: 0.95;">
+                                Validación ME53N - {time.strftime('%d/%m/%Y %H:%M')}
+                            </p>
+                        </td>
+                    </tr>
+                    
+                    <!-- Resumen Ejecutivo -->
+                    <tr>
+                        <td style="padding: 35px 40px 25px 40px;">
+                            <h2 style="margin: 0 0 20px 0; color: #2c3e50; font-size: 22px; border-bottom: 3px solid #3498db; padding-bottom: 10px;">
+                                Resumen Ejecutivo
+                            </h2>
+                            
+                            <!-- Estadísticas en Grid -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 25px;">
+                                <tr>
+                                    <!-- Total Procesadas -->
+                                    <td width="33%" style="padding: 20px 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; text-align: center;">
+                                        <div style="color: #ffffff; font-size: 38px; font-weight: bold; margin-bottom: 8px;">
+                                            {contadores['total_solpeds']}
+                                        </div>
+                                        <div style="color: #ffffff; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">
+                                            SOLPEDs<br>Procesadas
+                                        </div>
+                                    </td>
+                                    
+                                    <td width="2%"></td>
+                                    
+                                    <!-- Con Problemas -->
+                                    <td width="33%" style="padding: 20px 15px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 8px; text-align: center;">
+                                        <div style="color: #ffffff; font-size: 38px; font-weight: bold; margin-bottom: 8px;">
+                                            {len(solpeds_con_problemas)}
+                                        </div>
+                                        <div style="color: #ffffff; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">
+                                            Requieren<br>Atención
+                                        </div>
+                                    </td>
+                                    
+                                    <td width="2%"></td>
+                                    
+                                    <!-- Items Validados -->
+                                    <td width="33%" style="padding: 20px 15px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 8px; text-align: center;">
+                                        <div style="color: #ffffff; font-size: 38px; font-weight: bold; margin-bottom: 8px;">
+                                            {contadores['items_validados']}
+                                        </div>
+                                        <div style="color: #ffffff; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">
+                                            Items<br>Validados
+                                        </div>
+                                    </td>
+                                </tr>
+                            </table>
+                            
+                            <!-- Métricas Adicionales -->
+                            <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8f9fa; border-radius: 8px; padding: 20px;">
+                                <tr>
+                                    <td width="50%" style="padding: 10px; border-right: 1px solid #dee2e6;">
+                                        <div style="color: #6c757d; font-size: 13px; margin-bottom: 5px;">Items Procesados</div>
+                                        <div style="color: #2c3e50; font-size: 24px; font-weight: bold;">{contadores['items_procesados']}</div>
+                                    </td>
+                                    <td width="50%" style="padding: 10px;">
+                                        <div style="color: #6c757d; font-size: 13px; margin-bottom: 5px;">Items Verificar Manual</div>
+                                        <div style="color: #e74c3c; font-size: 24px; font-weight: bold;">{contadores['items_verificar_manual']}</div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td width="50%" style="padding: 10px; border-right: 1px solid #dee2e6; border-top: 1px solid #dee2e6;">
+                                        <div style="color: #6c757d; font-size: 13px; margin-bottom: 5px;">Items Sin Texto</div>
+                                        <div style="color: #f39c12; font-size: 24px; font-weight: bold;">{contadores['items_sin_texto']}</div>
+                                    </td>
+                                    <td width="50%" style="padding: 10px; border-top: 1px solid #dee2e6;">
+                                        <div style="color: #6c757d; font-size: 13px; margin-bottom: 5px;">Notificaciones Enviadas</div>
+                                        <div style="color: #27ae60; font-size: 24px; font-weight: bold;">{contadores['notificaciones_enviadas']}</div>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                    
+                    <!-- SOLPEDs con Problemas -->
+                    <tr>
+                        <td style="padding: 0 40px 35px 40px;">
+                            <h2 style="margin: 0 0 20px 0; color: #2c3e50; font-size: 22px; border-bottom: 3px solid #e74c3c; padding-bottom: 10px;">
+                                🚨 SOLPEDs que Requieren Atención
+                            </h2>
+                """
+
+                # Lista de SOLPEDs con problemas
+                for idx, solped_info in enumerate(solpeds_con_problemas, 1):
+                    # Determinar color según severidad
+                    if solped_info["items_revisar"] > solped_info["items_ok"]:
+                        color_borde = "#e74c3c"  # Rojo - Más problemas
+                        color_fondo = "#ffebee"
+                    elif solped_info["items_sin_texto"] > 0:
+                        color_borde = "#f39c12"  # Naranja - Advertencia
+                        color_fondo = "#fff3e0"
+                    else:
+                        color_borde = "#3498db"  # Azul - Info
+                        color_fondo = "#e3f2fd"
+
+                    cuerpo_final += f"""
+                            <!-- SOLPED {idx} -->
+                            <div style="background-color: {color_fondo}; border-left: 4px solid {color_borde}; border-radius: 6px; padding: 20px; margin-bottom: 20px;">
+                                <table width="100%" cellpadding="0" cellspacing="0">
+                                    <tr>
+                                        <td>
+                                            <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                                                <span style="background-color: {color_borde}; color: #ffffff; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-right: 12px;">
+                                                    #{idx}
+                                                </span>
+                                                <span style="color: #2c3e50; font-size: 20px; font-weight: bold;">
+                                                    SOLPED {solped_info['solped']}
+                                                </span>
+                                            </div>
+                                        </td>
+                                        <td align="right">
+                                            <span style="background-color: {color_borde}; color: #ffffff; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;">
+                                                {solped_info['estado']}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 15px;">
+                                    <tr>
+                                        <td width="25%" style="padding: 8px 0;">
+                                            <div style="color: #7f8c8d; font-size: 12px; margin-bottom: 4px;">Total Items</div>
+                                            <div style="color: #2c3e50; font-size: 18px; font-weight: bold;">{solped_info['items_total']}</div>
+                                        </td>
+                                        <td width="25%" style="padding: 8px 0;">
+                                            <div style="color: #7f8c8d; font-size: 12px; margin-bottom: 4px;">✓ Validados</div>
+                                            <div style="color: #27ae60; font-size: 18px; font-weight: bold;">{solped_info['items_ok']}</div>
+                                        </td>
+                                        <td width="25%" style="padding: 8px 0;">
+                                            <div style="color: #7f8c8d; font-size: 12px; margin-bottom: 4px;">⚠ Revisar</div>
+                                            <div style="color: #e74c3c; font-size: 18px; font-weight: bold;">{solped_info['items_revisar']}</div>
+                                        </td>
+                                        <td width="25%" style="padding: 8px 0;">
+                                            <div style="color: #7f8c8d; font-size: 12px; margin-bottom: 4px;">Sin Texto</div>
+                                            <div style="color: #f39c12; font-size: 18px; font-weight: bold;">{solped_info['items_sin_texto']}</div>
+                                        </td>
+                                    </tr>
+                                </table>
+                                
+                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1);">
+                    """
+
+                    if solped_info["responsables"]:
+                        responsables_str = ", ".join(solped_info["responsables"])
+                        if MODO_DESARROLLO:
+                            cuerpo_final += f"""
+                                    <div style="color: #856404; font-size: 13px;">
+                                        <strong>⚠️ Responsable (no notificado - desarrollo):</strong><br>
+                                        <span style="font-family: monospace; background-color: rgba(255,255,255,0.7); padding: 4px 8px; border-radius: 3px; display: inline-block; margin-top: 5px;">
+                                            {responsables_str}
+                                        </span>
+                                    </div>
+                            """
+                        else:
+                            cuerpo_final += f"""
+                                    <div style="color: #27ae60; font-size: 13px;">
+                                        <strong>✓ Notificado a:</strong> <span style="font-family: monospace;">{responsables_str}</span>
+                                    </div>
+                            """
+                    else:
+                        cuerpo_final += f"""
+                                    <div style="color: #e74c3c; font-size: 13px;">
+                                        <strong>⚠️ Sin responsable identificado</strong> - Se requiere asignación manual
+                                    </div>
+                        """
+
+                    cuerpo_final += """
+                                </div>
+                            </div>
+                    """
+
+                cuerpo_final += f"""
+                        </td>
+                    </tr>
+                    
+                    <!-- Información del Adjunto -->
+                    <tr>
+                        <td style="padding: 0 40px 35px 40px;">
+                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; padding: 25px; text-align: center;">
+                                <div style="font-size: 48px; margin-bottom: 10px;">📎</div>
+                                <h3 style="margin: 0 0 10px 0; color: #ffffff; font-size: 18px;">Reporte Detallado Adjunto</h3>
+                                <p style="margin: 0; color: #ffffff; font-size: 14px; opacity: 0.9;">
+                                    El archivo adjunto contiene información detallada de cada item, validaciones y observaciones completas.
+                                </p>
+                            </div>
+                        </td>
+                    </tr>
+                    
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color: #2c3e50; padding: 30px 40px; text-align: center;">
+                            <p style="margin: 0 0 10px 0; color: #ecf0f1; font-size: 14px;">
+                                <strong>Sistema de Validación Automática</strong>
+                            </p>
+                            <p style="margin: 0; color: #95a5a6; font-size: 12px;">
+                                © {time.strftime('%Y')} Colsubsidio | NetApplications<br>
+                                Este correo fue generado automáticamente
+                            </p>
+                        </td>
+                    </tr>
+                    
+                </table>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+                """
+
+                # Guardar reporte detallado en archivo
+                path_reporte_final = f"{RUTAS['PathReportes']}\\Reporte_Consolidado_{time.strftime('%Y%m%d_%H%M%S')}.txt"
+                with open(path_reporte_final, "w", encoding="utf-8") as f:
+                    f.write(reporte_final)
+
+                print(f"Reporte consolidado guardado: {path_reporte_final}")
+
+                # Enviar correo
+                exito_final = EnviarCorreoPersonalizado(
+                    destinatario=(
+                        EMAIL_DESARROLLO
+                        if MODO_DESARROLLO
+                        else "paula.sierra@netapplications.com.co"
+                    ),
+                    asunto=asunto_final,
+                    cuerpo=cuerpo_final,
+                    task_name=task_name,
+                    adjuntos=[path_reporte_final],
+                )
+
+                if exito_final:
+                    if MODO_DESARROLLO:
+                        print(
+                            f"✅ [DESARROLLO] Reporte consolidado enviado a {EMAIL_DESARROLLO}"
+                        )
+                    else:
+                        print(f"✅ Reporte consolidado enviado a NetApplications")
+                else:
+                    print(f"❌ Error al enviar reporte consolidado")
+
+            except Exception as e_final:
+                print(f"❌ Error al generar/enviar reporte final: {e_final}")
+                WriteLog(
+                    mensaje=f"Error al enviar reporte consolidado: {e_final}",
+                    estado="WARNING",
+                    task_name=task_name,
+                    path_log=RUTAS["PathLog"],
+                )
+
+            print(f"{'='*80}\n")
+        else:
+            print(
+                f"\n✅ Todas las SOLPEDs validadas correctamente - No se requiere reporte consolidado\n"
+            )
+
         # ======================================================
         # === Finalización HU03 ===
         # ======================================================
         WriteLog(
             mensaje=f"HU03 completado exitosamente. "
             f"SOLPEDs: {contadores['procesadas_exitosamente']}/{contadores['total_solpeds']}, "
-            f"Items validados: {contadores['items_validados']}/{contadores['items_procesados']}",
+            f"Items validados: {contadores['items_validados']}/{contadores['items_procesados']}, "
+            f"Notificaciones enviadas: {contadores['notificaciones_enviadas']}",
             estado="INFO",
             task_name=task_name,
             path_log=RUTAS["PathLog"],

@@ -11,7 +11,7 @@
 # ================================
 
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
-from HU.HU1_LoginSAP import ObtenerSesionActiva
+from HU.HU1_LoginSAP import ObtenerSesionActiva, conectar_sap
 from HU.HU2_DescargaME5A import EjecutarHU02
 from HU.HU03_ValidacionME53N import EjecutarHU03
 from Funciones.EscribirLog import WriteLog
@@ -20,7 +20,7 @@ from Funciones.GeneralME53N import (
     EnviarCorreoPersonalizado,
     NotificarRevisionManualSolped,
 )
-from Config.settings import RUTAS
+from Config.settings import RUTAS, SAP_CONFIG
 import traceback
 
 
@@ -38,59 +38,6 @@ def Main_GestionSolped():
             path_log=RUTAS["PathLog"],
         )
 
-        # # Enviar correo de inicio (código 1)
-        # # EnviarNotificacionCorreo(codigo_correo=1, task_name=task_name)
-        # archivo_descargado = rf"{RUTAS['PathReportes']}/Reporte_1300139268_10.txt"
-        # # Enviar correo de inicio (código 2 adjunto)
-        # EnviarNotificacionCorreo(
-        #     codigo_correo=54, task_name=task_name, adjuntos=[archivo_descargado]
-        # )
-
-        # exito_personalizado = EnviarCorreoPersonalizado(
-        #     destinatario="soporte_critico@netapplications.com.co",
-        #     asunto="Alerta Crítica: El servicio X ha fallado",
-        #     cuerpo=(
-        #         "<h1>Error Inesperado</h1>"
-        #         "<p>El proceso de sincronización ha fallado en la etapa de validación de datos.</p>"
-        #         "<p><strong>Revisar logs en:</strong> \\\\servidor\\logs\\errores.txt</p>"
-        #     ),
-        #     task_name=task_name,
-        #     adjuntos=["C:/Archivos/log_error_20251204.txt"],
-        #     cc=["paula.sierra@netapplications.com.co"],
-        # )
-
-        # if exito_personalizado:
-        #     print(f"Notificación enviada exitosamente exito_personalizado.")
-        # else:
-        #     print(f"Fallo al enviar la notificación exito_personalizado.")
-
-        # NUMERO_SOLPED = "8000012345"
-        # DESTINOS = ["usuario.revision@empresa.com", "supervisor@empresa.com"]
-        # RAZONES_VALIDACION = (
-        #     "1. El centro de costo asignado no es válido para el tipo de material.\n"
-        #     "2. La cantidad solicitada supera el límite sin aprobación especial."
-        # )
-
-        # # Llamada a la función
-        # exito_notificacion = NotificarRevisionManualSolped(
-        #     destinatarios=DESTINOS,
-        #     numero_solped=NUMERO_SOLPED,
-        #     validaciones=RAZONES_VALIDACION,
-        # )
-
-        # exito_notificacion = NotificarRevisionManualSolped(
-        #     destinatarios=["usuario.revision@empresa.com", "supervisor@empresa.com"],
-        #     numero_solped="8000012345",
-        #     validaciones=(
-        #         "1. El centro de costo asignado no es válido para el tipo de material.\n"
-        #         "2. La cantidad solicitada supera el límite sin aprobación especial."
-        #     ),
-        # )
-
-        # if exito_notificacion:
-        #     print(f"Notificación enviada exitosamente para SOLPED {NUMERO_SOLPED}.")
-        # else:
-        #     print(f"Fallo al enviar la notificación para SOLPED {NUMERO_SOLPED}.")
         # ================================
         # 1. Despliegue de ambiente
         # ================================
@@ -110,6 +57,13 @@ def Main_GestionSolped():
             estado="INFO",
             task_name=task_name,
             path_log=RUTAS["PathLog"],
+        )
+        session = conectar_sap(
+            SAP_CONFIG["sistema"],
+            SAP_CONFIG["mandante"],
+            SAP_CONFIG["user"],
+            SAP_CONFIG["password"],
+            "EN",
         )
 
         session = ObtenerSesionActiva()
@@ -131,7 +85,7 @@ def Main_GestionSolped():
             path_log=RUTAS["PathLog"],
         )
 
-        # EjecutarHU02(session)
+        EjecutarHU02(session)
 
         WriteLog(
             mensaje="HU02 finalizada correctamente.",

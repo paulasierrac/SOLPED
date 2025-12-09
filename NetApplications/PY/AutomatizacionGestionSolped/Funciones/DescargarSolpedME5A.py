@@ -107,9 +107,9 @@ def DescargarSolpedME5A(session, estado):
     time.sleep(1)
 
     session.findById("wnd[0]").sendVKey(12)
-    time.sleep(0.5)
+    time.sleep(1)
     pyautogui.press("f3")
-    time.sleep(0.5)
+    time.sleep(1)
     pyautogui.press("f12")
     print(
         f"Archivo exportado correctamente: {ruta_guardar}"

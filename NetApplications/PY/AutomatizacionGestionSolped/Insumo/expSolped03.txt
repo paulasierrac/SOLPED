@@ -1,6 +1,185 @@
 ---------------------------------------------------------------------------------------------------------------------------------------------------
-|Purch.Req.|Item|Req.Date  |Material|Created   |Short Text                              |PO        |  Quantity|Plnt|PGr||D|Requisnr.   |Proc.state|
+|Purch.Req.|Item|Req. Date |Material|Created by|Short Text                              |PO        |  Quantity|Plnt|PGr||D|Requisnr.   |Proc.state|
 ---------------------------------------------------------------------------------------------------------------------------------------------------
+|1300139390|  10|09.12.2025|80016676|OSCAVILN  |LAVADO MANTEL GRANDE                    |          |      231 |CE53|C53|| |            |03        |
+|1300139390|  20|09.12.2025|80019221|OSCAVILN  |LAVADO MULETON                          |          |       20 |CE53|C53|| |            |03        |
+|1300139390|  30|09.12.2025|80019225|OSCAVILN  |LAVADO TAPA  GRANDE                     |          |       71 |CE53|C53|| |            |03        |
+|1300139390|  40|09.12.2025|80019229|OSCAVILN  |LAVADO TAPA MANTEL LICRA ENCAUCHETADA GR|          |       59 |CE53|C53|| |            |03        |
+|1300139390|  50|09.12.2025|80019234|OSCAVILN  |LAVADO CHAQUETA CAPITAN                 |          |        1 |CE53|C53|| |            |03        |
+|1300139390|  60|09.12.2025|80019224|OSCAVILN  |LAVADO SERVILLETA                       |          |      229 |CE53|C53|| |            |03        |
+|1300139390|  70|09.12.2025|80019223|OSCAVILN  |LAVADO PETO COCINA                      |          |       78 |CE53|C53|| |            |03        |
+|1300139391|  10|09.12.2025|80011043|OSCAVILN  |HTH. PULSAR BRIQUETTES                  |          |  317,520 |CA09|H01|| |            |03        |
+|1300139391|  20|09.12.2025|80014748|OSCAVILN  |WATERCHLOR BOLSA x 1 KILO               |          |       20 |CA09|H01|| |            |03        |
+|1300139391|  30|09.12.2025|80016063|OSCAVILN  |BICARBONATO DE SODIO C. ALCALINIDAD     |          |       50 |CA09|H01|| |            |03        |
+|1300139391|  40|09.12.2025|80004191|OSCAVILN  |CLORO GRANULADO                         |          |       20 |CA09|H01|| |            |03        |
+|1300139391|  50|09.12.2025|80003065|OSCAVILN  |CRISTALIN ALGICIDA                      |          |       20 |CA09|H01|| |            |03        |
+|1300139391|  60|09.12.2025|80009686|OSCAVILN  |CLORO SHOCK                             |          |       20 |CA09|H01|| |            |03        |
+|1300139391|  70|09.12.2025|80018083|OSCAVILN  |REACTIVO TAYLOR N. 10                   |          |        2 |CA09|H01|| |            |03        |
+|1300139391|  80|09.12.2025|80018085|OSCAVILN  |REACTIVO TAYLOR N. 12                   |          |        2 |CA09|H01|| |            |03        |
+|1300139391|  90|09.12.2025|80023818|OSCAVILN  |REACTIVO TAYLOR ROJO FENOL # 4 (INNV WA)|          |        2 |CA09|H01|| |            |03        |
+|1300139392|  10|09.12.2025|80023744|OSCAVILN  |PERSONAJE ITINERANTE                    |          |        1 |CA65|RD4|| |            |03        |
+|1300139392|  20|09.12.2025|80001113|OSCAVILN  |SERVICIOS COMPL. DE  FOTOGRAFÍAS        |          |        1 |CA65|RD4|| |            |03        |
+|1300139392|  30|09.12.2025|80013126|OSCAVILN  |SERVICIO DE APOYO LOGÍSTICO             |          |        1 |CA65|RD4|| |            |03        |
+|1300139392|  40|09.12.2025|80001140|OSCAVILN  |TRANSPORTE DE MATERIALES                |          |        1 |CA65|RD4|| |            |03        |
+|1300139393|  10|09.12.2025|80001039|OSCAVILN  |ALQUILER DE CARPAS                      |          |        9 |CA15|RD2|| |            |03        |
+|1300139393|  20|09.12.2025|80001039|OSCAVILN  |ALQUILER DE CARPAS                      |          |       11 |CA15|RD2|| |            |03        |
+|1300139393|  30|09.12.2025|80001069|OSCAVILN  |SONIDO BÁSICO COLSUBSIDIO RECREACION    |          |        1 |CA15|RD2|| |            |03        |
+|1300139393|  40|09.12.2025|80001140|OSCAVILN  |TRANSPORTE DE MATERIALES                |          |        2 |CA15|RD2|| |            |03        |
+|1300139393|  50|09.12.2025|80017041|OSCAVILN  |SERVICIOS CONTRATADOS EVENTOS           |          |        2 |CA15|RD2|| |            |03        |
+|1300139393|  60|09.12.2025|80017041|OSCAVILN  |SERVICIOS CONTRATADOS EVENTOS           |          |        1 |CA15|RD2|| |            |03        |
+|1300139393|  70|09.12.2025|80004385|OSCAVILN  |ALQUILER PLANTA ELECTRICA               |          |        1 |CA15|RD2|| |            |03        |
+|1300139394|  10|09.12.2025|80032125|OSCAVILN  |HARAGANES                               |          |        2 |CA15|RD2|| |            |03        |
+|1300139394|  20|09.12.2025|80032127|OSCAVILN  |ESPUMA DE ABSORCION 50X50               |          |        5 |CA15|RD2|| |            |03        |
+|1300139394|  30|09.12.2025|80032126|OSCAVILN  |CEPILLO CAMPO DE TENIS                  |          |        2 |CA15|RD2|| |            |03        |
+|1300139394|  40|09.12.2025|80032128|OSCAVILN  |CEPILLO LIMPIA LINEAS                   |          |        2 |CA15|RD2|| |            |03        |
+|1300139394|  50|09.12.2025|80032129|OSCAVILN  |MANGUERA DE RIEGO DE 20 MTS             |          |        1 |CA15|RD2|| |            |03        |
+|1300139394|  60|09.12.2025|80032130|OSCAVILN  |ACOPLES E INSTALACION                   |          |        1 |CA15|RD2|| |            |03        |
+|1300139394|  70|09.12.2025|80013126|OSCAVILN  |SERVICIO DE APOYO LOGÍSTICO             |          |       40 |CA15|RD2|| |            |03        |
+|1300139389|  10|05.12.2025|80035263|GONZFERN  |PHOTO VIDEO BOOTH 360° 2H SAONA         |          |        2 |CE53|C55|| |            |03        |
+|50988227  |  10|04.12.2025|80027403|JOSEPUEC  |ROYAL FILMS BONOS 2D 50-500             |          |        1 |CA65|   || |            |03        |
+|1300139338|  10|01.12.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |       50 |CE53|C54|| |            |03        |
+|1300139338|  20|01.12.2025|80038758|ADMCC_POD |AYB ALGODON DE AZUCAR J.ARIAS           |          |       50 |CE53|C54|| |            |03        |
+|1300139338|  30|01.12.2025|80038763|ADMCC_POD |AYB HAMBURGUESA WRAPS J.ARIAS           |          |       50 |CE53|C54|| |            |03        |
+|1300139339|  10|01.12.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |       50 |CE53|C54|| |            |03        |
+|1300139339|  20|01.12.2025|80038758|ADMCC_POD |AYB ALGODON DE AZUCAR J.ARIAS           |          |       50 |CE53|C54|| |            |03        |
+|1300139339|  30|01.12.2025|80038764|ADMCC_POD |AYB FRESAS CON CHOCOLATE J.ARIAS        |          |       50 |CE53|C54|| |            |03        |
+|1300139339|  40|01.12.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |       50 |CE53|C54|| |            |03        |
+|1300139325|  70|28.11.2025|80033713|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A CUB F.SITE  |          |        4 |CA15|RD2|| |            |03        |
+|1300139332|  10|28.11.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |      300 |CE53|C54|| |            |03        |
+|1300139332|  20|28.11.2025|80038758|ADMCC_POD |AYB ALGODON DE AZUCAR J.ARIAS           |          |      300 |CE53|C54|| |            |03        |
+|1300139332|  30|28.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |      400 |CE53|C54|| |            |03        |
+|1300139332|  40|28.11.2025|80038764|ADMCC_POD |AYB FRESAS CON CHOCOLATE J.ARIAS        |          |      250 |CE53|C54|| |            |03        |
+|1300139332|  50|28.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |      420 |CE53|C54|| |            |03        |
+|1300139332|  60|28.11.2025|80033713|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A CUB F.SITE  |          |        5 |CE53|C54|| |            |03        |
+|1300139333|  10|28.11.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |      200 |CE53|C54|| |            |03        |
+|1300139333|  20|28.11.2025|80038758|ADMCC_POD |AYB ALGODON DE AZUCAR J.ARIAS           |          |      400 |CE53|C54|| |            |03        |
+|1300139333|  30|28.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |      500 |CE53|C54|| |            |03        |
+|1300139333|  40|28.11.2025|80038764|ADMCC_POD |AYB FRESAS CON CHOCOLATE J.ARIAS        |          |      500 |CE53|C54|| |            |03        |
+|1300139333|  50|28.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |      300 |CE53|C54|| |            |03        |
+|1300139333|  60|28.11.2025|80033714|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A DES F.SITE  |          |        4 |CE53|C54|| |            |03        |
+|1300139333|  70|28.11.2025|80033713|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A CUB F.SITE  |          |        8 |CE53|C54|| |            |03        |
+|1300139334|  10|28.11.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |      200 |CA65|RD4|| |            |03        |
+|1300139334|  20|28.11.2025|80038758|ADMCC_POD |AYB ALGODON DE AZUCAR J.ARIAS           |          |      300 |CA65|RD4|| |            |03        |
+|1300139334|  30|28.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |      500 |CA65|RD4|| |            |03        |
+|1300139334|  40|28.11.2025|80038764|ADMCC_POD |AYB FRESAS CON CHOCOLATE J.ARIAS        |          |      205 |CA65|RD4|| |            |03        |
+|1300139334|  50|28.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |      250 |CA65|RD4|| |            |03        |
+|1300139334|  60|28.11.2025|80033713|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A CUB F.SITE  |          |        4 |CA65|RD4|| |            |03        |
+|1300139335|  10|28.11.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |      200 |CA12|H04|| |            |03        |
+|1300139335|  20|28.11.2025|80038758|ADMCC_POD |AYB ALGODON DE AZUCAR J.ARIAS           |          |      500 |CA12|H04|| |            |03        |
+|1300139335|  30|28.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |      300 |CA12|H04|| |            |03        |
+|1300139335|  40|28.11.2025|80038764|ADMCC_POD |AYB FRESAS CON CHOCOLATE J.ARIAS        |          |      500 |CA12|H04|| |            |03        |
+|1300139335|  50|28.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |      400 |CA12|H04|| |            |03        |
+|1300139335|  60|28.11.2025|80038763|ADMCC_POD |AYB HAMBURGUESA WRAPS J.ARIAS           |          |      400 |CA12|H04|| |            |03        |
+|1300139335|  70|28.11.2025|80038766|ADMCC_POD |AYB JUGO DE CAJA J.ARIAS                |          |      600 |CA12|H04|| |            |03        |
+|1300139336|  10|28.11.2025|80033714|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A DES F.SITE  |          |        5 |CA27|H08|| |            |03        |
+|1300139336|  20|28.11.2025|80033713|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A CUB F.SITE  |          |        9 |CA27|H08|| |            |03        |
+|1300139336|  30|28.11.2025|80033713|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A CUB F.SITE  |          |        8 |CA27|H08|| |            |03        |
+|1300139336|  40|28.11.2025|80038763|ADMCC_POD |AYB HAMBURGUESA WRAPS J.ARIAS           |          |      100 |CA27|H08|| |            |03        |
+|1300139336|  50|28.11.2025|80038766|ADMCC_POD |AYB JUGO DE CAJA J.ARIAS                |          |      200 |CA27|H08|| |            |03        |
+|1300139336|  60|28.11.2025|80038760|ADMCC_POD |AYB PERRO CALIENTE J.ARIAS              |          |      100 |CA27|H08|| |            |03        |
+|1300139336|  70|28.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |      100 |CA27|H08|| |            |03        |
+|1300139336|  80|28.11.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |      300 |CA27|H08|| |            |03        |
+|1300139337|  10|28.11.2025|80033713|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A CUB F.SITE  |          |       10 |CE53|C54|| |            |03        |
+|1300139337|  20|28.11.2025|80033714|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A DES F.SITE  |          |        5 |CE53|C54|| |            |03        |
+|1300139337|  30|28.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |      200 |CE53|C54|| |            |03        |
+|1300139337|  40|28.11.2025|80038764|ADMCC_POD |AYB FRESAS CON CHOCOLATE J.ARIAS        |          |      150 |CE53|C54|| |            |03        |
+|1300139337|  50|28.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |      150 |CE53|C54|| |            |03        |
+|1300139337|  60|28.11.2025|80038766|ADMCC_POD |AYB JUGO DE CAJA J.ARIAS                |          |      300 |CE53|C54|| |            |03        |
+|1300139337|  70|28.11.2025|80038761|ADMCC_POD |AYB PERRO CALIENTE WRAPS J.ARIAS        |          |      150 |CE53|C54|| |            |03        |
+|1300139337|  80|28.11.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |      150 |CE53|C54|| |            |03        |
+|1300139323|  10|26.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |       20 |CA15|RD2|| |            |03        |
+|1300139323|  20|26.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |       20 |CA15|RD2|| |            |03        |
+|1300139324|  10|26.11.2025|80038758|ADMCC_POD |AYB ALGODON DE AZUCAR J.ARIAS           |          |      200 |CA12|H04|| |            |03        |
+|1300139324|  20|26.11.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |      200 |CA12|H04|| |            |03        |
+|1300139324|  30|26.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |      200 |CA12|H04|| |            |03        |
+|1300139324|  40|26.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |      200 |CA12|H04|| |            |03        |
+|1300139324|  50|26.11.2025|80038763|ADMCC_POD |AYB HAMBURGUESA WRAPS J.ARIAS           |          |      200 |CA12|H04|| |            |03        |
+|1300139324|  60|26.11.2025|80033713|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A CUB F.SITE  |          |       10 |CA12|H04|| |            |03        |
+|1300139325|  10|26.11.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |      100 |CA15|RD2|| |            |03        |
+|1300139325|  20|26.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |      100 |CA15|RD2|| |            |03        |
+|1300139325|  30|26.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |      600 |CA15|RD2|| |            |03        |
+|1300139325|  40|26.11.2025|80038766|ADMCC_POD |AYB JUGO DE CAJA J.ARIAS                |          |      400 |CA15|RD2|| |            |03        |
+|1300139325|  50|26.11.2025|80038760|ADMCC_POD |AYB PERRO CALIENTE J.ARIAS              |          |      150 |CA15|RD2|| |            |03        |
+|1300139325|  60|26.11.2025|80038764|ADMCC_POD |AYB FRESAS CON CHOCOLATE J.ARIAS        |          |      900 |CA15|RD2|| |            |03        |
+|1300139326|  10|26.11.2025|80038764|ADMCC_POD |AYB FRESAS CON CHOCOLATE J.ARIAS        |          |      400 |CE53|C54|| |            |03        |
+|1300139326|  20|26.11.2025|80038764|ADMCC_POD |AYB FRESAS CON CHOCOLATE J.ARIAS        |          |      400 |CE53|C54|| |            |03        |
+|1300139326|  30|26.11.2025|80038764|ADMCC_POD |AYB FRESAS CON CHOCOLATE J.ARIAS        |          |      400 |CE53|C54|| |            |03        |
+|1300139327|  10|26.11.2025|80035263|GONZFERN  |PHOTO VIDEO BOOTH 360° 2H SAONA         |          |        2 |CE53|C55|| |            |03        |
+|1300139328|  10|26.11.2025|80033713|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A CUB F.SITE  |          |        2 |CA12|H04|| |            |03        |
+|1300139328|  20|26.11.2025|80033714|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A DES F.SITE  |          |        2 |CA12|H04|| |            |03        |
+|1300139329|  10|26.11.2025|80035263|GONZFERN  |PHOTO VIDEO BOOTH 360° 2H SAONA         |          |        2 |CE53|C55|| |            |03        |
+|1300139329|  20|26.11.2025|80038758|GONZFERN  |AYB ALGODON DE AZUCAR J.ARIAS           |          |        1 |CA15|RD2|| |            |03        |
+|1300139330|  10|26.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |       15 |CE53|C54|| |            |03        |
+|1300139330|  20|26.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |       15 |CE53|C54|| |            |03        |
+|1300139331|  10|26.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |       30 |CA12|H04|| |            |03        |
+|1300139331|  20|26.11.2025|80038764|ADMCC_POD |AYB FRESAS CON CHOCOLATE J.ARIAS        |          |       30 |CA12|H04|| |            |03        |
+|1300139331|  30|26.11.2025|80038758|ADMCC_POD |AYB ALGODON DE AZUCAR J.ARIAS           |          |       30 |CA12|H04|| |            |03        |
+|1300139331|  40|26.11.2025|80038761|ADMCC_POD |AYB PERRO CALIENTE WRAPS J.ARIAS        |          |       30 |CA12|H04|| |            |03        |
+|1300139310|  50|25.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |      330 |CE53|C54|| |            |03        |
+|1300139318|  50|25.11.2025|80038763|ADMCC_POD |AYB HAMBURGUESA WRAPS J.ARIAS           |          |      200 |CA15|RD2|| |            |03        |
+|1300139319|  10|25.11.2025|80038764|ADMCC_POD |AYB FRESAS CON CHOCOLATE J.ARIAS        |          |      700 |CA15|RD2|| |            |03        |
+|1300139319|  20|25.11.2025|80038766|ADMCC_POD |AYB JUGO DE CAJA J.ARIAS                |          |      700 |CA15|RD2|| |            |03        |
+|1300139320|  10|25.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |      700 |CE53|C54|| |            |03        |
+|1300139320|  20|25.11.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |      700 |CE53|C54|| |            |03        |
+|1300139321|  10|25.11.2025|80033713|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A CUB F.SITE  |          |        3 |CA12|H04|| |            |03        |
+|1300139321|  20|25.11.2025|80033714|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A DES F.SITE  |          |        5 |CA12|H04|| |            |03        |
+|1300139321|  30|25.11.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |    1.000 |CA12|H04|| |            |03        |
+|1300139321|  40|25.11.2025|80038758|ADMCC_POD |AYB ALGODON DE AZUCAR J.ARIAS           |          |      500 |CA12|H04|| |            |03        |
+|1300139321|  50|25.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |      350 |CA12|H04|| |            |03        |
+|1300139322|  10|25.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |       50 |CE53|C54|| |            |03        |
+|1300139322|  20|25.11.2025|80038766|ADMCC_POD |AYB JUGO DE CAJA J.ARIAS                |          |       50 |CE53|C54|| |            |03        |
+|1300139322|  30|25.11.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |       50 |CE53|C54|| |            |03        |
+|1300139322|  40|25.11.2025|80038763|ADMCC_POD |AYB HAMBURGUESA WRAPS J.ARIAS           |          |       50 |CE53|C54|| |            |03        |
+|1300139322|  50|25.11.2025|80038764|ADMCC_POD |AYB FRESAS CON CHOCOLATE J.ARIAS        |          |       50 |CE53|C54|| |            |03        |
+|1300139322|  60|25.11.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |       50 |CE53|C54|| |            |03        |
+|1300139310|  40|24.11.2025|80033714|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A DES F.SITE  |          |       11 |CE53|C54|| |            |03        |
+|1300139311|  10|24.11.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |      100 |CA15|RD2|| |            |03        |
+|1300139311|  20|24.11.2025|80038758|ADMCC_POD |AYB ALGODON DE AZUCAR J.ARIAS           |          |       50 |CA15|RD2|| |            |03        |
+|1300139311|  30|24.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |       50 |CA15|RD2|| |            |03        |
+|1300139311|  40|24.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |       50 |CA15|RD2|| |            |03        |
+|1300139311|  50|24.11.2025|80038763|ADMCC_POD |AYB HAMBURGUESA WRAPS J.ARIAS           |          |       50 |CA15|RD2|| |            |03        |
+|1300139312|  10|24.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |      200 |CA27|H08|| |            |03        |
+|1300139312|  20|24.11.2025|80038764|ADMCC_POD |AYB FRESAS CON CHOCOLATE J.ARIAS        |          |      200 |CA27|H08|| |            |03        |
+|1300139312|  30|24.11.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |      200 |CA27|H08|| |            |03        |
+|1300139313|  10|24.11.2025|80038763|ADMCC_POD |AYB HAMBURGUESA WRAPS J.ARIAS           |          |    1.000 |CA15|RD2|| |            |03        |
+|1300139313|  20|24.11.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |    1.000 |CA15|RD2|| |            |03        |
+|1300139313|  30|24.11.2025|80038764|ADMCC_POD |AYB FRESAS CON CHOCOLATE J.ARIAS        |          |    1.000 |CA15|RD2|| |            |03        |
+|1300139313|  40|24.11.2025|80038766|ADMCC_POD |AYB JUGO DE CAJA J.ARIAS                |          |    1.000 |CA15|RD2|| |            |03        |
+|1300139314|  10|24.11.2025|80033713|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A CUB F.SITE  |          |       50 |CE53|C54|| |            |03        |
+|1300139314|  20|24.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |      200 |CE53|C54|| |            |03        |
+|1300139314|  30|24.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |      200 |CE53|C54|| |            |03        |
+|1300139314|  40|24.11.2025|80038763|ADMCC_POD |AYB HAMBURGUESA WRAPS J.ARIAS           |          |      200 |CE53|C54|| |            |03        |
+|1300139315|  10|24.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |      200 |CA15|RD2|| |            |03        |
+|1300139315|  20|24.11.2025|80038766|ADMCC_POD |AYB JUGO DE CAJA J.ARIAS                |          |      200 |CA15|RD2|| |            |03        |
+|1300139315|  30|24.11.2025|80033714|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A DES F.SITE  |          |      200 |CA15|RD2|| |            |03        |
+|1300139315|  40|24.11.2025|80038766|ADMCC_POD |AYB JUGO DE CAJA J.ARIAS                |          |      200 |CA15|RD2|| |            |03        |
+|1300139315|  50|24.11.2025|80038761|ADMCC_POD |AYB PERRO CALIENTE WRAPS J.ARIAS        |          |      200 |CA15|RD2|| |            |03        |
+|1300139316|  10|24.11.2025|80033713|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A CUB F.SITE  |          |      150 |CA12|H04|| |            |03        |
+|1300139316|  20|24.11.2025|80033714|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A DES F.SITE  |          |      150 |CA12|H04|| |            |03        |
+|1300139316|  30|24.11.2025|80038760|ADMCC_POD |AYB PERRO CALIENTE J.ARIAS              |          |      150 |CA12|H04|| |            |03        |
+|1300139316|  40|24.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |      150 |CA12|H04|| |            |03        |
+|1300139316|  50|24.11.2025|80038766|ADMCC_POD |AYB JUGO DE CAJA J.ARIAS                |          |      150 |CA12|H04|| |            |03        |
+|1300139316|  60|24.11.2025|80038761|ADMCC_POD |AYB PERRO CALIENTE WRAPS J.ARIAS        |          |      150 |CA12|H04|| |            |03        |
+|1300139317|  10|24.11.2025|80033713|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A CUB F.SITE  |          |      100 |CA15|RD2|| |            |03        |
+|1300139317|  20|24.11.2025|80033714|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A DES F.SITE  |          |      100 |CA15|RD2|| |            |03        |
+|1300139318|  10|24.11.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |      300 |CA15|RD2|| |            |03        |
+|1300139318|  20|24.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |      350 |CA15|RD2|| |            |03        |
+|1300139318|  30|24.11.2025|80038758|ADMCC_POD |AYB ALGODON DE AZUCAR J.ARIAS           |          |      310 |CA15|RD2|| |            |03        |
+|1300139318|  40|24.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |      420 |CA15|RD2|| |            |03        |
+|1300139310|  10|23.11.2025|80038765|ADMCC_POD |AYB AGUA 600 ML J.ARIAS                 |          |      600 |CE53|C54|| |            |03        |
+|1300139310|  20|23.11.2025|80038758|ADMCC_POD |AYB ALGODON DE AZUCAR J.ARIAS           |          |      500 |CE53|C54|| |            |03        |
+|1300139310|  30|23.11.2025|80033713|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A CUB F.SITE  |          |       18 |CE53|C54|| |            |03        |
+|1300139307|  10|21.11.2025|80033713|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A CUB F.SITE  |          |      100 |CE53|C54|| |            |03        |
+|1300139307|  20|21.11.2025|80033714|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A DES F.SITE  |          |      100 |CE53|C54|| |            |03        |
+|1300139307|  30|21.11.2025|80038758|ADMCC_POD |AYB ALGODON DE AZUCAR J.ARIAS           |          |      100 |CE53|C54|| |            |03        |
+|1300139307|  40|21.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |      100 |CE53|C54|| |            |03        |
+|1300139307|  50|21.11.2025|80038764|ADMCC_POD |AYB FRESAS CON CHOCOLATE J.ARIAS        |          |      100 |CE53|C54|| |            |03        |
+|1300139308|  10|21.11.2025|80038758|ADMCC_POD |AYB ALGODON DE AZUCAR J.ARIAS           |          |      100 |CA15|RD2|| |            |03        |
+|1300139308|  20|21.11.2025|80038759|ADMCC_POD |AYB CRISPETAS J.ARIAS                   |          |      100 |CA15|RD2|| |            |03        |
+|1300139308|  30|21.11.2025|80038764|ADMCC_POD |AYB FRESAS CON CHOCOLATE J.ARIAS        |          |      100 |CA15|RD2|| |            |03        |
+|1300139308|  40|21.11.2025|80038762|ADMCC_POD |AYB HAMBURGUESA J.ARIAS                 |          |      100 |CA15|RD2|| |            |03        |
+|1300139308|  50|21.11.2025|80038766|ADMCC_POD |AYB JUGO DE CAJA J.ARIAS                |          |      100 |CA15|RD2|| |            |03        |
+|1300139309|  10|21.11.2025|80038760|ADMCC_POD |AYB PERRO CALIENTE J.ARIAS              |          |      100 |CA65|RD4|| |            |03        |
 |1300139306|  10|20.11.2025|80033713|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A CUB F.SITE  |          |        3 |CE53|C54|| |            |03        |
 |1300139306|  20|20.11.2025|80033714|ADMCC_POD |CANCHA FUT5 AMERICAS FRAN-A DES F.SITE  |          |        3 |CE53|C54|| |            |03        |
 |1300139306|  30|20.11.2025|80038758|ADMCC_POD |AYB ALGODON DE AZUCAR J.ARIAS           |          |       50 |CE53|C54|| |            |03        |
@@ -1764,6 +1943,25 @@
 |50970836  |  20|18.01.2024|80014439|CRISCORREI|AYB ALMUERZO                            |          |        1 |CA65|RD4|| |            |03        |
 |50970534  |  10|16.01.2024|95024379|NINIFORFOR|MALETIN DE EQUIPO DE REANIMACION        |          |        2 |CS12|SAS|| |            |03        |
 |50970253  |  10|15.01.2024|95024379|ANDRGOMGON|MALETIN DE EQUIPO DE REANIMACION        |          |        2 |CA04|SAS|| |            |03        |
+|50962275  |1150|12.01.2024|80004675|VALEMARH  |PERSONAL DE SERVICIO                    |          |        2 |CA65|RD4|| |            |03        |
+|50962275  |1160|12.01.2024|80014441|VALEMARH  |VINO SANTA RITA                         |          |        1 |CA65|RD4|| |            |03        |
+|50962275  |1170|12.01.2024|80001112|VALEMARH  |PLATO ENTRADA Y POSTRE                  |          |       80 |CA65|RD4|| |            |03        |
+|50962275  |1230|12.01.2024|80001112|VALEMARH  |TRANSPORTE DECORACION                   |          |        1 |CA65|RD4|| |            |03        |
+|50962275  |1240|12.01.2024|80001112|VALEMARH  |TRANSPORTE TOTEMS                       |          |        1 |CA65|RD4|| |            |03        |
+|50962275  |1250|12.01.2024|80001112|VALEMARH  |TRANSPORTE MOBILIARIO                   |          |        1 |CA65|RD4|| |            |03        |
+|50962275  |1260|12.01.2024|80001112|VALEMARH  |TRANSPORTE TECNICA Y VIDEO              |          |        1 |CA65|RD4|| |            |03        |
+|50962275  |1270|12.01.2024|80001112|VALEMARH  |TRANSPORTE LETRAS                       |          |        1 |CA65|RD4|| |            |03        |
+|50962275  |1280|12.01.2024|80001091|VALEMARH  |RELOJ MUJER                             |          |        3 |CA65|RD4|| |            |03        |
+|50962275  |1290|12.01.2024|80001091|VALEMARH  |BOLIGRAFO                               |          |        9 |CA65|RD4|| |            |03        |
+|50962275  |1300|12.01.2024|80001091|VALEMARH  |USB                                     |          |        9 |CA65|RD4|| |            |03        |
+|50962275  |1310|12.01.2024|80001091|VALEMARH  |ESTUCHE METALICO                        |          |        9 |CA65|RD4|| |            |03        |
+|50962275  |1320|12.01.2024|80001091|VALEMARH  |MARCACION BOLIGRAFO                     |          |        9 |CA65|RD4|| |            |03        |
+|50962275  |1330|12.01.2024|80001091|VALEMARH  |MARCACION RELOJ                         |          |        9 |CA65|RD4|| |            |03        |
+|50962275  |1340|12.01.2024|80001091|VALEMARH  |MARCACION USB                           |          |        9 |CA65|RD4|| |            |03        |
+|50962275  |1350|12.01.2024|80001091|VALEMARH  |MARCACION CAJA USB                      |          |        9 |CA65|RD4|| |            |03        |
+|50962275  |1360|12.01.2024|80001091|VALEMARH  |CAJA NEGRA CON TAPA DURA                |          |        9 |CA65|RD4|| |            |03        |
+|50962275  |1370|12.01.2024|80001083|VALEMARH  |IMPRESION SALUDO                        |          |        9 |CA65|RD4|| |            |03        |
+|50962275  |1380|12.01.2024|80017263|VALEMARH  |HABITACION HOTEL                        |          |        1 |CA65|RD4|| |            |03        |
 |50969822  |  10|11.01.2024|80009943|CRISCORREI|ENTRADA PARQUES EVENTOS EXENTO          |          |    1.400 |CA65|RD4|| |            |03        |
 |50969822  |  20|11.01.2024|80014439|CRISCORREI|AYB ALMUERZO                            |          |    1.400 |CA65|RD4|| |            |03        |
 |50969822  |  30|11.01.2024|80014442|CRISCORREI|AYB BEBIDAS HIDRATANTES NO ALCOHOLICAS  |          |    1.400 |CA65|RD4|| |            |03        |
@@ -1785,6 +1983,17 @@
 |50969725  |  50|10.01.2024|95025622|CAROGOAR  |HISTORIA CLINICA MANUAL                 |          |      200 |CS73|SAS|| |            |03        |
 |50969404  |  10|09.01.2024|80017107|SANDROLSAN|ENTRADA SITIOS DE INTERES EVENTOS       |          |        1 |CA65|RD4|| |            |03        |
 |50969404  |  20|09.01.2024|80014439|SANDROLSAN|AYB ALMUERZO                            |          |        1 |CA65|RD4|| |            |03        |
+|50961561  | 130|04.01.2024|80014439|ANGIROZCAR|AYB ALMUERZO ADICIONAL                  |          |        3 |CA65|RD4|| |            |03        |
+|50961561  | 140|04.01.2024|80014439|ANGIROZCAR|AYB ALMUERZO ADICIONAL                  |          |        1 |CA65|RD4|| |            |03        |
+|50961561  | 150|04.01.2024|80020704|ANGIROZCAR|BEBIDAS AGUA ADICIONAL                  |          |       14 |CA65|RD4|| |            |03        |
+|50961561  | 160|04.01.2024|80020705|ANGIROZCAR|BEBIDAS ADICIONAL                       |          |        1 |CA65|RD4|| |            |03        |
+|50961561  | 170|04.01.2024|80020705|ANGIROZCAR|BEBIDAS ADICIONAL TEQUILA               |          |        4 |CA65|RD4|| |            |03        |
+|50961561  | 180|04.01.2024|80020705|ANGIROZCAR|BEBIDAS ADICIONAL MARGARITA             |          |        7 |CA65|RD4|| |            |03        |
+|50961561  | 190|04.01.2024|80020705|ANGIROZCAR|BEBIDAS ADICIONAL LYCHEE                |          |        1 |CA65|RD4|| |            |03        |
+|50961561  | 200|04.01.2024|80020704|ANGIROZCAR|BEBIDAS CAPUCHINO BAYLES                |          |        1 |CA65|RD4|| |            |03        |
+|50961561  | 210|04.01.2024|80020704|ANGIROZCAR|BEBIDAS CAPUCHINO                       |          |        1 |CA65|RD4|| |            |03        |
+|50961561  | 220|04.01.2024|80020705|ANGIROZCAR|BEBIDAS JOSE CUERVO TRADICIONAL         |          |        1 |CA65|RD4|| |            |03        |
+|50961561  | 230|04.01.2024|80020705|ANGIROZCAR|BEBIDAS CAZADORES REP                   |          |        1 |CA65|RD4|| |            |03        |
 |50969286  |  10|04.01.2024|80009943|ANGIROZCAR|ENTRADA PARQUES EVENTOS EXENTO          |          |      126 |CA65|RD4|| |            |03        |
 |50969286  |  20|04.01.2024|80000904|ANGIROZCAR|REFRIGERIO INTERNO                      |          |        2 |CA65|RD4|| |            |03        |
 |50969286  |  30|04.01.2024|80026070|ANGIROZCAR|IMP CONSUMO BOLSA PARQUES               |          |      113 |CA65|RD4|| |            |03        |

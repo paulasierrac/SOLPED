@@ -53,11 +53,13 @@ def NotificarRevisionManualSolped(
     cuerpo_template = f"""
         <html>
             <body style="font-family: Arial, sans-serif;">
-                <h2 style="color: #CC0000;">⚠️ Solicitud de Revisión Manual Requerida</h2>
+                <h2 style="color: #CC0000;">Solicitud de Revisión Manual Requerida</h2>
                 <p>El Solped <strong>{numero_solped}</strong> necesita ser validado por las siguientes razones:</p>
                 
                 <div style="border: 1px solid #ddd; padding: 15px; margin: 15px 0; background-color: #f9f9f9;">
-                    <p style="white-space: pre-wrap;">{validaciones}</p>
+                    <div style="padding: 10px; margin: 10px 0; background-color: #f4f4f4; border-radius: 6px;">
+                        {convertir_validaciones_a_lista(validaciones)}
+                    </div>
                 </div>
 
                 <p>Por favor, ingrese al sistema para realizar las correcciones o ajustes necesarios.</p>
@@ -130,7 +132,8 @@ def EnviarNotificacionCorreo(
         resultados = sender.procesar_excel_y_enviar(
             archivo_excel=RUTAS.get(
                 "ArchivoCorreos",
-                r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\EnvioCorreos.xlsx",
+                # r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\EnvioCorreos.xlsx",
+                rf"{RUTAS["ArchivoCorreos"]}",
             ),
             codigo_correo=codigo_correo,
             columna_codigo="codemailparameter",
@@ -262,6 +265,27 @@ def TraerSAPAlFrente_Opcion():
         print(f"Error en Opcion 4: {e}")
 
 
+def convertir_validaciones_a_lista(texto):
+    """
+    Convierte el bloque de texto de validaciones en una lista HTML <ul><li>.
+    Cada item debe comenzar con '📋 ITEM' u otro marcador detectable.
+    """
+    lineas = [l.strip() for l in texto.split("\n") if l.strip()]
+
+    lista_html = "<ul style='font-size:14px; line-height:1.5;'>"
+
+    for linea in lineas:
+        # Detectar inicio de item
+        if linea.startswith("-ITEM"):
+            lista_html += f"<li><strong>{linea}</strong></li>"
+        else:
+            lista_html += f"<li>{linea}</li>"
+
+    lista_html += "</ul>"
+
+    return lista_html
+
+
 def ObtenerTextoDelPortapapeles():
     """Obtener texto del portapapeles con manejo correcto de codificacion"""
     try:
@@ -292,7 +316,8 @@ def procesarTablaME5A(name, dias=None):
             path_log=RUTAS["PathLog"],
         )
 
-        path = f"C:\\Users\\CGRPA009\\Documents\\SOLPED-main\\SOLPED\\NetApplications\\PY\\AutomatizacionGestionSolped\\Insumo\\{name}"
+        # path = f".\\AutomatizacionGestionSolped\\Insumo\\{name}"
+        path = rf"{RUTAS["PathInsumos"]}\{name}"
 
         # INTENTAR LEER CON DIFERENTES CODIFICACIONES
         lineas = []
@@ -519,7 +544,8 @@ def procesarTablaME5A(name, dias=None):
 def GuardarTablaME5A(df, name):
     """Guarda el DataFrame de vuelta al TXT con formato de tabla"""
     try:
-        path = f"C:\\Users\\CGRPA009\\Documents\\SOLPED-main\\SOLPED\\NetApplications\\PY\\AutomatizacionGestionSolped\\Insumo\\{name}"
+        # path = f"C:\\Users\\CGRPA009\\Documents\\SOLPED-main\\SOLPED\\NetApplications\\PY\\AutomatizacionGestionSolped\\Insumo\\{name}"
+        path = rf"{RUTAS["PathInsumos"]}\{name}"
 
         # ASEGURAR QUE TIENE LAS COLUMNAS NECESARIAS
         columnas_requeridas = ["Estado", "Observaciones"]
@@ -802,7 +828,8 @@ def TablaItemsDataFrame(name) -> pd.DataFrame:
             path_log=RUTAS["PathLog"],
         )
 
-        path = rf"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\TablasME53N\{name}"
+        # path = rf"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\TablasME53N\{name}"
+        path = rf"{RUTAS["PathInsumos"]}\TablasME53N\{name}"
 
         # ========== DETECCION DE CODIFICACION ==========
         encoding = DetectarCodificacion(path)
@@ -937,7 +964,8 @@ def ObtenerItemsME53N(session, numero_solped):
 
         # 4. Escribir ruta de guardado
         session.findById("wnd[1]/usr/ctxtDY_PATH").text = (
-            r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\TablasME53N"
+            # r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\TablasME53N"
+            rf"{RUTAS["PathInsumos"]}\TablasME53N"
         )
         time.sleep(0.2)
 
@@ -1034,7 +1062,8 @@ def ObtenerItemTextME53N(session, numero_solped, numero_item):
         identificador = f"\n=====Solped: {numero_solped} Item: {numero_item} Registro: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} =====\n"
 
         # 7. Guardar texto en archivo de log
-        path = r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\texto_ITEMsap.txt"
+        # path = r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\texto_ITEMsap.txt"
+        path = rf"{RUTAS["PathInsumos"]}\texto_ITEMsap.txt"
         with open(path, "a", encoding="utf-8") as f:
             f.write(identificador)
             f.write(texto_limpio + "\n")
