@@ -11,6 +11,7 @@ import subprocess
 import time
 import os
 from Config.settings import RUTAS
+from HU.HU1_LoginSAP import ObtenerSesionActiva
 from Funciones.ValidacionM21N import (
     boton_existe,
     buscar_y_clickear,
@@ -36,20 +37,17 @@ def GenerarOCDesdeSolped(session, solped, item=2):
         print("Transacción ME21N abierta con éxito.")
         time.sleep(0.5)
 
-        ejecutar_accion_sap(
-            id_documento="click Solicitud de pedidos ",
-            ruta_vbs=rf".\scriptsVbs\clickptclickSolicituddepedidos.vbs",
-        )
-
-        # # Navegar hasta el campo Variante de seccion
-        # for i in range(7):    # 29 veces desde menu(sin Shift), 7 desde proveedor, 12 desde org compras
-        #   pyautogui.hotkey("shift","TAB")
-        #   time.sleep(0.5)
-        # pyautogui.press("enter")
-        # # Selecciona el campo Solicitudes de pedido en la lista
-        # time.sleep(0.5)
-        # pyautogui.press('s')
-        # time.sleep(0.5)
+        # Navegar hasta el campo Variante de seccion
+        for i in range(
+            7
+        ):  # 29 veces desde menu(sin Shift), 7 desde proveedor, 12 desde org compras
+            pyautogui.hotkey("shift", "TAB")
+            time.sleep(0.5)
+        pyautogui.press("enter")
+        # Selecciona el campo Solicitudes de pedido en la lista
+        time.sleep(0.5)
+        pyautogui.press("s")
+        time.sleep(0.5)
 
         # ingresa el numero de la solped que va a revisar
         session.findById("wnd[0]/usr/ctxtSP$00026-LOW").text = solped
