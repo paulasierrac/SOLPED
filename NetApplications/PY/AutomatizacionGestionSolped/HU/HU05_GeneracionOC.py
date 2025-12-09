@@ -11,7 +11,6 @@ import subprocess
 import time
 import os
 from Config.settings import RUTAS
-from HU.HU1_LoginSAP import ObtenerSesionActiva
 from Funciones.ValidacionM21N import (
     boton_existe,
     buscar_y_clickear,
