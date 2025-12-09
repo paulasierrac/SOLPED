@@ -1,9 +1,12 @@
-import win32com.client # pyright: ignore[reportMissingModuleSource]
+import win32com.client  # pyright: ignore[reportMissingModuleSource]
 import time
 import getpass
 import subprocess
 import os
-#import pyautogui
+from Config.settings import RUTAS, SAP_CONFIG
+
+# import pyautogui
+
 
 def abrir_sap_logon():
     """Abre SAP Logon si no está ya abierto."""
@@ -13,20 +16,30 @@ def abrir_sap_logon():
         return True
     except:
         # Si no está abierto, se lanza el ejecutable
-        subprocess.Popen(r'"C:\Program Files (x86)\SAP\FrontEnd\SapGui\saplogon.exe"')
+        subprocess.Popen(SAP_CONFIG["logon_path"])
         time.sleep(5)  # Esperar a que abra SAP Logon
         return False
-    
+
+
 def conectar_sap(conexion, mandante, usuario, password, idioma="ES"):
+
+    abrir_sap = abrir_sap_logon()
+    if abrir_sap:
+        print(" SAP Logon 750 ya se encuentra abierto")
+    else:
+        print(" SAP Logon 750 abierto ")
+
     try:
         print("Iniciando conexion con SAP...")
 
         # 1️⃣ Obtener objeto SAPGUI
         sap_gui_auto = win32com.client.GetObject("SAPGUI")
         if not sap_gui_auto:
-            raise Exception("No se pudo obtener el objeto SAPGUI. Asegúrate de que SAP Logon esté instalado y el scripting habilitado.")
+            raise Exception(
+                "No se pudo obtener el objeto SAPGUI. Asegúrate de que SAP Logon esté instalado y el scripting habilitado."
+            )
 
-        application = sap_gui_auto.GetScriptingEngine #motor de Scripting
+        application = sap_gui_auto.GetScriptingEngine  # motor de Scripting
 
         # 2️⃣ Buscar conexión activa
         # application.Connections → lista de conexiones (entradas en SAP Logon).
@@ -53,31 +66,24 @@ def conectar_sap(conexion, mandante, usuario, password, idioma="ES"):
             print(" Nueva sesion creada.")
 
         # 5️⃣ Si la pantalla está en login, ingresar credenciales
-        if "RSYST-BNAME" in session.findById("wnd[0]/usr").Text:
-            print("🧩 Ingresando credenciales...")
-        if password is None:
-            password = getpass.getpass("Contraseña SAP: ")
- 
-
+        # if "RSYST-BNAME" in session.findById("wnd[0]/usr").Text:
+        #     print("🧩 Ingresando credenciales...")
+        # if password is None:
+        #     password = getpass.getpass("Contraseña SAP: ")
+        # Ingresar datos de login
         session.findById("wnd[0]/usr/txtRSYST-MANDT").text = mandante
         session.findById("wnd[0]/usr/txtRSYST-BNAME").text = usuario
         session.findById("wnd[0]/usr/pwdRSYST-BCODE").text = password
         session.findById("wnd[0]/usr/txtRSYST-LANGU").text = idioma
-        time.sleep(10)
-        #pyautogui.press('Tab')
-        #pyautogui.write(password, interval=0.1)
-        #session.findById("wnd[0]/usr/pwdRSYST-BCODE").text = password
-        #pyautogui.press('Enter')
-        #session.findById("wnd[0]").sendVKey(0)
-        #session.findById("wnd[0]").resizeWorkingPane
-        #103, 16, false
-        print(" Conectado correctamente a SAP.")  
-      
+        session.findById("wnd[0]").sendVKey(0)
+        print(" Conectado correctamente a SAP.")
+
         return session
 
     except Exception as e:
         print(f" Error al conectar a SAP: {e}")
         return None
+
 
 def ObtenerSesionActiva():
     """Obtiene una sesión SAP ya iniciada (con usuario logueado)."""

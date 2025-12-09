@@ -132,7 +132,8 @@ def EnviarNotificacionCorreo(
         resultados = sender.procesar_excel_y_enviar(
             archivo_excel=RUTAS.get(
                 "ArchivoCorreos",
-                r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\EnvioCorreos.xlsx",
+                # r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\EnvioCorreos.xlsx",
+                rf"{RUTAS["ArchivoCorreos"]}",
             ),
             codigo_correo=codigo_correo,
             columna_codigo="codemailparameter",
@@ -315,7 +316,8 @@ def procesarTablaME5A(name, dias=None):
             path_log=RUTAS["PathLog"],
         )
 
-        path = f"C:\\Users\\CGRPA009\\Documents\\SOLPED-main\\SOLPED\\NetApplications\\PY\\AutomatizacionGestionSolped\\Insumo\\{name}"
+        # path = f".\\AutomatizacionGestionSolped\\Insumo\\{name}"
+        path = rf"{RUTAS["PathInsumos"]}\{name}"
 
         # INTENTAR LEER CON DIFERENTES CODIFICACIONES
         lineas = []
@@ -542,7 +544,8 @@ def procesarTablaME5A(name, dias=None):
 def GuardarTablaME5A(df, name):
     """Guarda el DataFrame de vuelta al TXT con formato de tabla"""
     try:
-        path = f"C:\\Users\\CGRPA009\\Documents\\SOLPED-main\\SOLPED\\NetApplications\\PY\\AutomatizacionGestionSolped\\Insumo\\{name}"
+        # path = f"C:\\Users\\CGRPA009\\Documents\\SOLPED-main\\SOLPED\\NetApplications\\PY\\AutomatizacionGestionSolped\\Insumo\\{name}"
+        path = rf"{RUTAS["PathInsumos"]}\{name}"
 
         # ASEGURAR QUE TIENE LAS COLUMNAS NECESARIAS
         columnas_requeridas = ["Estado", "Observaciones"]
@@ -825,7 +828,8 @@ def TablaItemsDataFrame(name) -> pd.DataFrame:
             path_log=RUTAS["PathLog"],
         )
 
-        path = rf"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\TablasME53N\{name}"
+        # path = rf"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\TablasME53N\{name}"
+        path = rf"{RUTAS["PathInsumos"]}\TablasME53N\{name}"
 
         # ========== DETECCION DE CODIFICACION ==========
         encoding = DetectarCodificacion(path)
@@ -960,7 +964,8 @@ def ObtenerItemsME53N(session, numero_solped):
 
         # 4. Escribir ruta de guardado
         session.findById("wnd[1]/usr/ctxtDY_PATH").text = (
-            r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\TablasME53N"
+            # r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\TablasME53N"
+            rf"{RUTAS["PathInsumos"]}\TablasME53N"
         )
         time.sleep(0.2)
 
@@ -1057,7 +1062,8 @@ def ObtenerItemTextME53N(session, numero_solped, numero_item):
         identificador = f"\n=====Solped: {numero_solped} Item: {numero_item} Registro: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} =====\n"
 
         # 7. Guardar texto en archivo de log
-        path = r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\texto_ITEMsap.txt"
+        # path = r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\texto_ITEMsap.txt"
+        path = rf"{RUTAS["PathInsumos"]}\texto_ITEMsap.txt"
         with open(path, "a", encoding="utf-8") as f:
             f.write(identificador)
             f.write(texto_limpio + "\n")

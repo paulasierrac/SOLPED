@@ -11,7 +11,7 @@
 # ================================
 
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
-from HU.HU1_LoginSAP import ObtenerSesionActiva
+from HU.HU1_LoginSAP import ObtenerSesionActiva, conectar_sap
 from HU.HU2_DescargaME5A import EjecutarHU02
 from HU.HU03_ValidacionME53N import EjecutarHU03
 from Funciones.EscribirLog import WriteLog
@@ -20,7 +20,7 @@ from Funciones.GeneralME53N import (
     EnviarCorreoPersonalizado,
     NotificarRevisionManualSolped,
 )
-from Config.settings import RUTAS
+from Config.settings import RUTAS, SAP_CONFIG
 import traceback
 
 
@@ -58,6 +58,13 @@ def Main_GestionSolped():
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
+        session = conectar_sap(
+            SAP_CONFIG["sistema"],
+            SAP_CONFIG["mandante"],
+            SAP_CONFIG["user"],
+            SAP_CONFIG["password"],
+            "EN",
+        )
 
         session = ObtenerSesionActiva()
 
@@ -78,7 +85,7 @@ def Main_GestionSolped():
             path_log=RUTAS["PathLog"],
         )
 
-        # EjecutarHU02(session)
+        EjecutarHU02(session)
 
         WriteLog(
             mensaje="HU02 finalizada correctamente.",
