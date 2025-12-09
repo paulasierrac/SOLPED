@@ -1,35 +1,52 @@
-# Prueba nuemro 2 
-import win32com.client
-import subprocess
-import time
-from Config.settings import SAP_CONFIG
-from HU.HU1_LoginSAP import obtener_sesion_activa
+# ================================
+# Main: GestionSolped
+# Autor: Paula Sierra, Henry Navarro - NetApplications
+# Descripcion: Main principal del Bot
+# Ultima modificacion: 24/11/2025
+# Propiedad de Colsubsidio
+# Cambios: Ajuste inicial para cumplimiento de estándar
+# ================================
+from HU.HU00_DespliegueAmbiente import EjecutarHU00
+from HU.HU01_LoginSAP import ObtenerSesionActiva, conectar_sap, abrir_sap_logon
+from HU.HU02_DescargaME5A import EjecutarHU02
+from HU.HU03_ValidacionME53N import EjecutarHU03
+from HU.HU05_GeneracionOC import GenerarOCDesdeSolped
+from HU.HU04_DescargaOCME9F import descarga_OCME9F
 
-subprocess.Popen(SAP_CONFIG["logon_path"])
-time.sleep(5)
-sapgui = win32com.client.GetObject("SAPGUI")
-application = sapgui.GetScriptingEngine 
-connection = application.OpenConnection(SAP_CONFIG["sistema"], True)
-session= connection.Children(0)
-
-#session = obtener_sesion_activa()
-
-try:
-        #campo = session.findById("wnd[0]/usr/pwdRSYST-BCODE")
-        #campo.text = "sT1f%4L*"
-        session.findById("wnd[0]").maximize
-        session.findById("wnd[0]/usr/txtRSYST-MANDT").text = SAP_CONFIG["mandante"]
-        session.findById("wnd[0]/usr/txtRSYST-BNAME").text = SAP_CONFIG["user"]
-        session.findById("wnd[0]/usr/pwdRSYST-BCODE").text = SAP_CONFIG["password"]
-        session.findById("wnd[0]/usr/txtRSYST-LANGU").text = SAP_CONFIG["idioma"]
-        session.findById("wnd[0]").sendVKey(0)
-        print(f"Campo modificado correctamente.{SAP_CONFIG["password"]}")
-except Exception as e:
-        print(f"❌ No se pudo escribir en el campo password: {e}")
+# from NetApplications.PY.AutomatizacionGestionSolped.HU.HU03_ValidacionME53N import buscar_SolpedME53N
+from Funciones.EscribirLog import WriteLog
+import traceback
+from Config.settings import RUTAS, SAP_CONFIG
 
 
-if session:
-    print("Conexion establecida, listo para ejecutar transacciones.")
-else:
-    print("No se pudo establecer la conexión.")
+def Main_Pruebas3():
+    try:
 
+        session = conectar_sap(
+            SAP_CONFIG["sistema"],
+            SAP_CONFIG["mandante"],
+            SAP_CONFIG["user"],
+            SAP_CONFIG["password"],
+            SAP_CONFIG["idioma"],
+        )
+
+        GenerarOCDesdeSolped(
+            session, "1300139102", 2
+        )  # Reemplaza con la Solped real:  1300139102, 2  1300139269 , 6
+        # GenerarOCDesdeSolped(session, "1300139269", 6)  # Reemplaza con la Solped real:  1300139102, 2  1300139269 , 6   1300138077, 10
+        # GenerarOCDesdeSolped(session, "1300138077", 10)
+        # GenerarOCDesdeSolped(session, "1300177338", 13)
+
+    except Exception as e:
+        error_text = traceback.format_exc()
+        WriteLog(
+            mensaje=f"ERROR GLOBAL: {e} | {error_text}",
+            estado="ERROR",
+            task_name="Main_GestionSOLPED",
+            path_log=RUTAS["PathLogError"],
+        )
+        raise
+
+
+if __name__ == "__main__":
+    Main_Pruebas3()

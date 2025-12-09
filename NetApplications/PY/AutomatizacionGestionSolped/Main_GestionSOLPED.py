@@ -11,8 +11,13 @@
 # ================================
 
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
-from HU.HU1_LoginSAP import ObtenerSesionActiva, conectar_sap
-from HU.HU2_DescargaME5A import EjecutarHU02
+from NetApplications.PY.AutomatizacionGestionSolped.HU.HU01_LoginSAP import (
+    ObtenerSesionActiva,
+    conectar_sap,
+)
+from NetApplications.PY.AutomatizacionGestionSolped.HU.HU02_DescargaME5A import (
+    EjecutarHU02,
+)
 from HU.HU03_ValidacionME53N import EjecutarHU03
 from Funciones.EscribirLog import WriteLog
 from Funciones.GeneralME53N import (
