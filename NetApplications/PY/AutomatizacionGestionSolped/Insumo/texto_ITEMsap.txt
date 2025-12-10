@@ -1,158 +1,45 @@
 
-=====Solped: 1300139269 Item: 10 Registro: 2025-12-09 16:06:01 =====
-GENERAR ORDEN DE COMPRA A:
-
-PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
-NIT:       900420798
-CORREO:    <ventas@macrodeportes.com
-POR CONCEPTO: PAR MANCUERNAS DE 5 LB encauchetadas
-EMPRESA: RAMA JUDICIAL
-FECHA: 7 DE MARZO DE 2024
-DIRECCION: CR 7 # 27 - 18 PS 17
-HORA: 4:00 PM
-
-
-SE ADJUNTA COTIZACIÓN -
-
-CANTIDAD:                       1
-VALOR UNITARIO :          $ 80.000
-VALOR SUBTOTAL :          $ 80.000
-VALOR TOTAL  + 19% IVA    $ 95.200
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+=====Solped: 1300139390 Item: 10 Registro: 2025-12-09 23:36:09 =====
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139269 Item: 20 Registro: 2025-12-09 16:06:06 =====
-GENERAR ORDEN DE COMPRA A:
-
-PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
-NIT:       900420798
-CORREO:    <ventas@macrodeportes.com
-POR CONCEPTO:PAR MANCUERNAS DE 10LB encauchetadas
-EMPRESA: RAMA JUDICIAL
-FECHA: 7 DE MARZO DE 2024
-DIRECCION: CR 7 # 27 - 18 PS 17
-HORA: 4:00 PM
-
-
-SE ADJUNTA COTIZACIÓN -
-
-CANTIDAD:                         1
-VALOR UNITARIO :          $ 160.000
-VALOR SUBTOTAL :          $ 160.000
-VALOR TOTAL  + 19% IVA    $ 190.400
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
---------------------------------------------------------------------------------
-
-=====Solped: 1300139269 Item: 30 Registro: 2025-12-09 16:06:10 =====
-GENERAR ORDEN DE COMPRA A:
-
-PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
-NIT:       900420798
-CORREO:    <ventas@macrodeportes.com
-POR CONCEPTO: PAR MANCUERNAS 2.5 kg hexagonal con barra cromadas
-EMPRESA: RAMA JUDICIAL
-FECHA: 7 DE MARZO DE 2024
-DIRECCION: CR 7 # 27 - 18 PS 17
-HORA: 4:00 PM
-
-
-SE ADJUNTA COTIZACIÓN -
-
-CANTIDAD:                       1
-VALOR UNITARIO :          $ 80.000
-VALOR SUBTOTAL :          $ 80.000
-VALOR TOTAL  + 19% IVA    $ 95.200
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+=====Solped: 1300139390 Item: 20 Registro: 2025-12-09 23:36:12 =====
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139269 Item: 40 Registro: 2025-12-09 16:06:15 =====
-GENERAR ORDEN DE COMPRA A:
-
-PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
-NIT:       900420798
-CORREO:    <ventas@macrodeportes.com
-POR CONCEPTO: PAR MANCUERNAS 5 kg hexagonal con barra cromadas
-EMPRESA: RAMA JUDICIAL
-FECHA: 7 DE MARZO DE 2024
-DIRECCION: CR 7 # 27 - 18 PS 17
-HORA: 4:00 PM
-
-
-SE ADJUNTA COTIZACIÓN -
-
-CANTIDAD:                         1
-VALOR UNITARIO :          $ 150.000
-VALOR SUBTOTAL :          $ 150.000
-VALOR TOTAL  + 19% IVA    $ 178.500
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+=====Solped: 1300139390 Item: 30 Registro: 2025-12-09 23:36:15 =====
+
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139269 Item: 50 Registro: 2025-12-09 16:06:19 =====
-GENERAR ORDEN DE COMPRA A:
-
-PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
-NIT:       900420798
-CORREO:    <ventas@macrodeportes.com
-POR CONCEPTO: colchoneta 100x50x3cm de gym
-EMPRESA: RAMA JUDICIAL
-FECHA: 7 DE MARZO DE 2024
-DIRECCION: CR 7 # 27 - 18 PS 17
-HORA: 4:00 PM
-
-
-SE ADJUNTA COTIZACIÓN -
-
-CANTIDAD:                        3
-VALOR UNITARIO :          $  69.000
-VALOR SUBTOTAL :          $ 207.000
-VALOR TOTAL  + 19% IVA    $ 246.330
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
---------------------------------------------------------------------------------
+=====Solped: 1300139390 Item: 40 Registro: 2025-12-09 23:36:18 =====
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|PurchReq    |Item  |ReqDate     |Material  |Created   |ShortText                                                                                                                                                                                                                                                                                                                                                                                                                            |PO  |Quantity  |Plnt  |PGr  |Blank1  |D  |Requisnr  |ProcState  |Estado                 |Observaciones                                                                  |
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|  1300139390|    10|  09.12.2025|  80016676|OSCAVILN  |LAVADO MANTEL GRANDE                                                                                                                                                                                                                                                                                                                                                                                                                 |    |       231|CE53  |C53  |        |   |          |         03|Sin Texto              |Texto no encontrado en el editor SAP - No se puede validar                     |
+|  1300139390|    20|  09.12.2025|  80019221|OSCAVILN  |LAVADO MULETON                                                                                                                                                                                                                                                                                                                                                                                                                       |    |        20|CE53  |C53  |        |   |          |         03|Sin Texto              |Texto no encontrado en el editor SAP - No se puede validar                     |
+|  1300139390|    30|  09.12.2025|  80019225|OSCAVILN  |LAVADO TAPA  GRANDE                                                                                                                                                                                                                                                                                                                                                                                                                  |    |        71|CE53  |C53  |        |   |          |         03|Sin Texto              |Texto no encontrado en el editor SAP - No se puede validar                     |
+|  1300139390|    40|  09.12.2025|  80019229|OSCAVILN  |LAVADO TAPA MANTEL LICRA ENCAUCHETADA GR                                                                                                                                                                                                                                                                                                                                                                                             |    |        59|CE53  |C53  |        |   |          |         03|Procesando             |7/7 items requieren verificacion manual                                        |
+|  1300139390|    50|  09.12.2025|  80019234|OSCAVILN  |LAVADO CHAQUETA CAPITAN                                                                                                                                                                                                                                                                                                                                                                                                              |    |         1|CE53  |C53  |        |   |          |         03|En Proceso             |7/7 items requieren verificacion manual                                        |
+|  1300139390|    60|  09.12.2025|  80019224|OSCAVILN  |LAVADO SERVILLETA                                                                                                                                                                                                                                                                                                                                                                                                                    |    |       229|CE53  |C53  |        |   |          |         03|En Proceso             |7/7 items requieren verificacion manual                                        |
+|  1300139390|    70|  09.12.2025|  80019223|OSCAVILN  |LAVADO PETO COCINA                                                                                                                                                                                                                                                                                                                                                                                                                   |    |        78|CE53  |C53  |        |   |          |         03|En Proceso             |7/7 items requieren verificacion manual                                        |
+|  1300139391|    40|  09.12.2025|  80004191|OSCAVILN  |CLORO GRANULADO                                                                                                                                                                                                                                                                                                                                                                                                                      |    |        20|CA09  |H01  |        |   |          |         03|Verificar manualmente  |9/10 items requieren verificacion manual                                       |
+|  1300139391|    50|  09.12.2025|  80003065|OSCAVILN  |CRISTALIN ALGICIDA                                                                                                                                                                                                                                                                                                                                                                                                                   |    |        20|CA09  |H01  |        |   |          |         03|Verificar manualmente  |9/10 items requieren verificacion manual                                       |
+|  1300139391|    60|  09.12.2025|  80009686|OSCAVILN  |CLORO SHOCK                                                                                                                                                                                                                                                                                                                                                                                                                          |    |        20|CA09  |H01  |        |   |          |         03|Verificar manualmente  |9/10 items requieren verificacion manual                                       |
+|  1300139391|    70|  09.12.2025|  80018083|OSCAVILN  |REACTIVO TAYLOR N. 10                                                                                                                                                                                                                                                                                                                                                                                                                |    |         2|CA09  |H01  |        |   |          |         03|Verificar manualmente  |9/10 items requieren verificacion manual                                       |
+|  1300139391|    80|  09.12.2025|  80018085|OSCAVILN  |REACTIVO TAYLOR N. 12                                                                                                                                                                                                                                                                                                                                                                                                                |    |         2|CA09  |H01  |        |   |          |         03|Verificar manualmente  |9/10 items requieren verificacion manual                                       |
+|  1300139391|    90|  09.12.2025|  80023818|OSCAVILN  |REACTIVO TAYLOR ROJO FENOL # 4 (INNV WA)                                                                                                                                                                                                                                                                                                                                                                                             |    |         2|CA09  |H01  |        |   |          |         03|Verificar manualmente  |9/10 items requieren verificacion manual                                       |
+|  1300139392|    20|  09.12.2025|  80001113|OSCAVILN  |SERVICIOS COMPL. DE  FOTOGRAFÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¯ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¿ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ½AS      |    |         1|CA65  |RD4  |        |   |          |         03|Solo descripcion       |Texto sin estructura completa (solo_descripcion). Solo contiene descripciÃ³n.  |
+|  1300139392|    30|  09.12.2025|  80013126|OSCAVILN  |SERVICIO DE APOYO LOGÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¯ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¿ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ½STICO           |    |         1|CA65  |RD4  |        |   |          |         03|Procesando             |4/4 items requieren verificacion manual                                        |
+|  1300139392|    40|  09.12.2025|  80001140|OSCAVILN  |TRANSPORTE DE MATERIALES                                                                                                                                                                                                                                                                                                                                                                                                             |    |         1|CA65  |RD4  |        |   |          |         03|En Proceso             |4/4 items requieren verificacion manual                                        |
+|  1300139393|    10|  09.12.2025|  80001039|OSCAVILN  |ALQUILER DE CARPAS                                                                                                                                                                                                                                                                                                                                                                                                                   |    |         9|CA15  |RD2  |        |   |          |         03|Verificar manualmente  |7/7 items requieren verificacion manual                                        |
+|  1300139393|    20|  09.12.2025|  80001039|OSCAVILN  |ALQUILER DE CARPAS                                                                                                                                                                                                                                                                                                                                                                                                                   |    |        11|CA15  |RD2  |        |   |          |         03|Verificar manualmente  |7/7 items requieren verificacion manual                                        |
+|  1300139393|    30|  09.12.2025|  80001069|OSCAVILN  |SONIDO BÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¯ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¿ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ½SICO COLSUBSIDIO RECREACION  |    |         1|CA15  |RD2  |        |   |          |         03|Verificar manualmente  |7/7 items requieren verificacion manual                                        |
+|  1300139393|    40|  09.12.2025|  80001140|OSCAVILN  |TRANSPORTE DE MATERIALES                                                                                                                                                                                                                                                                                                                                                                                                             |    |         2|CA15  |RD2  |        |   |          |         03|Verificar manualmente  |7/7 items requieren verificacion manual                                        |
+|  1300139393|    50|  09.12.2025|  80017041|OSCAVILN  |SERVICIOS CONTRATADOS EVENTOS                                                                                                                                                                                                                                                                                                                                                                                                        |    |         2|CA15  |RD2  |        |   |          |         03|Verificar manualmente  |7/7 items requieren verificacion manual                                        |
+|  1300139393|    60|  09.12.2025|  80017041|OSCAVILN  |SERVICIOS CONTRATADOS EVENTOS                                                                                                                                                                                                                                                                                                                                                                                                        |    |         1|CA15  |RD2  |        |   |          |         03|Verificar manualmente  |7/7 items requieren verificacion manual                                        |
+|  1300139393|    70|  09.12.2025|  80004385|OSCAVILN  |ALQUILER PLANTA ELECTRICA                                                                                                                                                                                                                                                                                                                                                                                                            |    |         1|CA15  |RD2  |        |   |          |         03|Verificar manualmente  |7/7 items requieren verificacion manual                                        |
+|  1300139394|    50|  09.12.2025|  80032129|OSCAVILN  |MANGUERA DE RIEGO DE 20 MTS                                                                                                                                                                                                                                                                                                                                                                                                          |    |         1|CA15  |RD2  |        |   |          |         03|Verificar manualmente  |7/7 items requieren verificacion manual                                        |
+|  1300139394|    60|  09.12.2025|  80032130|OSCAVILN  |ACOPLES E INSTALACION                                                                                                                                                                                                                                                                                                                                                                                                                |    |         1|CA15  |RD2  |        |   |          |         03|Verificar manualmente  |7/7 items requieren verificacion manual                                        |
+|  1300139394|    70|  09.12.2025|  80013126|OSCAVILN  |SERVICIO DE APOYO LOGÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¯ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¿ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ½STICO           |    |        40|CA15  |RD2  |        |   |          |         03|Verificar manualmente  |7/7 items requieren verificacion manual                                        |
 
-=====Solped: 1300139269 Item: 60 Registro: 2025-12-09 16:06:24 =====
-GENERAR ORDEN DE COMPRA A:
-
-PROVEEDOR: MACRODEPORTES REPRESENTACIONES SAS
-NIT:       900420798
-CORREO:    <ventas@macrodeportes.com
-POR CONCEPTO: kit toalla 70 x 40, botilito de agua grande de 700ml y tulas impermeable con logos empresariales
-EMPRESA: RAMA JUDICIAL
-FECHA: 7 DE MARZO DE 2024
-DIRECCION: CR 7 # 27 - 18 PS 17
-HORA: 4:00 PM
-
-
-SE ADJUNTA COTIZACIÓN -
-
-CANTIDAD:                          30
-VALOR UNITARIO :          $    65.000
-VALOR SUBTOTAL :          $  1.950.000
-VALOR TOTAL  + 19% IVA    $  2.320.500
-
-CECO:302040023
-COORDINADOR: LAURA ALVAREZ
-PROMOTOR: SMTM
-CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
 --------------------------------------------------------------------------------

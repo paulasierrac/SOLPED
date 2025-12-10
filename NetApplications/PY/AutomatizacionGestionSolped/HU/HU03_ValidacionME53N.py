@@ -29,13 +29,23 @@ from Funciones.GeneralME53N import (
     ProcesarYValidarItem,
     GuardarTablaME5A,
     NotificarRevisionManualSolped,
+    ValidarAttachmentList,
+    GenerarReporteAttachments,
+    ParsearTablaAttachments,
 )
 from Config.settings import RUTAS
 
 
 def EjecutarHU03(session, nombre_archivo):
     try:
+        # ==========================
+        # CONFIGURACIÓN DEL PROCESO
+        # ==========================
         task_name = "HU03_ValidacionME53N"
+        # Controla si el proceso debe detener validaciones cuando NO hay adjuntos
+        CANCELAR_SI_NO_HAY_ADJUNTOS = (
+            True  # ← ponlo en False si quieres seguir validando
+        )
 
         # === Inicio HU03 ===
         WriteLog(
@@ -139,6 +149,7 @@ def EjecutarHU03(session, nombre_archivo):
             "items_verificar_manual": 0,
             "notificaciones_enviadas": 0,
             "notificaciones_fallidas": 0,
+            "rechazadas_sin_attachments": 0,
         }
 
         # ========================================================
@@ -161,8 +172,9 @@ def EjecutarHU03(session, nombre_archivo):
 
         # Almacenar SOLPEDs que requirieron revisión para reporte final
         solpeds_con_problemas = []
-
-        # Procesar cada SOLPED
+        # ========================================================
+        # PROCESAR CADA SOLPED
+        # ========================================================
         for solped in solped_unicos:
             print(f"\n{'='*80}")
             print(f"PROCESANDO SOLPED: {solped}")
@@ -201,6 +213,93 @@ def EjecutarHU03(session, nombre_archivo):
 
                 time.sleep(0.5)
 
+                # ========================================================
+                # ✅ 3. VALIDAR ATTACHMENT LIST (NUEVA VALIDACIÓN)
+                # ========================================================
+                print(f"\n--- Validando Attachment List ---")
+
+                tiene_attachments, contenido_attachments, obs_attachments = (
+                    ValidarAttachmentList(session, solped)
+                )
+
+                # Parsear attachments para información detallada
+                attachments_lista = (
+                    ParsearTablaAttachments(contenido_attachments)
+                    if contenido_attachments
+                    else []
+                )
+
+                # Generar reporte de attachments
+                reporte_attachments = GenerarReporteAttachments(
+                    solped, tiene_attachments, contenido_attachments, obs_attachments
+                )
+                print(reporte_attachments)
+
+                # Guardar reporte de attachments
+                # Guardar reporte de attachments SOLO si tiene adjuntos
+                if tiene_attachments and contenido_attachments:
+                    path_reporte_attach = (
+                        f"{RUTAS['PathReportes']}\\Attachments_{solped}.txt"
+                    )
+                    try:
+                        with open(path_reporte_attach, "w", encoding="utf-8") as f:
+                            f.write(reporte_attachments)
+                        print(f"Reporte de attachments guardado: {path_reporte_attach}")
+                    except Exception as e:
+                        print(
+                            f"Advertencia: No se pudo guardar reporte de attachments: {e}"
+                        )
+                else:
+                    print(
+                        f"⚠️ No se genera archivo de adjuntos para SOLPED {solped} (sin archivos)"
+                    )
+
+                # ⚠️ MARCAR SI NO TIENE ATTACHMENTS (pero continuar validación)
+                solped_rechazada_por_attachments = False
+
+                if not tiene_attachments:
+                    print(f"\n❌ SOLPED {solped} SERÁ RECHAZADA: Sin archivos adjuntos")
+                    print(
+                        f"⚠️  Continuando con validaciones de items para reporte completo..."
+                    )
+
+                    contadores["rechazadas_sin_attachments"] += 1
+                    solped_rechazada_por_attachments = True
+                    requiere_notificacion = True
+
+                    # Agregar a resumen de validaciones
+                    resumen_validaciones.append(
+                        f"\n🚫 MOTIVO DE RECHAZO PRINCIPAL\n"
+                        f"   ❌ No cuenta con Attachment List\n"
+                        f"   Acción requerida: Adjuntar documentación soporte\n"
+                        f"   {obs_attachments}\n"
+                        f"   ⚠️ Aunque se complete el resto de validaciones, la SOLPED queda RECHAZADA\n"
+                    )
+
+                else:
+                    print(
+                        f"✅ SOLPED {solped} tiene attachments - Continuando validación"
+                    )
+
+                    # Agregar info detallada de attachments a validaciones
+                    info_attachments = (
+                        f"\n📎 ATTACHMENT LIST ({len(attachments_lista)} archivo(s))\n"
+                    )
+                    info_attachments += f"   {obs_attachments}\n"
+
+                    if attachments_lista:
+                        info_attachments += f"\n   Archivos adjuntos:\n"
+                        for i, attach in enumerate(
+                            attachments_lista[:5], 1
+                        ):  # Máximo 5 en resumen
+                            info_attachments += f"   {i}. {attach['title'][:50]}\n"
+                            info_attachments += f"      Creado por: {attach['creator']} - {attach['date']}\n"
+
+                        if len(attachments_lista) > 5:
+                            info_attachments += f"   ... y {len(attachments_lista) - 5} archivo(s) más\n"
+
+                    resumen_validaciones.append(info_attachments)
+
                 # 3. Obtener items de esta SOLPED
                 dtItems = ObtenerItemsME53N(session, solped)
 
@@ -231,8 +330,9 @@ def EjecutarHU03(session, nombre_archivo):
                     ):
                         lista_dicts.pop()
                         print(f"Fila de total eliminada")
-
-                # 5. Procesar cada item individualmente
+                # ========================================================
+                # 5. PROCESAR CADA ITEM
+                # ========================================================
                 contador_con_texto = 0
                 contador_validados = 0
                 contador_verificar_manual = 0
@@ -253,7 +353,7 @@ def EjecutarHU03(session, nombre_archivo):
 
                     # Obtener texto del editor SAP
                     texto = ObtenerItemTextME53N(session, solped, numero_item)
-                    print(texto)
+                    # print(texto)
 
                     # Procesar y validar el texto
                     if texto and texto.strip():
@@ -375,7 +475,7 @@ def EjecutarHU03(session, nombre_archivo):
                             requiere_notificacion = True
 
                             # Construir texto de validación del item
-                            item_info = f"\n📋 ITEM {numero_item}:\n"
+                            item_info = f"\n ITEM {numero_item}:\n"
                             item_info += f"   Estado: {estado_final}\n"
                             item_info += f"   Observaciones: {observaciones}\n"
 

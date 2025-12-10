@@ -90,7 +90,7 @@ def Main_GestionSolped():
             path_log=RUTAS["PathLog"],
         )
 
-        EjecutarHU02(session)
+        # EjecutarHU02(session)
 
         WriteLog(
             mensaje="HU02 finalizada correctamente.",
@@ -102,7 +102,7 @@ def Main_GestionSolped():
         # ================================
         # 4. Ejecutar HU03 – Validación ME53N
         # ================================
-        archivos_validar = ["expSolped05.txt", "expSolped03.txt"]
+        archivos_validar = ["expSolped03.txt", "expSolped05.txt"]
 
         for archivo in archivos_validar:
             WriteLog(

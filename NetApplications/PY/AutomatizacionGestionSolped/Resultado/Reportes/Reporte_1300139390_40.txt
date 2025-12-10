@@ -1,0 +1,46 @@
+
+================================================================================
+REPORTE DE VALIDACION - SOLPED: 1300139390, ITEM: 40
+================================================================================
+
+CAMPOS OBLIGATORIOS SAP ME53N:
+  Presentes: 11/13
+  Faltantes:
+    - Fix. Vend.
+    - POrg
+
+ADVERTENCIA IMPORTANTE:
+  Este ítem contiene solo descripción o no tiene estructura completa.
+  → No fue posible extraer todos los campos estructurados.
+  → Validar manualmente la información.
+  → Revisar cantidad, valor unitario, valor total y NIT directamente en SAP.
+
+DATOS EXTRAIDOS DEL TEXTO:
+  Razon Social: No encontrado
+  NIT: No encontrado
+  Correo: No encontrado
+  Concepto: TABLA SAP EXPORTADA...
+  Cantidad: No encontrado
+  Valor Unitario: No encontrado
+  Valor Total: No encontrado
+  Responsable: No encontrado
+  CECO: No encontrado
+
+CAMPOS OBLIGATORIOS (Segun Texto Extraído):
+  Presentes: 1/4
+  Faltantes:
+    - NIT
+    - Cantidad
+    - Valor Total
+
+VALIDACIONES:
+  ERROR CANTIDAD:
+  ERROR VALOR_UNITARIO:
+  ERROR VALOR_TOTAL:
+  ERROR CONCEPTO:
+      Texto: TABLA SAP EXPORTADA
+      Tabla: LAVADO TAPA MANTEL LICRA ENCAUCHETADA GR
+      Solo 0 palabras coinciden (minimo: 2)
+
+0/4 campos coinciden, 1/4 campos obligatorios presentes
+================================================================================

@@ -26,6 +26,393 @@ from Funciones.EmailSender import EmailSender
 from typing import List, Union
 
 
+def ValidarAttachmentList(session, numero_solped):
+    """
+    Valida si la SOLPED tiene Attachment List y extrae la información
+
+    Args:
+        session: Objeto de SAP GUI
+        numero_solped: Número de SOLPED a validar
+
+    Returns:
+        tuple: (tiene_attachments: bool, contenido_tabla: str, observaciones: str)
+    """
+    try:
+        WriteLog(
+            mensaje=f"Validando Attachment List para SOLPED {numero_solped}",
+            estado="INFO",
+            task_name="ValidarAttachmentList",
+            path_log=RUTAS["PathLog"],
+        )
+
+        # 1. Presionar botón de GOS Toolbox
+        try:
+            session.findById("wnd[0]/titl/shellcont/shell").pressButton("%GOS_TOOLBOX")
+            time.sleep(0.5)
+        except Exception as e:
+            WriteLog(
+                mensaje=f"Error al abrir GOS Toolbox: {e}",
+                estado="WARNING",
+                task_name="ValidarAttachmentList",
+                path_log=RUTAS["PathLog"],
+            )
+            return False, "", "No se pudo abrir el menú de servicios GOS"
+
+        # 2. Presionar botón VIEW_ATTA (View Attachments)
+        try:
+            session.findById("wnd[0]/shellcont[1]/shell").pressButton("VIEW_ATTA")
+            time.sleep(1)
+        except Exception as e:
+            WriteLog(
+                mensaje=f"No hay attachments disponibles: {e}",
+                estado="WARNING",
+                task_name="ValidarAttachmentList",
+                path_log=RUTAS["PathLog"],
+            )
+            # Cerrar menú GOS si quedó abierto
+            try:
+                session.findById("wnd[0]/shellcont[1]").close()
+            except:
+                pass
+            return False, "", "No se encontró lista de adjuntos (Attachment List vacía)"
+
+        # 3. Verificar si se abrió la ventana "Service: Attachment list"
+        try:
+            # Intentar acceder al objeto de la tabla de attachments
+            tabla_attachments = session.findById(
+                "wnd[1]/usr/cntlCONTAINER_0100/shellcont/shell"
+            )
+            time.sleep(0.5)
+        except Exception as e:
+            WriteLog(
+                mensaje=f"Ventana de Attachment List no encontrada: {e}",
+                estado="WARNING",
+                task_name="ValidarAttachmentList",
+                path_log=RUTAS["PathLog"],
+            )
+            # Cerrar menú GOS
+            try:
+                session.findById("wnd[0]/shellcont[1]").close()
+            except:
+                pass
+            return False, "", "Ventana de adjuntos no disponible"
+
+        # 4. Exportar contenido de la tabla al portapapeles
+        try:
+            # Abrir menú de exportación
+            tabla_attachments.pressToolbarContextButton("&MB_EXPORT")
+            time.sleep(0.5)
+
+            # Seleccionar "Hoja de cálculo" (opción PC)
+            tabla_attachments.selectContextMenuItem("&PC")
+            time.sleep(0.5)
+
+            # Seleccionar formato "Spreadsheet" (radio button)
+            session.findById(
+                "wnd[1]/usr/subSUBSCREEN_STEPLOOP:SAPLSPO5:0150/sub:SAPLSPO5:0150/radSPOPLI-SELFLAG[4,0]"
+            ).select()
+            session.findById(
+                "wnd[1]/usr/subSUBSCREEN_STEPLOOP:SAPLSPO5:0150/sub:SAPLSPO5:0150/radSPOPLI-SELFLAG[4,0]"
+            ).setFocus()
+            time.sleep(0.3)
+
+            # Confirmar exportación (botón OK)
+            session.findById("wnd[1]/tbar[0]/btn[0]").press()
+            time.sleep(1)
+
+        except Exception as e:
+            WriteLog(
+                mensaje=f"Error al exportar Attachment List: {e}",
+                estado="WARNING",
+                task_name="ValidarAttachmentList",
+                path_log=RUTAS["PathLog"],
+            )
+            # Intentar cerrar ventanas abiertas
+            try:
+                session.findById(
+                    "wnd[1]/tbar[0]/btn[12]"
+                ).press()  # Cancelar ventana exportación
+            except:
+                pass
+            try:
+                session.findById("wnd[0]/shellcont[1]").close()  # Cerrar menú GOS
+            except:
+                pass
+            return False, "", "Error al exportar lista de adjuntos"
+
+        # 5. Obtener contenido del portapapeles
+        time.sleep(0.5)
+        contenido_portapapeles = ObtenerTextoDelPortapapeles()
+
+        if not contenido_portapapeles or not contenido_portapapeles.strip():
+            WriteLog(
+                mensaje=f"Portapapeles vacío después de exportar attachments",
+                estado="WARNING",
+                task_name="ValidarAttachmentList",
+                path_log=RUTAS["PathLog"],
+            )
+            # Cerrar ventanas
+            try:
+                session.findById(
+                    "wnd[1]/tbar[0]/btn[12]"
+                ).press()  # Cerrar ventana de Attachment List
+            except:
+                pass
+            try:
+                session.findById("wnd[0]/shellcont[1]").close()  # Cerrar menú GOS
+            except:
+                pass
+            return False, "", "No se pudo copiar contenido de attachments"
+
+        # 6. Cerrar ventana de Attachment List (botón 12 = Cerrar)
+        try:
+            session.findById("wnd[1]/tbar[0]/btn[12]").press()
+            time.sleep(0.3)
+        except Exception as e:
+            WriteLog(
+                mensaje=f"Advertencia al cerrar ventana de attachments: {e}",
+                estado="WARNING",
+                task_name="ValidarAttachmentList",
+                path_log=RUTAS["PathLog"],
+            )
+
+        # 7. Cerrar menú GOS Toolbox (shellcont[1])
+        try:
+            session.findById("wnd[0]/shellcont[1]").close()
+            time.sleep(0.3)
+        except Exception as e:
+            WriteLog(
+                mensaje=f"Advertencia al cerrar menú GOS: {e}",
+                estado="WARNING",
+                task_name="ValidarAttachmentList",
+                path_log=RUTAS["PathLog"],
+            )
+
+        # 8. Analizar contenido obtenido
+        lineas = contenido_portapapeles.strip().split("\n")
+        lineas_validas = [
+            l.strip() for l in lineas if l.strip() and not l.strip().startswith("-")
+        ]
+
+        # Parsear attachments estructurados
+        attachments_parseados = ParsearTablaAttachments(contenido_portapapeles)
+        num_attachments = len(attachments_parseados)
+
+        if num_attachments == 0:
+            # Aún así cerrar todo antes de retornar
+            return (
+                False,
+                contenido_portapapeles,
+                "Lista de adjuntos vacía (sin archivos)",
+            )
+
+        # 9. Guardar contenido en archivo de log
+        identificador = f"\n===== SOLPED: {numero_solped} - Attachment List - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} =====\n"
+        path_log_attachments = rf"{RUTAS['PathInsumos']}\attachment_lists.txt"
+
+        try:
+            with open(path_log_attachments, "a", encoding="utf-8") as f:
+                f.write(identificador)
+                f.write(contenido_portapapeles)
+                f.write("\n" + "-" * 80 + "\n")
+        except Exception as e:
+            WriteLog(
+                mensaje=f"Advertencia: No se pudo guardar log de attachments: {e}",
+                estado="WARNING",
+                task_name="ValidarAttachmentList",
+                path_log=RUTAS["PathLog"],
+            )
+
+        WriteLog(
+            mensaje=f"SOLPED {numero_solped}: {num_attachments} attachment(s) encontrado(s)",
+            estado="INFO",
+            task_name="ValidarAttachmentList",
+            path_log=RUTAS["PathLog"],
+        )
+
+        # Construir observación detallada con nombres de archivos
+        observaciones_exito = f"✅ {num_attachments} archivo(s) adjunto(s)"
+
+        if num_attachments <= 3:
+            # Mostrar nombres si son pocos archivos
+            nombres = [a["title"][:40] for a in attachments_parseados[:3]]
+            observaciones_exito += f": {', '.join(nombres)}"
+            if any(len(a["title"]) > 40 for a in attachments_parseados[:3]):
+                observaciones_exito += "..."
+
+        return True, contenido_portapapeles, observaciones_exito
+
+    except Exception as e:
+        error_trace = traceback.format_exc()
+        WriteLog(
+            mensaje=f"Error inesperado en ValidarAttachmentList: {e}\n{error_trace}",
+            estado="ERROR",
+            task_name="ValidarAttachmentList",
+            path_log=RUTAS["PathLogError"],
+        )
+        # Intentar cerrar cualquier ventana abierta
+        try:
+            session.findById("wnd[1]/tbar[0]/btn[12]").press()
+        except:
+            pass
+        try:
+            session.findById("wnd[0]/shellcont[1]").close()
+        except:
+            pass
+        return False, "", f"Error al validar attachments: {str(e)[:100]}"
+
+
+def ParsearTablaAttachments(contenido: str) -> list:
+    """
+    Parsea la tabla de attachments exportada de SAP y extrae información estructurada
+
+    Formato esperado:
+    AttachmentFor1300139391
+    -----------------------------------------------------------------------------------
+    |Icon|Title                                             |Creator Name  |Created On|
+    -----------------------------------------------------------------------------------
+    |    |COTIZACIONPEÑALISAQUIMICOSPARAPISCINASJUNIO2024_20|OSCAR VILLABON|09.12.2025|
+    |    |COTIZACIONPEÑALISAQUIMICOSPARAPISCINASJUNIO2024_20|OSCAR VILLABON|09.12.2025|
+    -----------------------------------------------------------------------------------
+
+    Args:
+        contenido: Texto de la tabla exportada
+
+    Returns:
+        list: Lista de diccionarios con {title, creator, date}
+    """
+    attachments = []
+
+    try:
+        lineas = contenido.strip().split("\n")
+
+        # Buscar línea de encabezado (contiene "Title", "Creator", "Created")
+        header_idx = -1
+        for i, linea in enumerate(lineas):
+            if (
+                "|" in linea
+                and "Title" in linea
+                and ("Creator" in linea or "Created" in linea)
+            ):
+                header_idx = i
+                break
+
+        if header_idx == -1:
+            WriteLog(
+                mensaje="No se encontró encabezado en tabla de attachments",
+                estado="WARNING",
+                task_name="ParsearTablaAttachments",
+                path_log=RUTAS["PathLog"],
+            )
+            return attachments
+
+        # Procesar filas de datos (después del encabezado y línea de guiones)
+        for linea in lineas[
+            header_idx + 2 :
+        ]:  # +2 para saltar encabezado y línea de guiones
+            # Ignorar líneas vacías o separadores
+            if not linea.strip() or linea.strip().startswith("-"):
+                continue
+
+            # Debe contener pipes
+            if "|" not in linea:
+                continue
+
+            # Dividir por pipes y limpiar espacios
+            partes = [p.strip() for p in linea.split("|")]
+
+            # Filtrar partes vacías del inicio y final (| al inicio y final de cada línea)
+            # Formato típico: |    |COTIZACION...|OSCAR VILLABON|09.12.2025|
+            # Esto da: ['', '', 'COTIZACION...', 'OSCAR VILLABON', '09.12.2025', '']
+            partes_validas = [p for p in partes if p]
+
+            # Debe tener exactamente 3 columnas de datos: Title, Creator Name, Created On
+            # (Icon está vacío, así que solo contamos las que tienen datos)
+            if len(partes_validas) >= 3:
+                # Última estructura válida: [Title, Creator, Date]
+                title = partes_validas[0]
+                creator = partes_validas[1]
+                date = partes_validas[2]
+
+                # Validar que no sea una línea de encabezado repetida
+                if title.lower() in ["title", "título", "icon"]:
+                    continue
+                if creator.lower() in ["creator", "creador", "creator name"]:
+                    continue
+
+                # Validar que tenga contenido real
+                if not title or not creator or not date:
+                    continue
+
+                attachments.append({"title": title, "creator": creator, "date": date})
+
+    except Exception as e:
+        WriteLog(
+            mensaje=f"Error parseando tabla de attachments: {e}",
+            estado="ERROR",
+            task_name="ParsearTablaAttachments",
+            path_log=RUTAS["PathLogError"],
+        )
+        traceback.print_exc()
+
+    return attachments
+
+
+def GenerarReporteAttachments(
+    solped: str, tiene_attachments: bool, contenido: str, observaciones: str
+) -> str:
+    """
+    Genera un reporte formateado de la validación de attachments
+
+    Args:
+        solped: Número de SOLPED
+        tiene_attachments: Si tiene attachments o no
+        contenido: Contenido de la tabla exportada
+        observaciones: Observaciones de la validación
+
+    Returns:
+        str: Reporte formateado
+    """
+    reporte = f"\n{'='*80}\n"
+    reporte += f"VALIDACIÓN ATTACHMENT LIST - SOLPED: {solped}\n"
+    reporte += f"{'='*80}\n\n"
+
+    reporte += (
+        f"Estado: {'✅ CON ADJUNTOS' if tiene_attachments else '❌ SIN ADJUNTOS'}\n"
+    )
+    reporte += f"Observaciones: {observaciones}\n\n"
+
+    if tiene_attachments and contenido:
+        # Parsear tabla de attachments
+        attachments = ParsearTablaAttachments(contenido)
+
+        if attachments:
+            reporte += f"ARCHIVOS ADJUNTOS ENCONTRADOS ({len(attachments)}):\n"
+            reporte += f"{'-'*80}\n"
+
+            for i, attach in enumerate(attachments, 1):
+                reporte += f"\n{i}. Archivo: {attach['title']}\n"
+                reporte += f"   Creado por: {attach['creator']}\n"
+                reporte += f"   Fecha: {attach['date']}\n"
+
+            reporte += f"\n{'-'*80}\n"
+
+        # Agregar tabla completa como referencia
+        reporte += f"\nTABLA COMPLETA EXPORTADA DE SAP:\n"
+        reporte += f"{'-'*80}\n"
+        reporte += contenido
+        reporte += f"\n{'-'*80}\n"
+
+    else:
+        reporte += f"SOLPED RECHAZADA: No cuenta con archivos adjuntos\n"
+        reporte += (
+            f"Acción requerida: Adjuntar documentación soporte antes de continuar\n"
+        )
+
+    reporte += f"\n{'='*80}\n"
+    return reporte
+
+
 def NotificarRevisionManualSolped(
     destinatarios: Union[str, List[str]],
     numero_solped: Union[int, str],
