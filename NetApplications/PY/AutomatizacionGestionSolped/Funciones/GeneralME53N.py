@@ -404,7 +404,7 @@ def GenerarReporteAttachments(
         reporte += f"\n{'-'*80}\n"
 
     else:
-        reporte += f"SOLPED RECHAZADA: No cuenta con archivos adjuntos\n"
+        reporte += f"⚠️ SOLPED RECHAZADA: No cuenta con archivos adjuntos\n"
         reporte += (
             f"Acción requerida: Adjuntar documentación soporte antes de continuar\n"
         )
@@ -1519,39 +1519,53 @@ def ValidarContraTabla(
         return validaciones
 
     # ------------------------------------------------------------------
-    # VALIDACIÓN DE CAMPOS OBLIGATORIOS DE LA TABLA SAP ME53N
+    # VALIDACIÓN DE CAMPOS OBLIGATORIOS DE LA TABLA SAP ME53N (con alias)
     # ------------------------------------------------------------------
-    campos_obligatorios_me53n = [
-        "Material",
-        "Short Text",
-        "Quantity",
-        "Un",
-        "Valn Price",
-        "Crcy",
-        "Total Val.",
-        "Deliv.Date",
-        "Fix. Vend.",
-        "Plant",
-        "PGr",
-        "POrg",
-        "Matl Group",
-    ]
+
+    # Diccionario: nombre estándar → lista de nombres equivalentes que puede traer SAP
+    alias_campos = {
+        "Material": ["Material"],
+        "Short Text": ["Short Text"],
+        "Quantity": ["Quantity"],
+        "Un": ["Un"],
+        "Valn Price": ["Val. Price"],
+        "Crcy": ["Crcy"],
+        # ESTE CAMPO CAMBIA POR IDIOMA / CONFIGURACIÓN SAP
+        "Total Val.": ["Total Val.", "Total Value"],
+        "Deliv.Date": ["Deliv.Date"],
+        "Fix. Vend.": ["Fix. Vend."],
+        "Plant": ["Plant"],
+        "PGr": ["PGr"],
+        "POrg": ["POrg"],
+        "Matl Group": ["Matl Group"],
+    }
 
     faltantes_me53n = []
+    fila = item_df.iloc[0]  # se toma la primera fila del item
 
-    fila = item_df.iloc[0]
+    for campo_estandar, posibles_nombres in alias_campos.items():
 
-    for campo in campos_obligatorios_me53n:
-        if campo not in item_df.columns:
-            faltantes_me53n.append(campo)
-        else:
-            val = fila.get(campo, "")
-            if val is None or str(val).strip() in ["", "nan", "None"]:
-                faltantes_me53n.append(campo)
+        # Buscar si alguna columna coincide con los alias permitidos
+        columna_encontrada = None
+        for alias in posibles_nombres:
+            if alias in item_df.columns:
+                columna_encontrada = alias
+                break
 
+        # Si ninguna columna existe → campo faltante
+        if columna_encontrada is None:
+            faltantes_me53n.append(campo_estandar)
+            continue
+
+        # Validar contenido vacío o nulo
+        val = fila.get(columna_encontrada, "")
+        if val is None or str(val).strip() in ["", "nan", "None"]:
+            faltantes_me53n.append(campo_estandar)
+
+    # Construcción del resultado de validaciones
     validaciones["campos_me53n"] = {
-        "presentes": len(campos_obligatorios_me53n) - len(faltantes_me53n),
-        "total": len(campos_obligatorios_me53n),
+        "presentes": len(alias_campos) - len(faltantes_me53n),
+        "total": len(alias_campos),
         "faltantes": faltantes_me53n,
     }
 
@@ -2065,13 +2079,57 @@ def GenerarObservaciones(datos_texto: Dict, validaciones: Dict) -> str:
 
 
 def GenerarReporteValidacion(
-    solped: str, item: str, datos_texto: Dict, validaciones: Dict
+    solped: str,
+    item: str,
+    datos_texto: Dict,
+    validaciones: Dict,
+    tiene_attachments: bool = None,
+    obs_attachments: str = "",
+    attachments_lista: list = None,
 ) -> str:
     """Genera un reporte legible de la validacion"""
 
     reporte = f"\n{'='*80}\n"
     reporte += f"REPORTE DE VALIDACION - SOLPED: {solped}, ITEM: {item}\n"
     reporte += f"{'='*80}\n\n"
+
+    # ===================================================================================
+    # VALIDACIÓN ATTACHMENT LIST DE LA SOLPED:
+    # ===================================================================================
+    if tiene_attachments is False:
+        # NO TIENE ADJUNTOS
+        reporte += (
+            "ADVERTENCIA: La SOLPED NO tiene archivos adjuntos.\n"
+            f"    Detalle: {obs_attachments}\n"
+            "    La validación del ítem continúa, pero la SOLPED puede ser rechazada.\n\n"
+        )
+
+    elif tiene_attachments is True:
+        # SÍ TIENE ADJUNTOS → mostrar lista
+        reporte += (
+            "INFORMACIÓN DE ATTACHMENTS:\n"
+            "    La SOLPED cuenta con archivos adjuntos.\n"
+        )
+
+        # Si existe lista estructurada de attachments
+        if attachments_lista:
+            reporte += (
+                f"    Total de archivos: {len(attachments_lista)}\n" f"    Ejemplos:\n"
+            )
+            # Listar hasta 3 para evitar reportes enormes
+            for a in attachments_lista[:3]:
+                reporte += f"      - {a.get('title', '')}\n"
+
+            if len(attachments_lista) > 3:
+                reporte += (
+                    f"      ... ({len(attachments_lista)-3} archivos adicionales)\n"
+                )
+
+        # Si solo viene texto plano (caso exportación)
+        elif obs_attachments:
+            reporte += f"    Detalle: {obs_attachments}\n"
+
+        reporte += "\n"
 
     # ===================================================================================
     # 1. CAMPOS OBLIGATORIOS SAP ME53N
@@ -2177,7 +2235,14 @@ def GenerarReporteValidacion(
 
 
 def ProcesarYValidarItem(
-    session, solped: str, item_num: str, texto: str, df_items: pd.DataFrame
+    session,
+    solped: str,
+    item_num: str,
+    texto: str,
+    df_items: pd.DataFrame,
+    tiene_attachments: bool = None,
+    obs_attachments: str = "",
+    attachments_lista: list = None,
 ) -> Tuple[Dict, Dict, str, str, str]:
     """
     Procesa un item: extrae datos, valida y genera reporte
@@ -2200,6 +2265,14 @@ def ProcesarYValidarItem(
         )
 
     # 4. Generar reporte
-    reporte = GenerarReporteValidacion(solped, item_num, datos_texto, validaciones)
+    reporte = GenerarReporteValidacion(
+        solped,
+        item_num,
+        datos_texto,
+        validaciones,
+        tiene_attachments,
+        obs_attachments,
+        attachments_lista,
+    )
 
     return datos_texto, validaciones, reporte, estado_final, observaciones
