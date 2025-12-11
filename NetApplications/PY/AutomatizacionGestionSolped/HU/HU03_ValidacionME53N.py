@@ -155,7 +155,7 @@ def EjecutarHU03(session, nombre_archivo):
         # ========================================================
         # MODO DESARROLLO - REDIRIGIR CORREOS
         # ========================================================
-        MODO_DESARROLLO = True  # ⚠️ Cambiar a False en producción
+        MODO_DESARROLLO = True  # Cambiar a False en producción
         EMAIL_DESARROLLO = "paula.sierra@netapplications.com.co"
 
         if MODO_DESARROLLO:
@@ -252,6 +252,13 @@ def EjecutarHU03(session, nombre_archivo):
                 else:
                     print(
                         f"⚠️ No se genera archivo de adjuntos para SOLPED {solped} (sin archivos)"
+                    )
+                    ActualizarEstadoYObservaciones(
+                        df_solpeds,
+                        nombre_archivo,
+                        solped,
+                        nuevo_estado="Sin Adjuntos",
+                        observaciones="No cuenta con lista de Adjuntos",
                     )
 
                 # ⚠️ MARCAR SI NO TIENE ATTACHMENTS (pero continuar validación)
@@ -367,7 +374,14 @@ def EjecutarHU03(session, nombre_archivo):
                             estado_final,
                             observaciones,
                         ) = ProcesarYValidarItem(
-                            session, solped, numero_item, texto, dtItems
+                            session,
+                            solped,
+                            numero_item,
+                            texto,
+                            dtItems,
+                            tiene_attachments,
+                            obs_attachments,
+                            attachments_lista,
                         )
 
                         # ========================================================
@@ -536,33 +550,34 @@ def EjecutarHU03(session, nombre_archivo):
                             f"   Observaciones: {observaciones_item}\n"
                         )
 
-                # 6. Actualizar estado final de la SOLPED completa
-                if (
-                    contador_validados == items_procesados_en_solped
-                    and items_procesados_en_solped > 0
-                ):
-                    # Todos los items validados exitosamente
-                    estado_final_solped = "Registro validado para orden de compra"
-                    observaciones_solped = f"Todos los items validados ({contador_validados}/{items_procesados_en_solped})"
-                    contadores["procesadas_exitosamente"] += 1
-                    requiere_notificacion = False  # No notificar si todo está OK
+                # ========================================================
+                # 6. ESTADO FINAL DE LA SOLPED (considerando attachments)
+                # ========================================================
+                if solped_rechazada_por_attachments:
+                    # SOLPED rechazada por falta de attachments (independiente de items)
+                    estado_final_solped = "Rechazada - Sin Attachments"
+                    observaciones_solped = (
+                        f"❌ RECHAZADA por falta de adjuntos | "
+                        f"Items: {contador_validados} validados, "
+                        f"{contador_verificar_manual} requieren revisión, "
+                        f"{items_procesados_en_solped - contador_con_texto} sin texto"
+                    )
+                    # Ya fue contada en rechazadas_sin_attachments
 
-                elif contador_validados > 0 and contador_verificar_manual == 0:
-                    # Algunos validados, otros sin texto
-                    estado_final_solped = "Parcialmente validado"
-                    observaciones_solped = f"{contador_validados}/{items_procesados_en_solped} items validados, {items_procesados_en_solped - contador_validados} sin texto"
+                elif contador_validados == items_procesados_en_solped:
+                    estado_final_solped = "Registro validado para orden de compra"
+                    observaciones_solped = f"✅ Todos validados ({contador_validados}/{items_procesados_en_solped}) + Attachments OK"
                     contadores["procesadas_exitosamente"] += 1
+                    requiere_notificacion = False
 
                 elif contador_verificar_manual > 0:
-                    # Items que requieren verificacion manual
                     estado_final_solped = "Verificar manualmente"
-                    observaciones_solped = f"{contador_verificar_manual}/{items_procesados_en_solped} items requieren verificacion manual"
+                    observaciones_solped = f"⚠️ {contador_verificar_manual}/{items_procesados_en_solped} items requieren revisión + Attachments OK"
                     contadores["procesadas_exitosamente"] += 1
 
                 else:
-                    # Ningun item procesado correctamente
                     estado_final_solped = "Sin procesar"
-                    observaciones_solped = "No se pudo procesar ningun item"
+                    observaciones_solped = "No se pudo procesar correctamente"
                     contadores["con_errores"] += 1
 
                 ActualizarEstadoYObservaciones(
@@ -572,10 +587,14 @@ def EjecutarHU03(session, nombre_archivo):
                     nuevo_estado=estado_final_solped,
                     observaciones=observaciones_solped,
                 )
-
-                print(f"\nEXITO: SOLPED {solped} completada")
+                print(f"\n{'='*60}")
+                if solped_rechazada_por_attachments:
+                    print(f"❌ SOLPED {solped} RECHAZADA (Sin Attachments)")
+                else:
+                    print(f"✅ SOLPED {solped} completada")
                 print(f"  Estado final: {estado_final_solped}")
-                print(f"  Resumen: {observaciones_solped}")
+                print(f"  Observaciones: {observaciones_solped}")
+                print(f"{'='*60}")
 
                 # ========================================================
                 # ENVIAR NOTIFICACIÓN SI ES NECESARIO (UNA POR SOLPED)
@@ -651,11 +670,37 @@ def EjecutarHU03(session, nombre_archivo):
                                 {
                                     "solped": solped,
                                     "estado": estado_final_solped,
-                                    "items_total": items_procesados_en_solped,
-                                    "items_ok": contador_validados,
-                                    "items_revisar": contador_verificar_manual,
-                                    "items_sin_texto": items_procesados_en_solped
-                                    - contador_con_texto,
+                                    "tiene_attachments": tiene_attachments,
+                                    "obs_attachments": obs_attachments,
+                                    "attachments_detalle": (
+                                        attachments_lista[:10]
+                                        if attachments_lista
+                                        else []
+                                    ),  # Máximo 10 para el reporte
+                                    "items_total": (
+                                        items_procesados_en_solped
+                                        if "items_procesados_en_solped" in locals()
+                                        else 0
+                                    ),
+                                    "items_ok": (
+                                        contador_validados
+                                        if "contador_validados" in locals()
+                                        else 0
+                                    ),
+                                    "items_revisar": (
+                                        contador_verificar_manual
+                                        if "contador_verificar_manual" in locals()
+                                        else 0
+                                    ),
+                                    "items_sin_texto": (
+                                        (
+                                            items_procesados_en_solped
+                                            - contador_con_texto
+                                        )
+                                        if "items_procesados_en_solped" in locals()
+                                        and "contador_con_texto" in locals()
+                                        else 0
+                                    ),
                                     "responsables": (
                                         correos_originales
                                         if MODO_DESARROLLO
