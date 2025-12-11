@@ -7,10 +7,10 @@
 # Cambios: Ajuste inicial para cumplimiento de estándar
 # ================================
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
-from HU.HU1_LoginSAP import ObtenerSesionActiva,conectar_sap,abrir_sap_logon
-from HU.HU2_DescargaME5A import EjecutarHU02
+from HU.HU01_LoginSAP import ObtenerSesionActiva,conectar_sap,abrir_sap_logon
+from HU.HU02_DescargaME5A import EjecutarHU02
 from HU.HU03_ValidacionME53N import EjecutarHU03
-from HU.HU5_GeneracionOC import GenerarOCDesdeSolped
+from HU.HU05_GeneracionOC import GenerarOCDesdeSolped
 
 # from NetApplications.PY.AutomatizacionGestionSolped.HU.HU03_ValidacionME53N import buscar_SolpedME53N
 from Funciones.EscribirLog import WriteLog
