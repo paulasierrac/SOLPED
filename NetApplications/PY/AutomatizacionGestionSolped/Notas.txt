@@ -1,10 +1,8 @@
 CGRPA065
 sT1f%4L*
 
-CGRPA070
-G7p*k2Rm
- 
- 
+CGRPA062
+Tango25%$
 
 
 ZSUA
@@ -19,4 +17,57 @@ ME53N
 MM60
 ME9F
 ZMM_40B
-ME21N
+ME21N  / GENERACION DE ORDEN DE COMPRA 
+
+Click en resumen de documento activo 
+click variente de Seleccion 
+
+Solped para generar OC / revisar las generadas en el repote 05 ME5A
+1300139268
+1300133983
+
+
+Solped pasadas por el grupo para hacer pruebas 
+1300139390
+1300139391
+1300139392
+1300139393
+1300139394
+
+
+        #GenerarOCDesdeSolped(session, "1300139102", 2)  # Reemplaza con la Solped real:  1300139102, 2  1300139269 , 6
+        GenerarOCDesdeSolped(session, "1300139269", 6)  # Reemplaza con la Solped real:  1300139102, 2  1300139269 , 6   1300138077, 10
+        #GenerarOCDesdeSolped(session, "1300138077", 10)
+        #GenerarOCDesdeSolped(session, "1300177338", 13)
+        # Solped compartidas por el grupo
+        #GenerarOCDesdeSolped(session, "1300139390", 7)   #no tiene dato organizacion de compra 
+        #GenerarOCDesdeSolped(session, "1300139391", 9)
+        #GenerarOCDesdeSolped(session, "1300139392", 4)  # no tiene registros 
+        #GenerarOCDesdeSolped(session, "1300139393", 7)
+        #GenerarOCDesdeSolped(session, "1300139394", 7)
+
+
+OC con ZMTO
+4200342600
+
+4200340985
+
+
+1300139102
+TablaSolped1300139102
+TablaSolped1300139269
+TablaSolped1300138077
+
+
+git config --global user.name "paulasierrac"
+git config --global user.email "paula.sierra@netapplications.com.co"
+
+
+SAP_CONFIG = {
+    "user": get_env_variable("SAP_USUARIO"),
+    "password": get_env_variable("SAP_PASSWORD"),
+    "mandante": get_env_variable("SAP_MANDANTE"),
+    "sistema": get_env_variable("SAP_SISTEMA"),
+    "idioma": get_env_variable("SAP_IDIOMA"),
+    "logon_path": get_env_variable("SAP_LOGON_PATH"),
+}
