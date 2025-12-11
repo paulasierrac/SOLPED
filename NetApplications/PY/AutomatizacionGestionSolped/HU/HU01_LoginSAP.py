@@ -5,7 +5,7 @@ import subprocess
 import os
 from Config.settings import RUTAS, SAP_CONFIG
 
-# import pyautogui
+import pyautogui
 
 
 def abrir_sap_logon():
@@ -78,7 +78,16 @@ def conectar_sap(conexion, mandante, usuario, password, idioma="ES"):
         session.findById("wnd[0]/usr/txtRSYST-LANGU").text = idioma
         session.findById("wnd[0]").sendVKey(0)
         print(" Conectado correctamente a SAP.")
-
+        try:
+            if validarLoginDiag(
+                ruta_imagen=rf".\img\logindiag.png",
+                confidence=0.5,
+                intentos=20,
+                espera=0.5
+            ):
+                print("Ventana loginDiag inesperada superada correctamente")
+        except Exception as e:
+            print(f"Advertencia en validarLoginDiag: {e}")
         return session
 
     except Exception as e:
@@ -105,3 +114,31 @@ def ObtenerSesionActiva():
     except Exception as e:
         print(f" Error al obtener la sesion activa: {e}")
         return None
+
+
+
+def validarLoginDiag(ruta_imagen, confidence=0.5, intentos=3, espera=0.5):
+    """
+    Busca una imagen en pantalla y hace Enter cuando la encuentra.
+
+    Args:
+    
+        ruta_imagen (str): Ruta de la imagen a buscar.
+        confidence (float): Confianza para el match (requiere OpenCV).
+        intentos (int): Número de intentos antes de fallar.
+        espera (float): Tiempo entre intentos en segundos.
+
+    Returns:
+        bool: True si hizo click, False si no encontró la imagen.
+    """
+
+    for _ in range(intentos):
+        pos = pyautogui.locateCenterOnScreen(ruta_imagen, confidence=confidence)
+        if pos:
+            pyautogui.press("enter")
+            return True
+        time.sleep(espera)
+
+    print(f" No se encontró la ventana login diag: {ruta_imagen}")
+    return False
+

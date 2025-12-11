@@ -44,3 +44,8 @@ desktop.ini
 # Evitar subida de archivos grandes o sensibles
 *.zip
 *.rar
+
+# Carpetas 
+img/
+insumo/
+

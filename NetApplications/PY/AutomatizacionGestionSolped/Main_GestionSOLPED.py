@@ -19,6 +19,7 @@ from HU.HU02_DescargaME5A import (
     EjecutarHU02,
 )
 from HU.HU03_ValidacionME53N import EjecutarHU03
+from HU.HU05_GeneracionOC import EjecutarHU05
 from Funciones.EscribirLog import WriteLog
 from Funciones.GeneralME53N import (
     EnviarNotificacionCorreo,
@@ -63,15 +64,8 @@ def Main_GestionSolped():
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        session = conectar_sap(
-            SAP_CONFIG["sistema"],
-            SAP_CONFIG["mandante"],
-            SAP_CONFIG["user"],
-            SAP_CONFIG["password"],
-            "EN",
-        )
-
-        session = ObtenerSesionActiva()
+        session = conectar_sap(SAP_CONFIG["sistema"],SAP_CONFIG["mandante"],SAP_CONFIG["user"],SAP_CONFIG["password"],"EN",)
+        #session = ObtenerSesionActiva()
 
         WriteLog(
             mensaje="Sesión SAP obtenida correctamente.",
@@ -100,7 +94,7 @@ def Main_GestionSolped():
         )
 
         # ================================
-        # 4. Ejecutar HU03 – Validación ME53N
+        # 4. Ejecutar HU03 – Validación Solped ME53N 
         # ================================
         archivos_validar = ["expSolped05.txt", "expSolped03.txt"]
 
@@ -122,6 +116,31 @@ def Main_GestionSolped():
             )
 
         # Notificación de finalización HU02 con archivo descargado (código 2)
+
+        # ================================
+        # 5. Ejecutar HU05 – Creacion de OC
+        # ================================
+
+        archivos_validar = ["expSolped05.txt", "expSolped03.txt"]
+        
+        for archivo in archivos_validar:
+            WriteLog(
+                mensaje=f"Inicia HU05 - Validación ME21N para archivo {archivo}.",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+
+            EjecutarHU05(session, archivo)
+
+            WriteLog(
+                mensaje=f"HU05 finalizada correctamente para archivo {archivo}.",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+
+        # Finalizacion de HU5 generacion de OC 
 
         # ================================
         # Fin de Main

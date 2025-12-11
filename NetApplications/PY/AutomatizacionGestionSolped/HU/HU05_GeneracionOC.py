@@ -12,25 +12,28 @@ import subprocess
 import time
 import os
 from Config.settings import RUTAS
-from Funciones.ValidacionM21N import (
-    PressBuscarBoton,
-    buscar_y_clickear,
-    ejecutar_accion_sap,
-    limpiar_id_sap,
-    ejecutar_creacion_hijo
-)
-from Funciones.GeneralME53N import AbrirTransaccion
-
-
+from Funciones.ValidacionM21N import BorrarTextosDesdeSolped,ejecutar_accion_sap,buscar_y_clickear,limpiar_id_sap,ejecutar_creacion_hijo
+from Funciones.EscribirLog import WriteLog
+from Funciones.GeneralME53N import AbrirTransaccion,procesarTablaME5A
+import traceback
 import pyautogui  # Asegúrate de tener pyautogui instalado
 
 
-def GenerarOCDesdeSolped(session, solped, item=2):
-    try:
-        # Validación básica de sesión
-        if not session:
-            raise ValueError("Sesion SAP no valida.")
 
+def EjecutarHU05(session,archivo):
+
+    task_name="HU5_GeneracionOC"
+    """
+    Ejecuta la Historia de Usuario 05 encargada de la
+    generacion de OC desde la transacción ME21N.
+    """
+    try:
+        WriteLog(
+            mensaje="Inicia HU05",
+            estado="INFO",
+            task_name="HU5_GeneracionOC",
+            path_log=RUTAS["PathLog"],
+        )
         # ============================
         # Abrir transacción ME21N
         # ============================
@@ -38,7 +41,67 @@ def GenerarOCDesdeSolped(session, solped, item=2):
         AbrirTransaccion(session, "ME21N")
         print("Transacción ME21N abierta con éxito.")
         time.sleep(0.5)
+        # ============================
+        # Limpiar textos Solped 
+        # ============================
+        # Paso 2: Eliminar textos de Solped y remplazar con "."
 
+        #df_solpeds = procesarTablaME5A(nombre_archivo)
+
+        
+        archivos_validar = ["expSolped05.txt","expSolped03.txt"]
+
+        for archivo in archivos_validar:
+            WriteLog(
+                mensaje=f"Inicia HU05- Validación ME21N para archivo {archivo}.",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+            
+
+            #BorrarTextosDesdeSolped(session, "1300139102", 2)  # Reemplaza con la Solped real:  1300139102, 2  1300139269 , 6
+            #BorrarTextosDesdeSolped(session, "1300139269", 6)  # Reemplaza con la Solped real:  1300139102, 2  1300139269 , 6   1300138077, 10
+            BorrarTextosDesdeSolped(session, "1300138077", 10)
+            # Solped compartidas por el grupo
+            #BorrarTextosDesdeSolped(session, "1300139390", 7)   #no tiene dato organizacion de compra 
+            #BorrarTextosDesdeSolped(session, "1300139391", 9)
+            #BorrarTextosDesdeSolped(session, "1300139392", 4)  # no tiene registros 
+            #BorrarTextosDesdeSolped(session, "1300139393", 7)
+            #BorrarTextosDesdeSolped(session, "1300139394", 7)
+
+            WriteLog(
+                mensaje=f"HU05 finalizada correctamente para archivo {archivo}.",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+
+    except Exception as e:
+        error_text = traceback.format_exc()
+        WriteLog(
+            mensaje=f"ERROR GLOBAL: {e} | {error_text}",
+            estado="ERROR",
+            task_name="HU2_DescargaME5A",
+            path_log=RUTAS["PathLogError"],
+        )
+        raise
+
+
+
+def BorrarTextosDesdeSolped(session, solped, item=2):
+    
+
+    
+    AbrirTransaccion(session, "ME21N")
+    print("Transacción ME21N abierta con éxito.")
+    time.sleep(0.5)
+    #session.findById("wnd[0]").maximize()
+
+    try:
+        # Validación básica de sesión
+        if not session:
+            raise ValueError("Sesion SAP no valida.")
         #Click en carrito para el foco 
         ruta=rf".\img\carrito.png"
         buscar_y_clickear(ruta, confidence=0.5, intentos=20, espera=0.5)
