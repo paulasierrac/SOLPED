@@ -10,7 +10,7 @@ from HU.HU00_DespliegueAmbiente import EjecutarHU00
 from HU.HU01_LoginSAP import ObtenerSesionActiva,conectar_sap,abrir_sap_logon
 from HU.HU02_DescargaME5A import EjecutarHU02
 from HU.HU03_ValidacionME53N import EjecutarHU03
-from HU.HU05_GeneracionOC import GenerarOCDesdeSolped
+from HU.HU04_GeneracionOC import EjecutarHU04
 
 # from NetApplications.PY.AutomatizacionGestionSolped.HU.HU03_ValidacionME53N import buscar_SolpedME53N
 from Funciones.EscribirLog import WriteLog
@@ -49,7 +49,7 @@ def Main_Pruebas1():
         )
        
        
-        GenerarOCDesdeSolped(session, "1300139102")  # Reemplaza con la Solped real:  1300139102  1300139269
+        EjecutarHU04(session, "1300139102")  # Reemplaza con la Solped real:  1300139102  1300139269
      
     except Exception as e:
         error_text = traceback.format_exc()

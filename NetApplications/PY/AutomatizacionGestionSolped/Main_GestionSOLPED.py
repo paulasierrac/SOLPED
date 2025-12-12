@@ -19,12 +19,13 @@ from HU.HU02_DescargaME5A import (
     EjecutarHU02,
 )
 from HU.HU03_ValidacionME53N import EjecutarHU03
-from HU.HU05_GeneracionOC import EjecutarHU05
+from HU.HU04_GeneracionOC import EjecutarHU04
 from Funciones.EscribirLog import WriteLog
-from Funciones.GeneralME53N import (
-    EnviarNotificacionCorreo,
-    EnviarCorreoPersonalizado,
-    NotificarRevisionManualSolped,
+from Funciones.ValidacionM21N import (
+    leer_solpeds_desde_archivo,
+    BorrarTextosDesdeSolped
+
+ 
 )
 from Config.settings import RUTAS, SAP_CONFIG
 import traceback
@@ -64,7 +65,7 @@ def Main_GestionSolped():
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        session = conectar_sap(SAP_CONFIG["sistema"],SAP_CONFIG["mandante"],SAP_CONFIG["user"],SAP_CONFIG["password"],"EN",)
+        session = conectar_sap(SAP_CONFIG["sistema"],SAP_CONFIG["mandante"],SAP_CONFIG["user"],SAP_CONFIG["password"],)
         #session = ObtenerSesionActiva()
 
         WriteLog(
@@ -84,7 +85,7 @@ def Main_GestionSolped():
             path_log=RUTAS["PathLog"],
         )
 
-        EjecutarHU02(session)
+        #EjecutarHU02(session)
 
         WriteLog(
             mensaje="HU02 finalizada correctamente.",
@@ -106,7 +107,7 @@ def Main_GestionSolped():
                 path_log=RUTAS["PathLog"],
             )
 
-            EjecutarHU03(session, archivo)
+            #EjecutarHU03(session, archivo)
 
             WriteLog(
                 mensaje=f"HU03 finalizada correctamente para archivo {archivo}.",
@@ -118,20 +119,29 @@ def Main_GestionSolped():
         # Notificación de finalización HU02 con archivo descargado (código 2)
 
         # ================================
-        # 5. Ejecutar HU05 – Creacion de OC
+        # 5. Ejecutar HU04 – Creacion de OC
         # ================================
 
         archivos_validar = ["expSolped05.txt", "expSolped03.txt"]
         
         for archivo in archivos_validar:
             WriteLog(
-                mensaje=f"Inicia HU05 - Validación ME21N para archivo {archivo}.",
+                mensaje=f"Inicia HU04 - Validación ME21N para archivo {archivo}.",
                 estado="INFO",
                 task_name=task_name,
                 path_log=RUTAS["PathLog"],
             )
+            ruta = rf"{RUTAS["PathInsumo"]}{archivo}"
+            print("Esta es la ruta: ", ruta)
+            dataSolpeds = leer_solpeds_desde_archivo(ruta)
+            
+            for solped, info in dataSolpeds.items():
+                for item in range(info["items"]):
+                    # Llamas tu función de procesamiento por item
+                    BorrarTextosDesdeSolped(session, solped, item)
+                  
 
-            EjecutarHU05(session, archivo)
+            #EjecutarHU04(session, archivo)
 
             WriteLog(
                 mensaje=f"HU05 finalizada correctamente para archivo {archivo}.",
@@ -139,6 +149,7 @@ def Main_GestionSolped():
                 task_name=task_name,
                 path_log=RUTAS["PathLog"],
             )
+
 
         # Finalizacion de HU5 generacion de OC 
 

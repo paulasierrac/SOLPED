@@ -7,7 +7,7 @@
 # Cambios: Ajuste inicial para cumplimiento de estándar
 # ================================
 from HU.HU01_LoginSAP import conectar_sap
-from HU.HU05_GeneracionOC import BorrarTextosDesdeSolped,EjecutarHU05
+from Funciones.ValidacionM21N import BorrarTextosDesdeSolped
 
 # from NetApplications.PY.AutomatizacionGestionSolped.HU.HU03_ValidacionME53N import buscar_SolpedME53N
 from Funciones.EscribirLog import WriteLog
@@ -28,19 +28,15 @@ def Main_Pruebas3():
         #EjecutarHU05(session)
         print(session)
 
-        #BorrarTextosDesdeSolped(session, "1300139102", 2)  # Reemplaza con la Solped real:  1300139102, 2  1300139269 , 6
-        #BorrarTextosDesdeSolped(session, "1300139269", 6)  # Reemplaza con la Solped real:  1300139102, 2  1300139269 , 6   1300138077, 10
-        #BorrarTextosDesdeSolped(session, "1300138077", 10)
-        #BorrarTextosDesdeSolped(session, "1300139272", 10)
-        BorrarTextosDesdeSolped(session, "1300136848", 83)
-
       
+        #solpeds = [("1300139102", 2),("1300139269", 6),("1300138077", 10),("1300139272", 10),("1300136848", 83)]
         # Solped compartidas por el grupo
-        #BorrarTextosDesdeSolped(session, "1300139390", 7)   #no tiene dato organizacion de compra 
-        #BorrarTextosDesdeSolped(session, "1300139391", 9)
-        #BorrarTextosDesdeSolped(session, "1300139392", 4)  # no tiene registros 
-        #BorrarTextosDesdeSolped(session, "1300139393", 7)
-        #BorrarTextosDesdeSolped(session, "1300139394", 7)
+        solpeds = [("1300139390", 7),("1300139391", 9),("1300139392", 4),("1300139393", 7),("1300139394", 7)]
+        #solpeds = [("1300139269", 6)]
+
+        for solped, posicion in solpeds:
+            BorrarTextosDesdeSolped(session, solped, posicion)
+
     except Exception as e:
         error_text = traceback.format_exc()
         WriteLog(

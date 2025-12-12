@@ -85,9 +85,9 @@ def conectar_sap(conexion, mandante, usuario, password, idioma="ES"):
                 intentos=20,
                 espera=0.5
             ):
-                print("Ventana loginDiag inesperada superada correctamente")
+                print("Ventana loginDiag Copyrigth inesperada superada correctamente")
         except Exception as e:
-            print(f"Advertencia en validarLoginDiag: {e}")
+            print(f"no se encontro ventana Copyrigth en login {e}")
         return session
 
     except Exception as e:

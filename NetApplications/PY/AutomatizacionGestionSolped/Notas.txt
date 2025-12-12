@@ -28,23 +28,21 @@ Solped para generar OC / revisar las generadas en el repote 05 ME5A
 
 
 Solped pasadas por el grupo para hacer pruebas 
-1300139390
-1300139391
-1300139392
-1300139393
-1300139394
+"1300139390", 7  
+"1300139391", 9
+"1300139392", 4  
+"1300139393", 7
+"1300139394", 7
 
 
-        #GenerarOCDesdeSolped(session, "1300139102", 2)  # Reemplaza con la Solped real:  1300139102, 2  1300139269 , 6
-        GenerarOCDesdeSolped(session, "1300139269", 6)  # Reemplaza con la Solped real:  1300139102, 2  1300139269 , 6   1300138077, 10
-        #GenerarOCDesdeSolped(session, "1300138077", 10)
-        #GenerarOCDesdeSolped(session, "1300177338", 13)
-        # Solped compartidas por el grupo
-        #GenerarOCDesdeSolped(session, "1300139390", 7)   #no tiene dato organizacion de compra 
-        #GenerarOCDesdeSolped(session, "1300139391", 9)
-        #GenerarOCDesdeSolped(session, "1300139392", 4)  # no tiene registros 
-        #GenerarOCDesdeSolped(session, "1300139393", 7)
-        #GenerarOCDesdeSolped(session, "1300139394", 7)
+
+1300139269 - se genero la OC 4001155852
+"1300139102", 2  
+"1300139269", 6
+"1300138077", 10
+"1300177338", 13
+       
+
 
 
 OC con ZMTO

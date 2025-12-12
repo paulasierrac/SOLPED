@@ -14,6 +14,7 @@ import os
 from Funciones.EscribirLog import WriteLog
 from Config.settings import RUTAS
 import pyautogui 
+from Funciones.GeneralME53N import AbrirTransaccion
 
 
 def boton_existe(session,id):
@@ -105,22 +106,21 @@ def PressBuscarBoton(session):
 
 def find_sap_control(session, parent_id, dynamic_regex, trailing_path, desired_action=None, value=None):
     
-    """
-    Busca un control SAP cuyo ID contiene una parte dinámica (SAPLMEGUI:0010/0015/etc.)
-    y ejecuta una acción específica (.press, asignar .text, etc.).
+    # Busca un control SAP cuyo ID contiene una parte dinámica (SAPLMEGUI:0010/0015/etc.)
+    # y ejecuta una acción específica (.press, asignar .text, etc.).
 
-    Args:
-        session         : Objeto SAP GUI Scripting de la sesión actual.
-        parent_id       : Punto inicial estable (ej: "wnd[0]/usr")
-        dynamic_regex   : Patrón regex para identificar el contenedor variable.
-                          Ej: r"subSUB0:SAPLMEGUI:001\d"
-        trailing_path   : Ruta que viene DESPUÉS del contenedor dinámico.
-        desired_action  : Acción a ejecutar: "press", "set_text", "focus", None
-        value           : Valor para acciones como "set_text"
+    # Args:
+    #     session         : Objeto SAP GUI Scripting de la sesión actual.
+    #     parent_id       : Punto inicial estable (ej: "wnd[0]/usr")
+    #     dynamic_regex   : Patrón regex para identificar el contenedor variable.
+    #                       Ej: r"subSUB0:SAPLMEGUI:001\d"
+    #     trailing_path   : Ruta que viene DESPUÉS del contenedor dinámico.
+    #     desired_action  : Acción a ejecutar: "press", "set_text", "focus", None
+    #     value           : Valor para acciones como "set_text"
 
-    Returns:
-        El control encontrado (GuiComponent) o None si falla.
-    """
+    # Returns:
+    #     El control encontrado (GuiComponent) o None si falla.
+    
 
     parent = session.findById(parent_id)
     patron = re.compile(dynamic_regex)
@@ -189,25 +189,7 @@ def limpiar_id_sap(ruta_absoluta):
         return ruta_limpia
     return ruta_absoluta # Si ya estaba limpia, la devuelve igual
 
-# def ejecutar_creacion_hijo(session):
-#     user_area = session.findById("wnd[0]/usr")
-#     for hijo in user_area.Children:
-#         if "SAPLMEGUI" in hijo.Id:
-#             # Una vez dentro del área variable, intentamos construir la ruta al tabstrip
-#             # Ojo: Aquí asumimos la estructura interna fija después del cambio 0010/0020
-#             # Tomamos el ID del hijo (ej: ...:0010) y le pegamos el resto de la ruta que SÍ es constante:
-#             ruta_restante = "/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL"
-            
-#             try:
-#                 full_id = hijo.Id + ruta_restante
-#                 full_id = limpiar_id_sap(full_id)
-#                 obj_tabstrip = session.findById(full_id)
-#                 print("id:!!!!!")
-#                 print(full_id)
-#                 return obj_tabstrip
 
-#             except:
-#                 continue
 
 
 def ejecutar_creacion_hijo(session):
@@ -255,6 +237,11 @@ def ejecutar_creacion_hijo(session):
 
 
 def BorrarTextosDesdeSolped(session, solped, item=2):
+
+    AbrirTransaccion(session, "ME21N")
+    print("Transacción ME21N abierta con éxito.")
+    time.sleep(0.5)
+    session.findById("wnd[0]").maximize()
     try:
         # Validación básica de sesión
         if not session:
@@ -392,11 +379,76 @@ def BorrarTextosDesdeSolped(session, solped, item=2):
             time.sleep(1)
             ruta_img = rf".\img\abajo.png"
             buscar_y_clickear(ruta_img, confidence=0.8, intentos=20, espera=0.5)
+
+            # Salir de SAP 
+            session.findById("wnd[0]").sendVKey(12)
+            time.sleep(1)
+            pyautogui.press("f3")
+            time.sleep(1)
+            pyautogui.press("f12")
+
     except Exception as e:
         print(rf"Error en HU05: {e}", "ERROR")
         raise
 
+def leer_solpeds_desde_archivo(ruta_archivo):
+    resultados = {}
 
+    with open(ruta_archivo, "r", encoding="utf-8", errors="ignore") as f:
+        for linea in f:
+            # Todas las líneas útiles empiezan con '|'
+            if not linea.strip().startswith("|"):
+                continue
+            
+            partes = [p.strip() for p in linea.split("|")]
+
+            # Esperamos al menos 16 columnas por la estructura del archivo
+            if len(partes) < 16:
+                continue
+
+            try:
+                purch_req = partes[1]       # PurchReq
+                estado    = partes[14]      # Estado
+            except IndexError:
+                continue  # Si alguna fila viene corrupta
+
+            # Evitar encabezados
+            if purch_req.lower().startswith("purch"):
+                continue
+
+            # Inicializar
+            if purch_req not in resultados:
+                resultados[purch_req] = {
+                    "items": 0,
+                    "estados": set()
+                }
+
+            # Sumar item
+            resultados[purch_req]["items"] += 1
+            resultados[purch_req]["estados"].add(estado)
+
+    return resultados   
+
+def obtener_numero_oc(session):
+    """
+    Obtiene el número de la Orden de Compra creada desde la barra de estado.
+    """
+    try:
+        # El mensaje de éxito con el número de OC suele aparecer en la barra de estado.
+        status_text = session.findById("wnd[0]/sbar").text
+        # Usamos una expresión regular para buscar un número que sigue a un texto estándar.
+        # "Standard PO created under the number 4500021244" -> Ejemplo
+        match = re.search(r'(\d{10,})', status_text) # Busca 10 o más dígitos
+        if match:
+            numero_oc = match.group(1)
+            print(f"Número de OC extraído: {numero_oc}")
+            return numero_oc
+        else:
+            print("No se pudo encontrar el número de OC en la barra de estado.")
+            return None
+    except Exception as e:
+        print(f"Error al obtener el número de OC: {e}")
+        return None 
 
 def EncontrarDynpros(session):
     import re
