@@ -31,7 +31,7 @@ def Main_Pruebas3():
       
         #solpeds = [("1300139102", 2),("1300139269", 6),("1300138077", 10),("1300139272", 10),("1300136848", 83)]
         # Solped compartidas por el grupo
-        solpeds = [("1300139390", 7),("1300139391", 9),("1300139392", 4),("1300139393", 7),("1300139394", 7)]
+        solpeds = [("1300139394", 7),("1300139391", 9),("1300139392", 4),("1300139393", 7),("1300139390", 7)]
         #solpeds = [("1300139269", 6)]
 
         for solped, posicion in solpeds:
@@ -46,7 +46,6 @@ def Main_Pruebas3():
             path_log=RUTAS["PathLogError"],
         )
         raise
-
 
 if __name__ == "__main__":
     Main_Pruebas3()

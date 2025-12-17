@@ -49,7 +49,7 @@ def Main_Pruebas1():
         )
        
        
-        EjecutarHU04(session, "1300139102")  # Reemplaza con la Solped real:  1300139102  1300139269
+        #EjecutarHU04(session, "1300139102")  # Reemplaza con la Solped real:  1300139102  1300139269
      
     except Exception as e:
         error_text = traceback.format_exc()
@@ -121,4 +121,4 @@ if __name__ == "__main__":
 
                 if not pestaña_encontrada:
                     print(f"No se encontró la pestaña llamada {nombre_pestaña_buscada}")
- """
+"""

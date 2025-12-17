@@ -54,7 +54,7 @@ def Main_GestionSolped():
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        # EjecutarHU00()
+        #EjecutarHU00()
 
         # ================================
         # 2. Obtener sesión SAP
@@ -122,11 +122,36 @@ def Main_GestionSolped():
         # 5. Ejecutar HU04 – Creacion de OC
         # ================================
 
-        archivos_validar = ["expSolped05.txt", "expSolped03.txt"]
+            WriteLog(
+                mensaje="HU04 - Creacion de OC desde ME21N.",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+
+            archivos_validar = ["expSolped05 1.txt"]
+            EjecutarHU04(session, archivos_validar)
+            
+
+            WriteLog(
+                mensaje=f"HU05 finalizada correctamente para archivo {archivo}.",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+
+
+        # Finalizacion de HU4 generacion de OC 
+
+        # ================================
+        # 5. Ejecutar HU05 – Descarga de OC y envio de correo 
+        # ================================
+
+        archivos_validar = ["expSolped05 1.txt", "expSolped05.txt"]
         
         for archivo in archivos_validar:
             WriteLog(
-                mensaje=f"Inicia HU04 - Validación ME21N para archivo {archivo}.",
+                mensaje=f"Inicia HU05 - Descarga de OC y envio de correo  {archivo}.",
                 estado="INFO",
                 task_name=task_name,
                 path_log=RUTAS["PathLog"],
@@ -134,14 +159,11 @@ def Main_GestionSolped():
             ruta = rf"{RUTAS["PathInsumo"]}{archivo}"
             print("Esta es la ruta: ", ruta)
             dataSolpeds = leer_solpeds_desde_archivo(ruta)
-            
+                         
             for solped, info in dataSolpeds.items():
-                for item in range(info["items"]):
-                    # Llamas tu función de procesamiento por item
-                    BorrarTextosDesdeSolped(session, solped, item)
-                  
+                print(f"Solped {solped} tiene {info['items']} items")
+                #Cambiar por funcion de descarga de OC 
 
-            #EjecutarHU04(session, archivo)
 
             WriteLog(
                 mensaje=f"HU05 finalizada correctamente para archivo {archivo}.",

@@ -14,7 +14,8 @@ import os
 from Funciones.EscribirLog import WriteLog
 from Config.settings import RUTAS
 import pyautogui 
-from Funciones.GeneralME53N import AbrirTransaccion
+from pyautogui import ImageNotFoundException
+from Funciones.GeneralME53N import AbrirTransaccion, ColsultarSolped, procesarTablaME5A, ActualizarEstadoYObservaciones
 
 
 def boton_existe(session,id):
@@ -24,28 +25,86 @@ def boton_existe(session,id):
     except:
         return False
     
-def buscar_y_clickear(ruta_imagen, confidence=0.5, intentos=20, espera=0.5):
+# def buscar_y_clickear(ruta_imagen, confidence=0.5, intentos=20, espera=0.5):
+#     """
+#     Busca una imagen en pantalla y hace click cuando la encuentra.
+
+#     Args:
+#         ruta_imagen (str): Ruta de la imagen a buscar.
+#         confidence (float): Confianza para el match (requiere OpenCV).
+#         intentos (int): Número de intentos antes de fallar.
+#         espera (float): Tiempo entre intentos en segundos.
+
+#     Returns:
+#         bool: True si hizo click, False si no encontró la imagen.
+#     """
+
+#     for _ in range(intentos):
+#         pos = pyautogui.locateCenterOnScreen(ruta_imagen, confidence=confidence)
+#         if pos:
+#             pyautogui.click(*pos)
+#             return True
+#         time.sleep(espera)
+
+#     print(f"[WARNING] No se encontró la imagen: {ruta_imagen}")
+#     return False
+
+
+def buscar_y_clickear(
+    ruta_imagen,
+    confidence=0.5,
+    intentos=20,
+    espera=0.5,
+    fail_silently=True,
+    log=True
+):
     """
-    Busca una imagen en pantalla y hace click cuando la encuentra.
+    Busca una imagen en pantalla y hace click cuando la encuentra,
+    controlando el error si no aparece y permitiendo continuar el flujo.
 
     Args:
         ruta_imagen (str): Ruta de la imagen a buscar.
-        confidence (float): Confianza para el match (requiere OpenCV).
-        intentos (int): Número de intentos antes de fallar.
-        espera (float): Tiempo entre intentos en segundos.
+        confidence (float): Nivel de confianza para el match (OpenCV).
+        intentos (int): Número máximo de intentos.
+        espera (float): Tiempo de espera entre intentos (segundos).
+        fail_silently (bool): Si True, no lanza excepción al fallar.
+        log (bool): Si True, muestra mensajes de estado.
 
     Returns:
-        bool: True si hizo click, False si no encontró la imagen.
+        bool: True si se encontró e hizo click, False si no.
     """
 
-    for _ in range(intentos):
-        pos = pyautogui.locateCenterOnScreen(ruta_imagen, confidence=confidence)
-        if pos:
-            pyautogui.click(*pos)
-            return True
+    for intento in range(1, intentos + 1):
+        try:
+            pos = pyautogui.locateCenterOnScreen(
+                ruta_imagen,
+                confidence=confidence
+            )
+
+            if pos:
+                pyautogui.click(pos)
+                if log:
+                    print(f"[INFO] Imagen encontrada y clickeada: {ruta_imagen}")
+                return True
+
+        except ImageNotFoundException:
+            # PyAutoGUI puede lanzar esta excepción en algunas versiones
+            pass
+
+        except Exception as e:
+            if log:
+                print(f"[ERROR] Error inesperado buscando imagen {ruta_imagen}: {e}")
+            if not fail_silently:
+                raise
+
         time.sleep(espera)
 
-    print(f"[WARNING] No se encontró la imagen: {ruta_imagen}")
+    if log:
+        print(f"[WARNING] Imagen no encontrada tras {intentos} intentos: {ruta_imagen}")
+
+    if not fail_silently:
+        raise RuntimeError(f"No se encontró la imagen: {ruta_imagen}")
+
     return False
 
 def ejecutar_accion_sap(id_documento="0", ruta_vbs=rf".\scriptsVbs\clickptextos.vbs"):
@@ -63,7 +122,6 @@ def ejecutar_accion_sap(id_documento="0", ruta_vbs=rf".\scriptsVbs\clickptextos.
             print(f"Error al ejecutar VBS: {e}")
     else:
         print("No se encuentra el archivo VBS")
-
 
 def PressBuscarBoton(session):
 
@@ -102,7 +160,6 @@ def PressBuscarBoton(session):
     else:
         print("No se encontró el contenedor que coincida con la Regex.")
         return False
-
 
 def find_sap_control(session, parent_id, dynamic_regex, trailing_path, desired_action=None, value=None):
     
@@ -175,7 +232,6 @@ def find_sap_control(session, parent_id, dynamic_regex, trailing_path, desired_a
 
     return control
 
-
 def limpiar_id_sap(ruta_absoluta):
     """
     Toma una ruta larga tipo '/app/con[0]/ses[0]/wnd[0]/usr...'
@@ -188,9 +244,6 @@ def limpiar_id_sap(ruta_absoluta):
         ruta_limpia = "wnd[" + partes[1]
         return ruta_limpia
     return ruta_absoluta # Si ya estaba limpia, la devuelve igual
-
-
-
 
 def ejecutar_creacion_hijo(session):
     # 1. Definir el área padre.
@@ -235,9 +288,9 @@ def ejecutar_creacion_hijo(session):
  
     return None # Si fallaron los 3 intentos o no se encontró
 
-
 def BorrarTextosDesdeSolped(session, solped, item=2):
-
+    
+    esperar_sap_listo(session)
     AbrirTransaccion(session, "ME21N")
     print("Transacción ME21N abierta con éxito.")
     time.sleep(0.5)
@@ -246,7 +299,7 @@ def BorrarTextosDesdeSolped(session, solped, item=2):
         # Validación básica de sesión
         if not session:
             raise ValueError("Sesion SAP no valida.")
-
+        esperar_sap_listo(session)
         #Click en carrito para el foco 
         ruta=rf".\img\carrito.png"
         buscar_y_clickear(ruta, confidence=0.5, intentos=20, espera=0.5)
@@ -264,6 +317,7 @@ def BorrarTextosDesdeSolped(session, solped, item=2):
         time.sleep(0.5)
 
         # ingresa el numero de la solped que va a revisar
+        esperar_sap_listo(session)
         session.findById("wnd[0]/usr/ctxtSP$00026-LOW").text = solped
         session.findById("wnd[0]/tbar[1]/btn[8]").press()
 
@@ -318,6 +372,7 @@ def BorrarTextosDesdeSolped(session, solped, item=2):
                 # Buscar la pestaña "Textos" de nuevo (su ID padre pudo cambiar)
                 full_id_base_pestaña = ""
                 pestaña_encontrada = False
+                esperar_sap_listo(session)
                 for pestaña in obj_tabstrip.Children:
                     if pestaña.Text == "Textos":
                         # Capturamos el ID limpio actual de la pestaña
@@ -380,12 +435,17 @@ def BorrarTextosDesdeSolped(session, solped, item=2):
             ruta_img = rf".\img\abajo.png"
             buscar_y_clickear(ruta_img, confidence=0.8, intentos=20, espera=0.5)
 
-            # Salir de SAP 
-            session.findById("wnd[0]").sendVKey(12)
-            time.sleep(1)
-            pyautogui.press("f3")
-            time.sleep(1)
-            pyautogui.press("f12")
+        # Salir de SAP 
+        #session.findById("wnd[0]").sendVKey(12)
+        esperar_sap_listo(session)
+        time.sleep(1)
+        pyautogui.hotkey("ctrl", "s") 
+        time.sleep(1)
+        pyautogui.press("enter")
+        time.sleep(1)
+        pyautogui.press("F12")
+        time.sleep(1)
+        esperar_sap_listo(session)
 
     except Exception as e:
         print(rf"Error en HU05: {e}", "ERROR")
@@ -408,7 +468,7 @@ def leer_solpeds_desde_archivo(ruta_archivo):
 
             try:
                 purch_req = partes[1]       # PurchReq
-                estado    = partes[14]      # Estado
+                estado    = partes[15]      # Estado
             except IndexError:
                 continue  # Si alguna fila viene corrupta
 
@@ -450,40 +510,251 @@ def obtener_numero_oc(session):
         print(f"Error al obtener el número de OC: {e}")
         return None 
 
-def EncontrarDynpros(session):
-    import re
+def esperar_sap_listo(session, timeout=10):
+    inicio = time.time()
 
-    wnd = session.ActiveWindow
-    dynpros = set()
-    cola = [wnd]
-    patron = re.compile(r":[A-Z0-9_]+:(\d{4})")
-
-    while cola:
-        nodo = cola.pop(0)
-
+    while time.time() - inicio < timeout:
         try:
-            nid = nodo.Id
-            encontrados = patron.findall(nid)
-            for d in encontrados:
-                dynpros.add(d)
+            if not session.Busy:
+                return True
         except:
             pass
+        time.sleep(0.2)
 
-        try:
-            count = nodo.Children.Count
-        except:
-            continue
+    raise TimeoutError("SAP GUI no terminó de cargar (session.Busy)")
 
-        for i in range(count):
-            try:
-                child = nodo.Children(i)
-                cola.append(child)
-            except:
-                pass
-    lista_dynpros = sorted(dynpros)
+# ===============================================================================================
+# INICIO DE CÓDIGO DE VALIDACIÓN INDEPENDIENTE PARA HU04
+# ===============================================================================================
 
-    if lista_dynpros:
-        primer_valor = lista_dynpros[0]
-        return primer_valor
-    else:
-        return("No se encontraron dynpros.")
+import pandas as pd
+import chardet
+import win32clipboard
+from datetime import datetime
+from typing import Dict, Tuple, List
+
+# --- Funciones auxiliares de GUI y archivos (reimplementación para HU04) ---
+
+def _DetectarCodificacion_HU04(path: str) -> str:
+    try:
+        with open(path, "rb") as f:
+            rawdata = f.read()
+        resultado = chardet.detect(rawdata)
+        return resultado["encoding"]
+    except Exception:
+        return "utf-8"
+
+def _TablaItemsDataFrame_HU04(name: str) -> pd.DataFrame:
+    try:
+        path = rf"{RUTAS['PathInsumos']}\TablasME53N\{name}"
+        encoding = _DetectarCodificacion_HU04(path)
+        
+        with open(path, "r", encoding=encoding, errors='ignore') as f:
+            lineas = f.read().splitlines()
+
+        tabla = [l for l in lineas if l.strip().startswith("|") and "---" not in l]
+        if not tabla: return pd.DataFrame()
+
+        encabezado_raw = tabla[0]
+        columnas = [c.strip() for c in encabezado_raw.split("|")[1:-1]]
+        
+        columnas_unicas = []
+        contador = {}
+        for col in columnas:
+            if col in contador:
+                contador[col] += 1
+                columnas_unicas.append(f"{col}_{contador[col]}")
+            else:
+                contador[col] = 0
+                columnas_unicas.append(col)
+
+        filas = []
+        for fila in tabla[1:]:
+            partes = [c.strip() for c in fila.split("|")[1:-1]]
+            if len(partes) == len(columnas_unicas):
+                filas.append(partes)
+        
+        return pd.DataFrame(filas, columns=columnas_unicas)
+    except Exception as e:
+        print(f"ERROR en _TablaItemsDataFrame_HU04: {e}")
+        return pd.DataFrame()
+
+def _ObtenerItemsME53N_HU04(session, numero_solped: str) -> pd.DataFrame:
+    try:
+        grid = session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0015/subSUB2:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:3212/cntlGRIDCONTROL/shellcont/shell")
+        grid.pressToolbarContextButton("&MB_EXPORT")
+        grid.selectContextMenuItem("&PC")
+        session.findById("wnd[1]/tbar[0]/btn[0]").press()
+        session.findById("wnd[1]/usr/ctxtDY_PATH").text = rf"{RUTAS['PathInsumos']}\TablasME53N"
+        session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = f"TablaSolped{numero_solped}_HU04.txt"
+        session.findById("wnd[1]/tbar[0]/btn[0]").press()
+        time.sleep(1)
+        return _TablaItemsDataFrame_HU04(f"TablaSolped{numero_solped}_HU04.txt")
+    except Exception as e:
+        print(f"ERROR en _ObtenerItemsME53N_HU04: {e}")
+        return pd.DataFrame()
+
+def _ObtenerTextoDelPortapapeles_HU04() -> str:
+    try:
+        win32clipboard.OpenClipboard()
+        texto = win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)
+        win32clipboard.CloseClipboard()
+        return texto or ""
+    except Exception:
+        return ""
+
+def _ObtenerItemTextME53N_HU04(session, numero_solped: str, numero_item: str) -> str:
+    try:
+        editor = session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0015/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:3303/tabsREQ_ITEM_DETAIL/tabpTABREQDT13/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/subTEXTS:SAPLMMTE:0200/subEDITOR:SAPLMMTE:0201/cntlTEXT_EDITOR_0201/shellcont/shell")
+        editor.SetFocus()
+        time.sleep(0.5)
+        pyautogui.hotkey("ctrl", "a")
+        time.sleep(0.3)
+        pyautogui.hotkey("ctrl", "c")
+        time.sleep(0.5)
+        texto_completo = _ObtenerTextoDelPortapapeles_HU04()
+        
+        session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0015/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB1:SAPLMEGUI:6000/btn%#AUTOTEXT002").press()
+        time.sleep(0.5)
+        return texto_completo
+    except Exception as e:
+        print(f"ERROR en _ObtenerItemTextME53N_HU04: {e}")
+        return ""
+
+# --- Funciones de procesamiento y validación (reimplementación para HU04) ---
+
+def _LimpiarNumero_HU04(valor: str) -> float:
+    if not valor or not isinstance(valor, str): return 0.0
+    valor_limpio = valor.strip().replace("$", "").replace(" ", "")
+    if "." in valor_limpio and "," in valor_limpio:
+        if valor_limpio.rfind(".") > valor_limpio.rfind(","):
+            valor_limpio = valor_limpio.replace(",", "")
+        else:
+            valor_limpio = valor_limpio.replace(".", "").replace(",", ".")
+    elif "," in valor_limpio:
+        valor_limpio = valor_limpio.replace(",", ".")
+    try:
+        return float(valor_limpio)
+    except (ValueError, TypeError):
+        return 0.0
+
+def _ExtraerDatosTexto_HU04(texto: str) -> Dict:
+    datos = { "nit": "", "concepto_compra": "", "cantidad": "", "valor_total": "", "codigo_operacion": [] }
+    if not texto or not texto.strip(): return datos
+
+    texto_upper = texto.upper()
+    
+    # --- Lógica de normalización específica de HU04 ---
+    REEMPLAZOS = {
+        "VENTA SERVICIO": "V1", "VENTA PRODUCTO": "V1",
+        "GASTO PROPIO SERVICIO": "C2", "GASTO PROPIO PRODUCTO": "C2",
+        "SAA SERVICIO": "R3", "SAA PRODUCTO": "R3",
+    }
+    codigos_encontrados = set()
+    for keyword, code in REEMPLAZOS.items():
+        if keyword in texto_upper:
+            codigos_encontrados.add(code)
+    datos["codigo_operacion"] = sorted(list(codigos_encontrados))
+
+    # --- Extracción de campos ---
+    patrones = {
+        "nit": r"NIT[\s:]*([0-9.\-]+)",
+        "concepto_compra": r"POR CONCEPTO DE[:\s]*(.+?)\s*(?:EMPRESA|FECHA|CANTIDAD|VALOR)",
+        "cantidad": r"CANTIDAD[\s:]*([0-9.,]+)",
+        "valor_total": r"VALOR TOTAL[\s:]*([\$]?\s*[0-9]{1,3}(?:[.,][0-9]{3})*(?:[.,][0-9]{2})?)",
+    }
+    for campo, patron in patrones.items():
+        m = re.search(patron, texto_upper)
+        if m:
+            datos[campo] = m.group(1).strip()
+            
+    return datos
+
+def _ValidarContraTabla_HU04(datos_texto: Dict, df_items: pd.DataFrame, item_num: str) -> Dict:
+    validaciones = { "cantidad": {"match": False}, "valor_total": {"match": False}, "resumen": "" }
+    if df_items.empty:
+        validaciones["resumen"] = "Tabla vacía"
+        return validaciones
+
+    item_df = df_items[df_items["Item"].astype(str).str.strip() == str(item_num).strip()]
+    if item_df.empty:
+        validaciones["resumen"] = "Item no encontrado"
+        return validaciones
+
+    fila_item = item_df.iloc[0]
+
+    # Validar Cantidad
+    if datos_texto["cantidad"] and "Quantity" in fila_item:
+        cantidad_texto = _LimpiarNumero_HU04(datos_texto["cantidad"])
+        cantidad_tabla = _LimpiarNumero_HU04(str(fila_item["Quantity"]))
+        validaciones["cantidad"]["match"] = abs(cantidad_texto - cantidad_tabla) < 0.01
+
+    # Validar Valor Total
+    columna_total_sap = "Total Value" if "Total Value" in fila_item else "Total Val."
+    if datos_texto["valor_total"] and columna_total_sap in fila_item:
+        valor_texto = _LimpiarNumero_HU04(datos_texto["valor_total"])
+        valor_tabla = _LimpiarNumero_HU04(str(fila_item[columna_total_sap]))
+        if valor_tabla > 0:
+            validaciones["valor_total"]["match"] = abs(valor_texto - valor_tabla) / valor_tabla < 0.01
+        else:
+            validaciones["valor_total"]["match"] = valor_texto == valor_tabla
+            
+    return validaciones
+
+def _DeterminarEstadoFinal_HU04(datos_texto: Dict, validaciones: Dict) -> Tuple[str, str]:
+    if not all(v.get("match") for v in validaciones.values() if isinstance(v, dict)):
+        return "Datos no coinciden", "Los datos del texto no coinciden con los de la tabla SAP."
+    if not datos_texto.get("codigo_operacion"):
+        return "Sin Codigo Op", "No se encontró código de operación (V1, C2, R3) en el texto."
+    return "Registro validado para orden de compra", "Validación de HU04 exitosa."
+
+def _ProcesarYValidarItem_HU04(session, solped: str, item_num: str, texto: str, df_items: pd.DataFrame) -> Tuple[str, str]:
+    datos_texto = _ExtraerDatosTexto_HU04(texto)
+    validaciones = _ValidarContraTabla_HU04(datos_texto, df_items, item_num)
+    estado_final, observaciones = _DeterminarEstadoFinal_HU04(datos_texto, validaciones)
+    return estado_final, observaciones
+
+# --- Función principal de orquestación para HU04 ---
+
+def ValidarSolpedParaOC(session, task_name, solped, df_solpeds_para_actualizar, archivo):
+    WriteLog(f"Iniciando validación tipo HU04 para SOLPED {solped}", "INFO", task_name, RUTAS["PathLog"])
+    
+    AbrirTransaccion(session, "ME53N")
+    if not ColsultarSolped(session, solped):
+        WriteLog(f"No se pudo consultar la SOLPED {solped} en ME53N.", "ERROR", task_name, RUTAS["PathLogError"])
+        ActualizarEstadoYObservaciones(df_solpeds_para_actualizar, archivo, solped, nuevo_estado="Error Consulta ME53N", observaciones="No se pudo consultar en SAP para validación.")
+        return False
+
+    df_items = _ObtenerItemsME53N_HU04(session, solped)
+    if df_items.empty:
+        WriteLog(f"SOLPED {solped} no tiene ítems para validar.", "WARNING", task_name, RUTAS["PathLog"])
+        ActualizarEstadoYObservaciones(df_solpeds_para_actualizar, archivo, solped, nuevo_estado="Sin Items", observaciones="No se encontraron items en SAP para validar.")
+        return False
+
+    lista_items = df_items.to_dict(orient="records")
+    if lista_items and (lista_items[-1].get("Status", "").strip() == "*" or lista_items[-1].get("Item", "").strip() == ""):
+        lista_items.pop()
+
+    for item_row in lista_items:
+        numero_item = item_row.get("Item", "").strip()
+        print(f"--- Validando Item {numero_item} de SOLPED {solped} (HU04) ---")
+
+        texto_item = _ObtenerItemTextME53N_HU04(session, solped, numero_item)
+        
+        estado_final, observaciones = _ProcesarYValidarItem_HU04(session, solped, numero_item, texto_item, df_items)
+
+        if estado_final != "Registro validado para orden de compra":
+            mensaje_error = f"Item {numero_item} no validado. Estado: {estado_final}. Obs: {observaciones}"
+            WriteLog(f"SOLPED {solped}: {mensaje_error}", "ERROR", task_name, RUTAS["PathLogError"])
+            
+            ActualizarEstadoYObservaciones(
+                df_solpeds_para_actualizar, archivo, solped, item=numero_item,
+                nuevo_estado=estado_final, observaciones=observaciones
+            )
+            ActualizarEstadoYObservaciones(
+                df_solpeds_para_actualizar, archivo, solped,
+                nuevo_estado="Error de Validacion HU04", observaciones=f"Fallo en item {numero_item}: {estado_final}"
+            )
+            return False 
+    
+    return True
