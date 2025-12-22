@@ -32,6 +32,7 @@ from Funciones.GeneralME53N import (
     ValidarAttachmentList,
     GenerarReporteAttachments,
     ParsearTablaAttachments,
+    convertir_txt_a_excel,
 )
 from Config.settings import RUTAS
 
@@ -55,6 +56,10 @@ def EjecutarHU03(session, nombre_archivo):
             path_log=RUTAS["PathLog"],
         )
 
+        # Ruta del archivo a convertir
+
+        ruta = rf"{RUTAS["PathInsumos"]}\expSolped03.txt"
+        convertir_txt_a_excel(ruta)
         # Traer SAP al frente
         TraerSAPAlFrente_Opcion()
 

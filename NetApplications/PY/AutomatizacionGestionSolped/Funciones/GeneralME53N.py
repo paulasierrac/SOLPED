@@ -24,6 +24,135 @@ import smtplib
 import os
 from Funciones.EmailSender import EmailSender
 from typing import List, Union
+import sys
+
+# Configurar encoding para consola de Windows
+if sys.platform == "win32":
+    sys.stdout.reconfigure(encoding="utf-8")
+
+
+def convertir_txt_a_excel(ruta_archivo_txt):
+    """
+    Convierte un archivo TXT delimitado por pipes (|) a Excel.
+
+    Parámetros:
+    -----------
+    ruta_archivo_txt : str
+        Ruta completa del archivo TXT a convertir
+
+    Retorna:
+    --------
+    str : Ruta del archivo Excel generado
+
+    Ejemplo:
+    --------
+    >>> convertir_txt_a_excel('datos.txt')
+    'datos.xlsx'
+    """
+
+    try:
+        print(f"Leyendo archivo: {ruta_archivo_txt}")
+
+        # Leer el archivo
+        with open(ruta_archivo_txt, "r", encoding="utf-8") as f:
+            lineas = f.readlines()
+
+        # Filtrar líneas que contienen datos (excluir líneas de separadores)
+        lineas_validas = []
+        for linea in lineas:
+            linea_limpia = linea.strip()
+            # Verificar que tenga pipes y no sea solo guiones
+            if (
+                "|" in linea_limpia
+                and not linea_limpia.replace("-", "").replace("|", "").strip() == ""
+            ):
+                lineas_validas.append(linea_limpia)
+
+        if len(lineas_validas) < 2:
+            raise ValueError("El archivo no contiene suficientes datos")
+
+        print(f"Lineas validas encontradas: {len(lineas_validas)}")
+
+        # Procesar encabezados (primera línea válida)
+        # NO filtrar campos vacíos, mantener todas las posiciones
+        encabezados_raw = lineas_validas[0].split("|")
+        # Eliminar solo el primer y último elemento si están vacíos (bordes del pipe)
+        if encabezados_raw and encabezados_raw[0].strip() == "":
+            encabezados_raw = encabezados_raw[1:]
+        if encabezados_raw and encabezados_raw[-1].strip() == "":
+            encabezados_raw = encabezados_raw[:-1]
+        encabezados = [campo.strip() for campo in encabezados_raw]
+
+        print(f"\nColumnas encontradas: {len(encabezados)}")
+        for i, col in enumerate(encabezados, 1):
+            print(f"  {i}. {col}")
+
+        # Procesar datos (resto de líneas)
+        datos_procesados = []
+        for i, linea in enumerate(lineas_validas[1:], start=2):
+            campos_raw = linea.split("|")
+            # Eliminar solo el primer y último elemento si están vacíos (bordes del pipe)
+            if campos_raw and campos_raw[0].strip() == "":
+                campos_raw = campos_raw[1:]
+            if campos_raw and campos_raw[-1].strip() == "":
+                campos_raw = campos_raw[:-1]
+            # Mantener TODAS las posiciones, incluso las vacías
+            campos = [campo.strip() for campo in campos_raw]
+
+            # Asegurar que tenga el mismo número de columnas
+            if len(campos) != len(encabezados):
+                print(
+                    f"  Advertencia fila {i}: {len(campos)} columnas (esperadas: {len(encabezados)})"
+                )
+                # Ajustar el tamaño
+                if len(campos) < len(encabezados):
+                    campos.extend([""] * (len(encabezados) - len(campos)))
+                else:
+                    campos = campos[: len(encabezados)]
+
+            datos_procesados.append(campos)
+
+        # Crear DataFrame
+        df = pd.DataFrame(datos_procesados, columns=encabezados)
+
+        print(f"\nDataFrame creado: {len(df)} filas x {len(df.columns)} columnas")
+
+        # Generar nombre del archivo Excel
+        ruta_excel = ruta_archivo_txt.rsplit(".", 1)[0] + ".xlsx"
+
+        # Guardar a Excel con formato
+        print(f"\nGuardando archivo Excel...")
+        with pd.ExcelWriter(ruta_excel, engine="openpyxl") as writer:
+            df.to_excel(writer, index=False, sheet_name="Datos")
+
+            # Ajustar ancho de columnas
+            worksheet = writer.sheets["Datos"]
+            for idx, col in enumerate(df.columns):
+                # Calcular ancho máximo
+                max_length = max(df[col].astype(str).apply(len).max(), len(col)) + 2
+                max_length = min(max_length, 60)
+
+                # Calcular letra de columna
+                if idx < 26:
+                    col_letter = chr(65 + idx)
+                else:
+                    col_letter = chr(64 + idx // 26) + chr(65 + idx % 26)
+
+                worksheet.column_dimensions[col_letter].width = max_length
+
+        print(f"\n[OK] Archivo convertido exitosamente!")
+        print(f"Ubicacion: {ruta_excel}")
+        return ruta_excel
+
+    except FileNotFoundError:
+        print(f"[ERROR] No se encontro el archivo '{ruta_archivo_txt}'")
+        raise
+    except Exception as e:
+        print(f"[ERROR] Error al convertir el archivo: {str(e)}")
+        import traceback
+
+        traceback.print_exc()
+        raise
 
 
 def ValidarAttachmentList(session, numero_solped):
@@ -1485,15 +1614,278 @@ def FormatoMoneda(valor):
         return str(valor)
 
 
+# def ValidarContraTabla(
+#     datos_texto: Dict, df_items: pd.DataFrame, item_num: str = ""
+# ) -> Dict:
+#     """Compara los datos extraidos del texto con la tabla de items SAP"""
+#     validaciones = {
+#         "cantidad": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
+#         "valor_unitario": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
+#         "valor_total": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
+#         # "fecha_entrega": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
+#         "concepto": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
+#         "campos_obligatorios": {"presentes": 0, "total": 0, "faltantes": []},
+#         "resumen": "",
+#         "campos_validados": 0,
+#         "total_campos": 0,
+#     }
+
+#     if df_items.empty:
+#         validaciones["resumen"] = "Tabla vacia - No se puede validar"
+#         return validaciones
+
+#     # Buscar el item especifico en el DataFrame
+#     item_df = df_items
+#     if item_num and "Item" in df_items.columns:
+#         item_df = df_items[
+#             df_items["Item"].astype(str).str.strip() == str(item_num).strip()
+#         ]
+#         if item_df.empty:
+#             item_df = df_items.iloc[[0]]  # usar primera fila si no encuentra
+
+#     if item_df.empty:
+#         validaciones["resumen"] = "Item no encontrado en tabla - No se puede validar"
+#         return validaciones
+
+#     # ------------------------------------------------------------------
+#     # VALIDACIÓN DE CAMPOS OBLIGATORIOS DE LA TABLA SAP ME53N (con alias)
+#     # ------------------------------------------------------------------
+
+#     # Diccionario: nombre estándar → lista de nombres equivalentes que puede traer SAP
+#     alias_campos = {
+#         "Material": ["Material"],
+#         "Short Text": ["Short Text"],
+#         "Quantity": ["Quantity"],
+#         "Un": ["Un"],
+#         "Valn Price": ["Val. Price"],
+#         "Crcy": ["Crcy"],
+#         # ESTE CAMPO CAMBIA POR IDIOMA / CONFIGURACIÓN SAP
+#         "Total Val.": ["Total Val.", "Total Value"],
+#         "Deliv.Date": ["Deliv.Date"],
+#         "Fix. Vend.": ["Fix. Vend."],
+#         "Plant": ["Plant"],
+#         "PGr": ["PGr"],
+#         "POrg": ["POrg"],
+#         "Matl Group": ["Matl Group"],
+#     }
+
+#     faltantes_me53n = []
+#     fila = item_df.iloc[0]  # se toma la primera fila del item
+
+#     for campo_estandar, posibles_nombres in alias_campos.items():
+
+#         # Buscar si alguna columna coincide con los alias permitidos
+#         columna_encontrada = None
+#         for alias in posibles_nombres:
+#             if alias in item_df.columns:
+#                 columna_encontrada = alias
+#                 break
+
+#         # Si ninguna columna existe → campo faltante
+#         if columna_encontrada is None:
+#             faltantes_me53n.append(campo_estandar)
+#             continue
+
+#         # Validar contenido vacío o nulo
+#         val = fila.get(columna_encontrada, "")
+#         if val is None or str(val).strip() in ["", "nan", "None"]:
+#             faltantes_me53n.append(campo_estandar)
+
+#     # Construcción del resultado de validaciones
+#     validaciones["campos_me53n"] = {
+#         "presentes": len(alias_campos) - len(faltantes_me53n),
+#         "total": len(alias_campos),
+#         "faltantes": faltantes_me53n,
+#     }
+
+#     # --- VALIDAR CANTIDAD ---
+#     if datos_texto["cantidad"]:
+#         cantidad_texto = LimpiarNumero(datos_texto["cantidad"])
+#         if "Quantity" in item_df.columns:
+#             # CORREGIDO: Asegurar que obtenemos un valor escalar
+#             cantidad_tabla_val = item_df["Quantity"].iloc[0]
+#             cantidad_tabla = LimpiarNumero(str(cantidad_tabla_val))
+#             validaciones["cantidad"]["texto"] = datos_texto["cantidad"]
+#             validaciones["cantidad"]["tabla"] = str(cantidad_tabla)
+#             validaciones["cantidad"]["match"] = (
+#                 abs(cantidad_texto - cantidad_tabla) < 0.01
+#             )
+#             if not validaciones["cantidad"]["match"]:
+#                 validaciones["cantidad"][
+#                     "diferencia"
+#                 ] = f"Difiere en {abs(cantidad_texto - cantidad_tabla):.2f}"
+
+#     # --- VALIDAR VALOR UNITARIO ---
+#     if datos_texto["valor_unitario"]:
+#         valor_texto = LimpiarNumero(datos_texto["valor_unitario"])
+#         if "Valn Price" in item_df.columns:
+#             valor_tabla = LimpiarNumero(str(item_df["Valn Price"].iloc[0]))
+#             # validaciones["valor_unitario"]["texto"] = datos_texto["valor_unitario"]
+#             # validaciones["valor_unitario"]["tabla"] = str(valor_tabla)
+
+#             validaciones["valor_unitario"]["texto"] = FormatoMoneda(
+#                 datos_texto["valor_unitario"]
+#             )
+#             validaciones["valor_unitario"]["tabla"] = FormatoMoneda(valor_tabla)
+
+#             # Tolerancia del 1%
+#             if valor_tabla > 0:
+#                 diferencia_relativa = abs(valor_texto - valor_tabla) / valor_tabla
+#                 validaciones["valor_unitario"]["match"] = diferencia_relativa < 0.01
+#             else:
+#                 validaciones["valor_unitario"]["match"] = valor_texto == valor_tabla
+
+#             if not validaciones["valor_unitario"]["match"]:
+#                 diferencia = abs(valor_texto - valor_tabla)
+#                 validaciones["valor_unitario"][
+#                     "diferencia"
+#                 ] = f"Difiere en {FormatoMoneda(diferencia)}"
+#                 # validaciones["valor_unitario"][
+#                 #     "diferencia"
+#                 # ] = f"Difiere en ${diferencia:,.2f}"
+
+#     # --- VALIDAR VALOR TOTAL ---
+#     if datos_texto["valor_total"]:
+#         valor_texto = LimpiarNumero(datos_texto["valor_total"])
+
+#         # ACEPTAR AMBOS CAMPOS DE SAP
+#         columna_total = None
+#         if "Total Value" in item_df.columns:
+#             columna_total = "Total Value"
+#         elif "Total Val." in item_df.columns:
+#             columna_total = "Total Val."
+
+#         if columna_total:
+#             valor_tabla = LimpiarNumero(str(item_df[columna_total].iloc[0]))
+
+#             # validaciones["valor_total"]["texto"] = datos_texto["valor_total"]
+#             # validaciones["valor_total"]["tabla"] = str(valor_tabla)
+
+#             validaciones["valor_total"]["texto"] = FormatoMoneda(
+#                 datos_texto["valor_total"]
+#             )
+#             validaciones["valor_total"]["tabla"] = FormatoMoneda(valor_tabla)
+
+#             # Tolerancia del 1%
+#             if valor_tabla > 0:
+#                 diferencia_relativa = abs(valor_texto - valor_tabla) / valor_tabla
+#                 validaciones["valor_total"]["match"] = diferencia_relativa < 0.01
+#             else:
+#                 validaciones["valor_total"]["match"] = valor_texto == valor_tabla
+
+#             if not validaciones["valor_total"]["match"]:
+#                 diferencia = abs(valor_texto - valor_tabla)
+#                 validaciones["valor_total"][
+#                     "diferencia"
+#                 ] = f"Difiere en {FormatoMoneda(diferencia)}"
+
+#                 # validaciones["valor_total"][
+#                 #     "diferencia"
+#                 # ] = f"Difiere en ${diferencia:,.2f}"
+#         else:
+#             # Si no existe ninguna columna válida
+#             validaciones["valor_total"]["tabla"] = "Campo no encontrado en SAP"
+#             validaciones["valor_total"]["match"] = False
+
+#     # # --- VALIDAR FECHA DE ENTREGA ---
+#     # if datos_texto["fecha_prestacion"] and "Deliv.Date" in item_df.columns:
+#     #     fecha_texto = datos_texto["fecha_prestacion"]
+#     #     fecha_tabla = str(item_df["Deliv.Date"].iloc[0]) if not item_df.empty else ""
+#     #     validaciones["fecha_entrega"]["texto"] = fecha_texto
+#     #     validaciones["fecha_entrega"]["tabla"] = fecha_tabla
+#     #     validaciones["fecha_entrega"]["match"] = NormalizarFecha(
+#     #         fecha_texto
+#     #     ) == NormalizarFecha(fecha_tabla)
+#     #     if not validaciones["fecha_entrega"]["match"]:
+#     #         validaciones["fecha_entrega"]["diferencia"] = "Fechas no coinciden"
+
+#     # --- VALIDAR CONCEPTO ---
+#     if datos_texto["concepto_compra"] and "Short Text" in item_df.columns:
+#         concepto_texto = datos_texto["concepto_compra"].upper()
+#         concepto_tabla_val = item_df["Short Text"].iloc[0] if not item_df.empty else ""
+#         concepto_tabla = str(concepto_tabla_val).upper()
+
+#         validaciones["concepto"]["texto"] = datos_texto["concepto_compra"][:50] + (
+#             "..." if len(datos_texto["concepto_compra"]) > 50 else ""
+#         )
+#         validaciones["concepto"]["tabla"] = concepto_tabla[:50] + (
+#             "..." if len(concepto_tabla) > 50 else ""
+#         )
+
+#         # Verificar coincidencia de palabras clave
+#         palabras_texto = set(re.findall(r"\w+", concepto_texto))
+#         palabras_tabla = set(re.findall(r"\w+", concepto_tabla))
+#         coincidencias = len(palabras_texto & palabras_tabla)
+
+#         # CORREGIDO: Mejorar logica de validacion de palabras
+#         if palabras_texto and palabras_tabla:
+#             palabras_minimas = max(
+#                 2, min(len(palabras_texto), len(palabras_tabla)) // 3
+#             )
+#             validaciones["concepto"]["match"] = coincidencias >= palabras_minimas
+#         else:
+#             validaciones["concepto"]["match"] = False
+
+#         if not validaciones["concepto"]["match"]:
+#             validaciones["concepto"][
+#                 "diferencia"
+#             ] = f"Solo {coincidencias} palabras coinciden (minimo: {palabras_minimas if 'palabras_minimas' in locals() else 2})"
+
+#     # --- VALIDAR CAMPOS OBLIGATORIOS ---
+#     campos_obligatorios = {
+#         "nit": "NIT",
+#         "concepto_compra": "Concepto de Compra",
+#         "cantidad": "Cantidad",
+#         "valor_total": "Valor Total",
+#     }
+
+#     campos_presentes = 0
+#     campos_faltantes = []
+
+#     for campo, nombre in campos_obligatorios.items():
+#         if datos_texto.get(campo) and str(datos_texto[campo]).strip():
+#             campos_presentes += 1
+#         else:
+#             campos_faltantes.append(nombre)
+
+#     validaciones["campos_obligatorios"]["presentes"] = campos_presentes
+#     validaciones["campos_obligatorios"]["total"] = len(campos_obligatorios)
+#     validaciones["campos_obligatorios"]["faltantes"] = campos_faltantes
+
+#     # --- CALCULAR RESUMEN ---
+#     campos_para_validar = [
+#         "cantidad",
+#         "valor_unitario",
+#         "valor_total",
+#         # "fecha_entrega",
+#         "concepto",
+#     ]
+#     campos_validados = sum(
+#         [1 for campo in campos_para_validar if validaciones[campo]["match"]]
+#     )
+
+#     validaciones["campos_validados"] = campos_validados
+#     validaciones["total_campos"] = len(campos_para_validar)
+
+#     validaciones["resumen"] = (
+#         f"{campos_validados}/{len(campos_para_validar)} campos coinciden, "
+#         f"{campos_presentes}/{len(campos_obligatorios)} campos obligatorios presentes"
+#     )
+
+#     return validaciones
+
+
 def ValidarContraTabla(
     datos_texto: Dict, df_items: pd.DataFrame, item_num: str = ""
 ) -> Dict:
-    """Compara los datos extraidos del texto con la tabla de items SAP"""
+    """
+    Compara los datos extraidos del texto con la tabla de items SAP ME53N.
+    Maneja variaciones de nombres de columnas según idioma/configuración SAP.
+    """
     validaciones = {
         "cantidad": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
         "valor_unitario": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
         "valor_total": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
-        # "fecha_entrega": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
         "concepto": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
         "campos_obligatorios": {"presentes": 0, "total": 0, "faltantes": []},
         "resumen": "",
@@ -1512,197 +1904,445 @@ def ValidarContraTabla(
             df_items["Item"].astype(str).str.strip() == str(item_num).strip()
         ]
         if item_df.empty:
-            item_df = df_items.iloc[[0]]  # usar primera fila si no encuentra
+            item_df = df_items.iloc[[0]]
 
     if item_df.empty:
         validaciones["resumen"] = "Item no encontrado en tabla - No se puede validar"
         return validaciones
 
-    # ------------------------------------------------------------------
-    # VALIDACIÓN DE CAMPOS OBLIGATORIOS DE LA TABLA SAP ME53N (con alias)
-    # ------------------------------------------------------------------
+    # ==================================================================
+    # MAPEO DE CAMPOS SAP ME53N
+    # Basado en nombres reales de la transacción según idioma
+    # ==================================================================
 
-    # Diccionario: nombre estándar → lista de nombres equivalentes que puede traer SAP
     alias_campos = {
-        "Material": ["Material"],
-        "Short Text": ["Short Text"],
-        "Quantity": ["Quantity"],
-        "Un": ["Un"],
-        "Valn Price": ["Val. Price"],
-        "Crcy": ["Crcy"],
-        # ESTE CAMPO CAMBIA POR IDIOMA / CONFIGURACIÓN SAP
-        "Total Val.": ["Total Val.", "Total Value"],
-        "Deliv.Date": ["Deliv.Date"],
-        "Fix. Vend.": ["Fix. Vend."],
-        "Plant": ["Plant"],
-        "PGr": ["PGr"],
-        "POrg": ["POrg"],
-        "Matl Group": ["Matl Group"],
+        # MATERIAL (Campo técnico: MATNR)
+        "Material": [
+            # Español
+            "Material",
+            "Número de material",
+            "Nº material",
+            "Mat.",
+            # Inglés
+            "Material",
+            "Material Number",
+            "Material No",
+            "Mat. No.",
+            # Portugués
+            "Material",
+            "Número do material",
+            "Nº do material",
+            # Otros
+            "Código",
+            "Code",
+            "Item Code",
+        ],
+        # TEXTO BREVE (Campo técnico: TXZ01)
+        "Short Text": [
+            # Español
+            "Texto breve",
+            "Descripción",
+            "Desc.",
+            "Denominación",
+            # Inglés
+            "Short Text",
+            "Short text",
+            "Description",
+            "Item Text",
+            "Text",
+            # Portugués
+            "Texto breve",
+            "Descrição",
+            "Texto resumido",
+        ],
+        # CANTIDAD (Campo técnico: MENGE)
+        "Quantity": [
+            # Español
+            "Cantidad",
+            "Cant.",
+            "Ctd.",
+            "Cantidad pedido",
+            # Inglés
+            "Quantity",
+            "Qty",
+            "Order Quantity",
+            "PO Quantity",
+            # Portugués
+            "Quantidade",
+            "Qtd",
+            "Qtde",
+            "Quantidade pedido",
+        ],
+        # UNIDAD DE MEDIDA (Campo técnico: MEINS)
+        "Un": [
+            # Español
+            "Un",
+            "UM",
+            "Unidad",
+            "UMed",
+            "Unidad medida",
+            # Inglés
+            "Un",
+            "Unit",
+            "UoM",
+            "Unit of Measure",
+            "U.M.",
+            # Portugués
+            "Un",
+            "Unidade",
+            "UM",
+            "Unidade de medida",
+        ],
+        # PRECIO VALORACIÓN (Campo técnico: BPREIS / NETPR)
+        "Valn Price": [
+            # Español
+            "Precio valoración",
+            "Precio val.",
+            "Val. Price",
+            "Precio unit.",
+            "Precio unitario",
+            "Pr.unit.",
+            "Precio",
+            # Inglés
+            "Valn Price",
+            "Valuation Price",
+            "Unit Price",
+            "Price",
+            "Net Price",
+            # Portugués
+            "Preço valorização",
+            "Preço unit.",
+            "Preço unitário",
+        ],
+        # MONEDA (Campo técnico: WAERS)
+        "Crcy": [
+            # Español
+            "Moneda",
+            "Mon.",
+            "Divisa",
+            "Crcy",
+            # Inglés
+            "Crcy",
+            "Currency",
+            "Curr",
+            "Ccy",
+            # Portugués
+            "Moeda",
+            "Crcy",
+        ],
+        # VALOR TOTAL (Campo técnico: NETWR)
+        "Total Val.": [
+            # Español
+            "Valor total",
+            "Total",
+            "Importe",
+            "Imp.total",
+            "Total Val.",
+            "Valor neto",
+            "Importe neto",
+            # Inglés
+            "Total Val.",
+            "Total Value",
+            "Net Value",
+            "Total",
+            "Amount",
+            "Net Price",
+            "Total Amount",
+            "Total Price",
+            # Portugués
+            "Valor total",
+            "Total",
+            "Valor líquido",
+        ],
+        # FECHA DE ENTREGA (Campo técnico: EINDT)
+        "Deliv.Date": [
+            # Español
+            "Fecha entrega",
+            "Fech.entr.",
+            "Fecha de entrega",
+            "Deliv.Date",
+            "Fecha",
+            "F.entrega",
+            # Inglés
+            "Deliv.Date",
+            "Delivery Date",
+            "Del. Date",
+            "Delivery",
+            "Date",
+            # Portugués
+            "Data entrega",
+            "Data de entrega",
+            "Dt.entrega",
+        ],
+        # PROVEEDOR FIJO (Campo técnico: LIFNR)
+        "Fix. Vend.": [
+            # Español
+            "Proveedor fijo",
+            "Prov.fijo",
+            "Proveedor",
+            "Fix. Vend.",
+            # Inglés
+            "Fix. Vend.",
+            "Fixed Vendor",
+            "Vendor",
+            "Supplier",
+            "Fixed Supplier",
+            # Portugués
+            "Fornecedor fixo",
+            "Fornecedor",
+            "Forn.fixo",
+        ],
+        # CENTRO (Campo técnico: WERKS)
+        "Plant": [
+            # Español
+            "Centro",
+            "Planta",
+            "Cen.",
+            "Plant",
+            # Inglés
+            "Plant",
+            "Center",
+            "Plnt",
+            # Portugués
+            "Centro",
+            "Planta",
+        ],
+        # GRUPO DE COMPRAS (Campo técnico: EKGRP)
+        "PGr": [
+            # Español
+            "Grupo compras",
+            "Gr.compras",
+            "GC",
+            "PGr",
+            # Inglés
+            "PGr",
+            "Purchasing Group",
+            "Purch. Group",
+            "Pur. Group",
+            # Portugués
+            "Grupo compras",
+            "Gr.compras",
+        ],
+        # ORGANIZACIÓN DE COMPRAS (Campo técnico: EKORG)
+        "POrg": [
+            # Español
+            "Org.compras",
+            "Organización compras",
+            "Org. compras",
+            "POrg",
+            # Inglés
+            "POrg",
+            "Purchasing Organization",
+            "Purch. Org",
+            "Pur. Org",
+            # Portugués
+            "Org.compras",
+            "Organização compras",
+        ],
+        # GRUPO DE ARTÍCULOS (Campo técnico: MATKL)
+        "Matl Group": [
+            # Español
+            "Grupo artículos",
+            "Gr.artículos",
+            "Grupo material",
+            "Matl Group",
+            # Inglés
+            "Matl Group",
+            "Material Group",
+            "Mat. Group",
+            "Item Group",
+            # Portugués
+            "Grupo mercadorias",
+            "Gr.mercadorias",
+            "Grupo material",
+        ],
     }
 
-    faltantes_me53n = []
-    fila = item_df.iloc[0]  # se toma la primera fila del item
+    # ==================================================================
+    # FUNCIÓN DE BÚSQUEDA MEJORADA
+    # ==================================================================
+    def buscar_columna(campo_estandar: str) -> str:
+        """
+        Busca la columna real en item_df que coincida con algún alias.
+        Prioriza coincidencias exactas, luego parciales.
+        """
+        posibles_nombres = alias_campos.get(campo_estandar, [])
+        columnas_disponibles = [str(col).strip() for col in item_df.columns]
 
-    for campo_estandar, posibles_nombres in alias_campos.items():
-
-        # Buscar si alguna columna coincide con los alias permitidos
-        columna_encontrada = None
+        # PASO 1: Búsqueda exacta (case-insensitive)
         for alias in posibles_nombres:
-            if alias in item_df.columns:
-                columna_encontrada = alias
-                break
+            alias_lower = alias.lower().strip()
+            for col in columnas_disponibles:
+                if col.lower() == alias_lower:
+                    return col
 
-        # Si ninguna columna existe → campo faltante
+        # PASO 2: Búsqueda parcial (contiene)
+        for alias in posibles_nombres:
+            alias_lower = alias.lower().strip()
+            for col in columnas_disponibles:
+                col_lower = col.lower()
+                # Verificar si el alias está contenido en la columna o viceversa
+                if alias_lower in col_lower or col_lower in alias_lower:
+                    # Evitar falsos positivos con palabras muy cortas
+                    if len(alias_lower) >= 3:
+                        return col
+
+        return None
+
+    # ==================================================================
+    # VALIDACIÓN DE CAMPOS OBLIGATORIOS ME53N
+    # ==================================================================
+
+    faltantes_me53n = []
+    fila = item_df.iloc[0]
+
+    for campo_estandar in alias_campos.keys():
+        columna_encontrada = buscar_columna(campo_estandar)
+
         if columna_encontrada is None:
             faltantes_me53n.append(campo_estandar)
             continue
 
-        # Validar contenido vacío o nulo
         val = fila.get(columna_encontrada, "")
-        if val is None or str(val).strip() in ["", "nan", "None"]:
+        if val is None or str(val).strip() in ["", "nan", "None", "NaN"]:
             faltantes_me53n.append(campo_estandar)
 
-    # Construcción del resultado de validaciones
     validaciones["campos_me53n"] = {
         "presentes": len(alias_campos) - len(faltantes_me53n),
         "total": len(alias_campos),
         "faltantes": faltantes_me53n,
     }
 
-    # --- VALIDAR CANTIDAD ---
-    if datos_texto["cantidad"]:
+    # ==================================================================
+    # VALIDAR CANTIDAD
+    # ==================================================================
+    if datos_texto.get("cantidad"):
         cantidad_texto = LimpiarNumero(datos_texto["cantidad"])
-        if "Quantity" in item_df.columns:
-            # CORREGIDO: Asegurar que obtenemos un valor escalar
-            cantidad_tabla_val = item_df["Quantity"].iloc[0]
-            cantidad_tabla = LimpiarNumero(str(cantidad_tabla_val))
-            validaciones["cantidad"]["texto"] = datos_texto["cantidad"]
-            validaciones["cantidad"]["tabla"] = str(cantidad_tabla)
-            validaciones["cantidad"]["match"] = (
-                abs(cantidad_texto - cantidad_tabla) < 0.01
-            )
-            if not validaciones["cantidad"]["match"]:
-                validaciones["cantidad"][
-                    "diferencia"
-                ] = f"Difiere en {abs(cantidad_texto - cantidad_tabla):.2f}"
+        col_quantity = buscar_columna("Quantity")
 
-    # --- VALIDAR VALOR UNITARIO ---
-    if datos_texto["valor_unitario"]:
+        if col_quantity and col_quantity in item_df.columns:
+            try:
+                cantidad_tabla_val = item_df[col_quantity].iloc[0]
+                cantidad_tabla = LimpiarNumero(str(cantidad_tabla_val))
+                validaciones["cantidad"]["texto"] = datos_texto["cantidad"]
+                validaciones["cantidad"]["tabla"] = str(cantidad_tabla)
+                validaciones["cantidad"]["match"] = (
+                    abs(cantidad_texto - cantidad_tabla) < 0.01
+                )
+                if not validaciones["cantidad"]["match"]:
+                    validaciones["cantidad"][
+                        "diferencia"
+                    ] = f"Difiere en {abs(cantidad_texto - cantidad_tabla):.2f}"
+            except Exception as e:
+                validaciones["cantidad"]["tabla"] = f"Error al leer: {str(e)}"
+
+    # ==================================================================
+    # VALIDAR VALOR UNITARIO
+    # ==================================================================
+    if datos_texto.get("valor_unitario"):
         valor_texto = LimpiarNumero(datos_texto["valor_unitario"])
-        if "Valn Price" in item_df.columns:
-            valor_tabla = LimpiarNumero(str(item_df["Valn Price"].iloc[0]))
-            # validaciones["valor_unitario"]["texto"] = datos_texto["valor_unitario"]
-            # validaciones["valor_unitario"]["tabla"] = str(valor_tabla)
+        col_price = buscar_columna("Valn Price")
 
-            validaciones["valor_unitario"]["texto"] = FormatoMoneda(
-                datos_texto["valor_unitario"]
-            )
-            validaciones["valor_unitario"]["tabla"] = FormatoMoneda(valor_tabla)
+        if col_price and col_price in item_df.columns:
+            try:
+                valor_tabla = LimpiarNumero(str(item_df[col_price].iloc[0]))
 
-            # Tolerancia del 1%
-            if valor_tabla > 0:
-                diferencia_relativa = abs(valor_texto - valor_tabla) / valor_tabla
-                validaciones["valor_unitario"]["match"] = diferencia_relativa < 0.01
-            else:
-                validaciones["valor_unitario"]["match"] = valor_texto == valor_tabla
+                validaciones["valor_unitario"]["texto"] = FormatoMoneda(
+                    datos_texto["valor_unitario"]
+                )
+                validaciones["valor_unitario"]["tabla"] = FormatoMoneda(valor_tabla)
 
-            if not validaciones["valor_unitario"]["match"]:
-                diferencia = abs(valor_texto - valor_tabla)
-                validaciones["valor_unitario"][
-                    "diferencia"
-                ] = f"Difiere en {FormatoMoneda(diferencia)}"
-                # validaciones["valor_unitario"][
-                #     "diferencia"
-                # ] = f"Difiere en ${diferencia:,.2f}"
+                if valor_tabla > 0:
+                    diferencia_relativa = abs(valor_texto - valor_tabla) / valor_tabla
+                    validaciones["valor_unitario"]["match"] = diferencia_relativa < 0.01
+                else:
+                    validaciones["valor_unitario"]["match"] = valor_texto == valor_tabla
 
-    # --- VALIDAR VALOR TOTAL ---
-    if datos_texto["valor_total"]:
+                if not validaciones["valor_unitario"]["match"]:
+                    diferencia = abs(valor_texto - valor_tabla)
+                    validaciones["valor_unitario"][
+                        "diferencia"
+                    ] = f"Difiere en {FormatoMoneda(diferencia)}"
+            except Exception as e:
+                validaciones["valor_unitario"]["tabla"] = f"Error al leer: {str(e)}"
+
+    # ==================================================================
+    # VALIDAR VALOR TOTAL
+    # ==================================================================
+    if datos_texto.get("valor_total"):
         valor_texto = LimpiarNumero(datos_texto["valor_total"])
+        col_total = buscar_columna("Total Val.")
 
-        # ACEPTAR AMBOS CAMPOS DE SAP
-        columna_total = None
-        if "Total Value" in item_df.columns:
-            columna_total = "Total Value"
-        elif "Total Val." in item_df.columns:
-            columna_total = "Total Val."
+        if col_total and col_total in item_df.columns:
+            try:
+                valor_tabla = LimpiarNumero(str(item_df[col_total].iloc[0]))
 
-        if columna_total:
-            valor_tabla = LimpiarNumero(str(item_df[columna_total].iloc[0]))
+                validaciones["valor_total"]["texto"] = FormatoMoneda(
+                    datos_texto["valor_total"]
+                )
+                validaciones["valor_total"]["tabla"] = FormatoMoneda(valor_tabla)
 
-            # validaciones["valor_total"]["texto"] = datos_texto["valor_total"]
-            # validaciones["valor_total"]["tabla"] = str(valor_tabla)
+                if valor_tabla > 0:
+                    diferencia_relativa = abs(valor_texto - valor_tabla) / valor_tabla
+                    validaciones["valor_total"]["match"] = diferencia_relativa < 0.01
+                else:
+                    validaciones["valor_total"]["match"] = valor_texto == valor_tabla
 
-            validaciones["valor_total"]["texto"] = FormatoMoneda(
-                datos_texto["valor_total"]
-            )
-            validaciones["valor_total"]["tabla"] = FormatoMoneda(valor_tabla)
-
-            # Tolerancia del 1%
-            if valor_tabla > 0:
-                diferencia_relativa = abs(valor_texto - valor_tabla) / valor_tabla
-                validaciones["valor_total"]["match"] = diferencia_relativa < 0.01
-            else:
-                validaciones["valor_total"]["match"] = valor_texto == valor_tabla
-
-            if not validaciones["valor_total"]["match"]:
-                diferencia = abs(valor_texto - valor_tabla)
-                validaciones["valor_total"][
-                    "diferencia"
-                ] = f"Difiere en {FormatoMoneda(diferencia)}"
-
-                # validaciones["valor_total"][
-                #     "diferencia"
-                # ] = f"Difiere en ${diferencia:,.2f}"
+                if not validaciones["valor_total"]["match"]:
+                    diferencia = abs(valor_texto - valor_tabla)
+                    validaciones["valor_total"][
+                        "diferencia"
+                    ] = f"Difiere en {FormatoMoneda(diferencia)}"
+            except Exception as e:
+                validaciones["valor_total"]["tabla"] = f"Error al leer: {str(e)}"
         else:
-            # Si no existe ninguna columna válida
             validaciones["valor_total"]["tabla"] = "Campo no encontrado en SAP"
             validaciones["valor_total"]["match"] = False
 
-    # # --- VALIDAR FECHA DE ENTREGA ---
-    # if datos_texto["fecha_prestacion"] and "Deliv.Date" in item_df.columns:
-    #     fecha_texto = datos_texto["fecha_prestacion"]
-    #     fecha_tabla = str(item_df["Deliv.Date"].iloc[0]) if not item_df.empty else ""
-    #     validaciones["fecha_entrega"]["texto"] = fecha_texto
-    #     validaciones["fecha_entrega"]["tabla"] = fecha_tabla
-    #     validaciones["fecha_entrega"]["match"] = NormalizarFecha(
-    #         fecha_texto
-    #     ) == NormalizarFecha(fecha_tabla)
-    #     if not validaciones["fecha_entrega"]["match"]:
-    #         validaciones["fecha_entrega"]["diferencia"] = "Fechas no coinciden"
+    # ==================================================================
+    # VALIDAR CONCEPTO
+    # ==================================================================
+    if datos_texto.get("concepto_compra"):
+        col_text = buscar_columna("Short Text")
 
-    # --- VALIDAR CONCEPTO ---
-    if datos_texto["concepto_compra"] and "Short Text" in item_df.columns:
-        concepto_texto = datos_texto["concepto_compra"].upper()
-        concepto_tabla_val = item_df["Short Text"].iloc[0] if not item_df.empty else ""
-        concepto_tabla = str(concepto_tabla_val).upper()
+        if col_text and col_text in item_df.columns:
+            try:
+                concepto_texto = datos_texto["concepto_compra"].upper()
+                concepto_tabla_val = item_df[col_text].iloc[0]
+                concepto_tabla = str(concepto_tabla_val).upper()
 
-        validaciones["concepto"]["texto"] = datos_texto["concepto_compra"][:50] + (
-            "..." if len(datos_texto["concepto_compra"]) > 50 else ""
-        )
-        validaciones["concepto"]["tabla"] = concepto_tabla[:50] + (
-            "..." if len(concepto_tabla) > 50 else ""
-        )
+                validaciones["concepto"]["texto"] = datos_texto["concepto_compra"][
+                    :50
+                ] + ("..." if len(datos_texto["concepto_compra"]) > 50 else "")
+                validaciones["concepto"]["tabla"] = concepto_tabla[:50] + (
+                    "..." if len(concepto_tabla) > 50 else ""
+                )
 
-        # Verificar coincidencia de palabras clave
-        palabras_texto = set(re.findall(r"\w+", concepto_texto))
-        palabras_tabla = set(re.findall(r"\w+", concepto_tabla))
-        coincidencias = len(palabras_texto & palabras_tabla)
+                palabras_texto = set(re.findall(r"\w+", concepto_texto))
+                palabras_tabla = set(re.findall(r"\w+", concepto_tabla))
+                coincidencias = len(palabras_texto & palabras_tabla)
 
-        # CORREGIDO: Mejorar logica de validacion de palabras
-        if palabras_texto and palabras_tabla:
-            palabras_minimas = max(
-                2, min(len(palabras_texto), len(palabras_tabla)) // 3
-            )
-            validaciones["concepto"]["match"] = coincidencias >= palabras_minimas
-        else:
-            validaciones["concepto"]["match"] = False
+                if palabras_texto and palabras_tabla:
+                    palabras_minimas = max(
+                        2, min(len(palabras_texto), len(palabras_tabla)) // 3
+                    )
+                    validaciones["concepto"]["match"] = (
+                        coincidencias >= palabras_minimas
+                    )
+                else:
+                    validaciones["concepto"]["match"] = False
 
-        if not validaciones["concepto"]["match"]:
-            validaciones["concepto"][
-                "diferencia"
-            ] = f"Solo {coincidencias} palabras coinciden (minimo: {palabras_minimas if 'palabras_minimas' in locals() else 2})"
+                if not validaciones["concepto"]["match"]:
+                    validaciones["concepto"]["diferencia"] = (
+                        f"Solo {coincidencias} palabras coinciden "
+                        f"(minimo: {palabras_minimas if palabras_texto and palabras_tabla else 2})"
+                    )
+            except Exception as e:
+                validaciones["concepto"]["tabla"] = f"Error al leer: {str(e)}"
 
-    # --- VALIDAR CAMPOS OBLIGATORIOS ---
+    # ==================================================================
+    # VALIDAR CAMPOS OBLIGATORIOS
+    # ==================================================================
     campos_obligatorios = {
         "nit": "NIT",
         "concepto_compra": "Concepto de Compra",
@@ -1723,12 +2363,13 @@ def ValidarContraTabla(
     validaciones["campos_obligatorios"]["total"] = len(campos_obligatorios)
     validaciones["campos_obligatorios"]["faltantes"] = campos_faltantes
 
-    # --- CALCULAR RESUMEN ---
+    # ==================================================================
+    # CALCULAR RESUMEN
+    # ==================================================================
     campos_para_validar = [
         "cantidad",
         "valor_unitario",
         "valor_total",
-        # "fecha_entrega",
         "concepto",
     ]
     campos_validados = sum(

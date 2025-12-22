@@ -63,13 +63,13 @@ def Main_GestionSolped():
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        session = conectar_sap(
-            SAP_CONFIG["sistema"],
-            SAP_CONFIG["mandante"],
-            SAP_CONFIG["user"],
-            SAP_CONFIG["password"],
-            "EN",
-        )
+        # session = conectar_sap(
+        #     SAP_CONFIG["sistema"],
+        #     SAP_CONFIG["mandante"],
+        #     SAP_CONFIG["user"],
+        #     SAP_CONFIG["password"],
+        #     "EN",
+        # )
 
         session = ObtenerSesionActiva()
 
@@ -102,7 +102,8 @@ def Main_GestionSolped():
         # ================================
         # 4. Ejecutar HU03 – Validación ME53N
         # ================================
-        archivos_validar = ["expSolped03.txt", "expSolped05.txt"]
+        # archivos_validar = ["expSolped03.txt", "expSolped05.txt"]
+        archivos_validar = ["expSolped03.txt"]
 
         for archivo in archivos_validar:
             WriteLog(
