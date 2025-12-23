@@ -20,12 +20,14 @@ from HU.HU02_DescargaME5A import (
 )
 from HU.HU03_ValidacionME53N import EjecutarHU03
 from HU.HU04_GeneracionOC import EjecutarHU04
+from Funciones.GeneralME53N import (
+    EnviarNotificacionCorreo,
+    EnviarCorreoPersonalizado,
+    NotificarRevisionManualSolped,)
 from Funciones.EscribirLog import WriteLog
 from Funciones.ValidacionM21N import (
     leer_solpeds_desde_archivo,
-    BorrarTextosDesdeSolped
-
- 
+    BorrarTextosDesdeSolped 
 )
 from Config.settings import RUTAS, SAP_CONFIG
 import traceback
@@ -97,7 +99,7 @@ def Main_GestionSolped():
         # ================================
         # 4. Ejecutar HU03 – Validación Solped ME53N 
         # ================================
-        archivos_validar = ["expSolped03.txt", "expSolped05.txt"]
+        archivos_validar = ["expSolped05.txt", "expSolped03.txt"]
 
         for archivo in archivos_validar:
             WriteLog(
