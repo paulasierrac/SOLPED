@@ -1,125 +1,216 @@
-from Funciones.ValidacionM21N import ejecutar_creacion_hijo,buscar_y_clickear
-from HU.HU01_LoginSAP import ObtenerSesionActiva
+# ================================
+# Main: GestionSolped
+# Autor: Paula Sierra, Henry Navarro - NetApplications
+# Descripcion: Main principal del Bot
+# Ultima modificacion: 24/11/2025
+# Propiedad de Colsubsidio
+# Cambios: Ajuste inicial para cumplimiento de estándar
+# ================================
+from requests import session
+from HU.HU01_LoginSAP import ObtenerSesionActiva,conectar_sap
+from Funciones.ValidacionM21N import SapTextEditor
+from Funciones.GeneralME53N import AbrirTransaccion
+import pyautogui  # Asegúrate de tener pyautogui instalado
+import time
+
+# from NetApplications.PY.AutomatizacionGestionSolped.HU.HU03_ValidacionME53N import buscar_SolpedME53N
+from Funciones.EscribirLog import WriteLog
+import traceback
+from Config.settings import RUTAS,SAP_CONFIG
 
 
-session=ObtenerSesionActiva()
+def Main_Pruebas4():
+    try:
 
-for i in range(3):
-                
-    obj_btnDel = None
-    selectsFs = [2,3,4,5]
-    obj_tabstrip = ejecutar_creacion_hijo(session)
-    ruta=rf"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\img\abajo2.png"
-    buscar_y_clickear(ruta, confidence=0.7, intentos=20, espera=0.5)
+        #session = conectar_sap( SAP_CONFIG["sistema"], SAP_CONFIG["mandante"],SAP_CONFIG["user"], SAP_CONFIG["password"], SAP_CONFIG["idioma"] )
+        session = ObtenerSesionActiva()
+        #AbrirTransaccion(session, "ME21N")
+        # codigo para pruebas
+        print(session)
 
-
-
-
-
-
-
-
-# import re
-
-# import win32com.client
-# from HU.HU01_LoginSAP import ObtenerSesionActiva 
-# import time
-# import pyautogui
-# from Funciones.ValidacionM21N import  buscar_y_clickear
+        EDITOR_ID2=(
+            "wnd[0]/usr/"
+            "subSUB0:SAPLMEGUI:0010/"
+            "subSUB3:SAPLMEVIEWS:1100/"
+            "subSUB2:SAPLMEVIEWS:1200/"
+            "subSUB1:SAPLMEGUI:1301/"
+            "subSUB2:SAPLMEGUI:1303/"
+            "tabsITEM_DETAIL/tabpTABIDT14/"
+            "ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/"
+            "subTEXTS:SAPLMMTE:0200/"
+            "subEDITOR:SAPLMMTE:0201/"
+            "cntlTEXT_EDITOR_0201/shellcont/shell")
 
 
+        """
+        #Obtiene los valores de los campos de precio en la tabla de posiciones
+        for fila in range(4):
+            precio = get_GuiTextField_text(session, f"NETPR[10,{fila}]")
+            print(f"Fila {fila+1}: {precio}")
+        """
+        EDITOR_ID = (
+            "wnd[0]/usr/"
+            "subSUB0:SAPLMEGUI:0010/"
+            "subSUB3:SAPLMEVIEWS:1100/"
+            "subSUB2:SAPLMEVIEWS:1200/"
+            "subSUB1:SAPLMEGUI:1301/"
+            "subSUB2:SAPLMEGUI:1303/"
+            "tabsITEM_DETAIL/tabpTABIDT14/"
+            "ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/"
+            "subTEXTS:SAPLMMTE:0200/"
+            "subEDITOR:SAPLMMTE:0201/"
+            "cntlTEXT_EDITOR_0201/shellcont/shell"
+        )
 
-# def limpiar_id_sap(ruta_absoluta):
-#     """
-#     Toma una ruta larga tipo '/app/con[0]/ses[0]/wnd[0]/usr...'
-#     y devuelve solo desde 'wnd[0]/usr...'
-#     """
-#     if "/wnd[" in ruta_absoluta:
-#         # Dividimos el string en donde aparezca "/wnd["
-#         partes = ruta_absoluta.split("/wnd[")
-#         # partes[1] contendrá "0]/usr/..." así que le volvemos a pegar el prefijo "wnd["
-#         ruta_limpia = "wnd[" + partes[1]
-#         return ruta_limpia
-#     return ruta_absoluta # Si ya estaba limpia, la devuelve igual
+        editor_shell = session.findById(EDITOR_ID)
+        #texto = editor_shell.GetText()
+        texto="Holoaaaa SAP"
+        #editor_shell.SetText(texto) 
+        editor_shell.SetLineText(1,texto)
+
+        print("ID encontrado:", editor_shell.Id)
+        print("Tipo:", editor_shell.Type)
+  
+        editor = SapTextEditor(session, EDITOR_ID)
 
 
+        print("Texto original:",flush=True)
+        texto = editor.get_all_text()
+        print(texto,flush=True)
 
-# session=ObtenerSesionActiva()
-# # Patrón que busca el contenedor de pestañas 'tabsITEM_DETAIL'
-# # El .* permite que haya cualquier cosa en el medio (incluyendo el cambio 0010/0020)
-# # pero anclamos el final con 'tabsITEM_DETAIL' para ser precisos.
-# patron_tabstrip = re.compile(r"wnd\[0\]/usr/.*SAPLMEGUI:\d{4}/.*/tabsITEM_DETAIL$")
- 
-# obj_tabstrip = None
-# obj_btnDel = None
 
-# # Recorremos recursivamente o buscamos inteligentemente. 
-# # Dado que 'FindAllByName' no existe nativamente en SAP para rutas parciales,
-# # lo mejor es localizar el padre 'usr' y buscar el hijo que coincida.
-# user_area = session.findById("wnd[0]/usr")
- 
-# # Nota: Esto es simplificado. En estructuras profundas, a veces es mejor iterar 
-# # sobre los hijos de 'usr' buscando cual contiene "SAPLMEGUI".
-# for hijo in user_area.Children:
-#     if "SAPLMEGUI" in hijo.Id:
-#         # Una vez dentro del área variable, intentamos construir la ruta al tabstrip
-#         # Ojo: Aquí asumimos la estructura interna fija después del cambio 0010/0020
-#         # Tomamos el ID del hijo (ej: ...:0010) y le pegamos el resto de la ruta que SÍ es constante:
-#         ruta_restante = "/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL"
-#         ruta_restante_btnDel = "/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/subTEXTS:SAPLMMTE:0200/subEDITOR:SAPLMMTE:0201/btnDELETE_0201"
-#         ruta_restante_textoposicion="/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/subTEXTS:SAPLMMTE:0200/cntlTEXT_TYPES_0200/shell"
-#         ruta_restante_textoarea="/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/subTEXTS:SAPLMMTE:0200/subEDITOR:SAPLMMTE:0201/cntlTEXT_EDITOR_0201/shellcont/shell"
+        reemplazos = {
+                "VENTA SERVICIO": "V1",
+                "VENTA PRODUCTO": "V1",
+                "GASTO PROPIO SERVICIO": "C2",
+                "GASTO PROPIO PRODUCTO": "C2",
+                "SAA": "R3", #"SAA SERVICIO": "R3"
+                "SAA PRODUCTO": "R3",
+                "DAVIVIENDA": "RWWWWWW",
+            }
 
-#         try:
-#             full_id = hijo.Id + ruta_restante
-#             full_id = limpiar_id_sap(full_id)
-#             obj_tabstrip = session.findById(full_id)
-#             print("id:!!!!!")
-#             print(full_id)
-#             break # ¡Encontrado!
-#         except:
-#             continue
 
-# selectsFs = [2,3,4,5]
+        nuevo_texto, cambios = editor.replace_in_text(texto, reemplazos)
 
-# if obj_tabstrip:
-#     nombre_pestaña_buscada = "Textos" # O "Invoice", "Entregas", etc.
-#     pestaña_encontrada = False
-#     for pestaña in obj_tabstrip.Children:
-#         # pestaña.Text te da el nombre visible (ej: "Condiciones")
-#         # pestaña.Name te da el ID técnico (ej: "TABIDT3")
-#         if pestaña.Text == nombre_pestaña_buscada:
-#             pestaña_encontrada = True
+     
+        print(type(nuevo_texto))
+        
 
-#             print(f"Pestaña '{nombre_pestaña_buscada}' seleccionada. (ID Técnico: {pestaña.Name})")
-#             full_id_btnDel = limpiar_id_sap(pestaña.Id) + ruta_restante_btnDel
-#             full_id_textoposicion = limpiar_id_sap(pestaña.Id) + ruta_restante_textoposicion
-#             full_id_textoarea = limpiar_id_sap(pestaña.Id) + ruta_restante_textoarea
-#             time.sleep(2)
-#             pestaña.Select()
+        print(f"texto modificado {nuevo_texto}")
+        print(f"cambios realizados {cambios}") 
 
-#             for i in selectsFs:
-#                 F0n = "F0" + str(i)
+        editor.set_text( nuevo_texto )  # Usa el método
+
+        
+        
+        #editor_shell.text = nuevo_texto
+       
+        """
+        def normalizar(texto):
+            return texto.replace("\r", "").replace("\xa0", " ")
+        texto_norm = normalizar(texto)
+        reemplazos = {
+                "VENTA SERVICIO": "V1",
+                "VENTA PRODUCTO": "V1",
+                "GASTO PROPIO SERVICIO": "C2",
+                "GASTO PROPIO PRODUCTO": "C2",
+                "\nSAA\n": "\nR3\n",
+            }
+        nuevo_texto = texto_norm
+        for b, r in reemplazos.items():
+            nuevo_texto = nuevo_texto.replace(b, r)
+
+        print(f"Nuevo texto: {nuevo_texto}") 
             
-#                 # .selectedNode = "F02" Texto pedido de posicion   
-#                 obj_textoposicion = session.findById(full_id_textoposicion)
-#                 print(f"Texto posicion  '{obj_textoposicion.Id}' seleccionada. (ID Técnico: {obj_textoposicion.Name})")
-#                 obj_textoposicion.selectedNode = F0n
-#                 time.sleep(2)
-#                 #Boton Eliminar 
-#                 try:
-#                     obj_btnDel = session.findById(full_id_btnDel)
-#                     print(f"Bot+on Delete '{obj_btnDel.Id}' seleccionada. (ID Técnico: {obj_btnDel.Name})")
-#                     obj_btnDel.Press()
+        print(f"Líneas modificadas: {cambios}")
 
-#                     # entrar a editar texto "."
-#                     obj_textoarea = session.findById(full_id_textoarea)
-#                     obj_textoarea.text = "."
-#                 except:
-#                     pass
-#                     # ruta=rf".\img\abajo.png"
-#                     # buscar_y_clickear(ruta, confidence=0.8, intentos=20, espera=0.5)
+        # print("Texto final:",flush=True)
+        # texto = editor.get_all_text()
+        # print(texto,flush=True)
 
-#             break
-#     if not pestaña_encontrada:
-#         print(f"No se encontró la pestaña llamada {nombre_pestaña_buscada}")
+        editor = SapTextEditor(session, EDITOR_ID)
+
+        cambio = editor.reemplazar_linea_exacta("SAA", "R3")
+        
+
+        if cambio:
+            print("Línea SAA reemplazada por R3")
+        else:
+            print("No se encontró la línea SAA")
+
+        # def set_all_text(self, texto):
+        #     self.shell.SetFocus()
+        #     self.shell.SelectAll()
+        #     self.shell.SetUnprotectedTextPart(texto)   
+
+        print("Esperando antes de la siguiente modificación...")
+
+        editor.set_all_text(editor.get_all_text().replace("\nDAVIVIENDA\n", "\nRWWWWWW\n"))
+
+
+        if nuevo_texto != texto_norm:
+            editor.set_all_text(nuevo_texto)
+
+        """
+
+      
+                
+
+    
+  
+        #grid.selectContextMenuItem("8265D72160021FD0B6F43226BAE842F8NEW:REQ_QUERY")
+         #                          "8265D72160021FD0B6F5D4A4306A42D8NEW:REQ_QUERY"
+
+        #grid.selectContextMenuItem(":REQ_QUERY")
+
+
+        #grid.selectContextMenuItem("REQ")
+
+#session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]").selectContextMenuItem "8265D72160021FD0B6F43226BAE842F8NEW:REQ_QUERY"
+
+        #grid.selectContextMenuItem("EBAN")
+        #session.sendVKey(0)  
+        #grid.pressContextButton("SELECT")
+
+        #grid.press()
+        #grid.selectRow(6)  # Selecciona la primera fila
+        # grid.pressContextButton("SELECT")
+        # grid.selectRow(item_index)
+        # grid.selectContextMenuItem("8265D72160021FD0B6F19C1CA23F42F6NEW:REQ_QUERY")
+
+        #session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]").pressContextButton ("SELECT")
+        #pyautogui.press("s")
+        #pyautogui.hotkey("enter")
+
+          # #ejecutar_accion_sap(id_documento="0", ruta_vbs=rf".\scriptsVbs\clickptextos.vbs")
+
+        # # Abre Ventana Solicitudes de Pedido M21N
+        # #grid = session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]")
+        # buscar_y_clickear(rf".\img\vSeleccion.png", confidence=0.7, intentos=20, espera=0.5)
+        # time.sleep(0.5)
+        # pyautogui.press("s")
+
+                # grid = session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT14")
+        # print(type(grid))
+        # print(grid.Type)
+        # grid.select()
+
+
+
+
+
+
+    except Exception as e:
+        error_text = traceback.format_exc()
+        WriteLog(
+            mensaje=f"ERROR GLOBAL: {e} | {error_text}",
+            estado="ERROR",
+            task_name="Main_GestionSOLPED",
+            path_log=RUTAS["PathLogError"],
+        )
+        raise
+
+if __name__ == "__main__":
+    Main_Pruebas4()
+
+

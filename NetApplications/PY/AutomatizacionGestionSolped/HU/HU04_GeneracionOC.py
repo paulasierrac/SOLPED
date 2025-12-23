@@ -12,34 +12,27 @@ import subprocess
 import time
 import os
 from Config.settings import RUTAS
-from Funciones.ValidacionM21N import BorrarTextosDesdeSolped,obtener_numero_oc,ejecutar_accion_sap,buscar_y_clickear,limpiar_id_sap,ejecutar_creacion_hijo
+from Funciones.ValidacionM21N import BorrarTextosDesdeSolped,obtener_numero_oc
 from Funciones.EscribirLog import WriteLog
 from Funciones.GeneralME53N import AbrirTransaccion,procesarTablaME5A
 import traceback
 import pyautogui  # Asegúrate de tener pyautogui instalado
 
-
-
 def EjecutarHU04(session, archivo):
     
-    task_name = "HU5_GeneracionOC"
+    task_name = "HU4_GeneracionOC"
     """
-    Ejecuta la Historia de Usuario 05 encargada de la
+    Ejecuta la Historia de Usuario 04 encargada de la
     generacion de OC desde la transacción ME21N.
     """
     try:
         WriteLog(
-            mensaje=f"Inicia HU05 para el archivo {archivo}",
+            mensaje=f"HU04 Inicia para el archivo {archivo}",
             estado="INFO",
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        # ============================
-        # Abrir transacción ME21N
-        # ============================
-        AbrirTransaccion(session, "ME21N")
-        print("Transacción ME21N abierta con éxito.")
-        time.sleep(0.5)
+        
 
         # ============================
         # Limpiar textos Solped
@@ -56,8 +49,23 @@ def EjecutarHU04(session, archivo):
             return
 
         solpeds_unicas = df_solpeds['PurchReq'].unique()
+        print(f"Solpeds únicas a procesar: {solpeds_unicas}")
         
-        for solped in solpeds_unicas:
+        for solped in solpeds_unicas[1:]:  # Saltar la primera solped si es necesario (Encabezados)
+             # --- Validación de Solped ---
+            if (
+                not solped                      # None o vacío
+                or not str(solped).isdigit()    # Debe ser numérica
+                #or len(str(solped)) != 10       # Longitud típica SAP (ej: 1300139274)
+                or solped not in df_solpeds['PurchReq'].values  # Debe existir en el DF
+            ):
+                WriteLog(
+                    mensaje=f"Solped inválida u omitida: {solped}",
+                    estado="WARNING",
+                    task_name=task_name,
+                    path_log=RUTAS["PathLog"],
+                )
+                continue  # Saltar a la siguiente solped
             # Contar los items para la solped actual
             item_count = df_solpeds[df_solpeds['PurchReq'] == solped].shape[0]
             
@@ -67,21 +75,21 @@ def EjecutarHU04(session, archivo):
                 task_name=task_name,
                 path_log=RUTAS["PathLog"],
             )
-            
+            print(f"Session actual: {session}")
+            print(f"procesando solped: {solped} de items: {item_count}")
             BorrarTextosDesdeSolped(session, solped, item_count)
+            orden_de_compra = obtener_numero_oc(session)
+            # Después de procesar todas las solpeds y (presumiblemente) guardar la OC.        
+            WriteLog(
+                mensaje=f"Se generó la Orden de Compra: {orden_de_compra}",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
 
-        # Después de procesar todas las solpeds y (presumiblemente) guardar la OC.
-        orden_de_compra = obtener_numero_oc(session)
+
         WriteLog(
-            mensaje=f"Se generó la Orden de Compra: {orden_de_compra}",
-            estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
-        )
-
-
-        WriteLog(
-            mensaje=f"HU05 finalizada correctamente para archivo {archivo}.",
+            mensaje=f"HU04 finalizada correctamente para archivo {archivo}.",
             estado="INFO",
             task_name=task_name,
             path_log=RUTAS["PathLog"],
@@ -90,7 +98,7 @@ def EjecutarHU04(session, archivo):
     except Exception as e:
         error_text = traceback.format_exc()
         WriteLog(
-            mensaje=f"ERROR GLOBAL en HU05: {e} | {error_text}",
+            mensaje=f"ERROR GLOBAL en HU04: {e} | {error_text}",
             estado="ERROR",
             task_name=task_name,
             path_log=RUTAS["PathLogError"],

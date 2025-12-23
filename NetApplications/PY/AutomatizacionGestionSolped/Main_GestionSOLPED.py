@@ -97,7 +97,7 @@ def Main_GestionSolped():
         # ================================
         # 4. Ejecutar HU03 – Validación Solped ME53N 
         # ================================
-        archivos_validar = ["expSolped05.txt", "expSolped03.txt"]
+        archivos_validar = ["expSolped03.txt", "expSolped05.txt"]
 
         for archivo in archivos_validar:
             WriteLog(
@@ -123,18 +123,19 @@ def Main_GestionSolped():
         # ================================
 
             WriteLog(
-                mensaje="HU04 - Creacion de OC desde ME21N.",
+                mensaje="Inicia HU04 - Creacion de OC desde ME21N.",
                 estado="INFO",
                 task_name=task_name,
                 path_log=RUTAS["PathLog"],
             )
 
-            archivos_validar = ["expSolped05 1.txt"]
-            EjecutarHU04(session, archivos_validar)
-            
+            archivos_validar = ["expSolped05test.txt"] # CAMBIAR A 05 PARA SOLPED LIBERADAS
+            for archivo in archivos_validar:
+                EjecutarHU04(session, archivo)
+
 
             WriteLog(
-                mensaje=f"HU05 finalizada correctamente para archivo {archivo}.",
+                mensaje=f"HU04 finalizada correctamente para archivo {archivo}.",
                 estado="INFO",
                 task_name=task_name,
                 path_log=RUTAS["PathLog"],

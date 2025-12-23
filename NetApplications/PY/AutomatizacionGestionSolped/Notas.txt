@@ -4,6 +4,8 @@ sT1f%4L*
 CGRPA062
 Tango25%$
 
+CGRPA074
+Arriendos%312*
 
 ZSUA
 ZSOL
@@ -11,8 +13,8 @@ ZSUB
 ZSU3
 
 
-
-ME5A
+ME54N / liberacion de Solped, no se tiene dentro del alcance en RESOC, solped
+ME5A  / 
 ME53N
 MM60
 ME9F
@@ -25,6 +27,16 @@ click variente de Seleccion
 Solped para generar OC / revisar las generadas en el repote 05 ME5A
 1300139268
 1300133983
+
+/ pasadas por el grupo para generar Oc 
+1300139395
+1300139396  / 4001155889
+1300139397
+1300139398
+1300139399
+1300139394 / OC GENERADA 4001155884
+
+
 
 
 Solped pasadas por el grupo para hacer pruebas 
@@ -69,3 +81,11 @@ SAP_CONFIG = {
     "idioma": get_env_variable("SAP_IDIOMA"),
     "logon_path": get_env_variable("SAP_LOGON_PATH"),
 }
+
+
+
+
+/ metodos del editor de textos de SAP GuiShell:
+<class 'win32com.client.CDispatch'>
+GuiShell
+['ContextMenu', 'DoubleClick', 'DumpState', 'FindAllByName', 'FindAllByNameEx', 'FindById', 'FindByName', 'FindByNameEx', 'GetLineText', 'GetUnprotectedTextPart', 'IsBreakpointLine', 'IsCommentLine', 'IsHighlightedLine', 'IsProtectedLine', 'IsSelectedLine', 'ModifiedStatusChanged', 'MultipleFilesDropped', 'PressF1', 'PressF4', 'SelectContextMenuItem', 'SelectContextMenuItemByPosition', 'SelectContextMenuItemByText', 'SetFocus', 'SetSelectionIndexes', 'SetUnprotectedTextPart', 'ShowContextMenu', 'SingleFileDropped', 'Visualize', '_ApplyTypes_', '_FlagAsMethod', '_LazyAddAttr_', '_NewEnum', '_Release_', '_UpdateWithITypeInfo_', '__AttrToID__', '__LazyMap__', '__bool__', '__call__', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattr__', '__getattribute__', '__getitem__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__int__', '__le__', '__len__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__setitem__', '__sizeof__', '__str__', '__subclasshook__', '__weakref__', '_builtMethods_', '_dir_ole_', '_enum_', '_find_dispatch_type_', '_get_good_object_', '_get_good_single_object_', '_lazydata_', '_make_method_', '_mapCachedItems_', '_oleobj_', '_olerepr_', '_print_details_', '_proc_', '_unicode_to_string_', '_username_', '_wrap_dispatch_']

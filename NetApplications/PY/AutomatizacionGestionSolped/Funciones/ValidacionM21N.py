@@ -13,10 +13,366 @@ import time
 import os
 from Funciones.EscribirLog import WriteLog
 from Config.settings import RUTAS
-import pyautogui 
+import pyautogui
 from pyautogui import ImageNotFoundException
 from Funciones.GeneralME53N import AbrirTransaccion, ColsultarSolped, procesarTablaME5A, ActualizarEstadoYObservaciones
 
+class SapTextEditor:
+    """
+    Wrapper para el editor de textos SAP (GuiShell - SAPLMMTE).
+    Permite leer y modificar texto línea por línea de forma segura.
+    """
+
+    def __init__(self, session, editor_id):
+        """
+        Args:
+            session: sesión activa SAP GUI
+            editor_id (str): ID completo del editor (hasta /shell)
+        """
+        self.session = session
+        self.editor_id = editor_id
+        self.shell = self._get_shell()
+
+    def _get_shell(self):
+        shell = self.session.findById(self.editor_id)
+        if shell.Type != "GuiShell":
+            raise Exception("El objeto encontrado no es un GuiShell (Text Editor SAP)")
+        return shell
+
+    # ------------------------------------------------------------------
+    # LECTURA
+    # ------------------------------------------------------------------
+
+    def get_line(self, index):
+        """Obtiene el texto completo de una línea."""
+        try:
+            return self.shell.GetLineText(index)
+        except Exception:
+            return None
+
+    def get_editable_line(self, index):
+        """Obtiene solo la parte editable de una línea."""
+        try:
+            return self.shell.GetUnprotectedTextPart(index)
+        except Exception:
+            return None
+
+    def get_all_text(self, max_lines=100):
+        """
+        Obtiene todo el texto del editor SAP sin saltos de línea finales
+        ni líneas vacías generadas por el control.
+        """
+        lines = []
+    
+
+        for i in range(max_lines):
+            try:
+                line = self.get_line(i)
+
+                if line is None:
+                    break
+
+                # Limpia caracteres invisibles pero conserva el contenido
+                clean_line = line.rstrip()
+                lines.append(clean_line)
+
+            except Exception:
+                break
+
+        # Elimina líneas vacías finales
+        while lines and lines[-1] == "":
+            lines.pop()        
+        
+        return "\n".join(lines)
+    
+        
+    
+
+    # ------------------------------------------------------------------
+    # ESCRITURA
+    # ------------------------------------------------------------------
+
+    def set_editable_line(self, index, new_text):
+        """Modifica únicamente la parte editable de una línea."""
+        try:
+            self.shell.SetUnprotectedTextPart(index, new_text)
+            return True
+        except Exception:
+            return False
+
+    def replace_in_editor(self, replacements: dict, max_lines=300):
+        """
+        Reemplaza textos en todo el editor (solo partes editables).
+
+        Args:
+            replacements (dict): {"VENTA SERVICIO": "V1", ...}
+
+        Returns:
+            cambios (int): número de líneas modificadas
+        """
+        cambios = 0
+
+        for i in range(max_lines):
+            try:
+                editable = self.get_editable_line(i)
+                if not editable:
+                    continue
+
+                nuevo = editable
+                for buscar, reemplazar in replacements.items():
+                    nuevo = nuevo.replace(buscar, reemplazar)
+
+                if nuevo != editable:
+                    self.set_editable_line(i, nuevo)
+                    cambios += 1
+
+            except Exception:
+                break
+
+        return cambios
+    
+    def replace_in_text(self,texto: str, replacements: dict):
+        """
+        Reemplaza textos sobre un string completo.
+
+        Args:
+            texto (str): texto original
+            replacements (dict): {"SAA": "R3", ...}
+
+        Returns:
+            nuevo_texto (str)
+            cambios (int): número de líneas modificadas
+        """
+        lineas = texto.splitlines()
+        cambios = 0
+        nuevas_lineas = []
+
+        for linea in lineas:
+            nueva = linea
+            for buscar, reemplazar in replacements.items():
+                # reemplazo exacto por línea
+                if linea.strip() == buscar:
+                    nueva = reemplazar
+                else:
+                    nueva = nueva.replace(buscar, reemplazar)
+
+            if nueva != linea:
+                cambios += 1
+
+            nuevas_lineas.append(nueva)
+
+        return nuevas_lineas, cambios
+        
+
+    # ------------------------------------------------------------------
+    # UTILIDADES
+    # ------------------------------------------------------------------
+
+    def count_lines(self, max_lines=300):
+        """Cuenta cuántas líneas tiene el editor."""
+        for i in range(max_lines):
+            if self.get_line(i) is None:
+                return i
+        return max_lines
+    
+    def reemplazar_linea_exacta(self, texto_buscar, texto_nuevo):
+        """
+        Reemplaza una línea EXACTA (trim) en el editor SAP.
+        Ej: 'SAA' -> 'R3'
+        Retorna True si hubo cambio.
+        """
+
+        linea = 0
+        hubo_cambio = False
+
+        while True:
+            try:
+                texto = self.shell.GetLineText(linea)
+
+                if texto is None:
+                    break
+
+                if texto.strip() == texto_buscar:
+                    # Seleccionar línea completa
+                    self.shell.SetSelectionIndexes(linea, len(texto))
+                    self.shell.SetUnprotectedTextPart(texto_nuevo)
+                    hubo_cambio = True
+                    break
+
+                linea += 1
+
+            except Exception:
+                # No hay más líneas
+                break
+        return hubo_cambio
+    
+    def set_all_text(self, texto):
+        """
+        Reemplaza todo el texto del editor SAP línea por línea
+        (única forma estable en ME21N).
+        """
+
+        self.shell.SetFocus()
+
+        nuevas_lineas = texto.splitlines()
+
+        for i, linea in enumerate(nuevas_lineas):
+            try:
+                original = self.shell.GetLineText(i)
+
+                if original is None:
+                    break
+
+                # Seleccionar línea completa
+                self.shell.SetSelectionIndexes(i, len(original))
+
+                # Reemplazar contenido de la línea
+                self.shell.SetUnprotectedTextPart(linea)
+
+            except Exception:
+                break
+
+    def set_text(self, texto: list):
+        """
+        Establece el texto completo en el editor SAP, línea por línea.
+        
+        Args:
+            texto (list): El texto completo que se quiere establecer en el editor.
+        
+        Returns:
+            cambios (int): Número de líneas modificadas.
+        """
+        #lineas = texto.splitlines()  # Dividimos el texto en líneas
+        cambios = 0  # Contador de líneas modificadas
+        
+        # Recorremos cada línea y la establecemos en el editor
+        for i, linea in enumerate(texto):
+            try:
+                # Simplemente insertamos o reemplazamos el texto sin comparar
+                self.shell.set_editable_line(i, linea)
+                cambios += 1
+
+            except Exception as e:
+                # Si ocurre un error (por ejemplo, fuera del rango), lo manejamos
+                print(f"Error al insertar texto en la línea {i}: {e}")
+                break  # Si prefieres continuar con la siguiente línea en caso de error, usa `continue`
+
+        return cambios
+    
+
+
+def get_GuiTextField_text(session, campo_posicion):
+    """
+    Obtiene el texto de un GuiTextField dentro de un TableControl SAP
+    usando una posición lógica (ej: 'NETPR[10,0]').
+
+    Args:
+        session: sesión SAP activa
+        campo_posicion (str): campo con posición SAP (ej: 'NETPR[10,0]')
+
+    Returns:
+        str: texto del campo
+
+    Raises:
+        Exception si no se encuentra el objeto
+    """
+
+    if not campo_posicion:
+        raise ValueError("campo_posicion es obligatorio")
+
+    # Parsear NETPR[10,0]
+    match = re.match(r"(.+)\[(\d+),(\d+)\]", campo_posicion)
+    if not match:
+        raise ValueError("Formato inválido. Use: NETPR[10,0]")
+
+    campo, col, fila = match.groups()
+    col = int(col)
+    fila = int(fila)
+
+    usr = session.findById("wnd[0]/usr")
+
+    def buscar_textfield(obj):
+        try:
+            if (
+                obj.Type == "GuiTextField"
+                and campo in obj.Id
+                and obj.Id.endswith(f"[{col},{fila}]")
+            ):
+                return obj
+
+            for child in obj.Children:
+                res = buscar_textfield(child)
+                if res:
+                    return res
+        except Exception:
+            pass
+        return None
+
+    txt = buscar_textfield(usr)
+
+    if not txt:
+        raise Exception(f"No se encontró GuiTextField: {campo_posicion}")
+
+    return txt.Text.strip()
+
+def ventana_abierta(session, titulo_parcial):
+    """
+    Verifica si existe una ventana abierta cuyo título contenga el texto indicado.
+
+    Args:
+        session: sesión activa SAP GUI
+        titulo_parcial (str): texto a buscar en el título (case-insensitive)
+
+    Returns:
+        bool
+    """
+
+    titulo_parcial = titulo_parcial.lower()
+
+    for wnd in session.Children:
+        try:
+            if titulo_parcial in wnd.Text.lower():
+                return True
+        except Exception:
+            pass
+
+    return False
+
+def select_GuiTab(session, tab_id):
+    """
+    Selecciona una pestaña (GuiTab) del detalle de posición en ME21N.
+    Args:
+        session: sesión activa de SAP GUI
+        tab_id (str): ID lógico de la pestaña (ej: 'TABIDT14')
+    Ejemplos:
+        seleccionar_tab_item(session, "TABIDT14")  # Textos
+        seleccionar_tab_item(session, "TABIDT05")  # Entrega
+    """
+
+    if not tab_id:
+        raise ValueError("tab_id es obligatorio")
+
+    usr = session.findById("wnd[0]/usr")
+    target_suffix = f"tabp{tab_id}"
+
+    def buscar_tab(obj):
+        try:
+            if obj.Type == "GuiTab" and obj.Id.endswith(target_suffix):
+                return obj
+            for child in obj.Children:
+                res = buscar_tab(child)
+                if res:
+                    return res
+        except Exception:
+            pass
+        return None
+
+    tab = buscar_tab(usr)
+
+    if not tab:
+        raise Exception(f"No se encontró la pestaña GuiTab con ID :{tab_id}")
+    # Select() es seguro incluso si ya está seleccionada
+    tab.Select()
 
 def boton_existe(session,id):
     try:
@@ -24,31 +380,6 @@ def boton_existe(session,id):
         return True
     except:
         return False
-    
-# def buscar_y_clickear(ruta_imagen, confidence=0.5, intentos=20, espera=0.5):
-#     """
-#     Busca una imagen en pantalla y hace click cuando la encuentra.
-
-#     Args:
-#         ruta_imagen (str): Ruta de la imagen a buscar.
-#         confidence (float): Confianza para el match (requiere OpenCV).
-#         intentos (int): Número de intentos antes de fallar.
-#         espera (float): Tiempo entre intentos en segundos.
-
-#     Returns:
-#         bool: True si hizo click, False si no encontró la imagen.
-#     """
-
-#     for _ in range(intentos):
-#         pos = pyautogui.locateCenterOnScreen(ruta_imagen, confidence=confidence)
-#         if pos:
-#             pyautogui.click(*pos)
-#             return True
-#         time.sleep(espera)
-
-#     print(f"[WARNING] No se encontró la imagen: {ruta_imagen}")
-#     return False
-
 
 def buscar_y_clickear(
     ruta_imagen,
@@ -83,12 +414,14 @@ def buscar_y_clickear(
 
             if pos:
                 pyautogui.click(pos)
+                #pyautogui.press("enter") # Descomentar si se quiere dar enter tras el click
                 if log:
                     print(f"[INFO] Imagen encontrada y clickeada: {ruta_imagen}")
                 return True
 
         except ImageNotFoundException:
             # PyAutoGUI puede lanzar esta excepción en algunas versiones
+            #pyautogui.press("enter") # Descomentar si se quiere dar enter tras el click
             pass
 
         except Exception as e:
@@ -100,7 +433,7 @@ def buscar_y_clickear(
         time.sleep(espera)
 
     if log:
-        print(f"[WARNING] Imagen no encontrada tras {intentos} intentos: {ruta_imagen}")
+        print(f"[WARNING] Imagen no encontrada tras {intento} intentos: {ruta_imagen}")
 
     if not fail_silently:
         raise RuntimeError(f"No se encontró la imagen: {ruta_imagen}")
@@ -109,10 +442,10 @@ def buscar_y_clickear(
 
 def ejecutar_accion_sap(id_documento="0", ruta_vbs=rf".\scriptsVbs\clickptextos.vbs"):
     # Asegúrate de poner la ruta correcta donde guardaste el código de arriba
-    
+
     ruta_vbs = ruta_vbs
 
-    
+
     if os.path.exists(ruta_vbs):
         try:
             # Enviamos el id_documento como argumento
@@ -131,14 +464,14 @@ def PressBuscarBoton(session):
     # 1. Definir el contenedor padre estable (justo antes de donde cambia el número)
     padre_id = "wnd[0]/usr"
     obj_padre = session.findById(padre_id)
-    
+
     # 2. Definir el patrón Regex para la parte cambiante
     # Buscamos "subSUB0:SAPLMEGUI:001" seguido de un dígito (0-9)
     patron = re.compile(r"subSUB0:SAPLMEGUI:001\d")
-    
+
     # 3. Iterar sobre los hijos del padre para encontrar la coincidencia
     id_contenedor_encontrado = None
-    
+
     for hijo in obj_padre.Children:
         # El hijo.Id devuelve la ruta completa, extraemos solo la parte final o comparamos todo
         if patron.search(hijo.Id):
@@ -162,7 +495,7 @@ def PressBuscarBoton(session):
         return False
 
 def find_sap_control(session, parent_id, dynamic_regex, trailing_path, desired_action=None, value=None):
-    
+
     # Busca un control SAP cuyo ID contiene una parte dinámica (SAPLMEGUI:0010/0015/etc.)
     # y ejecuta una acción específica (.press, asignar .text, etc.).
 
@@ -177,7 +510,7 @@ def find_sap_control(session, parent_id, dynamic_regex, trailing_path, desired_a
 
     # Returns:
     #     El control encontrado (GuiComponent) o None si falla.
-    
+
 
     parent = session.findById(parent_id)
     patron = re.compile(dynamic_regex)
@@ -254,7 +587,7 @@ def ejecutar_creacion_hijo(session):
         # Si falla de entrada, esperamos un poco y reintentamos una vez
         time.sleep(1)
         user_area = session.findById("wnd[0]/usr")
- 
+
     ruta_restante = "/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL"
     # 2. BUCLE DE RESILIENCIA (Reintentos)
     # Intentaremos leer los hijos hasta 3 veces antes de rendirnos.
@@ -279,53 +612,46 @@ def ejecutar_creacion_hijo(session):
             # Si terminamos el for y no retornamos nada, es que no se encontró en este intento
             # pero no hubo error técnico.
             break
- 
+
         except Exception as e:
             # Este bloque captura el error "Data necessary... not available"
             print(f"Intento {intento + 1}/{max_intentos} fallido esperando a SAP... ({e})")
             time.sleep(1.5) # Espera importante: Dale tiempo a SAP para terminar de pintar
             continue
- 
+
     return None # Si fallaron los 3 intentos o no se encontró
 
 def BorrarTextosDesdeSolped(session, solped, item=2):
-    
-    esperar_sap_listo(session)
+
+    # ============================
+    # Abrir transacción ME21N
+    # ============================
     AbrirTransaccion(session, "ME21N")
-    print("Transacción ME21N abierta con éxito.")
     time.sleep(0.5)
-    session.findById("wnd[0]").maximize()
+
     try:
         # Validación básica de sesión
         if not session:
             raise ValueError("Sesion SAP no valida.")
         esperar_sap_listo(session)
-        #Click en carrito para el foco 
-        ruta=rf".\img\carrito.png"
-        buscar_y_clickear(ruta, confidence=0.5, intentos=20, espera=0.5)
+        # Click Variante de Seleccion y selecciona el campo Solicitudes de pedido en la lista
+        timeout = time.time() + 25
+        ventana= "Solicitudes de pedido"
+        while not ventana_abierta(session, ventana):
+            if time.time() > timeout:
+                raise TimeoutError(f"No se abrió la ventana :{ventana}")
+            buscar_y_clickear(rf".\img\vSeleccion.png", confidence=0.8, intentos=5, espera=0.5)
+            esperar_sap_listo(session)
+            time.sleep(2)
+            pyautogui.press("s") # selecciona el campo Solicitudes de pedido en la lista
 
-        # Navegar hasta el campo Variante de seccion
-        for i in range(
-            6
-        ):  # 29 veces desde menu(sin Shift), 7 desde proveedor, 12 desde org compras
-            pyautogui.hotkey("shift", "TAB")
-            time.sleep(0.5)
-        pyautogui.press("enter")
-        # Selecciona el campo Solicitudes de pedido en la lista
-        time.sleep(0.5)
-        pyautogui.press("s")
-        time.sleep(0.5)
-
-        # ingresa el numero de la solped que va a revisar
+        # ingresa el numero de la solped que va a revisar  #Funciona perfecto
         esperar_sap_listo(session)
         session.findById("wnd[0]/usr/ctxtSP$00026-LOW").text = solped
         session.findById("wnd[0]/tbar[1]/btn[8]").press()
 
         # Navegar hasta la sol.pedido en la lista
-        for i in range(2):
-            pyautogui.hotkey("shift", "TAB")
-        pyautogui.hotkey("TAB")
-
+        buscar_y_clickear(rf".\img\sol.pedido.png", confidence=0.8, intentos=20, espera=0.5)
         # Despliga los itemns de la solped
         time.sleep(0.5)
         pyautogui.hotkey("right")
@@ -335,18 +661,15 @@ def BorrarTextosDesdeSolped(session, solped, item=2):
 
         # Selecciona todos los items de la solped revisar variable item para ajustar
         with pyautogui.hold("shift"):
-            pyautogui.press(
-                "down", presses=item
-            )  # Stev: cantidad de items a bajar articulos de la solped
+            pyautogui.press("down", presses=item)  # Stev: cantidad de items a bajar articulos de la solped
             time.sleep(0.5)
 
-        # enter en tomar pedido con articulos seleccionados (Click en tomar pedido )
-        for i in range(5):
-            pyautogui.hotkey("shift", "TAB")
-            time.sleep(0.5)
-        pyautogui.press("enter")
-        time.sleep(1)
+        # Click en tomar pedido 
+        buscar_y_clickear(rf".\img\tomar.png", confidence=0.7, intentos=20, espera=0.5)
+
         print("Esperando a click en pestana de texto y luego en info.......... ")
+        select_GuiTab(session, "TABIDT14")
+                
         time.sleep(1)
         ejecutar_accion_sap(id_documento="click pestaña texto e info ",ruta_vbs=rf".\scriptsVbs\clickptextos.vbs")
         time.sleep(10)
@@ -406,18 +729,18 @@ def BorrarTextosDesdeSolped(session, solped, item=2):
                         obj_btnDel.Press()
                         print(f"Texto F0{j} eliminado.")
                         # --- ESPERA OBLIGATORIA TRAS BORRAR ---
-                        # Aquí SAP destruye y reconstruye la pantalla. 
+                        # Aquí SAP destruye y reconstruye la pantalla.
                         # Esto es lo que rompe los IDs para la siguiente vuelta del 'for j'.
                         time.sleep(1.5)
                         # 5. EDITAR TEXTO (Poner el punto)
                         # Ojo: Como hubo refresh, debemos re-buscar el área de texto con el ID fresco
-                        # Pero cuidado: a veces al borrar, el foco cambia. 
+                        # Pero cuidado: a veces al borrar, el foco cambia.
                         # Re-validamos el objeto antes de usarlo.
                         try:
                             obj_textoarea = session.findById(current_id_textoarea)
                             obj_textoarea.text = "."
                         except:
-                            # Si falla aquí, es probable que necesitemos recalcular el ID de nuevo 
+                            # Si falla aquí, es probable que necesitemos recalcular el ID de nuevo
                             # o que el área de texto no esté lista.
                             pass
                     except Exception as e_btn:
@@ -435,11 +758,11 @@ def BorrarTextosDesdeSolped(session, solped, item=2):
             ruta_img = rf".\img\abajo.png"
             buscar_y_clickear(ruta_img, confidence=0.8, intentos=20, espera=0.5)
 
-        # Salir de SAP 
+        # Salir de SAP
         #session.findById("wnd[0]").sendVKey(12)
         esperar_sap_listo(session)
         time.sleep(1)
-        pyautogui.hotkey("ctrl", "s") 
+        pyautogui.hotkey("ctrl", "s")
         time.sleep(1)
         pyautogui.press("enter")
         time.sleep(1)
@@ -459,7 +782,7 @@ def leer_solpeds_desde_archivo(ruta_archivo):
             # Todas las líneas útiles empiezan con '|'
             if not linea.strip().startswith("|"):
                 continue
-            
+
             partes = [p.strip() for p in linea.split("|")]
 
             # Esperamos al menos 16 columnas por la estructura del archivo
@@ -487,7 +810,7 @@ def leer_solpeds_desde_archivo(ruta_archivo):
             resultados[purch_req]["items"] += 1
             resultados[purch_req]["estados"].add(estado)
 
-    return resultados   
+    return resultados
 
 def obtener_numero_oc(session):
     """
@@ -508,7 +831,7 @@ def obtener_numero_oc(session):
             return None
     except Exception as e:
         print(f"Error al obtener el número de OC: {e}")
-        return None 
+        return None
 
 def esperar_sap_listo(session, timeout=10):
     inicio = time.time()
@@ -548,7 +871,7 @@ def _TablaItemsDataFrame_HU04(name: str) -> pd.DataFrame:
     try:
         path = rf"{RUTAS['PathInsumos']}\TablasME53N\{name}"
         encoding = _DetectarCodificacion_HU04(path)
-        
+
         with open(path, "r", encoding=encoding, errors='ignore') as f:
             lineas = f.read().splitlines()
 
@@ -557,7 +880,7 @@ def _TablaItemsDataFrame_HU04(name: str) -> pd.DataFrame:
 
         encabezado_raw = tabla[0]
         columnas = [c.strip() for c in encabezado_raw.split("|")[1:-1]]
-        
+
         columnas_unicas = []
         contador = {}
         for col in columnas:
@@ -573,7 +896,7 @@ def _TablaItemsDataFrame_HU04(name: str) -> pd.DataFrame:
             partes = [c.strip() for c in fila.split("|")[1:-1]]
             if len(partes) == len(columnas_unicas):
                 filas.append(partes)
-        
+
         return pd.DataFrame(filas, columns=columnas_unicas)
     except Exception as e:
         print(f"ERROR en _TablaItemsDataFrame_HU04: {e}")
@@ -613,7 +936,7 @@ def _ObtenerItemTextME53N_HU04(session, numero_solped: str, numero_item: str) ->
         pyautogui.hotkey("ctrl", "c")
         time.sleep(0.5)
         texto_completo = _ObtenerTextoDelPortapapeles_HU04()
-        
+
         session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0015/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB1:SAPLMEGUI:6000/btn%#AUTOTEXT002").press()
         time.sleep(0.5)
         return texto_completo
@@ -643,7 +966,7 @@ def _ExtraerDatosTexto_HU04(texto: str) -> Dict:
     if not texto or not texto.strip(): return datos
 
     texto_upper = texto.upper()
-    
+
     # --- Lógica de normalización específica de HU04 ---
     REEMPLAZOS = {
         "VENTA SERVICIO": "V1", "VENTA PRODUCTO": "V1",
@@ -667,7 +990,7 @@ def _ExtraerDatosTexto_HU04(texto: str) -> Dict:
         m = re.search(patron, texto_upper)
         if m:
             datos[campo] = m.group(1).strip()
-            
+
     return datos
 
 def _ValidarContraTabla_HU04(datos_texto: Dict, df_items: pd.DataFrame, item_num: str) -> Dict:
@@ -698,7 +1021,7 @@ def _ValidarContraTabla_HU04(datos_texto: Dict, df_items: pd.DataFrame, item_num
             validaciones["valor_total"]["match"] = abs(valor_texto - valor_tabla) / valor_tabla < 0.01
         else:
             validaciones["valor_total"]["match"] = valor_texto == valor_tabla
-            
+
     return validaciones
 
 def _DeterminarEstadoFinal_HU04(datos_texto: Dict, validaciones: Dict) -> Tuple[str, str]:
@@ -718,7 +1041,7 @@ def _ProcesarYValidarItem_HU04(session, solped: str, item_num: str, texto: str, 
 
 def ValidarSolpedParaOC(session, task_name, solped, df_solpeds_para_actualizar, archivo):
     WriteLog(f"Iniciando validación tipo HU04 para SOLPED {solped}", "INFO", task_name, RUTAS["PathLog"])
-    
+
     AbrirTransaccion(session, "ME53N")
     if not ColsultarSolped(session, solped):
         WriteLog(f"No se pudo consultar la SOLPED {solped} en ME53N.", "ERROR", task_name, RUTAS["PathLogError"])
@@ -740,13 +1063,13 @@ def ValidarSolpedParaOC(session, task_name, solped, df_solpeds_para_actualizar, 
         print(f"--- Validando Item {numero_item} de SOLPED {solped} (HU04) ---")
 
         texto_item = _ObtenerItemTextME53N_HU04(session, solped, numero_item)
-        
+
         estado_final, observaciones = _ProcesarYValidarItem_HU04(session, solped, numero_item, texto_item, df_items)
 
         if estado_final != "Registro validado para orden de compra":
             mensaje_error = f"Item {numero_item} no validado. Estado: {estado_final}. Obs: {observaciones}"
             WriteLog(f"SOLPED {solped}: {mensaje_error}", "ERROR", task_name, RUTAS["PathLogError"])
-            
+
             ActualizarEstadoYObservaciones(
                 df_solpeds_para_actualizar, archivo, solped, item=numero_item,
                 nuevo_estado=estado_final, observaciones=observaciones
@@ -755,6 +1078,6 @@ def ValidarSolpedParaOC(session, task_name, solped, df_solpeds_para_actualizar, 
                 df_solpeds_para_actualizar, archivo, solped,
                 nuevo_estado="Error de Validacion HU04", observaciones=f"Fallo en item {numero_item}: {estado_final}"
             )
-            return False 
-    
+            return False
+
     return True

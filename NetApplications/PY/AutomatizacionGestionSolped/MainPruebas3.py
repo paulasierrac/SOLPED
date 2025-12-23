@@ -8,6 +8,9 @@
 # ================================
 from HU.HU01_LoginSAP import conectar_sap
 from Funciones.ValidacionM21N import BorrarTextosDesdeSolped
+from Funciones.GeneralME53N import AbrirTransaccion
+
+
 
 # from NetApplications.PY.AutomatizacionGestionSolped.HU.HU03_ValidacionME53N import buscar_SolpedME53N
 from Funciones.EscribirLog import WriteLog
@@ -26,16 +29,21 @@ def Main_Pruebas3():
          )
           
         #EjecutarHU05(session)
-        print(session)
+        # print(session)
+        # AbrirTransaccion(session, "ME21N")
 
       
         #solpeds = [("1300139102", 2),("1300139269", 6),("1300138077", 10),("1300139272", 10),("1300136848", 83)]
         # Solped compartidas por el grupo
-        solpeds = [("1300139394", 7),("1300139391", 9),("1300139392", 4),("1300139393", 7),("1300139390", 7)]
-        #solpeds = [("1300139269", 6)]
+        #solpeds = [("1300139396", 7),("1300139391", 9),("1300139392", 4),("1300139393", 7),("1300139390", 7)]
+        # solpeds = [("1300139395", 6)]
+        
 
-        for solped, posicion in solpeds:
-            BorrarTextosDesdeSolped(session, solped, posicion)
+        # for solped, posicion in solpeds:
+        #     BorrarTextosDesdeSolped(session, solped, posicion)
+
+
+        
 
     except Exception as e:
         error_text = traceback.format_exc()

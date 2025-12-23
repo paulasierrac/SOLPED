@@ -17,7 +17,7 @@ import traceback
 from Config.settings import RUTAS,SAP_CONFIG
 
 
-def Main_Pruebas3():
+def Main_Pruebas2():
     try:  
         session = conectar_sap(
          SAP_CONFIG["sistema"], 
@@ -48,5 +48,5 @@ def Main_Pruebas3():
         raise
 
 if __name__ == "__main__":
-    Main_Pruebas3()
+    Main_Pruebas2()
 

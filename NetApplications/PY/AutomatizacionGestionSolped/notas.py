@@ -195,6 +195,26 @@ def Notas():
       #   # 5) Obtener texto del portapapeles con codificacion correcta
       #   texto_completo = ObtenerTextoDelPortapapeles()
 
+    """ #obtener los textos de la pestana textos, se utiliza el editor de terxtos de SAP y se accede a el por medio de su ID
+        # y con el metodo GetLineText se obtiene el texto de la primera linea (index 1)
+        grid = session.findById("wnd[0]/usr/" 
+        "subSUB0:SAPLMEGUI:0010/" 
+        "subSUB3:SAPLMEVIEWS:1100/" 
+        "subSUB2:SAPLMEVIEWS:1200/" 
+        "subSUB1:SAPLMEGUI:1301/" 
+        "subSUB2:SAPLMEGUI:1303/" 
+        "tabsITEM_DETAIL/tabpTABIDT14/" 
+        "ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329"
+        "/subTEXTS:SAPLMMTE:0200/" 
+        "subEDITOR:SAPLMMTE:0201/" 
+        "cntlTEXT_EDITOR_0201/shellcont/shell"
+        )
+
+        texto = grid.GetLineText(1)
+        print("Texto en la pestaña de textos:")
+        print(texto)
+    """
+
 
 
 
