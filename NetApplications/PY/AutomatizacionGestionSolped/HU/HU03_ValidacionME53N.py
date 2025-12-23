@@ -56,7 +56,7 @@ def EjecutarHU03(session, nombre_archivo):
         )
 
         # Traer SAP al frente
-        TraerSAPAlFrente_Opcion()
+        #TraerSAPAlFrente_Opcion()
 
         # Leer el archivo con las SOLPEDs a procesar
         df_solpeds = procesarTablaME5A(nombre_archivo)
