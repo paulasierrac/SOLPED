@@ -87,7 +87,8 @@ def Main_GestionSolped():
             path_log=RUTAS["PathLog"],
         )
 
-        #EjecutarHU02(session)
+       
+        # EjecutarHU02(session)
 
         WriteLog(
             mensaje="HU02 finalizada correctamente.",
