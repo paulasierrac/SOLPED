@@ -1,0 +1,23 @@
+23/12/2025 23:00:11 | ERROR | Main_GestionSOLPED | ERROR GLOBAL: invalid literal for int() with base 10: 'Holoaaaa SAP' | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\MainPruebas4.py", line 69, in Main_Pruebas4
+    editor_shell.SetUnprotectedTextPart(texto)
+  File "<COMObject <unknown>>", line 2, in SetUnprotectedTextPart
+ValueError: invalid literal for int() with base 10: 'Holoaaaa SAP'
+ | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:09 | ERROR | AbrirTransaccion | Error en AbrirTransaccion: Sesion SAP no disponible | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:09 | ERROR | HU4_GeneracionOC | ERROR GLOBAL en HU04: Sesion SAP no valida. | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 80, in EjecutarHU04
+    BorrarTextosDesdeSolped(session, solped, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 665, in BorrarTextosDesdeSolped
+    raise ValueError("Sesion SAP no valida.")
+ValueError: Sesion SAP no valida.
+ | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:09 | ERROR | Main_GestionSOLPED | Error Global en Main: Sesion SAP no valida. | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Main_GestionSOLPED.py", line 137, in Main_GestionSolped
+    EjecutarHU04(session, archivo)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 80, in EjecutarHU04
+    BorrarTextosDesdeSolped(session, solped, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 665, in BorrarTextosDesdeSolped
+    raise ValueError("Sesion SAP no valida.")
+ValueError: Sesion SAP no valida.
+ | WPRUFABRICC1 | CGRPA042

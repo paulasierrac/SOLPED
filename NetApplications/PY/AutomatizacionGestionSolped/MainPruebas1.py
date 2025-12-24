@@ -6,6 +6,7 @@
 # Propiedad de Colsubsidio
 # Cambios: Ajuste inicial para cumplimiento de estándar
 # ================================
+from Funciones.ValidacionM21N import debug_sap_object
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
 from HU.HU01_LoginSAP import ObtenerSesionActiva,conectar_sap,abrir_sap_logon
 from HU.HU02_DescargaME5A import EjecutarHU02
@@ -20,45 +21,38 @@ from Config.settings import RUTAS,SAP_CONFIG
 
 def Main_Pruebas1():
     try:
-        # HU00 pruebas de desarrollo con login
-        #EjecutarHU00()
+        session = ObtenerSesionActiva()
+        if not session:
+            return
+        
+        orgCompra = "wnd[0]/usr/subSUB0:SAPLMEGUI:0010/" \
+        "subSUB1:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/" \
+        "subSUB1:SAPLMEGUI:1102/tabsHEADER_DETAIL/tabpTABHDT9/" \
+        "ssubTABSTRIPCONTROL2SUB:SAPLMEGUI:1221/ctxtMEPO1222-EKORG"
+        grupoCompra = "wnd[0]/usr/subSUB0:SAPLMEGUI:0010/" \
+        "subSUB1:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/" \
+        "subSUB1:SAPLMEGUI:1102/tabsHEADER_DETAIL/tabpTABHDT9/" \
+        "ssubTABSTRIPCONTROL2SUB:SAPLMEGUI:1221/ctxtMEPO1222-EKGRP"
 
-        # HU1 Login - Inicio de sesion SAP 
-        WriteLog(
-            mensaje="Inicia HU01",
-            estado="INFO",
-            task_name="Main_GestionSOLPED",
-            path_log=RUTAS["PathLog"],
-        )
-        
-        #session = ObtenerSesionActiva()  #//Intentar obtener sesión activa , para pruebas de desarrollo con login manual
-        session = conectar_sap(
-         SAP_CONFIG["sistema"], 
-         SAP_CONFIG["mandante"],
-         SAP_CONFIG["user"],
-         SAP_CONFIG["password"],
-         SAP_CONFIG["idioma"]
-         )
-        
-        # HU5 Gereacion de OC 
-        WriteLog(
-            mensaje="Inicia HU05",
-            estado="INFO",
-            task_name="Main_GestionSOLPED",
-            path_log=RUTAS["PathLog"],
-        )
+        obj_orgCompra = session.findById(orgCompra)
+        obj_grupoCompra = session.findById(grupoCompra)
+
+        print(type(obj_orgCompra))
+        print(obj_orgCompra.Type)
+        print(type(obj_grupoCompra))
+        print(obj_grupoCompra.Type)
        
-       
-        #EjecutarHU04(session, "1300139102")  # Reemplaza con la Solped real:  1300139102  1300139269
-     
+        debug_sap_object(obj_orgCompra)
+        debug_sap_object(obj_grupoCompra)
+
+        print(obj_orgCompra.text)
+        print(obj_grupoCompra.text)
+
+
+
+
     except Exception as e:
-        error_text = traceback.format_exc()
-        WriteLog(
-            mensaje=f"ERROR GLOBAL: {e} | {error_text}",
-            estado="ERROR",
-            task_name="Main_GestionSOLPED",
-            path_log=RUTAS["PathLogError"],
-        )
+        print(f"\nHa ocurrido un error inesperado durante la ejecución: {e}")
         raise
 
 

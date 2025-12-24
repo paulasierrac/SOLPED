@@ -7,12 +7,7 @@
 # Cambios: Ajuste inicial para cumplimiento de estándar
 # ================================
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
-from HU.HU1_LoginSAP import ObtenerSesionActiva,conectar_sap,abrir_sap_logon
-from HU.HU2_DescargaME5A import EjecutarHU02
-from HU.HU03_ValidacionME53N import EjecutarHU03
-from HU.HU5_GeneracionOC import GenerarOCDesdeSolped
-from HU.HU4_DescargaOCME9F import descarga_OCME9F
-
+from HU.HU01_LoginSAP import ObtenerSesionActiva
 # from NetApplications.PY.AutomatizacionGestionSolped.HU.HU03_ValidacionME53N import buscar_SolpedME53N
 from Funciones.EscribirLog import WriteLog
 import traceback
@@ -213,13 +208,155 @@ def Notas():
         texto = grid.GetLineText(1)
         print("Texto en la pestaña de textos:")
         print(texto)
+
+        
+    """
+    #Funciones que no se usarion, se dejan por si en el futuro se requieren para entendimiento de SAP
+    """
+        def ejecutar_accion_sap(id_documento="0", ruta_vbs=rf".\scriptsVbs\clickptextos.vbs"):
+        # Asegúrate de poner la ruta correcta donde guardaste el código de arriba
+
+        ruta_vbs = ruta_vbs
+
+
+        if os.path.exists(ruta_vbs):
+            try:
+                # Enviamos el id_documento como argumento
+                subprocess.run(["cscript", "//Nologo", ruta_vbs, str(id_documento)], check=True)
+                print(f"Script ejecutado correctamente para el ID: {id_documento}")
+            except subprocess.CalledProcessError as e:
+                print(f"Error al ejecutar VBS: {e}")
+        else:
+            print("No se encuentra el archivo VBS")
+    #NO SE USA
+    def PressBuscarBoton(session):
+
+        # Asumimos que ya tienes la sesión iniciada
+        # SapGuiAuto = win32com.client.GetObject("SAPGUI")
+        # ... session = ...
+        # 1. Definir el contenedor padre estable (justo antes de donde cambia el número)
+        padre_id = "wnd[0]/usr"
+        obj_padre = session.findById(padre_id)
+
+        # 2. Definir el patrón Regex para la parte cambiante
+        # Buscamos "subSUB0:SAPLMEGUI:001" seguido de un dígito (0-9)
+        patron = re.compile(r"subSUB0:SAPLMEGUI:001\d")
+
+        # 3. Iterar sobre los hijos del padre para encontrar la coincidencia
+        id_contenedor_encontrado = None
+
+        for hijo in obj_padre.Children:
+            # El hijo.Id devuelve la ruta completa, extraemos solo la parte final o comparamos todo
+            if patron.search(hijo.Id):
+                id_contenedor_encontrado = hijo.Id
+                break
+        if id_contenedor_encontrado:
+            print(f"Contenedor variable encontrado: {id_contenedor_encontrado}")
+            # 4. Reconstruir la ruta completa del botón
+            # Esta es la parte de la ruta que va DESPUÉS del número cambiante
+            resto_ruta = "/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT14/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/subTEXTS:SAPLMMTE:0200/subEDITOR:SAPLMMTE:0201/btnDELETE_0201"
+            ruta_final_boton = id_contenedor_encontrado + resto_ruta
+            try:
+                boton = session.findById(ruta_final_boton)
+                boton.Press()
+                print("Botón presionado con éxito.")
+                return True
+            except Exception as e:
+                print(f"Error al presionar el botón: {e}")
+        else:
+            print("No se encontró el contenedor que coincida con la Regex.")
+            return False
+    #NO SE USA
+    def find_sap_control(session, parent_id, dynamic_regex, trailing_path, desired_action=None, value=None):
+
+        # Busca un control SAP cuyo ID contiene una parte dinámica (SAPLMEGUI:0010/0015/etc.)
+        # y ejecuta una acción específica (.press, asignar .text, etc.).
+
+        # Args:
+        #     session         : Objeto SAP GUI Scripting de la sesión actual.
+        #     parent_id       : Punto inicial estable (ej: "wnd[0]/usr")
+        #     dynamic_regex   : Patrón regex para identificar el contenedor variable.
+        #                       Ej: r"subSUB0:SAPLMEGUI:001\d"
+        #     trailing_path   : Ruta que viene DESPUÉS del contenedor dinámico.
+        #     desired_action  : Acción a ejecutar: "press", "set_text", "focus", None
+        #     value           : Valor para acciones como "set_text"
+
+        # Returns:
+        #     El control encontrado (GuiComponent) o None si falla.
+
+
+        parent = session.findById(parent_id)
+        patron = re.compile(dynamic_regex)
+        dynamic_container = None
+
+        # Buscar el contenedor que contiene la parte dinámica
+        for child in parent.Children:
+            if patron.search(child.Id):
+                dynamic_container = child.Id
+                break
+
+        if dynamic_container is None:
+            print("No se encontró un contenedor que coincida con el patrón dinámico.")
+            return None
+
+        ruta_final = dynamic_container + trailing_path
+
+        try:
+            control = session.findById(ruta_final)
+        except:
+            print(f"No se pudo encontrar el control final: {ruta_final}")
+            return None
+
+        # Ejecutar acción solicitada
+        if desired_action == "press":
+            try:
+                control.press()
+                print("Acción .press ejecutada con éxito.")
+            except Exception as e:
+                print(f"Error al ejecutar .press(): {e}")
+                return None
+
+        elif desired_action == "set_text":
+            try:
+                control.text = value
+                print(f"Texto asignado correctamente: {value}")
+            except Exception as e:
+                print(f"Error al asignar texto: {e}")
+                return None
+
+        elif desired_action == "focus":
+            try:
+                control.setFocus()
+                print("Control enfocado correctamente.")
+            except Exception as e:
+                print(f"Error al aplicar setFocus: {e}")
+                return None
+
+        elif desired_action is None:
+            # Solo devolver el control sin hacer nada
+            pass
+
+        return control
+    #NO SE USA
+    def limpiar_id_sap(ruta_absoluta):
+     
+        #Toma una ruta larga tipo '/app/con[0]/ses[0]/wnd[0]/usr...'
+        #y devuelve solo desde 'wnd[0]/usr...'
+       
+        if "/wnd[" in ruta_absoluta:
+            # Dividimos el string en donde aparezca "/wnd["
+            partes = ruta_absoluta.split("/wnd[")
+            # partes[1] contendrá "0]/usr/..." así que le volvemos a pegar el prefijo "wnd["
+            ruta_limpia = "wnd[" + partes[1]
+            return ruta_limpia
+        return ruta_absoluta # Si ya estaba limpia, la devuelve igual
+    #NO SE USA
+    def ejecutar_creacion_hijo(session):
+    
+    
     """
 
 
-
-
-if __name__ == "__main__":
-    Notas()
 
 
 

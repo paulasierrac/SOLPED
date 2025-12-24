@@ -167,6 +167,8 @@ def Main_GestionSolped():
             for solped, info in dataSolpeds.items():
                 print(f"Solped {solped} tiene {info['items']} items")
                 #Cambiar por funcion de descarga de OC 
+                
+
 
 
             WriteLog(

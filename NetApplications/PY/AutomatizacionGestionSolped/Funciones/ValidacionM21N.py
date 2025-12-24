@@ -161,8 +161,7 @@ class SapTextEditor:
 
             nuevas_lineas.append(nueva)
 
-        return nuevas_lineas, cambios
-        
+        return "\n".join(nuevas_lineas), cambios
 
     # ------------------------------------------------------------------
     # UTILIDADES
@@ -258,8 +257,15 @@ class SapTextEditor:
                 break  # Si prefieres continuar con la siguiente línea en caso de error, usa `continue`
 
         return cambios
-    
+# fin class SapTextEditor:    
+# fin utilidades 
 
+# ===============================================================================================
+# Obtiene los valores de los campos de precio en la tabla de posiciones 
+# ===============================================================================================
+
+#for fila in range(item):
+#   precio = get_GuiTextField_text(session, f"NETPR[10,{fila}]")
 
 def get_GuiTextField_text(session, campo_posicion):
     """
@@ -345,8 +351,8 @@ def select_GuiTab(session, tab_id):
         session: sesión activa de SAP GUI
         tab_id (str): ID lógico de la pestaña (ej: 'TABIDT14')
     Ejemplos:
-        seleccionar_tab_item(session, "TABIDT14")  # Textos
-        seleccionar_tab_item(session, "TABIDT05")  # Entrega
+        select_GuiTab(session, "TABIDT14")  # Textos
+        select_GuiTab(session, "TABIDT05")  # Entrega
     """
 
     if not tab_id:
@@ -621,6 +627,18 @@ def ejecutar_creacion_hijo(session):
 
     return None # Si fallaron los 3 intentos o no se encontró
 
+def debug_sap_object(obj, nombre="Objeto SAP"):
+    print(f"--- {nombre} ---")
+    print("Tipo:", getattr(obj, "Type", "N/A"))
+    print("ID:", getattr(obj, "Id", "N/A"))
+    print("Métodos / propiedades:")
+    for m in dir(obj):
+        if not m.startswith("_"):
+            print(" ", m)
+
+# ===============================================================================================
+# SI SE USA, BORRA LOS TEXTOS DE LAS SOLPED QUE NO SE USAS DESPUES DE "texto posicion"  HU4 G OC
+# ===============================================================================================
 def BorrarTextosDesdeSolped(session, solped, item=2):
 
     # ============================
@@ -668,6 +686,7 @@ def BorrarTextosDesdeSolped(session, solped, item=2):
         buscar_y_clickear(rf".\img\tomar.png", confidence=0.7, intentos=20, espera=0.5)
 
         print("Esperando a click en pestana de texto y luego en info.......... ")
+        # Seleccionar la pestaña de textos, asegurándonos de que esté visible
         select_GuiTab(session, "TABIDT14")
                 
         time.sleep(1)

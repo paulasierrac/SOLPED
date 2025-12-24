@@ -6,11 +6,12 @@
 # Propiedad de Colsubsidio
 # Cambios: Ajuste inicial para cumplimiento de estándar
 # ================================
-from HU.HU01_LoginSAP import conectar_sap
-from Funciones.ValidacionM21N import BorrarTextosDesdeSolped
+from requests import session
+from HU.HU01_LoginSAP import ObtenerSesionActiva
+from Funciones.ValidacionM21N import obtener_numero_oc,select_GuiTab
+from Funciones.GuiShellFunciones import SapTextEditor
 from Funciones.GeneralME53N import AbrirTransaccion
-
-
+import re
 
 # from NetApplications.PY.AutomatizacionGestionSolped.HU.HU03_ValidacionME53N import buscar_SolpedME53N
 from Funciones.EscribirLog import WriteLog
@@ -18,42 +19,21 @@ import traceback
 from Config.settings import RUTAS,SAP_CONFIG
 
 
-def Main_Pruebas3():
-    try:  
-        session = conectar_sap(
-         SAP_CONFIG["sistema"], 
-         SAP_CONFIG["mandante"],
-         SAP_CONFIG["user"],
-         SAP_CONFIG["password"],
-         SAP_CONFIG["idioma"]
-         )
-          
-        #EjecutarHU05(session)
-        # print(session)
-        # AbrirTransaccion(session, "ME21N")
 
-      
-        #solpeds = [("1300139102", 2),("1300139269", 6),("1300138077", 10),("1300139272", 10),("1300136848", 83)]
-        # Solped compartidas por el grupo
-        #solpeds = [("1300139396", 7),("1300139391", 9),("1300139392", 4),("1300139393", 7),("1300139390", 7)]
-        # solpeds = [("1300139395", 6)]
-        
-
-        # for solped, posicion in solpeds:
-        #     BorrarTextosDesdeSolped(session, solped, posicion)
+def main():
+    session = ObtenerSesionActiva()
+    if not session:
+        return
 
 
-        
+    try:
 
+        select_GuiTab(session, "TABHDT9") 
+                 
+
+    
     except Exception as e:
-        error_text = traceback.format_exc()
-        WriteLog(
-            mensaje=f"ERROR GLOBAL: {e} | {error_text}",
-            estado="ERROR",
-            task_name="Main_GestionSOLPED",
-            path_log=RUTAS["PathLogError"],
-        )
-        raise
-
+        print(f"\nHa ocurrido un error inesperado durante la ejecución: {e}")
+        print("Asegúrate de que estás en la pantalla correcta de SAP y el ID del editor es el correcto.")
 if __name__ == "__main__":
-    Main_Pruebas3()
+    main()

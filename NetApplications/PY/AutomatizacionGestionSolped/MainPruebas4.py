@@ -63,17 +63,13 @@ def Main_Pruebas4():
         )
 
         editor_shell = session.findById(EDITOR_ID)
-        #texto = editor_shell.GetText()
-        texto="Holoaaaa SAP"
-        #editor_shell.SetText(texto) 
-        editor_shell.SetLineText(1,texto)
-
+   
         print("ID encontrado:", editor_shell.Id)
         print("Tipo:", editor_shell.Type)
   
         editor = SapTextEditor(session, EDITOR_ID)
 
-
+        print("Tipo:", type(editor))
         print("Texto original:",flush=True)
         texto = editor.get_all_text()
         print(texto,flush=True)
@@ -86,7 +82,7 @@ def Main_Pruebas4():
                 "GASTO PROPIO PRODUCTO": "C2",
                 "SAA": "R3", #"SAA SERVICIO": "R3"
                 "SAA PRODUCTO": "R3",
-                "DAVIVIENDA": "RWWWWWW",
+                "DAVIVIENDA": "HOLA MUNDO",
             }
 
 
@@ -99,10 +95,11 @@ def Main_Pruebas4():
         print(f"texto modificado {nuevo_texto}")
         print(f"cambios realizados {cambios}") 
 
-        editor.set_text( nuevo_texto )  # Usa el método
+        #editor.set_text( nuevo_texto )  # Usa el método
+        editor_shell.SetUnprotectedTextPart(0,"**//TEXTO MODIFICADO POR BOT RESOC//**")
+        editor_shell.SetUnprotectedTextPart(1,nuevo_texto)
 
-        
-        
+              
         #editor_shell.text = nuevo_texto
        
         """
@@ -201,13 +198,7 @@ def Main_Pruebas4():
 
 
     except Exception as e:
-        error_text = traceback.format_exc()
-        WriteLog(
-            mensaje=f"ERROR GLOBAL: {e} | {error_text}",
-            estado="ERROR",
-            task_name="Main_GestionSOLPED",
-            path_log=RUTAS["PathLogError"],
-        )
+        print(f"\nHa ocurrido un error inesperado durante la ejecución: {e}")
         raise
 
 if __name__ == "__main__":

@@ -1,0 +1,48 @@
+23/12/2025 22:51:17 | INFO  | Main_GestionSOLPED | Inicia HU01 | WPRUFABRICC1 | CGRPA042
+23/12/2025 22:51:25 | INFO  | Main_GestionSOLPED | Inicia HU05 | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:05 | INFO  | Main_GestionSOLPED | Inicio ejecución Main GestionSolped. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:05 | INFO  | Main_GestionSOLPED | Inicia HU00_DespliegueAmbiente. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:05 | INFO  | Main_GestionSOLPED | Obteniendo sesión SAP... | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:09 | INFO  | Main_GestionSOLPED | Sesión SAP obtenida correctamente. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:09 | INFO  | Main_GestionSOLPED | Inicia HU02 - Descarga ME5A. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:09 | INFO  | Main_GestionSOLPED | HU02 finalizada correctamente. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:09 | INFO  | Main_GestionSOLPED | Inicia HU03 - Validación ME53N para archivo expSolped05.txt. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:09 | INFO  | Main_GestionSOLPED | HU03 finalizada correctamente para archivo expSolped05.txt. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:09 | INFO  | Main_GestionSOLPED | Inicia HU04 - Creacion de OC desde ME21N. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:09 | INFO  | HU4_GeneracionOC | HU04 Inicia para el archivo expSolped05test.txt | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:09 | INFO  | procesarTablaME5A | Procesar archivo nombre expSolped05test.txt | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:09 | INFO  | HU4_GeneracionOC | Procesando Solped: 1300139397 con 6 item(s). | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:09 | INFO  | AbrirTransaccion | Abrir Transaccion ME21N | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:09 | ERROR | AbrirTransaccion | Sesion SAP no disponible | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:17 | INFO  | Main_GestionSOLPED | Inicio ejecución Main GestionSolped. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:17 | INFO  | Main_GestionSOLPED | Inicia HU00_DespliegueAmbiente. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:17 | INFO  | Main_GestionSOLPED | Obteniendo sesión SAP... | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:25 | INFO  | Main_GestionSOLPED | Sesión SAP obtenida correctamente. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:25 | INFO  | Main_GestionSOLPED | Inicia HU02 - Descarga ME5A. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:25 | INFO  | Main_GestionSOLPED | HU02 finalizada correctamente. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:25 | INFO  | Main_GestionSOLPED | Inicia HU03 - Validación ME53N para archivo expSolped05.txt. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:25 | INFO  | Main_GestionSOLPED | HU03 finalizada correctamente para archivo expSolped05.txt. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:25 | INFO  | Main_GestionSOLPED | Inicia HU04 - Creacion de OC desde ME21N. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:25 | INFO  | HU4_GeneracionOC | HU04 Inicia para el archivo expSolped05test.txt | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:25 | INFO  | procesarTablaME5A | Procesar archivo nombre expSolped05test.txt | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:25 | INFO  | HU4_GeneracionOC | Procesando Solped: 1300139397 con 6 item(s). | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:25 | INFO  | AbrirTransaccion | Abrir Transaccion ME21N | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:27:27 | INFO  | AbrirTransaccion | Transaccion ME21N abierta | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:29:18 | INFO  | HU4_GeneracionOC | Se generó la Orden de Compra: None | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:29:18 | INFO  | HU4_GeneracionOC | Procesando Solped: 1300139274 con 16 item(s). | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:29:18 | INFO  | AbrirTransaccion | Abrir Transaccion ME21N | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:29:20 | INFO  | AbrirTransaccion | Transaccion ME21N abierta | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:38:16 | INFO  | Main_GestionSOLPED | Inicio ejecución Main GestionSolped. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:38:16 | INFO  | Main_GestionSOLPED | Inicia HU00_DespliegueAmbiente. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:38:16 | INFO  | Main_GestionSOLPED | Obteniendo sesión SAP... | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:38:23 | INFO  | Main_GestionSOLPED | Sesión SAP obtenida correctamente. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:38:23 | INFO  | Main_GestionSOLPED | Inicia HU02 - Descarga ME5A. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:38:23 | INFO  | Main_GestionSOLPED | HU02 finalizada correctamente. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:38:23 | INFO  | Main_GestionSOLPED | Inicia HU03 - Validación ME53N para archivo expSolped05.txt. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:38:23 | INFO  | Main_GestionSOLPED | HU03 finalizada correctamente para archivo expSolped05.txt. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:38:23 | INFO  | Main_GestionSOLPED | Inicia HU04 - Creacion de OC desde ME21N. | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:38:23 | INFO  | HU4_GeneracionOC | HU04 Inicia para el archivo expSolped05test.txt | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:38:23 | INFO  | procesarTablaME5A | Procesar archivo nombre expSolped05test.txt | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:38:23 | INFO  | HU4_GeneracionOC | Procesando Solped: 1300139397 con 6 item(s). | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:38:23 | INFO  | AbrirTransaccion | Abrir Transaccion ME21N | WPRUFABRICC1 | CGRPA042
+23/12/2025 23:38:25 | INFO  | AbrirTransaccion | Transaccion ME21N abierta | WPRUFABRICC1 | CGRPA042
