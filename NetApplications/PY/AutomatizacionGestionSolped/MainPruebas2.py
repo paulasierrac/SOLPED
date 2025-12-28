@@ -7,6 +7,7 @@
 # Cambios: Ajuste inicial para cumplimiento de estándar
 # ================================
 from HU.HU01_LoginSAP import conectar_sap
+from HU.HU04_GeneracionOC import EjecutarHU04
 from Funciones.ValidacionM21N import BorrarTextosDesdeSolped
 from HU.HU05_DescargaOCME9F import EjecutarHU04
 

@@ -6,51 +6,43 @@
 # Propiedad de Colsubsidio
 # Cambios: Ajuste inicial para cumplimiento de estándar
 # ================================
-from Funciones.ValidacionM21N import debug_sap_object
-from HU.HU00_DespliegueAmbiente import EjecutarHU00
+from Funciones.ValidacionM21N import SapTextEditor, get_GuiTextField_text, press_GuiButton, set_GuiTextField_text,normalizar_precio_sap, validar_y_ajustar_solped,debug_sap_object
 from HU.HU01_LoginSAP import ObtenerSesionActiva,conectar_sap,abrir_sap_logon
-from HU.HU02_DescargaME5A import EjecutarHU02
-from HU.HU03_ValidacionME53N import EjecutarHU03
-from HU.HU04_GeneracionOC import EjecutarHU04
 
-# from NetApplications.PY.AutomatizacionGestionSolped.HU.HU03_ValidacionME53N import buscar_SolpedME53N
-from Funciones.EscribirLog import WriteLog
-import traceback
-from Config.settings import RUTAS,SAP_CONFIG
+import re
+from typing import List, Optional
+
 
 
 def Main_Pruebas1():
     try:
         session = ObtenerSesionActiva()
-        if not session:
-            return
+        #validar_y_ajustar_solped(session, 7)
+        textop=session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/" \
+        "subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/" \
+        "subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/" \
+        "tabsITEM_DETAIL/tabpTABIDT14/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/" \
+        "subTEXTS:SAPLMMTE:0200/cntlTEXT_TYPES_0200/shell")
+        """
+        session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/" \
+        "subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/" \
+        "subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/" \
+        "tabsITEM_DETAIL/tabpTABIDT14/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/" \
+        "subTEXTS:SAPLMMTE:0200/cntlTEXT_TYPES_0200/shell")
+        session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT14/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/subTEXTS:SAPLMMTE:0200/cntlTEXT_TYPES_0200/shell").selectedNode = "F03"
+        session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT14/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/subTEXTS:SAPLMMTE:0200/cntlTEXT_TYPES_0200/shell").selectedNode = "F04"
+        session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT14/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/subTEXTS:SAPLMMTE:0200/cntlTEXT_TYPES_0200/shell").selectedNode = "F05"
+        """
         
-        orgCompra = "wnd[0]/usr/subSUB0:SAPLMEGUI:0010/" \
-        "subSUB1:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/" \
-        "subSUB1:SAPLMEGUI:1102/tabsHEADER_DETAIL/tabpTABHDT9/" \
-        "ssubTABSTRIPCONTROL2SUB:SAPLMEGUI:1221/ctxtMEPO1222-EKORG"
-        grupoCompra = "wnd[0]/usr/subSUB0:SAPLMEGUI:0010/" \
-        "subSUB1:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/" \
-        "subSUB1:SAPLMEGUI:1102/tabsHEADER_DETAIL/tabpTABHDT9/" \
-        "ssubTABSTRIPCONTROL2SUB:SAPLMEGUI:1221/ctxtMEPO1222-EKGRP"
+        print(type(textop))
+        print(textop.Type)
 
-        obj_orgCompra = session.findById(orgCompra)
-        obj_grupoCompra = session.findById(grupoCompra)
-
-        print(type(obj_orgCompra))
-        print(obj_orgCompra.Type)
-        print(type(obj_grupoCompra))
-        print(obj_grupoCompra.Type)
-       
-        debug_sap_object(obj_orgCompra)
-        debug_sap_object(obj_grupoCompra)
-
-        print(obj_orgCompra.text)
-        print(obj_grupoCompra.text)
+        textop.selectedNode = "F03"
+        debug_sap_object(textop, "GuiShell")
 
 
-
-
+  
+     
     except Exception as e:
         print(f"\nHa ocurrido un error inesperado durante la ejecución: {e}")
         raise

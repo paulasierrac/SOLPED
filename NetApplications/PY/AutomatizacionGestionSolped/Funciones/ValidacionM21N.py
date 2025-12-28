@@ -16,6 +16,7 @@ from Config.settings import RUTAS
 import pyautogui
 from pyautogui import ImageNotFoundException
 from Funciones.GeneralME53N import AbrirTransaccion, ColsultarSolped, procesarTablaME5A, ActualizarEstadoYObservaciones
+from typing import List, Optional
 
 class SapTextEditor:
     """
@@ -131,26 +132,35 @@ class SapTextEditor:
 
         return cambios
     
-    def replace_in_text(self,texto: str, replacements: dict):
+    def replace_in_text(self, texto: str, replacements: dict):
         """
-        Reemplaza textos sobre un string completo.
+        Reemplaza textos sobre un string completo, evitando líneas vacías iniciales
+        y agregando un mensaje final con el total de cambios.
 
         Args:
-            texto (str): texto original
+            texto (str): texto original del editor SAP
             replacements (dict): {"SAA": "R3", ...}
 
         Returns:
             nuevo_texto (str)
-            cambios (int): número de líneas modificadas
+            cambios (int)
         """
+
+        if not texto:
+            return texto, 0
+
+        # 1. Eliminar SOLO saltos de línea iniciales
+        texto = texto.lstrip("\n")
         lineas = texto.splitlines()
-        cambios = 0
+
         nuevas_lineas = []
+        cambios = 0
 
         for linea in lineas:
             nueva = linea
+
             for buscar, reemplazar in replacements.items():
-                # reemplazo exacto por línea
+                # Reemplazo exacto por línea
                 if linea.strip() == buscar:
                     nueva = reemplazar
                 else:
@@ -161,8 +171,15 @@ class SapTextEditor:
 
             nuevas_lineas.append(nueva)
 
-        return "\n".join(nuevas_lineas), cambios
+        # 2. Agregar mensaje final si hubo cambios
+        if cambios > 0:
+            nuevas_lineas.append("")
+            nuevas_lineas.append(
+                f"TEXTO MODIFICADO AUTOMÁTICAMENTE POR BOT RPA – CAMBIOS APLICADOS: {cambios}"
+            )
 
+        return "\n".join(nuevas_lineas), cambios
+    
     # ------------------------------------------------------------------
     # UTILIDADES
     # ------------------------------------------------------------------
@@ -261,8 +278,191 @@ class SapTextEditor:
 # fin utilidades 
 
 # ===============================================================================================
-# Obtiene los valores de los campos de precio en la tabla de posiciones 
+# Funciones para obtener el ID de los objetos dinamicamnete dependiento del objeto padre 
+# devuelve el valor de la propiedad o ejecuta la accion deseada
 # ===============================================================================================
+
+def press_GuiButton(session, button_id):
+    """
+    Presiona un botón (GuiButton) en SAP GUI a partir de su ID lógico.
+
+    Args:
+        session: sesión SAP activa
+        button_id (str): ID lógico del botón (ej: 'AUTOTEXT002')
+
+    Ejemplo:
+        press_GuiButton(session, "AUTOTEXT002")
+    """
+
+    if not button_id:
+        raise ValueError("button_id es obligatorio")
+
+    usr = session.findById("wnd[0]/usr")
+    target_suffix = f"btn%#{button_id}"
+
+    def buscar_boton(obj):
+        try:
+            if obj.Type == "GuiButton" and obj.Id.endswith(target_suffix):
+                return obj
+
+            for child in obj.Children:
+                res = buscar_boton(child)
+                if res:
+                    return res
+        except Exception:
+            pass
+        return None
+
+    boton = buscar_boton(usr)
+
+    if not boton:
+        raise Exception(f"No se encontró GuiButton con ID lógico: {button_id}")
+
+    # Press() es seguro incluso si el botón ya fue usado
+    boton.Press()
+
+def set_GuiComboBox_key(session, campo_id, key_value="ZRCR"):
+    """
+    Selecciona un valor en un GuiComboBox de SAP GUI usando un ID lógico.
+
+    Args:
+        session: sesión SAP activa
+        campo_id (str): identificador lógico del campo (ej: 'TOPLINE-BSART')
+        key_value (str): clave a seleccionar en el combo (ej: 'ZRCR')
+
+    Raises:
+        Exception si no se encuentra el GuiComboBox
+    Ejemplo de uso:    
+        set_GuiComboBox_key(session, "TOPLINE-BSART", "ZRCR")
+    """
+
+    if not campo_id:
+        raise ValueError("campo_id es obligatorio")
+
+    usr = session.findById("wnd[0]/usr")
+
+    def buscar_combobox(obj):
+        try:
+            if (
+                obj.Type == "GuiComboBox"
+                and campo_id in obj.Id
+            ):
+                return obj
+
+            for child in obj.Children:
+                res = buscar_combobox(child)
+                if res:
+                    return res
+        except Exception:
+            pass
+        return None
+
+    combo = buscar_combobox(usr)
+
+    if not combo:
+        raise Exception(f"No se encontró GuiComboBox con ID lógico: {campo_id}")
+
+    # Selección por Key (forma correcta y estable)
+    combo.Key = key_value
+
+def set_GuiCTextField_text(session, campo_id, valor):
+    """
+    Setea un texto en un GuiCTextField (ME21N / cabecera)
+    usando el identificador lógico SAP (ej: 'EKORG', 'EKGRP').
+
+    Args:
+        session: sesión activa de SAP GUI
+        campo_id (str): ID lógico del campo (ej: 'EKORG')
+        valor (str): texto a insertar
+
+    Raises:
+        ValueError: si los argumentos son inválidos
+        Exception: si no se encuentra el campo
+    """
+
+    if not campo_id:
+        raise ValueError("campo_id es obligatorio (ej: 'EKORG')")
+
+    if valor is None:
+        raise ValueError("valor no puede ser None")
+
+    usr = session.findById("wnd[0]/usr")
+    target_suffix = f"-{campo_id}"
+
+    def buscar_ctextfield(obj):
+        try:
+            if (
+                obj.Type == "GuiCTextField"
+                and obj.Id.endswith(target_suffix)
+            ):
+                return obj
+
+            for child in obj.Children:
+                res = buscar_ctextfield(child)
+                if res:
+                    return res
+        except Exception:
+            pass
+        return None
+
+    ctext = buscar_ctextfield(usr)
+
+    if not ctext:
+        raise Exception(f"No se encontró GuiCTextField con ID lógico: {campo_id}")
+
+    # En SAP es buena práctica asegurar foco antes de escribir
+    try:
+        ctext.SetFocus()
+    except Exception:
+        pass
+
+    ctext.Text = str(valor)
+
+def get_GuiCTextField_text(session, campo_id):
+    """
+    Obtiene el texto (.Text.strip()) de un GuiCTextField en ME21N
+    a partir del identificador lógico SAP (ej: 'EKORG', 'EKGRP').
+
+    Args:
+        session: sesión activa de SAP GUI
+        campo_id (str): identificador lógico del campo SAP (ej: 'EKORG')
+
+    Returns:
+        str: texto del campo (strip)
+
+    Raises:
+        ValueError: si el argumento es inválido
+        Exception: si no se encuentra el GuiCTextField
+    """
+
+    if not campo_id:
+        raise ValueError("campo_id es obligatorio (ej: 'EKORG')")
+
+    usr = session.findById("wnd[0]/usr")
+    target_suffix = f"-{campo_id}"
+
+    def buscar_ctextfield(obj):
+        try:
+            if (
+                obj.Type == "GuiCTextField"
+                and obj.Id.endswith(target_suffix)
+            ):
+                return obj
+
+            for child in obj.Children:
+                res = buscar_ctextfield(child)
+                if res:
+                    return res
+        except Exception:
+            pass
+        return None
+
+    ctext = buscar_ctextfield(usr)
+
+    if not ctext:
+        raise Exception(f"No se encontró GuiCTextField con ID lógico: {campo_id}")
+
+    return ctext.Text.strip()
 
 #for fila in range(item):
 #   precio = get_GuiTextField_text(session, f"NETPR[10,{fila}]")
@@ -320,6 +520,64 @@ def get_GuiTextField_text(session, campo_posicion):
         raise Exception(f"No se encontró GuiTextField: {campo_posicion}")
 
     return txt.Text.strip()
+
+def set_GuiTextField_text(session, campo_posicion, valor):
+    """
+    Setea el texto de un GuiTextField dentro de un TableControl SAP
+    usando una posición lógica (ej: 'NETPR[10,0]').
+
+    Args:
+        session: sesión SAP activa
+        campo_posicion (str): campo con posición SAP (ej: 'NETPR[10,0]')
+        valor (str): texto a escribir en el campo
+
+    Raises:
+        Exception si no se encuentra el objeto
+    """
+
+    if not campo_posicion:
+        raise ValueError("campo_posicion es obligatorio")
+
+    if valor is None:
+        valor = ""
+
+    # Parsear NETPR[10,0]
+    match = re.match(r"(.+)\[(\d+),(\d+)\]", campo_posicion)
+    if not match:
+        raise ValueError("Formato inválido. Use: NETPR[10,0]")
+
+    campo, col, fila = match.groups()
+    col = int(col)
+    fila = int(fila)
+
+    usr = session.findById("wnd[0]/usr")
+
+    def buscar_textfield(obj):
+        try:
+            if (
+                obj.Type == "GuiTextField"
+                and campo in obj.Id
+                and obj.Id.endswith(f"[{col},{fila}]")
+            ):
+                return obj
+
+            for child in obj.Children:
+                res = buscar_textfield(child)
+                if res:
+                    return res
+        except Exception:
+            pass
+        return None
+
+    txt = buscar_textfield(usr)
+
+    if not txt:
+        raise Exception(f"No se encontró GuiTextField: {campo_posicion}")
+
+    # Seteo del valor
+    txt.SetFocus()
+    txt.Text = str(valor)
+
 
 def ventana_abierta(session, titulo_parcial):
     """
@@ -637,8 +895,79 @@ def debug_sap_object(obj, nombre="Objeto SAP"):
             print(" ", m)
 
 # ===============================================================================================
-# SI SE USA, BORRA LOS TEXTOS DE LAS SOLPED QUE NO SE USAS DESPUES DE "texto posicion"  HU4 G OC
+# BORRA LOS TEXTOS DE LAS SOLPED QUE NO SE USAS DESPUES DE "texto posicion"  HU4 G OC
 # ===============================================================================================
+def obtener_valor(texto: str, contiene: List[str]) -> Optional[str]:
+
+    patron = re.compile(r"\$\s*([\d\.]+)")
+    
+    contiene_upper = [c.upper() for c in contiene]
+
+    for linea in texto.splitlines():
+        linea_upper = linea.upper()
+        if any(c in linea_upper for c in contiene_upper):
+            match = patron.search(linea)
+            if match:
+                return match.group(1)
+            
+    return None
+
+def validar_y_ajustar_solped(session,item=1):
+    
+    try:
+        
+        EDITOR_ID = (
+            "wnd[0]/usr/"
+            "subSUB0:SAPLMEGUI:0010/"
+            "subSUB3:SAPLMEVIEWS:1100/"
+            "subSUB2:SAPLMEVIEWS:1200/"
+            "subSUB1:SAPLMEGUI:1301/"
+            "subSUB2:SAPLMEGUI:1303/"
+            "tabsITEM_DETAIL/tabpTABIDT14/"
+            "ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/"
+            "subTEXTS:SAPLMMTE:0200/"
+            "subEDITOR:SAPLMMTE:0201/"
+            "cntlTEXT_EDITOR_0201/shellcont/shell"
+        )
+
+        #Obtiene los valores de los campos de precio en la tabla de posiciones
+        for fila in range(item):  #cambiar por item 
+            precio = get_GuiTextField_text(session, f"NETPR[10,{fila}]")
+            precio = normalizar_precio_sap(precio)
+            editor = SapTextEditor(session, EDITOR_ID)
+            texto = editor.get_all_text()
+            claves = ["VALOR "]
+            preciotexto = obtener_valor(texto, claves)
+            preciotexto = normalizar_precio_sap(preciotexto)
+            #print( "Precio en el texto: ",preciotexto)
+            if precio==preciotexto:
+                print(f"Precio coincide en la fila {fila+1}0: {precio} == {preciotexto}")
+            else:
+                set_GuiTextField_text(session, f"NETPR[10,{fila}]", preciotexto)
+                print(f"Se mofico posicion :{fila+1}0: {precio} != {preciotexto}")
+                
+            # Realiza los reemplazos en el texto      
+            reemplazos = {
+                    "VENTA SERVICIO": "V1",
+                    "VENTA PRODUCTO": "V1",
+                    "GASTO PROPIO SERVICIO": "C2",
+                    "GASTO PROPIO PRODUCTO": "C2",
+                    "SAA": "R3", #"SAA SERVICIO": "R3"
+                    "SAA PRODUCTO": "R3",
+                    "SONAR": "HOLA MUNDO",
+                }
+            nuevo_texto, cambios = editor.replace_in_text(texto, reemplazos)
+            #print(f"texto modificado {nuevo_texto}")
+            print(f"cambios realizados {cambios}")     
+            editext=session.findById(EDITOR_ID)
+            editext.SetUnprotectedTextPart(0,nuevo_texto)
+            # Finalmente, presiona el botón abajo siguiente posicion
+            press_GuiButton(session, "AUTOTEXT002")
+
+    except Exception as e:
+        print(f"\nHa ocurrido un error inesperado durante la ejecución: {e}")
+        raise
+
 def BorrarTextosDesdeSolped(session, solped, item=2):
 
     # ============================
@@ -865,6 +1194,42 @@ def esperar_sap_listo(session, timeout=10):
 
     raise TimeoutError("SAP GUI no terminó de cargar (session.Busy)")
 
+def cambiar_grupo_compra(session): 
+    # Obtener el valor actual de la organización de compra
+    obj_orgCompra = get_GuiCTextField_text(session, "EKORG")
+    print(f"Valor de OrgCompra: {obj_orgCompra}")
+    condiciones = {
+        "OC15": "RCC",
+        "OC26": "HAB",
+        "OC25": "HAB",
+        "OC28": "AC2",
+        "OC27": "AC2" 
+    }
+
+    if obj_orgCompra not in condiciones:
+        raise ValueError(f"Organización de compra '{obj_orgCompra}' no reconocida.")
+    
+    obj_grupoCompra = condiciones[obj_orgCompra]
+
+    print(obj_grupoCompra)
+
+    set_GuiCTextField_text(session, "EKGRP", obj_grupoCompra)
+
+    print(f"Grupo de compra actualizado a: {obj_grupoCompra}")
+
+def normalizar_precio_sap(precio: str) -> int:
+    """
+    Convierte un precio SAP tipo '2.750.000,00' en entero 2750000
+    para comparaciones confiables.
+    """
+    if not precio:
+        return 0
+
+    # Quitar separador de miles y decimales
+    limpio = precio.replace(".", "").replace(",00", "")
+
+    return int(limpio)
+
 # ===============================================================================================
 # INICIO DE CÓDIGO DE VALIDACIÓN INDEPENDIENTE PARA HU04
 # ===============================================================================================
@@ -873,7 +1238,7 @@ import pandas as pd
 import chardet
 import win32clipboard
 from datetime import datetime
-from typing import Dict, Tuple, List
+from typing import Dict, Optional, Tuple, List
 
 # --- Funciones auxiliares de GUI y archivos (reimplementación para HU04) ---
 

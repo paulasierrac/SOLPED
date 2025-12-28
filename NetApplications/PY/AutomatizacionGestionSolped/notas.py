@@ -15,6 +15,39 @@ from Config.settings import RUTAS,SAP_CONFIG
 
 
 def Notas():
+
+    def replace_in_text(self,texto: str, replacements: dict):
+        """
+        Reemplaza textos sobre un string completo.
+
+        Args:
+            texto (str): texto original
+            replacements (dict): {"SAA": "R3", ...}
+
+        Returns:
+            nuevo_texto (str)
+            cambios (int): número de líneas modificadas
+        """
+        lineas = texto.splitlines()
+        cambios = 0
+        nuevas_lineas = []
+
+        for linea in lineas:
+            nueva = linea
+            for buscar, reemplazar in replacements.items():
+                # reemplazo exacto por línea
+                if linea.strip() == buscar:
+                    nueva = reemplazar
+                else:
+                    nueva = nueva.replace(buscar, reemplazar)
+
+            if nueva != linea:
+                cambios += 1
+
+            nuevas_lineas.append(nueva)
+
+        return "\n".join(nuevas_lineas), cambios
+
      # textoPocision3=session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0015/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI"
     #                  ":1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT14/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/"
     #                  "subTEXTS:SAPLMMTE:0200/cntlTEXT_TYPES_0200/shell").selectedNode = "F02"

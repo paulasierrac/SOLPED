@@ -92,3 +92,156 @@ GuiShell
 
 <class 'win32com.client.CDispatch'>
 GuiStatusbar
+
+<class 'win32com.client.CDispatch'>
+GuiCTextField
+<class 'win32com.client.CDispatch'>
+GuiCTextField
+
+<class 'win32com.client.CDispatch'>
+GuiComboBox
+
+
+
+       orgCompra = "wnd[0]/usr/subSUB0:SAPLMEGUI:0013/" \
+        "subSUB1:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/" \
+        "subSUB1:SAPLMEGUI:1102/tabsHEADER_DETAIL/tabpTABHDT9/" \
+        "ssubTABSTRIPCONTROL2SUB:SAPLMEGUI:1221/ctxtMEPO1222-EKORG"
+        grupoCompra = "wnd[0]/usr/subSUB0:SAPLMEGUI:0013/" \
+        "subSUB1:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/" \
+        "subSUB1:SAPLMEGUI:1102/tabsHEADER_DETAIL/tabpTABHDT9/" \
+        "ssubTABSTRIPCONTROL2SUB:SAPLMEGUI:1221/ctxtMEPO1222-EKGRP"
+
+        obj_orgCompra = session.findById(orgCompra)
+        obj_grupoCompra = session.findById(grupoCompra)
+
+        print(type(obj_orgCompra))
+        print(obj_orgCompra.Type)
+        print(type(obj_grupoCompra))
+        print(obj_grupoCompra.Type)
+       
+        debug_sap_object(obj_orgCompra)
+        debug_sap_object(obj_grupoCompra)
+
+        print(obj_orgCompra.text)
+        print(obj_grupoCompra.text)
+
+
+
+            EDITOR_ID2=(
+        "wnd[0]/usr/"
+        "subSUB0:SAPLMEGUI:0010/"
+        "subSUB3:SAPLMEVIEWS:1100/"
+        "subSUB2:SAPLMEVIEWS:1200/"
+        "subSUB1:SAPLMEGUI:1301/"
+        "subSUB2:SAPLMEGUI:1303/"
+        "tabsITEM_DETAIL/tabpTABIDT14/"
+        "ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/"
+        "subTEXTS:SAPLMMTE:0200/"
+        "subEDITOR:SAPLMMTE:0201/"
+        "cntlTEXT_EDITOR_0201/shellcont/shell")
+
+
+textop=session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/" \
+        "subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/" \
+        "subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/" \
+        "tabsITEM_DETAIL/tabpTABIDT14/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/" \
+        "subTEXTS:SAPLMMTE:0200/cntlTEXT_TYPES_0200/shell")
+        """
+
+<class 'win32com.client.CDispatch'>
+GuiShell
+--- GuiShell ---
+Tipo: GuiShell
+ID: /app/con[0]/ses[0]/wnd[0]/usr/subSUB0:SAPLMEGUI:0010/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT14/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/subTEXTS:SAPLMMTE:0200/cntlTEXT_TYPES_0200/shell
+M├⌐todos / propiedades:
+  ChangeCheckbox
+  ClickLink
+  CollapseNode
+  DefaultContextMenu
+  DoubleClickItem
+  DoubleClickNode
+  DumpState
+  EnsureVisibleHorizontalItem
+  ExpandNode
+  FindAllByName
+  FindAllByNameEx
+  FindById
+  FindByName
+  FindByNameEx
+  FindNodeKeyByPath
+  GetAbapImage
+  GetAllNodeKeys
+  GetCheckBoxState
+  GetColumnCol
+  GetColumnHeaders
+  GetColumnIndexFromName
+  GetColumnNames
+  GetColumnTitleFromName
+  GetColumnTitles
+  GetFocusedNodeKey
+  GetHierarchyLevel
+  GetHierarchyTitle
+  GetIsDisabled
+  GetIsEditable
+  GetIsHighLighted
+  GetItemHeight
+  GetItemLeft
+  GetItemStyle
+  GetItemText
+  GetItemTextColor
+  GetItemToolTip
+  GetItemTop
+  GetItemType
+  GetItemWidth
+  GetListTreeNodeItemCount
+  GetNextNodeKey
+  GetNodeAbapImage
+  GetNodeChildrenCount
+  GetNodeChildrenCountByPath
+  GetNodeHeight
+  GetNodeIndex
+  GetNodeItemHeaders
+  GetNodeKeyByPath
+  GetNodeLeft
+  GetNodePathByKey
+  GetNodeStyle
+  GetNodeTextByKey
+  GetNodeTextByPath
+  GetNodeTextColor
+  GetNodeToolTip
+  GetNodeTop
+  GetNodeWidth
+  GetNodesCol
+  GetParent
+  GetPreviousNodeKey
+  GetSelectedNodes
+  GetSelectionMode
+  GetStyleDescription
+  GetSubNodesCol
+  GetTreeType
+  HeaderContextMenu
+  IsFolder
+  IsFolderExpandable
+  IsFolderExpanded
+  ItemContextMenu
+  NodeContextMenu
+  PressButton
+  PressHeader
+  PressKey
+  SelectColumn
+  SelectContextMenuItem
+  SelectContextMenuItemByPosition
+  SelectContextMenuItemByText
+  SelectItem
+  SelectNode
+  SelectedItemColumn
+  SelectedItemNode
+  SetCheckBoxState
+  SetColumnWidth
+  SetFocus
+  ShowContextMenu
+  UnselectAll
+  UnselectColumn
+  UnselectNode
+  Visualize
