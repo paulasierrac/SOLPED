@@ -22,6 +22,8 @@ class SapTextEditor:
     """
     Wrapper para el editor de textos SAP (GuiShell - SAPLMMTE).
     Permite leer y modificar texto línea por línea de forma segura.
+    #Stev: se prueban varios metodos, pero la mejor opcion es tomar todo el texto y luego setearlo todo de nuevo desde la linea 0 
+    # usando EditorTxt.SetUnprotectedTextPart(0,".")
     """
 
     def __init__(self, session, editor_id):
@@ -144,6 +146,7 @@ class SapTextEditor:
         Returns:
             nuevo_texto (str)
             cambios (int)
+        #Stev: cambia el texto segun un diccionario de reemplazos y retorna el texto modificado y la cantidad de cambios realizados
         """
 
         if not texto:
@@ -281,6 +284,65 @@ class SapTextEditor:
 # Funciones para obtener el ID de los objetos dinamicamnete dependiento del objeto padre 
 # devuelve el valor de la propiedad o ejecuta la accion deseada
 # ===============================================================================================
+
+def find_sap_object(
+    root,
+    obj_type: str,
+    id_contains: str = None,
+    id_endswith: str = None,
+):
+    """
+    Busca recursivamente un objeto SAP por tipo y patrón de ID.
+
+    Args:
+        root: objeto raíz (ej: session.findById("wnd[0]/usr"))
+        obj_type (str): tipo SAP (GuiButton, GuiCTextField, etc.)
+        id_contains (str): texto que debe estar en el ID
+        id_endswith (str): texto con el que debe terminar el ID
+
+    Returns:
+        objeto SAP encontrado o None
+    """
+    
+
+    try:
+        if root.Type == obj_type:
+            if id_contains and id_contains not in root.Id:
+                pass
+            elif id_endswith and not root.Id.endswith(id_endswith):
+                pass
+            else:
+                return root
+
+        for child in root.Children:
+            res = find_sap_object(
+                child,
+                obj_type,
+                id_contains,
+                id_endswith
+            )
+            if res:
+                return res
+    except Exception:
+        pass
+
+    return None
+
+def find_sap_object_in_usr(
+    session,
+    obj_type: str,
+    id_contains: str = None,
+    id_endswith: str = None,
+):
+    usr = session.findById("wnd[0]/usr")
+    return find_sap_object(
+        usr,
+        obj_type,
+        id_contains,
+        id_endswith
+    )
+
+
 
 def press_GuiButton(session, button_id):
     """
@@ -913,8 +975,31 @@ def obtener_valor(texto: str, contiene: List[str]) -> Optional[str]:
     return None
 
 def validar_y_ajustar_solped(session,item=1):
+    """
+    Cambia los precios de la Solped segun el texto del "Texto pedido" (textPF.selectedNode ="F01")
+    borra los textos adicionales que no se utilizan (textPF.selectedNode ="F02"), hasta el F05
+
+    Args:
+        session: sesión SAP activa
+        item (int): posiciones que tiene la Solped 
+
+    Raises:
+        Exception si no se encuentra el objeto
+    """
     
     try:
+        textoPosicionF = (
+            "wnd[0]/usr/"
+            "subSUB0:SAPLMEGUI:0010/" \
+            "subSUB3:SAPLMEVIEWS:1100/" \
+            "subSUB2:SAPLMEVIEWS:1200/" \
+            "subSUB1:SAPLMEGUI:1301/" \
+            "subSUB2:SAPLMEGUI:1303/" \
+            "tabsITEM_DETAIL/tabpTABIDT14/"
+            "ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/"
+            "subTEXTS:SAPLMMTE:0200/" \
+            "cntlTEXT_TYPES_0200/shell"
+        )
         
         EDITOR_ID = (
             "wnd[0]/usr/"
@@ -934,14 +1019,15 @@ def validar_y_ajustar_solped(session,item=1):
         for fila in range(item):  #cambiar por item 
             precio = get_GuiTextField_text(session, f"NETPR[10,{fila}]")
             precio = normalizar_precio_sap(precio)
+            # obtiene el texto del objeto 
             editor = SapTextEditor(session, EDITOR_ID)
             texto = editor.get_all_text()
-            claves = ["VALOR "]
+            claves = ["VALOR "] # str que busca en el texto 
             preciotexto = obtener_valor(texto, claves)
             preciotexto = normalizar_precio_sap(preciotexto)
-            #print( "Precio en el texto: ",preciotexto)
+            print( "Precio obtenido desde el texto: ",preciotexto)
             if precio==preciotexto:
-                print(f"Precio coincide en la fila {fila+1}0: {precio} == {preciotexto}")
+                print(f"Precio coincide en la posicion : {fila+1}0: {precio} == {preciotexto}")
             else:
                 set_GuiTextField_text(session, f"NETPR[10,{fila}]", preciotexto)
                 print(f"Se mofico posicion :{fila+1}0: {precio} != {preciotexto}")
@@ -961,12 +1047,69 @@ def validar_y_ajustar_solped(session,item=1):
             print(f"cambios realizados {cambios}")     
             editext=session.findById(EDITOR_ID)
             editext.SetUnprotectedTextPart(0,nuevo_texto)
+            #Borra los textos de cada editor F02 en adelante 
+            for i in range(2, 6):  # F02 a F05
+                textPF = session.findById(textoPosicionF)
+                nodo = f"F0{i}"
+                textPF.selectedNode = nodo
+                editxt = session.findById(EDITOR_ID)
+                editor = SapTextEditor(session, EDITOR_ID)
+                texto = editor.get_all_text()
+                if texto :
+                    print("El texto no está vacío. Procediendo a borrarlo... :"f"F0{i}")
+                    editxt.SetUnprotectedTextPart(0,".")
+                    print("Texto borrado exitosamente.")
             # Finalmente, presiona el botón abajo siguiente posicion
             press_GuiButton(session, "AUTOTEXT002")
+            textPF.selectedNode ="F01"
 
     except Exception as e:
         print(f"\nHa ocurrido un error inesperado durante la ejecución: {e}")
         raise
+
+def abrirSolped(session, solped, item=2):
+    try:
+        esperar_sap_listo(session)
+        # Click Variante de Seleccion y selecciona el campo Solicitudes de pedido en la lista
+        timeout = time.time() + 25
+        ventana= "Solicitudes de pedido"
+        while not ventana_abierta(session, ventana):
+            if time.time() > timeout:
+                raise TimeoutError(f"No se abrió la ventana :{ventana}")
+            buscar_y_clickear(rf".\img\vSeleccion.png", confidence=0.8, intentos=5, espera=0.5)
+            esperar_sap_listo(session)
+            time.sleep(2)
+            pyautogui.press("s") # selecciona el campo Solicitudes de pedido en la lista
+
+        # ingresa el numero de la solped que va a revisar  #Funciona perfecto
+        esperar_sap_listo(session)
+        session.findById("wnd[0]/usr/ctxtSP$00026-LOW").text = solped
+        session.findById("wnd[0]/tbar[1]/btn[8]").press()
+
+        # Navegar hasta la sol.pedido en la lista
+        buscar_y_clickear(rf".\img\sol.pedido.png", confidence=0.8, intentos=20, espera=0.5)
+        # Despliga los itemns de la solped
+        time.sleep(0.5)
+        pyautogui.hotkey("right")
+        time.sleep(0.5)
+        pyautogui.hotkey("down")
+        time.sleep(0.5)
+
+        # Selecciona todos los items de la solped revisar variable item para ajustar
+        with pyautogui.hold("shift"):
+            pyautogui.press("down", presses=item)  # Stev: cantidad de items a bajar articulos de la solped
+            time.sleep(0.5)
+
+        # Click en tomar pedido 
+        buscar_y_clickear(rf".\img\tomar.png", confidence=0.7, intentos=20, espera=0.5)
+    
+    except Exception as e:
+        print(rf"Error en HU05: {e}", "ERROR")
+        raise
+
+
+        
+
 
 def BorrarTextosDesdeSolped(session, solped, item=2):
 
@@ -975,6 +1118,7 @@ def BorrarTextosDesdeSolped(session, solped, item=2):
     # ============================
     AbrirTransaccion(session, "ME21N")
     time.sleep(0.5)
+
 
     try:
         # Validación básica de sesión
@@ -1285,6 +1429,7 @@ def _TablaItemsDataFrame_HU04(name: str) -> pd.DataFrame:
     except Exception as e:
         print(f"ERROR en _TablaItemsDataFrame_HU04: {e}")
         return pd.DataFrame()
+
 
 def _ObtenerItemsME53N_HU04(session, numero_solped: str) -> pd.DataFrame:
     try:

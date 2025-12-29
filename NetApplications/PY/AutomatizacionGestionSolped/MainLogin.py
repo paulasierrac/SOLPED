@@ -8,7 +8,7 @@
 # ================================
 from requests import session
 from HU.HU01_LoginSAP import ObtenerSesionActiva,conectar_sap
-from Funciones.ValidacionM21N import SapTextEditor
+from Funciones.ValidacionM21N import SapTextEditor,abrirSolped
 from Funciones.GeneralME53N import AbrirTransaccion
 import pyautogui  # Asegúrate de tener pyautogui instalado
 import time
@@ -30,8 +30,16 @@ def Main_Login():
         #session = ObtenerSesionActiva()
         AbrirTransaccion(session, "ME21N")
         # codigo para pruebas
-        print(session)
+        #abrirSolped(session, 1300139390, 7)
+        #abrirSolped(session, 1300139391, 9)
+        abrirSolped(session, 1300139392, 4)
+        #abrirSolped(session, 1300139393, 7)
+        #abrirSolped(session, 1300139394, 7)
+        
+       
 
+        
+      
 
     except Exception as e:
         print(f"\nHa ocurrido un error inesperado durante la ejecución: {e}")

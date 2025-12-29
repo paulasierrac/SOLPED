@@ -12,7 +12,7 @@ import subprocess
 import time
 import os
 from Config.settings import RUTAS
-from Funciones.ValidacionM21N import select_GuiTab, obtener_numero_oc,set_GuiComboBox_key,cambiar_grupo_compra, validar_y_ajustar_solped
+from Funciones.ValidacionM21N import select_GuiTab, obtener_numero_oc,set_GuiComboBox_key,cambiar_grupo_compra, validar_y_ajustar_solped,abrirSolped
 from Funciones.EscribirLog import WriteLog
 from Funciones.GeneralME53N import AbrirTransaccion,procesarTablaME5A
 import traceback
@@ -49,7 +49,13 @@ def EjecutarHU04(session, archivo):
             return
 
         solpeds_unicas = df_solpeds['PurchReq'].unique()
-        print(f"Solpeds únicas a procesar: {solpeds_unicas}")
+        #print(f"Solpeds a procesar: {solpeds_unicas}")
+        WriteLog(
+                    mensaje=f"listado de Solped cargadas : {solpeds_unicas}",
+                    estado="INFO",
+                    task_name=task_name,
+                    path_log=RUTAS["PathLog"],
+                )
         
         for solped in solpeds_unicas[1:]:  # Saltar la primera solped si es necesario (Encabezados)
              # --- Validación de Solped ---
@@ -73,40 +79,40 @@ def EjecutarHU04(session, archivo):
                 mensaje=f"Procesando Solped: {solped} de items: {item_count} .",
                 estado="INFO",
                 task_name=task_name,
-                path_log=RUTAS["PathLog"], # revisar ruta para hacer el informe 
+                path_log=RUTAS["PathLog"]
+                #path_log=f"{RUTAS["PathLog"]}StevInforme.txt", # revisar ruta para hacer el informe 
+                
             )
-            print(f"Session actual: {session}")
-            print(f"procesando solped: {solped} de items: {item_count}")
-
+            #print(f"procesando solped: {solped} de items: {item_count}")
+            AbrirTransaccion(session, "ME21N")
+            #navegacion por SAP que permite abrir Solped 
+            abrirSolped(session, solped, item_count)
             #se selecciona la clase de docuemnto ZRCR, revisar alcance si es necesario cambiar a otra clase dependiendo de algun criterio
             set_GuiComboBox_key(session, "TOPLINE-BSART", "ZRCR")
-            #se ingresa a la pestaña  Dat.org. de cabecera para cambiar el grupo de compra
+            #se ingresa a la pestaña  Dat.org. de cabecera, asegurándonos de que esté visible
             select_GuiTab(session, "TABHDT9") 
             # Se cambia el grupo de compra dependiendo de la org de compra
             cambiar_grupo_compra(session)
+            # Seleccionar la pestaña de textos, asegurándonos de que esté visible
+            select_GuiTab(session, "TABIDT14")
             # Valores y textos se validan y ajustan 
             validar_y_ajustar_solped(session, item_count)
-
+            #***********///////////**************///////////********
+            # Se debe remplazar con guardar OC 
+            #////////////*******///////////////*******
+            # Salir para pruebas 
+            pyautogui.press("F12")
+            time.sleep(1)
+            pyautogui.hotkey("TAB")
+            time.sleep(0.5)
+            pyautogui.hotkey("enter")
+            # Salir para pruebas 
+            #***********///////////**************///////////********  
             
-
-
-             
-
-
-            
-
-            # Obtener el valor actual de la organización de compra
-        
-            
-
-
-
-
-            #BorrarTextosDesdeSolped(session, solped, item_count)
             orden_de_compra = obtener_numero_oc(session)
             # Después de procesar todas las solpeds y (presumiblemente) guardar la OC.        
             WriteLog(
-                mensaje=f"Se generó la Orden de Compra: {orden_de_compra}",
+                mensaje=f" para la solped : {solped} Se generó la Orden de Compra: {orden_de_compra}",
                 estado="INFO",
                 task_name=task_name,
                 path_log=RUTAS["PathLog"],

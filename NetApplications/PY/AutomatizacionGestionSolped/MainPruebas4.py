@@ -8,7 +8,7 @@
 # ================================
 from requests import session
 from HU.HU01_LoginSAP import ObtenerSesionActiva,conectar_sap
-from Funciones.ValidacionM21N import SapTextEditor,get_GuiTextField_text
+from Funciones.ValidacionM21N import SapTextEditor,find_sap_object_in_usr
 from Funciones.GeneralME53N import AbrirTransaccion
 import pyautogui  # Asegúrate de tener pyautogui instalado
 import time
@@ -72,8 +72,9 @@ def Main_Pruebas4():
         session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT14/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/subTEXTS:SAPLMMTE:0200/subEDITOR:SAPLMMTE:0201/cntlTEXT_EDITOR_0201/shellcont/shell").setSelectionIndexes 0,0
         session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT14/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/subTEXTS:SAPLMMTE:0200/cntlTEXT_TYPES_0200/shell").selectedNode = "F04"
         session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT14/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/subTEXTS:SAPLMMTE:0200/cntlTEXT_TYPES_0200/shell").selectedNode = "F05"
+
         """
-        EDITOR_ID = (
+        textoPosicionF = (
             "wnd[0]/usr/"
             "subSUB0:SAPLMEGUI:0010/" \
             "subSUB3:SAPLMEVIEWS:1100/" \
@@ -85,7 +86,7 @@ def Main_Pruebas4():
             "subTEXTS:SAPLMMTE:0200/" \
             "cntlTEXT_TYPES_0200/shell"
         )
-        EDITOR_ID2 = (
+        EDITOR_ID = (
             "wnd[0]/usr/"
             "subSUB0:SAPLMEGUI:0010/"
             "subSUB3:SAPLMEVIEWS:1100/"
@@ -98,16 +99,18 @@ def Main_Pruebas4():
             "subEDITOR:SAPLMMTE:0201/"
             "cntlTEXT_EDITOR_0201/shellcont/shell"
         )
-        textEditor = session.findById(EDITOR_ID)
-        textEditor2 = session.findById(EDITOR_ID2)
-        print(textEditor.Type)
-        textEditor.selectedNode = "F02"
-        editor = SapTextEditor(session, EDITOR_ID2)
-        texto = editor.get_all_text()
-        if texto :
-            print("El texto no está vacío. Procediendo a borrarlo...")
-            textEditor2.SetUnprotectedTextPart(0,".")
-            print("Texto borrado exitosamente.")
+        
+        for i in range(2, 6):  # F02 a F05
+            textPF = session.findById(textoPosicionF)
+            nodo = f"F0{i}"
+            textPF.selectedNode = nodo
+            editxt = session.findById(EDITOR_ID)
+            editor = SapTextEditor(session, EDITOR_ID)
+            texto = editor.get_all_text()
+            if texto :
+                print("El texto no está vacío. Procediendo a borrarlo...")
+                editxt.SetUnprotectedTextPart(0,".")
+                print("Texto borrado exitosamente.")
     
 
     except Exception as e:
