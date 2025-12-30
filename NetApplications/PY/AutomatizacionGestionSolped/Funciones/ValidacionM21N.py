@@ -383,7 +383,7 @@ def press_GuiButton(session, button_id):
     # Press() es seguro incluso si el botón ya fue usado
     boton.Press()
 
-def set_GuiComboBox_key(session, campo_id, key_value="ZRCR"):
+def SetGuiComboBoxkey(session, campo_id, key_value="ZRCR"):
     """
     Selecciona un valor en un GuiComboBox de SAP GUI usando un ID lógico.
 
@@ -395,7 +395,7 @@ def set_GuiComboBox_key(session, campo_id, key_value="ZRCR"):
     Raises:
         Exception si no se encuentra el GuiComboBox
     Ejemplo de uso:    
-        set_GuiComboBox_key(session, "TOPLINE-BSART", "ZRCR")
+        SetGuiComboBoxkey(session, "TOPLINE-BSART", "ZRCR")
     """
 
     if not campo_id:
@@ -664,15 +664,15 @@ def ventana_abierta(session, titulo_parcial):
 
     return False
 
-def select_GuiTab(session, tab_id):
+def SelectGuiTab(session, tab_id):
     """
     Selecciona una pestaña (GuiTab) del detalle de posición en ME21N.
     Args:
         session: sesión activa de SAP GUI
         tab_id (str): ID lógico de la pestaña (ej: 'TABIDT14')
     Ejemplos:
-        select_GuiTab(session, "TABIDT14")  # Textos
-        select_GuiTab(session, "TABIDT05")  # Entrega
+        SelectGuiTab(session, "TABIDT14")  # Textos
+        SelectGuiTab(session, "TABIDT05")  # Entrega
     """
 
     if not tab_id:
@@ -730,6 +730,7 @@ def buscar_y_clickear(
     Returns:
         bool: True si se encontró e hizo click, False si no.
     """
+    task_name = "HU4_GeneracionOC"
 
     for intento in range(1, intentos + 1):
         try:
@@ -742,7 +743,13 @@ def buscar_y_clickear(
                 pyautogui.click(pos)
                 #pyautogui.press("enter") # Descomentar si se quiere dar enter tras el click
                 if log:
-                    print(f"[INFO] Imagen encontrada y clickeada: {ruta_imagen}")
+                    WriteLog(
+                        mensaje=f"Imagen encontrada y clickeada: {ruta_imagen}",
+                        estado="INFO",
+                        task_name=task_name,
+                        path_log=RUTAS["PathLog"],
+                    )
+                    #print(f"[INFO] Imagen encontrada y clickeada: {ruta_imagen}")
                 return True
 
         except ImageNotFoundException:
@@ -752,14 +759,26 @@ def buscar_y_clickear(
 
         except Exception as e:
             if log:
-                print(f"[ERROR] Error inesperado buscando imagen {ruta_imagen}: {e}")
+                 WriteLog(
+                        mensaje=f"Error inesperado buscando imagen {ruta_imagen}: {e}",
+                        estado="ERROR",
+                        task_name=task_name,
+                        path_log=RUTAS["PathLog"],
+                    )
+                 #print(f"[ERROR] Error inesperado buscando imagen {ruta_imagen}: {e}")
             if not fail_silently:
                 raise
 
         time.sleep(espera)
 
     if log:
-        print(f"[WARNING] Imagen no encontrada tras {intento} intentos: {ruta_imagen}")
+        WriteLog(
+            mensaje=f"Imagen no encontrada tras {intento} intentos: {ruta_imagen}",
+            estado="WARNING",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
+        #print(f"[WARNING] Imagen no encontrada tras {intento} intentos: {ruta_imagen}")
 
     if not fail_silently:
         raise RuntimeError(f"No se encontró la imagen: {ruta_imagen}")
@@ -974,7 +993,7 @@ def obtener_valor(texto: str, contiene: List[str]) -> Optional[str]:
             
     return None
 
-def validar_y_ajustar_solped(session,item=1):
+def ValidarAjustarSolped(session,item=1):
     """
     Cambia los precios de la Solped segun el texto del "Texto pedido" (textPF.selectedNode ="F01")
     borra los textos adicionales que no se utilizan (textPF.selectedNode ="F02"), hasta el F05
@@ -1001,6 +1020,7 @@ def validar_y_ajustar_solped(session,item=1):
             "cntlTEXT_TYPES_0200/shell"
         )
         
+
         EDITOR_ID = (
             "wnd[0]/usr/"
             "subSUB0:SAPLMEGUI:0010/"
@@ -1014,7 +1034,8 @@ def validar_y_ajustar_solped(session,item=1):
             "subEDITOR:SAPLMMTE:0201/"
             "cntlTEXT_EDITOR_0201/shellcont/shell"
         )
-
+        acciones = []
+       
         #Obtiene los valores de los campos de precio en la tabla de posiciones
         for fila in range(item):  #cambiar por item 
             precio = get_GuiTextField_text(session, f"NETPR[10,{fila}]")
@@ -1025,12 +1046,15 @@ def validar_y_ajustar_solped(session,item=1):
             claves = ["VALOR "] # str que busca en el texto 
             preciotexto = obtener_valor(texto, claves)
             preciotexto = normalizar_precio_sap(preciotexto)
-            print( "Precio obtenido desde el texto: ",preciotexto)
+            #print( "Precio obtenido desde el texto: ",preciotexto)
+            acciones.append(f"Precio obtenido desde el texto: {preciotexto}")
             if precio==preciotexto:
-                print(f"Precio coincide en la posicion : {fila+1}0: {precio} == {preciotexto}")
+                #print(f"Precio coincide en la posicion : {fila+1}0: {precio} == {preciotexto}")
+                acciones.append(f"Precio coincide en la posicion : {fila+1}0: {precio} == {preciotexto}")
             else:
                 set_GuiTextField_text(session, f"NETPR[10,{fila}]", preciotexto)
-                print(f"Se mofico posicion :{fila+1}0: {precio} != {preciotexto}")
+                #print(f"Se mofico posicion :{fila+1}0: {precio} != {preciotexto}")
+                acciones.append(f"Se mofico posicion :{fila+1}0: {precio} != {preciotexto}")
                 
             # Realiza los reemplazos en el texto      
             reemplazos = {
@@ -1044,7 +1068,8 @@ def validar_y_ajustar_solped(session,item=1):
                 }
             nuevo_texto, cambios = editor.replace_in_text(texto, reemplazos)
             #print(f"texto modificado {nuevo_texto}")
-            print(f"cambios realizados {cambios}")     
+            #print(f"cambios realizados {cambios}")
+            acciones.append(f"cambios realizados {cambios}")
             editext=session.findById(EDITOR_ID)
             editext.SetUnprotectedTextPart(0,nuevo_texto)
             #Borra los textos de cada editor F02 en adelante 
@@ -1056,19 +1081,32 @@ def validar_y_ajustar_solped(session,item=1):
                 editor = SapTextEditor(session, EDITOR_ID)
                 texto = editor.get_all_text()
                 if texto :
-                    print("El texto no está vacío. Procediendo a borrarlo... :"f"F0{i}")
+                    #print("El texto no esta vacío. Procediendo a borrarlo... :"f"F0{i}")
                     editxt.SetUnprotectedTextPart(0,".")
-                    print("Texto borrado exitosamente.")
+                    acciones.append(f"Texto borrado en F0{i} en {fila+1}0")
+                    
             # Finalmente, presiona el botón abajo siguiente posicion
             press_GuiButton(session, "AUTOTEXT002")
             textPF.selectedNode ="F01"
 
+        return acciones
+
     except Exception as e:
+        #todo: canbiar por log 
         print(f"\nHa ocurrido un error inesperado durante la ejecución: {e}")
         raise
 
-def abrirSolped(session, solped, item=2):
+def AbrirSolped(session, solped, item=2):
     try:
+        """
+        Navega el SAP para abrir una Solped 
+
+
+
+        """
+        print("SOLPED            :",solped)
+        print("POSICIONES        :",item)
+
         esperar_sap_listo(session)
         # Click Variante de Seleccion y selecciona el campo Solicitudes de pedido en la lista
         timeout = time.time() + 25
@@ -1107,8 +1145,6 @@ def abrirSolped(session, solped, item=2):
         print(rf"Error en HU05: {e}", "ERROR")
         raise
 
-
-        
 
 
 def BorrarTextosDesdeSolped(session, solped, item=2):
@@ -1160,8 +1196,7 @@ def BorrarTextosDesdeSolped(session, solped, item=2):
 
         print("Esperando a click en pestana de texto y luego en info.......... ")
         # Seleccionar la pestaña de textos, asegurándonos de que esté visible
-        select_GuiTab(session, "TABIDT14")
-                
+        SelectGuiTab(session, "TABIDT14")  
         time.sleep(1)
         ejecutar_accion_sap(id_documento="click pestaña texto e info ",ruta_vbs=rf".\scriptsVbs\clickptextos.vbs")
         time.sleep(10)
@@ -1338,10 +1373,10 @@ def esperar_sap_listo(session, timeout=10):
 
     raise TimeoutError("SAP GUI no terminó de cargar (session.Busy)")
 
-def cambiar_grupo_compra(session): 
+def CambiarGrupoCompra(session): 
     # Obtener el valor actual de la organización de compra
     obj_orgCompra = get_GuiCTextField_text(session, "EKORG")
-    print(f"Valor de OrgCompra: {obj_orgCompra}")
+    #print(f"Valor de OrgCompra: {obj_orgCompra}")
     condiciones = {
         "OC15": "RCC",
         "OC26": "HAB",
@@ -1355,11 +1390,17 @@ def cambiar_grupo_compra(session):
     
     obj_grupoCompra = condiciones[obj_orgCompra]
 
-    print(obj_grupoCompra)
+
 
     set_GuiCTextField_text(session, "EKGRP", obj_grupoCompra)
+    #print(f"Grupo de compra actualizado a: {obj_grupoCompra}")
+    acciones = []
+    acciones.append(f"Valor de OrgCompra: {obj_orgCompra}")
+    acciones.append(f"Grupo de compra actualizado a: {obj_grupoCompra}")
+    return acciones
 
-    print(f"Grupo de compra actualizado a: {obj_grupoCompra}")
+
+
 
 def normalizar_precio_sap(precio: str) -> int:
     """

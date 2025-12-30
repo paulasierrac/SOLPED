@@ -1,0 +1,46 @@
+INFORME AUTOMATIZACIÓN – MODIFICACIÓN SOLPED / GENERACIÓN OC
+=================================================================
+
+Fecha ejecución   : 30/12/2025 12:46:33
+Usuario ejecución : CGRPA042
+Equipo            : WPRUFABRICC1
+Bot RPA           : Resock
+Proceso           : HU4_GeneracionOC
+
+SOLPED            : 1300139397
+ORDEN DE COMPRA   : None
+Estado final      : EXITOSO
+
+Acciones realizadas:
+ - Valor de OrgCompra: OC15
+ - Grupo de compra actualizado a: RCC
+ - Precio obtenido desde el texto: 27000
+ - Precio coincide en la posicion : 10: 27000 == 27000
+ - cambios realizados 0
+ - Texto borrado en F02 en 10
+ - Precio obtenido desde el texto: 8500
+ - Precio coincide en la posicion : 20: 8500 == 8500
+ - cambios realizados 0
+ - Texto borrado en F02 en 20
+ - Precio obtenido desde el texto: 29000
+ - Precio coincide en la posicion : 30: 29000 == 29000
+ - cambios realizados 1
+ - Texto borrado en F02 en 30
+ - Precio obtenido desde el texto: 21500
+ - Precio coincide en la posicion : 40: 21500 == 21500
+ - cambios realizados 0
+ - Texto borrado en F02 en 40
+ - Precio obtenido desde el texto: 20000
+ - Precio coincide en la posicion : 50: 20000 == 20000
+ - cambios realizados 0
+ - Texto borrado en F02 en 50
+ - Precio obtenido desde el texto: 1200
+ - Precio coincide en la posicion : 60: 1200 == 1200
+ - cambios realizados 0
+ - Texto borrado en F02 en 60
+
+Observaciones:
+Proceso ejecutado sin errores.
+
+=================================================================
+Informe generado automáticamente por RPA.

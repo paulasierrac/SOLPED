@@ -12,11 +12,13 @@ import subprocess
 import time
 import os
 from Config.settings import RUTAS
-from Funciones.ValidacionM21N import select_GuiTab, obtener_numero_oc,set_GuiComboBox_key,cambiar_grupo_compra, validar_y_ajustar_solped,abrirSolped
+from Funciones.ValidacionM21N import SelectGuiTab, obtener_numero_oc,SetGuiComboBoxkey,CambiarGrupoCompra, ValidarAjustarSolped,AbrirSolped
+from Funciones.EscribirInforme import WriteInformeOperacion
 from Funciones.EscribirLog import WriteLog
 from Funciones.GeneralME53N import AbrirTransaccion,procesarTablaME5A
 import traceback
 import pyautogui  # Asegúrate de tener pyautogui instalado
+
 
 def EjecutarHU04(session, archivo):
     
@@ -83,20 +85,21 @@ def EjecutarHU04(session, archivo):
                 #path_log=f"{RUTAS["PathLog"]}StevInforme.txt", # revisar ruta para hacer el informe 
                 
             )
+            acciones = []
             #print(f"procesando solped: {solped} de items: {item_count}")
             AbrirTransaccion(session, "ME21N")
             #navegacion por SAP que permite abrir Solped 
-            abrirSolped(session, solped, item_count)
+            AbrirSolped(session, solped, item_count)
             #se selecciona la clase de docuemnto ZRCR, revisar alcance si es necesario cambiar a otra clase dependiendo de algun criterio
-            set_GuiComboBox_key(session, "TOPLINE-BSART", "ZRCR")
+            SetGuiComboBoxkey(session, "TOPLINE-BSART", "ZRCR")
             #se ingresa a la pestaña  Dat.org. de cabecera, asegurándonos de que esté visible
-            select_GuiTab(session, "TABHDT9") 
-            # Se cambia el grupo de compra dependiendo de la org de compra
-            cambiar_grupo_compra(session)
+            SelectGuiTab(session, "TABHDT9") 
+            # Se cambia el grupo de compra dependiendo de la org de compra, y se guardan acciones
+            acciones.extend(CambiarGrupoCompra(session))
             # Seleccionar la pestaña de textos, asegurándonos de que esté visible
-            select_GuiTab(session, "TABIDT14")
+            SelectGuiTab(session, "TABIDT14")
             # Valores y textos se validan y ajustan 
-            validar_y_ajustar_solped(session, item_count)
+            acciones.extend(ValidarAjustarSolped(session, item_count))
             #***********///////////**************///////////********
             # Se debe remplazar con guardar OC 
             #////////////*******///////////////*******
@@ -110,6 +113,21 @@ def EjecutarHU04(session, archivo):
             #***********///////////**************///////////********  
             
             orden_de_compra = obtener_numero_oc(session)
+
+            
+            ruta = WriteInformeOperacion(
+                    solped=solped,
+                    orden_compra= orden_de_compra,
+                    acciones=acciones,
+                    estado="EXITOSO",
+                    bot_name="Resock",
+                    task_name=task_name,
+                    path_informes=r".\Salida",
+                    observaciones="Proceso ejecutado sin errores."
+            )
+
+            print(f"Informe generado en: {ruta}")
+
             # Después de procesar todas las solpeds y (presumiblemente) guardar la OC.        
             WriteLog(
                 mensaje=f" para la solped : {solped} Se generó la Orden de Compra: {orden_de_compra}",

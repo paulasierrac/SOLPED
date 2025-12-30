@@ -1,0 +1,23 @@
+INFORME AUTOMATIZACIÓN – MODIFICACIÓN SOLPED / GENERACIÓN OC
+=================================================================
+
+Fecha ejecución   : 30/12/2025 10:14:16
+Usuario ejecución : CGRPA042
+Equipo            : WPRUFABRICC1
+Bot RPA           : Resock
+Proceso           : HU4_GeneracionOC
+
+SOLPED            : 1300139397
+ORDEN DE COMPRA   : None
+Estado final      : EXITOSO
+
+Acciones realizadas:
+ - SOLPED 1300139274 – Posición 10 – Texto F02 actualizado
+ - SOLPED 1300139274 – Posición 20 – Texto F03 eliminado
+ - Orden de compra generada correctamente
+
+Observaciones:
+Proceso ejecutado sin errores.
+
+=================================================================
+Informe generado automáticamente por RPA.

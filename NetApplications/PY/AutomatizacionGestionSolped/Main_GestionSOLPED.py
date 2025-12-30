@@ -33,6 +33,7 @@ from Config.settings import RUTAS, SAP_CONFIG
 import traceback
 
 
+
 def Main_GestionSolped():
     try:
         task_name = "Main_GestionSOLPED"

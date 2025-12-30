@@ -1,0 +1,254 @@
+28/12/2025 17:22:28 | ERROR | HU4_GeneracionOC | ERROR GLOBAL en HU04: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None) | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 89, in EjecutarHU04
+    validar_y_ajustar_solped(session, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1011, in validar_y_ajustar_solped
+    editor = SapTextEditor(session, EDITOR_ID)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 37, in __init__
+    self.shell = self._get_shell()
+                 ^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 40, in _get_shell
+    shell = self.session.findById(self.editor_id)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<COMObject <unknown>>", line 2, in findById
+pywintypes.com_error: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None)
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 17:22:28 | ERROR | Main_GestionSOLPED | Error Global en Main: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None) | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Main_GestionSOLPED.py", line 137, in Main_GestionSolped
+    EjecutarHU04(session, archivo)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 89, in EjecutarHU04
+    validar_y_ajustar_solped(session, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1011, in validar_y_ajustar_solped
+    editor = SapTextEditor(session, EDITOR_ID)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 37, in __init__
+    self.shell = self._get_shell()
+                 ^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 40, in _get_shell
+    shell = self.session.findById(self.editor_id)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<COMObject <unknown>>", line 2, in findById
+pywintypes.com_error: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None)
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 17:23:42 | ERROR | AbrirTransaccion | Error en AbrirTransaccion: Sesion SAP no disponible | WPRUFABRICC1 | CGRPA042
+28/12/2025 17:23:52 | ERROR | HU4_GeneracionOC | ERROR GLOBAL en HU04: SAP GUI no terminó de cargar (session.Busy) | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 81, in EjecutarHU04
+    abrirSolped(session, solped, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1059, in abrirSolped
+    esperar_sap_listo(session)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1326, in esperar_sap_listo
+    raise TimeoutError("SAP GUI no terminó de cargar (session.Busy)")
+TimeoutError: SAP GUI no terminó de cargar (session.Busy)
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 17:23:52 | ERROR | Main_GestionSOLPED | Error Global en Main: SAP GUI no terminó de cargar (session.Busy) | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Main_GestionSOLPED.py", line 137, in Main_GestionSolped
+    EjecutarHU04(session, archivo)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 81, in EjecutarHU04
+    abrirSolped(session, solped, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1059, in abrirSolped
+    esperar_sap_listo(session)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1326, in esperar_sap_listo
+    raise TimeoutError("SAP GUI no terminó de cargar (session.Busy)")
+TimeoutError: SAP GUI no terminó de cargar (session.Busy)
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 17:24:27 | ERROR | HU4_GeneracionOC | ERROR GLOBAL en HU04: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None) | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 89, in EjecutarHU04
+    validar_y_ajustar_solped(session, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1011, in validar_y_ajustar_solped
+    editor = SapTextEditor(session, EDITOR_ID)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 37, in __init__
+    self.shell = self._get_shell()
+                 ^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 40, in _get_shell
+    shell = self.session.findById(self.editor_id)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<COMObject <unknown>>", line 2, in findById
+pywintypes.com_error: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None)
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 17:24:27 | ERROR | Main_GestionSOLPED | Error Global en Main: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None) | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Main_GestionSOLPED.py", line 137, in Main_GestionSolped
+    EjecutarHU04(session, archivo)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 89, in EjecutarHU04
+    validar_y_ajustar_solped(session, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1011, in validar_y_ajustar_solped
+    editor = SapTextEditor(session, EDITOR_ID)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 37, in __init__
+    self.shell = self._get_shell()
+                 ^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 40, in _get_shell
+    shell = self.session.findById(self.editor_id)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<COMObject <unknown>>", line 2, in findById
+pywintypes.com_error: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None)
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 17:27:22 | ERROR | HU4_GeneracionOC | ERROR GLOBAL en HU04: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None) | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 89, in EjecutarHU04
+    validar_y_ajustar_solped(session, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1011, in validar_y_ajustar_solped
+    editor = SapTextEditor(session, EDITOR_ID)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 37, in __init__
+    self.shell = self._get_shell()
+                 ^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 40, in _get_shell
+    shell = self.session.findById(self.editor_id)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<COMObject <unknown>>", line 2, in findById
+pywintypes.com_error: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None)
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 17:27:22 | ERROR | Main_GestionSOLPED | Error Global en Main: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None) | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Main_GestionSOLPED.py", line 137, in Main_GestionSolped
+    EjecutarHU04(session, archivo)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 89, in EjecutarHU04
+    validar_y_ajustar_solped(session, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1011, in validar_y_ajustar_solped
+    editor = SapTextEditor(session, EDITOR_ID)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 37, in __init__
+    self.shell = self._get_shell()
+                 ^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 40, in _get_shell
+    shell = self.session.findById(self.editor_id)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<COMObject <unknown>>", line 2, in findById
+pywintypes.com_error: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None)
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 17:28:31 | ERROR | HU4_GeneracionOC | ERROR GLOBAL en HU04: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None) | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 89, in EjecutarHU04
+    validar_y_ajustar_solped(session, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1011, in validar_y_ajustar_solped
+    editor = SapTextEditor(session, EDITOR_ID)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 37, in __init__
+    self.shell = self._get_shell()
+                 ^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 40, in _get_shell
+    shell = self.session.findById(self.editor_id)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<COMObject <unknown>>", line 2, in findById
+pywintypes.com_error: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None)
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 17:28:31 | ERROR | Main_GestionSOLPED | Error Global en Main: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None) | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Main_GestionSOLPED.py", line 137, in Main_GestionSolped
+    EjecutarHU04(session, archivo)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 89, in EjecutarHU04
+    validar_y_ajustar_solped(session, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1011, in validar_y_ajustar_solped
+    editor = SapTextEditor(session, EDITOR_ID)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 37, in __init__
+    self.shell = self._get_shell()
+                 ^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 40, in _get_shell
+    shell = self.session.findById(self.editor_id)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<COMObject <unknown>>", line 2, in findById
+pywintypes.com_error: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None)
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 17:31:50 | ERROR | AbrirTransaccion | Error en AbrirTransaccion: Sesion SAP no disponible | WPRUFABRICC1 | CGRPA042
+28/12/2025 17:32:00 | ERROR | HU4_GeneracionOC | ERROR GLOBAL en HU04: SAP GUI no terminó de cargar (session.Busy) | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 81, in EjecutarHU04
+    abrirSolped(session, solped, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1059, in abrirSolped
+    esperar_sap_listo(session)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1326, in esperar_sap_listo
+    raise TimeoutError("SAP GUI no terminó de cargar (session.Busy)")
+TimeoutError: SAP GUI no terminó de cargar (session.Busy)
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 17:32:00 | ERROR | Main_GestionSOLPED | Error Global en Main: SAP GUI no terminó de cargar (session.Busy) | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Main_GestionSOLPED.py", line 137, in Main_GestionSolped
+    EjecutarHU04(session, archivo)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 81, in EjecutarHU04
+    abrirSolped(session, solped, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1059, in abrirSolped
+    esperar_sap_listo(session)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1326, in esperar_sap_listo
+    raise TimeoutError("SAP GUI no terminó de cargar (session.Busy)")
+TimeoutError: SAP GUI no terminó de cargar (session.Busy)
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 17:33:02 | ERROR | HU4_GeneracionOC | ERROR GLOBAL en HU04: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None) | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 91, in EjecutarHU04
+    validar_y_ajustar_solped(session, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1043, in validar_y_ajustar_solped
+    editxt = session.findById(EDITOR_ID)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<COMObject <unknown>>", line 2, in findById
+pywintypes.com_error: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None)
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 17:33:02 | ERROR | Main_GestionSOLPED | Error Global en Main: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None) | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Main_GestionSOLPED.py", line 137, in Main_GestionSolped
+    EjecutarHU04(session, archivo)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 91, in EjecutarHU04
+    validar_y_ajustar_solped(session, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1043, in validar_y_ajustar_solped
+    editxt = session.findById(EDITOR_ID)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<COMObject <unknown>>", line 2, in findById
+pywintypes.com_error: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None)
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 17:38:27 | ERROR | HU4_GeneracionOC | ERROR GLOBAL en HU04: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None) | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 91, in EjecutarHU04
+    validar_y_ajustar_solped(session, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1043, in validar_y_ajustar_solped
+    editxt = session.findById(EDITOR_ID)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<COMObject <unknown>>", line 2, in findById
+pywintypes.com_error: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None)
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 17:38:27 | ERROR | Main_GestionSOLPED | Error Global en Main: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None) | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Main_GestionSOLPED.py", line 137, in Main_GestionSolped
+    EjecutarHU04(session, archivo)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 91, in EjecutarHU04
+    validar_y_ajustar_solped(session, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1043, in validar_y_ajustar_solped
+    editxt = session.findById(EDITOR_ID)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<COMObject <unknown>>", line 2, in findById
+pywintypes.com_error: (-2147352567, 'Exception occurred.', (619, 'SAP Frontend Server', 'The control could not be found by id.', 'C:\\Program Files (x86)\\SAP\\FrontEnd\\SapGui\\sapfront.HLP', 393215, 0), None)
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 18:33:20 | ERROR | HU4_GeneracionOC | ERROR GLOBAL en HU04: No se encontró GuiTextField: NETPR[10,15] | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 91, in EjecutarHU04
+    validar_y_ajustar_solped(session, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1009, in validar_y_ajustar_solped
+    precio = get_GuiTextField_text(session, f"NETPR[10,{fila}]")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 582, in get_GuiTextField_text
+    raise Exception(f"No se encontró GuiTextField: {campo_posicion}")
+Exception: No se encontró GuiTextField: NETPR[10,15]
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 18:33:20 | ERROR | Main_GestionSOLPED | Error Global en Main: No se encontró GuiTextField: NETPR[10,15] | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Main_GestionSOLPED.py", line 137, in Main_GestionSolped
+    EjecutarHU04(session, archivo)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 91, in EjecutarHU04
+    validar_y_ajustar_solped(session, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1009, in validar_y_ajustar_solped
+    precio = get_GuiTextField_text(session, f"NETPR[10,{fila}]")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 582, in get_GuiTextField_text
+    raise Exception(f"No se encontró GuiTextField: {campo_posicion}")
+Exception: No se encontró GuiTextField: NETPR[10,15]
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 18:42:24 | ERROR | HU4_GeneracionOC | ERROR GLOBAL en HU04: No se encontró GuiTextField: NETPR[10,15] | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 91, in EjecutarHU04
+    validar_y_ajustar_solped(session, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1009, in validar_y_ajustar_solped
+    precio = get_GuiTextField_text(session, f"NETPR[10,{fila}]")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 582, in get_GuiTextField_text
+    raise Exception(f"No se encontró GuiTextField: {campo_posicion}")
+Exception: No se encontró GuiTextField: NETPR[10,15]
+ | WPRUFABRICC1 | CGRPA042
+28/12/2025 18:42:24 | ERROR | Main_GestionSOLPED | Error Global en Main: No se encontró GuiTextField: NETPR[10,15] | Traceback (most recent call last):
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Main_GestionSOLPED.py", line 137, in Main_GestionSolped
+    EjecutarHU04(session, archivo)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\HU\HU04_GeneracionOC.py", line 91, in EjecutarHU04
+    validar_y_ajustar_solped(session, item_count)
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 1009, in validar_y_ajustar_solped
+    precio = get_GuiTextField_text(session, f"NETPR[10,{fila}]")
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Funciones\ValidacionM21N.py", line 582, in get_GuiTextField_text
+    raise Exception(f"No se encontró GuiTextField: {campo_posicion}")
+Exception: No se encontró GuiTextField: NETPR[10,15]
+ | WPRUFABRICC1 | CGRPA042
