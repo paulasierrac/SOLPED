@@ -33,6 +33,7 @@ from Funciones.GeneralME53N import (
     GenerarReporteAttachments,
     ParsearTablaAttachments,
     convertir_txt_a_excel,
+    EnviarNotificacionCorreo,
 )
 from Config.settings import RUTAS
 
@@ -56,10 +57,6 @@ def EjecutarHU03(session, nombre_archivo):
             path_log=RUTAS["PathLog"],
         )
 
-        # Ruta del archivo a convertir
-
-        ruta = rf"{RUTAS["PathInsumos"]}\expSolped03.txt"
-        convertir_txt_a_excel(ruta)
         # Traer SAP al frente
         TraerSAPAlFrente_Opcion()
 
@@ -822,392 +819,392 @@ def EjecutarHU03(session, nombre_archivo):
 
         print("\n")
 
-        # ========================================================
-        # ENVIAR REPORTE FINAL GENERAL A NETAPPLICATIONS
-        # ========================================================
-        if solpeds_con_problemas:
-            print(f"\n{'='*80}")
-            if MODO_DESARROLLO:
-                print(f"📧 GENERANDO REPORTE FINAL CONSOLIDADO (MODO DESARROLLO)")
-            else:
-                print(f"📧 GENERANDO REPORTE FINAL CONSOLIDADO")
-            print(f"{'='*80}")
+        #         # ========================================================
+        #         # ENVIAR REPORTE FINAL GENERAL A NETAPPLICATIONS
+        #         # ========================================================
+        #         if solpeds_con_problemas:
+        #             print(f"\n{'='*80}")
+        #             if MODO_DESARROLLO:
+        #                 print(f"📧 GENERANDO REPORTE FINAL CONSOLIDADO (MODO DESARROLLO)")
+        #             else:
+        #                 print(f"📧 GENERANDO REPORTE FINAL CONSOLIDADO")
+        #             print(f"{'='*80}")
 
-            # Construir reporte consolidado
-            reporte_final = f"REPORTE CONSOLIDADO - VALIDACIÓN ME53N\n"
-            reporte_final += f"Fecha: {time.strftime('%Y-%m-%d %H:%M:%S')}\n"
-            reporte_final += f"Archivo procesado: {nombre_archivo}\n"
+        #             # Construir reporte consolidado
+        #             reporte_final = f"REPORTE CONSOLIDADO - VALIDACIÓN ME53N\n"
+        #             reporte_final += f"Fecha: {time.strftime('%Y-%m-%d %H:%M:%S')}\n"
+        #             reporte_final += f"Archivo procesado: {nombre_archivo}\n"
 
-            if MODO_DESARROLLO:
-                reporte_final += f"\n{'='*60}\n"
-                reporte_final += f"⚠️ MODO DESARROLLO ACTIVO\n"
-                reporte_final += f"Este es un correo de prueba.\n"
-                reporte_final += (
-                    f"En producción se enviaría a los destinatarios reales.\n"
-                )
-                reporte_final += f"{'='*60}\n"
+        #             if MODO_DESARROLLO:
+        #                 reporte_final += f"\n{'='*60}\n"
+        #                 reporte_final += f"⚠️ MODO DESARROLLO ACTIVO\n"
+        #                 reporte_final += f"Este es un correo de prueba.\n"
+        #                 reporte_final += (
+        #                     f"En producción se enviaría a los destinatarios reales.\n"
+        #                 )
+        #                 reporte_final += f"{'='*60}\n"
 
-            reporte_final += f"\n{'='*60}\n"
-            reporte_final += f"RESUMEN GENERAL:\n"
-            reporte_final += f"{'='*60}\n"
-            reporte_final += (
-                f"Total SOLPEDs procesadas: {contadores['total_solpeds']}\n"
-            )
-            reporte_final += f"SOLPEDs con problemas: {len(solpeds_con_problemas)}\n"
-            reporte_final += f"SOLPEDs exitosas: {contadores['procesadas_exitosamente'] - len(solpeds_con_problemas)}\n"
-            reporte_final += (
-                f"Total items procesados: {contadores['items_procesados']}\n"
-            )
-            reporte_final += f"Items validados: {contadores['items_validados']}\n"
-            reporte_final += (
-                f"Items para verificar: {contadores['items_verificar_manual']}\n"
-            )
-            reporte_final += f"Items sin texto: {contadores['items_sin_texto']}\n"
-            reporte_final += (
-                f"Notificaciones enviadas: {contadores['notificaciones_enviadas']}\n"
-            )
-            reporte_final += (
-                f"Notificaciones fallidas: {contadores['notificaciones_fallidas']}\n\n"
-            )
+        #             reporte_final += f"\n{'='*60}\n"
+        #             reporte_final += f"RESUMEN GENERAL:\n"
+        #             reporte_final += f"{'='*60}\n"
+        #             reporte_final += (
+        #                 f"Total SOLPEDs procesadas: {contadores['total_solpeds']}\n"
+        #             )
+        #             reporte_final += f"SOLPEDs con problemas: {len(solpeds_con_problemas)}\n"
+        #             reporte_final += f"SOLPEDs exitosas: {contadores['procesadas_exitosamente'] - len(solpeds_con_problemas)}\n"
+        #             reporte_final += (
+        #                 f"Total items procesados: {contadores['items_procesados']}\n"
+        #             )
+        #             reporte_final += f"Items validados: {contadores['items_validados']}\n"
+        #             reporte_final += (
+        #                 f"Items para verificar: {contadores['items_verificar_manual']}\n"
+        #             )
+        #             reporte_final += f"Items sin texto: {contadores['items_sin_texto']}\n"
+        #             reporte_final += (
+        #                 f"Notificaciones enviadas: {contadores['notificaciones_enviadas']}\n"
+        #             )
+        #             reporte_final += (
+        #                 f"Notificaciones fallidas: {contadores['notificaciones_fallidas']}\n\n"
+        #             )
 
-            reporte_final += f"{'='*60}\n"
-            reporte_final += f"DETALLE DE SOLPEDS CON PROBLEMAS:\n"
-            reporte_final += f"{'='*60}\n\n"
+        #             reporte_final += f"{'='*60}\n"
+        #             reporte_final += f"DETALLE DE SOLPEDS CON PROBLEMAS:\n"
+        #             reporte_final += f"{'='*60}\n\n"
 
-            for idx, solped_info in enumerate(solpeds_con_problemas, 1):
-                reporte_final += f"\n{idx}. SOLPED: {solped_info['solped']}\n"
-                reporte_final += f"   Estado: {solped_info['estado']}\n"
-                reporte_final += f"   Items Total: {solped_info['items_total']}\n"
-                reporte_final += f"   Items Validados: {solped_info['items_ok']}\n"
-                reporte_final += (
-                    f"   Items Requieren Revisión: {solped_info['items_revisar']}\n"
-                )
-                reporte_final += (
-                    f"   Items Sin Texto: {solped_info['items_sin_texto']}\n"
-                )
+        #             for idx, solped_info in enumerate(solpeds_con_problemas, 1):
+        #                 reporte_final += f"\n{idx}. SOLPED: {solped_info['solped']}\n"
+        #                 reporte_final += f"   Estado: {solped_info['estado']}\n"
+        #                 reporte_final += f"   Items Total: {solped_info['items_total']}\n"
+        #                 reporte_final += f"   Items Validados: {solped_info['items_ok']}\n"
+        #                 reporte_final += (
+        #                     f"   Items Requieren Revisión: {solped_info['items_revisar']}\n"
+        #                 )
+        #                 reporte_final += (
+        #                     f"   Items Sin Texto: {solped_info['items_sin_texto']}\n"
+        #                 )
 
-                if solped_info["responsables"]:
-                    if MODO_DESARROLLO:
-                        reporte_final += f"   Responsables (no notificados - modo desarrollo): {', '.join(solped_info['responsables'])}\n"
-                    else:
-                        reporte_final += f"   Responsables notificados: {', '.join(solped_info['responsables'])}\n"
-                else:
-                    reporte_final += f"   ⚠️ Sin responsable identificado\n"
+        #                 if solped_info["responsables"]:
+        #                     if MODO_DESARROLLO:
+        #                         reporte_final += f"   Responsables (no notificados - modo desarrollo): {', '.join(solped_info['responsables'])}\n"
+        #                     else:
+        #                         reporte_final += f"   Responsables notificados: {', '.join(solped_info['responsables'])}\n"
+        #                 else:
+        #                     reporte_final += f"   ⚠️ Sin responsable identificado\n"
 
-                reporte_final += f"\n   DETALLE DE ITEMS:\n"
-                reporte_final += "".join(solped_info["detalle"])
-                reporte_final += f"\n   {'-'*60}\n"
+        #                 reporte_final += f"\n   DETALLE DE ITEMS:\n"
+        #                 reporte_final += "".join(solped_info["detalle"])
+        #                 reporte_final += f"\n   {'-'*60}\n"
 
-            # Enviar correo consolidado a NetApplications
-            try:
-                from Funciones.GeneralME53N import EnviarCorreoPersonalizado
+        #             # Enviar correo consolidado a NetApplications
+        #             try:
+        #                 from Funciones.GeneralME53N import EnviarCorreoPersonalizado
 
-                if MODO_DESARROLLO:
-                    asunto_final = f"[DESARROLLO] 📊 Reporte Consolidado - {len(solpeds_con_problemas)} SOLPEDs requieren atención"
-                else:
-                    asunto_final = f"📊 Reporte Consolidado Validación ME53N - {len(solpeds_con_problemas)} SOLPEDs"
+        #                 if MODO_DESARROLLO:
+        #                     asunto_final = f"[DESARROLLO] 📊 Reporte Consolidado - {len(solpeds_con_problemas)} SOLPEDs requieren atención"
+        #                 else:
+        #                     asunto_final = f"📊 Reporte Consolidado Validación ME53N - {len(solpeds_con_problemas)} SOLPEDs"
 
-                cuerpo_final = f"""
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-</head>
-<body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-    <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 20px;">
-        <tr>
-            <td align="center">
-                <table width="700" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
-                """
+        #                 cuerpo_final = f"""
+        # <!DOCTYPE html>
+        # <html>
+        # <head>
+        #     <meta charset="UTF-8">
+        #     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        # </head>
+        # <body style="margin: 0; padding: 0; background-color: #f4f4f4; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        #     <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f4f4f4; padding: 20px;">
+        #         <tr>
+        #             <td align="center">
+        #                 <table width="700" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 8px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        #                 """
 
-                # Banner de modo desarrollo
-                if MODO_DESARROLLO:
-                    cuerpo_final += f"""
-                    <!-- Banner Desarrollo -->
-                    <tr>
-                        <td style="background-color: #fff3cd; border-left: 5px solid #ffc107; padding: 20px 40px;">
-                            <table width="100%" cellpadding="0" cellspacing="0">
-                                <tr>
-                                    <td width="50">
-                                        <div style="font-size: 36px;">⚠️</div>
-                                    </td>
-                                    <td>
-                                        <h3 style="margin: 0 0 5px 0; color: #856404; font-size: 18px;">MODO DESARROLLO</h3>
-                                        <p style="margin: 0; color: #856404; font-size: 14px;">
-                                            Este es un correo de prueba. Los destinatarios reales NO fueron notificados.
-                                        </p>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    """
+        #                 # Banner de modo desarrollo
+        #                 if MODO_DESARROLLO:
+        #                     cuerpo_final += f"""
+        #                     <!-- Banner Desarrollo -->
+        #                     <tr>
+        #                         <td style="background-color: #fff3cd; border-left: 5px solid #ffc107; padding: 20px 40px;">
+        #                             <table width="100%" cellpadding="0" cellspacing="0">
+        #                                 <tr>
+        #                                     <td width="50">
+        #                                         <div style="font-size: 36px;">⚠️</div>
+        #                                     </td>
+        #                                     <td>
+        #                                         <h3 style="margin: 0 0 5px 0; color: #856404; font-size: 18px;">MODO DESARROLLO</h3>
+        #                                         <p style="margin: 0; color: #856404; font-size: 14px;">
+        #                                             Este es un correo de prueba. Los destinatarios reales NO fueron notificados.
+        #                                         </p>
+        #                                     </td>
+        #                                 </tr>
+        #                             </table>
+        #                         </td>
+        #                     </tr>
+        #                     """
 
-                cuerpo_final += f"""
-                    <!-- Header -->
-                    <tr>
-                        <td style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); padding: 40px 40px 30px 40px;">
-                            <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 600; text-align: center;">
-                                📊 Reporte Consolidado
-                            </h1>
-                            <p style="margin: 10px 0 0 0; color: #ecf0f1; font-size: 16px; text-align: center; opacity: 0.95;">
-                                Validación ME53N - {time.strftime('%d/%m/%Y %H:%M')}
-                            </p>
-                        </td>
-                    </tr>
-                    
-                    <!-- Resumen Ejecutivo -->
-                    <tr>
-                        <td style="padding: 35px 40px 25px 40px;">
-                            <h2 style="margin: 0 0 20px 0; color: #2c3e50; font-size: 22px; border-bottom: 3px solid #3498db; padding-bottom: 10px;">
-                                Resumen Ejecutivo
-                            </h2>
-                            
-                            <!-- Estadísticas en Grid -->
-                            <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 25px;">
-                                <tr>
-                                    <!-- Total Procesadas -->
-                                    <td width="33%" style="padding: 20px 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; text-align: center;">
-                                        <div style="color: #ffffff; font-size: 38px; font-weight: bold; margin-bottom: 8px;">
-                                            {contadores['total_solpeds']}
-                                        </div>
-                                        <div style="color: #ffffff; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">
-                                            SOLPEDs<br>Procesadas
-                                        </div>
-                                    </td>
-                                    
-                                    <td width="2%"></td>
-                                    
-                                    <!-- Con Problemas -->
-                                    <td width="33%" style="padding: 20px 15px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 8px; text-align: center;">
-                                        <div style="color: #ffffff; font-size: 38px; font-weight: bold; margin-bottom: 8px;">
-                                            {len(solpeds_con_problemas)}
-                                        </div>
-                                        <div style="color: #ffffff; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">
-                                            Requieren<br>Atención
-                                        </div>
-                                    </td>
-                                    
-                                    <td width="2%"></td>
-                                    
-                                    <!-- Items Validados -->
-                                    <td width="33%" style="padding: 20px 15px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 8px; text-align: center;">
-                                        <div style="color: #ffffff; font-size: 38px; font-weight: bold; margin-bottom: 8px;">
-                                            {contadores['items_validados']}
-                                        </div>
-                                        <div style="color: #ffffff; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">
-                                            Items<br>Validados
-                                        </div>
-                                    </td>
-                                </tr>
-                            </table>
-                            
-                            <!-- Métricas Adicionales -->
-                            <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8f9fa; border-radius: 8px; padding: 20px;">
-                                <tr>
-                                    <td width="50%" style="padding: 10px; border-right: 1px solid #dee2e6;">
-                                        <div style="color: #6c757d; font-size: 13px; margin-bottom: 5px;">Items Procesados</div>
-                                        <div style="color: #2c3e50; font-size: 24px; font-weight: bold;">{contadores['items_procesados']}</div>
-                                    </td>
-                                    <td width="50%" style="padding: 10px;">
-                                        <div style="color: #6c757d; font-size: 13px; margin-bottom: 5px;">Items Verificar Manual</div>
-                                        <div style="color: #e74c3c; font-size: 24px; font-weight: bold;">{contadores['items_verificar_manual']}</div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td width="50%" style="padding: 10px; border-right: 1px solid #dee2e6; border-top: 1px solid #dee2e6;">
-                                        <div style="color: #6c757d; font-size: 13px; margin-bottom: 5px;">Items Sin Texto</div>
-                                        <div style="color: #f39c12; font-size: 24px; font-weight: bold;">{contadores['items_sin_texto']}</div>
-                                    </td>
-                                    <td width="50%" style="padding: 10px; border-top: 1px solid #dee2e6;">
-                                        <div style="color: #6c757d; font-size: 13px; margin-bottom: 5px;">Notificaciones Enviadas</div>
-                                        <div style="color: #27ae60; font-size: 24px; font-weight: bold;">{contadores['notificaciones_enviadas']}</div>
-                                    </td>
-                                </tr>
-                            </table>
-                        </td>
-                    </tr>
-                    
-                    <!-- SOLPEDs con Problemas -->
-                    <tr>
-                        <td style="padding: 0 40px 35px 40px;">
-                            <h2 style="margin: 0 0 20px 0; color: #2c3e50; font-size: 22px; border-bottom: 3px solid #e74c3c; padding-bottom: 10px;">
-                                🚨 SOLPEDs que Requieren Atención
-                            </h2>
-                """
+        #                 cuerpo_final += f"""
+        #                     <!-- Header -->
+        #                     <tr>
+        #                         <td style="background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%); padding: 40px 40px 30px 40px;">
+        #                             <h1 style="margin: 0; color: #ffffff; font-size: 32px; font-weight: 600; text-align: center;">
+        #                                 📊 Reporte Consolidado
+        #                             </h1>
+        #                             <p style="margin: 10px 0 0 0; color: #ecf0f1; font-size: 16px; text-align: center; opacity: 0.95;">
+        #                                 Validación ME53N - {time.strftime('%d/%m/%Y %H:%M')}
+        #                             </p>
+        #                         </td>
+        #                     </tr>
 
-                # Lista de SOLPEDs con problemas
-                for idx, solped_info in enumerate(solpeds_con_problemas, 1):
-                    # Determinar color según severidad
-                    if solped_info["items_revisar"] > solped_info["items_ok"]:
-                        color_borde = "#e74c3c"  # Rojo - Más problemas
-                        color_fondo = "#ffebee"
-                    elif solped_info["items_sin_texto"] > 0:
-                        color_borde = "#f39c12"  # Naranja - Advertencia
-                        color_fondo = "#fff3e0"
-                    else:
-                        color_borde = "#3498db"  # Azul - Info
-                        color_fondo = "#e3f2fd"
+        #                     <!-- Resumen Ejecutivo -->
+        #                     <tr>
+        #                         <td style="padding: 35px 40px 25px 40px;">
+        #                             <h2 style="margin: 0 0 20px 0; color: #2c3e50; font-size: 22px; border-bottom: 3px solid #3498db; padding-bottom: 10px;">
+        #                                 Resumen Ejecutivo
+        #                             </h2>
 
-                    cuerpo_final += f"""
-                            <!-- SOLPED {idx} -->
-                            <div style="background-color: {color_fondo}; border-left: 4px solid {color_borde}; border-radius: 6px; padding: 20px; margin-bottom: 20px;">
-                                <table width="100%" cellpadding="0" cellspacing="0">
-                                    <tr>
-                                        <td>
-                                            <div style="display: flex; align-items: center; margin-bottom: 12px;">
-                                                <span style="background-color: {color_borde}; color: #ffffff; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-right: 12px;">
-                                                    #{idx}
-                                                </span>
-                                                <span style="color: #2c3e50; font-size: 20px; font-weight: bold;">
-                                                    SOLPED {solped_info['solped']}
-                                                </span>
-                                            </div>
-                                        </td>
-                                        <td align="right">
-                                            <span style="background-color: {color_borde}; color: #ffffff; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;">
-                                                {solped_info['estado']}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                </table>
-                                
-                                <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 15px;">
-                                    <tr>
-                                        <td width="25%" style="padding: 8px 0;">
-                                            <div style="color: #7f8c8d; font-size: 12px; margin-bottom: 4px;">Total Items</div>
-                                            <div style="color: #2c3e50; font-size: 18px; font-weight: bold;">{solped_info['items_total']}</div>
-                                        </td>
-                                        <td width="25%" style="padding: 8px 0;">
-                                            <div style="color: #7f8c8d; font-size: 12px; margin-bottom: 4px;">✓ Validados</div>
-                                            <div style="color: #27ae60; font-size: 18px; font-weight: bold;">{solped_info['items_ok']}</div>
-                                        </td>
-                                        <td width="25%" style="padding: 8px 0;">
-                                            <div style="color: #7f8c8d; font-size: 12px; margin-bottom: 4px;">⚠ Revisar</div>
-                                            <div style="color: #e74c3c; font-size: 18px; font-weight: bold;">{solped_info['items_revisar']}</div>
-                                        </td>
-                                        <td width="25%" style="padding: 8px 0;">
-                                            <div style="color: #7f8c8d; font-size: 12px; margin-bottom: 4px;">Sin Texto</div>
-                                            <div style="color: #f39c12; font-size: 18px; font-weight: bold;">{solped_info['items_sin_texto']}</div>
-                                        </td>
-                                    </tr>
-                                </table>
-                                
-                                <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1);">
-                    """
+        #                             <!-- Estadísticas en Grid -->
+        #                             <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 25px;">
+        #                                 <tr>
+        #                                     <!-- Total Procesadas -->
+        #                                     <td width="33%" style="padding: 20px 15px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; text-align: center;">
+        #                                         <div style="color: #ffffff; font-size: 38px; font-weight: bold; margin-bottom: 8px;">
+        #                                             {contadores['total_solpeds']}
+        #                                         </div>
+        #                                         <div style="color: #ffffff; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">
+        #                                             SOLPEDs<br>Procesadas
+        #                                         </div>
+        #                                     </td>
 
-                    if solped_info["responsables"]:
-                        responsables_str = ", ".join(solped_info["responsables"])
-                        if MODO_DESARROLLO:
-                            cuerpo_final += f"""
-                                    <div style="color: #856404; font-size: 13px;">
-                                        <strong>⚠️ Responsable (no notificado - desarrollo):</strong><br>
-                                        <span style="font-family: monospace; background-color: rgba(255,255,255,0.7); padding: 4px 8px; border-radius: 3px; display: inline-block; margin-top: 5px;">
-                                            {responsables_str}
-                                        </span>
-                                    </div>
-                            """
-                        else:
-                            cuerpo_final += f"""
-                                    <div style="color: #27ae60; font-size: 13px;">
-                                        <strong>✓ Notificado a:</strong> <span style="font-family: monospace;">{responsables_str}</span>
-                                    </div>
-                            """
-                    else:
-                        cuerpo_final += f"""
-                                    <div style="color: #e74c3c; font-size: 13px;">
-                                        <strong>⚠️ Sin responsable identificado</strong> - Se requiere asignación manual
-                                    </div>
-                        """
+        #                                     <td width="2%"></td>
 
-                    cuerpo_final += """
-                                </div>
-                            </div>
-                    """
+        #                                     <!-- Con Problemas -->
+        #                                     <td width="33%" style="padding: 20px 15px; background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); border-radius: 8px; text-align: center;">
+        #                                         <div style="color: #ffffff; font-size: 38px; font-weight: bold; margin-bottom: 8px;">
+        #                                             {len(solpeds_con_problemas)}
+        #                                         </div>
+        #                                         <div style="color: #ffffff; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">
+        #                                             Requieren<br>Atención
+        #                                         </div>
+        #                                     </td>
 
-                cuerpo_final += f"""
-                        </td>
-                    </tr>
-                    
-                    <!-- Información del Adjunto -->
-                    <tr>
-                        <td style="padding: 0 40px 35px 40px;">
-                            <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; padding: 25px; text-align: center;">
-                                <div style="font-size: 48px; margin-bottom: 10px;">📎</div>
-                                <h3 style="margin: 0 0 10px 0; color: #ffffff; font-size: 18px;">Reporte Detallado Adjunto</h3>
-                                <p style="margin: 0; color: #ffffff; font-size: 14px; opacity: 0.9;">
-                                    El archivo adjunto contiene información detallada de cada item, validaciones y observaciones completas.
-                                </p>
-                            </div>
-                        </td>
-                    </tr>
-                    
-                    <!-- Footer -->
-                    <tr>
-                        <td style="background-color: #2c3e50; padding: 30px 40px; text-align: center;">
-                            <p style="margin: 0 0 10px 0; color: #ecf0f1; font-size: 14px;">
-                                <strong>Sistema de Validación Automática</strong>
-                            </p>
-                            <p style="margin: 0; color: #95a5a6; font-size: 12px;">
-                                © {time.strftime('%Y')} Colsubsidio | NetApplications<br>
-                                Este correo fue generado automáticamente
-                            </p>
-                        </td>
-                    </tr>
-                    
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>
-                """
+        #                                     <td width="2%"></td>
 
-                # Guardar reporte detallado en archivo
-                path_reporte_final = f"{RUTAS['PathReportes']}\\Reporte_Consolidado_{time.strftime('%Y%m%d_%H%M%S')}.txt"
-                with open(path_reporte_final, "w", encoding="utf-8") as f:
-                    f.write(reporte_final)
+        #                                     <!-- Items Validados -->
+        #                                     <td width="33%" style="padding: 20px 15px; background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); border-radius: 8px; text-align: center;">
+        #                                         <div style="color: #ffffff; font-size: 38px; font-weight: bold; margin-bottom: 8px;">
+        #                                             {contadores['items_validados']}
+        #                                         </div>
+        #                                         <div style="color: #ffffff; font-size: 13px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.9;">
+        #                                             Items<br>Validados
+        #                                         </div>
+        #                                     </td>
+        #                                 </tr>
+        #                             </table>
 
-                print(f"Reporte consolidado guardado: {path_reporte_final}")
+        #                             <!-- Métricas Adicionales -->
+        #                             <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #f8f9fa; border-radius: 8px; padding: 20px;">
+        #                                 <tr>
+        #                                     <td width="50%" style="padding: 10px; border-right: 1px solid #dee2e6;">
+        #                                         <div style="color: #6c757d; font-size: 13px; margin-bottom: 5px;">Items Procesados</div>
+        #                                         <div style="color: #2c3e50; font-size: 24px; font-weight: bold;">{contadores['items_procesados']}</div>
+        #                                     </td>
+        #                                     <td width="50%" style="padding: 10px;">
+        #                                         <div style="color: #6c757d; font-size: 13px; margin-bottom: 5px;">Items Verificar Manual</div>
+        #                                         <div style="color: #e74c3c; font-size: 24px; font-weight: bold;">{contadores['items_verificar_manual']}</div>
+        #                                     </td>
+        #                                 </tr>
+        #                                 <tr>
+        #                                     <td width="50%" style="padding: 10px; border-right: 1px solid #dee2e6; border-top: 1px solid #dee2e6;">
+        #                                         <div style="color: #6c757d; font-size: 13px; margin-bottom: 5px;">Items Sin Texto</div>
+        #                                         <div style="color: #f39c12; font-size: 24px; font-weight: bold;">{contadores['items_sin_texto']}</div>
+        #                                     </td>
+        #                                     <td width="50%" style="padding: 10px; border-top: 1px solid #dee2e6;">
+        #                                         <div style="color: #6c757d; font-size: 13px; margin-bottom: 5px;">Notificaciones Enviadas</div>
+        #                                         <div style="color: #27ae60; font-size: 24px; font-weight: bold;">{contadores['notificaciones_enviadas']}</div>
+        #                                     </td>
+        #                                 </tr>
+        #                             </table>
+        #                         </td>
+        #                     </tr>
 
-                # Enviar correo
-                exito_final = EnviarCorreoPersonalizado(
-                    destinatario=(
-                        EMAIL_DESARROLLO
-                        if MODO_DESARROLLO
-                        else "paula.sierra@netapplications.com.co"
-                    ),
-                    asunto=asunto_final,
-                    cuerpo=cuerpo_final,
-                    task_name=task_name,
-                    adjuntos=[path_reporte_final],
-                )
+        #                     <!-- SOLPEDs con Problemas -->
+        #                     <tr>
+        #                         <td style="padding: 0 40px 35px 40px;">
+        #                             <h2 style="margin: 0 0 20px 0; color: #2c3e50; font-size: 22px; border-bottom: 3px solid #e74c3c; padding-bottom: 10px;">
+        #                                 🚨 SOLPEDs que Requieren Atención
+        #                             </h2>
+        #                 """
 
-                if exito_final:
-                    if MODO_DESARROLLO:
-                        print(
-                            f"✅ [DESARROLLO] Reporte consolidado enviado a {EMAIL_DESARROLLO}"
-                        )
-                    else:
-                        print(f"✅ Reporte consolidado enviado a NetApplications")
-                else:
-                    print(f"❌ Error al enviar reporte consolidado")
+        #                 # Lista de SOLPEDs con problemas
+        #                 for idx, solped_info in enumerate(solpeds_con_problemas, 1):
+        #                     # Determinar color según severidad
+        #                     if solped_info["items_revisar"] > solped_info["items_ok"]:
+        #                         color_borde = "#e74c3c"  # Rojo - Más problemas
+        #                         color_fondo = "#ffebee"
+        #                     elif solped_info["items_sin_texto"] > 0:
+        #                         color_borde = "#f39c12"  # Naranja - Advertencia
+        #                         color_fondo = "#fff3e0"
+        #                     else:
+        #                         color_borde = "#3498db"  # Azul - Info
+        #                         color_fondo = "#e3f2fd"
 
-            except Exception as e_final:
-                print(f"❌ Error al generar/enviar reporte final: {e_final}")
-                WriteLog(
-                    mensaje=f"Error al enviar reporte consolidado: {e_final}",
-                    estado="WARNING",
-                    task_name=task_name,
-                    path_log=RUTAS["PathLog"],
-                )
+        #                     cuerpo_final += f"""
+        #                             <!-- SOLPED {idx} -->
+        #                             <div style="background-color: {color_fondo}; border-left: 4px solid {color_borde}; border-radius: 6px; padding: 20px; margin-bottom: 20px;">
+        #                                 <table width="100%" cellpadding="0" cellspacing="0">
+        #                                     <tr>
+        #                                         <td>
+        #                                             <div style="display: flex; align-items: center; margin-bottom: 12px;">
+        #                                                 <span style="background-color: {color_borde}; color: #ffffff; padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-right: 12px;">
+        #                                                     #{idx}
+        #                                                 </span>
+        #                                                 <span style="color: #2c3e50; font-size: 20px; font-weight: bold;">
+        #                                                     SOLPED {solped_info['solped']}
+        #                                                 </span>
+        #                                             </div>
+        #                                         </td>
+        #                                         <td align="right">
+        #                                             <span style="background-color: {color_borde}; color: #ffffff; padding: 8px 16px; border-radius: 20px; font-size: 13px; font-weight: 600;">
+        #                                                 {solped_info['estado']}
+        #                                             </span>
+        #                                         </td>
+        #                                     </tr>
+        #                                 </table>
 
-            print(f"{'='*80}\n")
-        else:
-            print(
-                f"\n✅ Todas las SOLPEDs validadas correctamente - No se requiere reporte consolidado\n"
-            )
+        #                                 <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 15px;">
+        #                                     <tr>
+        #                                         <td width="25%" style="padding: 8px 0;">
+        #                                             <div style="color: #7f8c8d; font-size: 12px; margin-bottom: 4px;">Total Items</div>
+        #                                             <div style="color: #2c3e50; font-size: 18px; font-weight: bold;">{solped_info['items_total']}</div>
+        #                                         </td>
+        #                                         <td width="25%" style="padding: 8px 0;">
+        #                                             <div style="color: #7f8c8d; font-size: 12px; margin-bottom: 4px;">✓ Validados</div>
+        #                                             <div style="color: #27ae60; font-size: 18px; font-weight: bold;">{solped_info['items_ok']}</div>
+        #                                         </td>
+        #                                         <td width="25%" style="padding: 8px 0;">
+        #                                             <div style="color: #7f8c8d; font-size: 12px; margin-bottom: 4px;">⚠ Revisar</div>
+        #                                             <div style="color: #e74c3c; font-size: 18px; font-weight: bold;">{solped_info['items_revisar']}</div>
+        #                                         </td>
+        #                                         <td width="25%" style="padding: 8px 0;">
+        #                                             <div style="color: #7f8c8d; font-size: 12px; margin-bottom: 4px;">Sin Texto</div>
+        #                                             <div style="color: #f39c12; font-size: 18px; font-weight: bold;">{solped_info['items_sin_texto']}</div>
+        #                                         </td>
+        #                                     </tr>
+        #                                 </table>
+
+        #                                 <div style="margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(0,0,0,0.1);">
+        #                     """
+
+        #                     if solped_info["responsables"]:
+        #                         responsables_str = ", ".join(solped_info["responsables"])
+        #                         if MODO_DESARROLLO:
+        #                             cuerpo_final += f"""
+        #                                     <div style="color: #856404; font-size: 13px;">
+        #                                         <strong>⚠️ Responsable (no notificado - desarrollo):</strong><br>
+        #                                         <span style="font-family: monospace; background-color: rgba(255,255,255,0.7); padding: 4px 8px; border-radius: 3px; display: inline-block; margin-top: 5px;">
+        #                                             {responsables_str}
+        #                                         </span>
+        #                                     </div>
+        #                             """
+        #                         else:
+        #                             cuerpo_final += f"""
+        #                                     <div style="color: #27ae60; font-size: 13px;">
+        #                                         <strong>✓ Notificado a:</strong> <span style="font-family: monospace;">{responsables_str}</span>
+        #                                     </div>
+        #                             """
+        #                     else:
+        #                         cuerpo_final += f"""
+        #                                     <div style="color: #e74c3c; font-size: 13px;">
+        #                                         <strong>⚠️ Sin responsable identificado</strong> - Se requiere asignación manual
+        #                                     </div>
+        #                         """
+
+        #                     cuerpo_final += """
+        #                                 </div>
+        #                             </div>
+        #                     """
+
+        #                 cuerpo_final += f"""
+        #                         </td>
+        #                     </tr>
+
+        #                     <!-- Información del Adjunto -->
+        #                     <tr>
+        #                         <td style="padding: 0 40px 35px 40px;">
+        #                             <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 8px; padding: 25px; text-align: center;">
+        #                                 <div style="font-size: 48px; margin-bottom: 10px;">📎</div>
+        #                                 <h3 style="margin: 0 0 10px 0; color: #ffffff; font-size: 18px;">Reporte Detallado Adjunto</h3>
+        #                                 <p style="margin: 0; color: #ffffff; font-size: 14px; opacity: 0.9;">
+        #                                     El archivo adjunto contiene información detallada de cada item, validaciones y observaciones completas.
+        #                                 </p>
+        #                             </div>
+        #                         </td>
+        #                     </tr>
+
+        #                     <!-- Footer -->
+        #                     <tr>
+        #                         <td style="background-color: #2c3e50; padding: 30px 40px; text-align: center;">
+        #                             <p style="margin: 0 0 10px 0; color: #ecf0f1; font-size: 14px;">
+        #                                 <strong>Sistema de Validación Automática</strong>
+        #                             </p>
+        #                             <p style="margin: 0; color: #95a5a6; font-size: 12px;">
+        #                                 © {time.strftime('%Y')} Colsubsidio | NetApplications<br>
+        #                                 Este correo fue generado automáticamente
+        #                             </p>
+        #                         </td>
+        #                     </tr>
+
+        #                 </table>
+        #             </td>
+        #         </tr>
+        #     </table>
+        # </body>
+        # </html>
+        #                 """
+
+        #                 # Guardar reporte detallado en archivo
+        #                 path_reporte_final = f"{RUTAS['PathReportes']}\\Reporte_Consolidado_{time.strftime('%Y%m%d_%H%M%S')}.txt"
+        #                 with open(path_reporte_final, "w", encoding="utf-8") as f:
+        #                     f.write(reporte_final)
+
+        #                 print(f"Reporte consolidado guardado: {path_reporte_final}")
+
+        #                 # Enviar correo
+        #                 exito_final = EnviarCorreoPersonalizado(
+        #                     destinatario=(
+        #                         EMAIL_DESARROLLO
+        #                         if MODO_DESARROLLO
+        #                         else "paula.sierra@netapplications.com.co"
+        #                     ),
+        #                     asunto=asunto_final,
+        #                     cuerpo=cuerpo_final,
+        #                     task_name=task_name,
+        #                     adjuntos=[path_reporte_final],
+        #                 )
+
+        #                 if exito_final:
+        #                     if MODO_DESARROLLO:
+        #                         print(
+        #                             f"✅ [DESARROLLO] Reporte consolidado enviado a {EMAIL_DESARROLLO}"
+        #                         )
+        #                     else:
+        #                         print(f"✅ Reporte consolidado enviado a NetApplications")
+        #                 else:
+        #                     print(f"❌ Error al enviar reporte consolidado")
+
+        #             except Exception as e_final:
+        #                 print(f"❌ Error al generar/enviar reporte final: {e_final}")
+        #                 WriteLog(
+        #                     mensaje=f"Error al enviar reporte consolidado: {e_final}",
+        #                     estado="WARNING",
+        #                     task_name=task_name,
+        #                     path_log=RUTAS["PathLog"],
+        #                 )
+
+        #             print(f"{'='*80}\n")
+        #         else:
+        #             print(
+        #                 f"\n✅ Todas las SOLPEDs validadas correctamente - No se requiere reporte consolidado\n"
+        #             )
 
         # ======================================================
         # === Finalización HU03 ===
@@ -1221,6 +1218,17 @@ def EjecutarHU03(session, nombre_archivo):
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
+
+        # Ruta del archivo a convertir
+
+        convertir_txt_a_excel(nombre_archivo)
+
+        archivo_descargado = rf"{RUTAS['PathInsumos']}/expSolped03.xlsx"
+        # Enviar correo de inicio (código 2 adjunto)
+        EnviarNotificacionCorreo(
+            codigo_correo=54, task_name=task_name, adjuntos=[archivo_descargado]
+        )
+
         return True
 
     except Exception as e:

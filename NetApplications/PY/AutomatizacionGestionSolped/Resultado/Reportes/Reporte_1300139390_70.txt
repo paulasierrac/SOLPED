@@ -1,6 +1,6 @@
 
 ================================================================================
-REPORTE DE VALIDACION - SOLPED: 1300139390, ITEM: 40
+REPORTE DE VALIDACION - SOLPED: 1300139390, ITEM: 70
 ================================================================================
 
 ADVERTENCIA: La SOLPED NO tiene archivos adjuntos.
@@ -18,9 +18,9 @@ DATOS EXTRAIDOS DEL TEXTO:
   NIT: 900526437-8
   Correo: facturacionexpressclean@gmail.com
   Concepto: SERVICIO DE LAVANDERÍA SEGUNDA QUINCENA DEL...
-  Cantidad: 59
-  Valor Unitario: 5.245
-  Valor Total: 309.455
+  Cantidad: 78
+  Valor Unitario: 2.800
+  Valor Total: 218.400
   Responsable: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
   CECO: 302201003
 
@@ -30,17 +30,17 @@ CAMPOS OBLIGATORIOS (Segun Texto Extraído):
 
 VALIDACIONES:
   EXITO CANTIDAD:
-      Texto: 59
-      Tabla: 59.0
+      Texto: 78
+      Tabla: 78.0
   EXITO VALOR_UNITARIO:
-      Texto: $5.25
-      Tabla: $5,245.00
+      Texto: $2.80
+      Tabla: $2,800.00
   EXITO VALOR_TOTAL:
-      Texto: $309.45
-      Tabla: $309,455.00
+      Texto: $218.40
+      Tabla: $218,400.00
   ERROR CONCEPTO:
       Texto: SERVICIO DE LAVANDERÍA SEGUNDA QUINCENA DEL
-      Tabla: LAVADO TAPA MANTEL LICRA ENCAUCHETADA GR
+      Tabla: LAVADO PETO COCINA
       Solo 0 palabras coinciden (minimo: 2)
 
 3/4 campos coinciden, 4/4 campos obligatorios presentes

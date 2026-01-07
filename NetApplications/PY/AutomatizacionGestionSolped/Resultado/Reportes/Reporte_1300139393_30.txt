@@ -1,0 +1,46 @@
+
+================================================================================
+REPORTE DE VALIDACION - SOLPED: 1300139393, ITEM: 30
+================================================================================
+
+INFORMACIÓN DE ATTACHMENTS:
+    La SOLPED cuenta con archivos adjuntos.
+    Total de archivos: 1
+    Ejemplos:
+      - PROPUESTAEVENTOPAREX27ABRIL2024JOSEROJASBELLAVISTA
+
+CAMPOS OBLIGATORIOS SAP ME53N:
+  Presentes: 13/13
+  ✓ Todos los campos obligatorios ME53N están presentes.
+
+DATOS EXTRAIDOS DEL TEXTO:
+  Razon Social: ON PRODUCCIONES
+  NIT: 900592400-7.
+  Correo: onproduccionessas@live.com
+  Concepto: SONIDO COMBO #3...
+  Cantidad: No encontrado
+  Valor Unitario: 1.269.572
+  Valor Total: 1.269.572
+  Responsable: No encontrado
+  CECO: 302090202
+
+CAMPOS OBLIGATORIOS (Segun Texto Extraído):
+  Presentes: 3/4
+  Faltantes:
+    - Cantidad
+
+VALIDACIONES:
+  ERROR CANTIDAD:
+  EXITO VALOR_UNITARIO:
+      Texto: 1.269.572
+      Tabla: $1,269,572.00
+  EXITO VALOR_TOTAL:
+      Texto: 1.269.572
+      Tabla: $1,269,572.00
+  ERROR CONCEPTO:
+      Texto: SONIDO COMBO #3
+      Tabla: SONIDO BÁSICO COLSUBSIDIO RECREACION
+      Solo 1 palabras coinciden (minimo: 2)
+
+2/4 campos coinciden, 3/4 campos obligatorios presentes
+================================================================================

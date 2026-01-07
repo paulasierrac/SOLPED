@@ -31,7 +31,7 @@ if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")
 
 
-def convertir_txt_a_excel(ruta_archivo_txt):
+def convertir_txt_a_excel(archivo):
     """
     Convierte un archivo TXT delimitado por pipes (|) a Excel.
 
@@ -51,8 +51,9 @@ def convertir_txt_a_excel(ruta_archivo_txt):
     """
 
     try:
-        print(f"Leyendo archivo: {ruta_archivo_txt}")
+        print(f"Leyendo archivo: {archivo}")
 
+        ruta_archivo_txt = rf"{RUTAS["PathInsumos"]}\{archivo}"
         # Leer el archivo
         with open(ruta_archivo_txt, "r", encoding="utf-8") as f:
             lineas = f.readlines()
@@ -818,7 +819,7 @@ def ObtenerTextoDelPortapapeles():
         return ""
 
 
-def procesarTablaME5A(name, dias=None):
+def procesarTablaME5A(name, dias=15):
     """name: nombre del txt a utilizar
     return data frame
     Procesa txt estructura ME5A y devuelve un df con manejo de columnas dinamico.
@@ -2629,7 +2630,7 @@ def ExtraerDatosTexto(texto: str) -> Dict:
 
     # --- CONCEPTO (NUEVO + tu fallback) ---
     m = re.search(
-        r"POR CONCEPTO DE[:\s]*(.+?)\s*(EMPRESA|FECHA|HORA|DIRECCION|CANTIDAD)",
+        r"POR CONCEPTO DE[:\s]*(.+?)\s*(EMPRESA|FECHA|HORA|DIRECCION|CANTIDAD|MES|HTH)",
         texto_upper,
     )
     if m:
@@ -2651,20 +2652,38 @@ def ExtraerDatosTexto(texto: str) -> Dict:
     for linea in lineas:
         if any(
             kw in linea.upper()
-            for kw in ["VALOR UNITARIO", "VR UNITARIO", "PRECIO UNITARIO"]
+            for kw in [
+                "VALOR UNITARIO",
+                "VALOR UNIDAD",
+                "VR UNITARIO",
+                "PRECIO UNITARIO",
+            ]
         ):
             m = re.search(patron_valor, linea)
             if m:
                 datos["valor_unitario"] = m.group(1).strip()
                 break
 
-    # valor total / subtotal
-    for linea in lineas:
-        if any(kw in linea.upper() for kw in ["VALOR TOTAL", "SUBTOTAL"]):
-            m = re.search(patron_valor, linea)
-            if m:
-                datos["valor_total"] = m.group(1).strip()
-                break
+    # --- IVA (MEJORADO) ---
+    m = re.search(r"IVA[\s:]*" + patron_valor, texto_upper)
+    if m:
+        datos["iva_impo"] = m.group(1).strip()
+
+    # valor total / subtotal (lógica según IVA)
+    if datos["iva_impo"]:  # Si hay IVA, buscar valor SIN IVA
+        for linea in lineas:
+            if any(kw in linea.upper() for kw in ["VALOR SIN IVA", "SUBTOTAL"]):
+                m = re.search(patron_valor, linea)
+                if m:
+                    datos["valor_total"] = m.group(1).strip()
+                    break
+    else:  # Si NO hay IVA, tomar VALOR TOTAL normal
+        for linea in lineas:
+            if any(kw in linea.upper() for kw in ["VALOR TOTAL", "SUBTOTAL"]):
+                m = re.search(patron_valor, linea)
+                if m:
+                    datos["valor_total"] = m.group(1).strip()
+                    break
 
     # --- CECO (NUEVO) ---
     m = re.search(r"CECO[:\s]*([0-9]+)", texto_upper)

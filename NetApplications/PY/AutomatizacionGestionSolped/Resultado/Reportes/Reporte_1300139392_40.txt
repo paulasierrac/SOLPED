@@ -1,0 +1,49 @@
+
+================================================================================
+REPORTE DE VALIDACION - SOLPED: 1300139392, ITEM: 40
+================================================================================
+
+ADVERTENCIA: La SOLPED NO tiene archivos adjuntos.
+    Detalle: Lista de adjuntos vacía (sin archivos)
+    La validación del ítem continúa, pero la SOLPED puede ser rechazada.
+
+CAMPOS OBLIGATORIOS SAP ME53N:
+  Presentes: 12/13
+  Faltantes:
+    - Fix. Vend.
+
+ADVERTENCIA IMPORTANTE:
+  Este ítem contiene solo descripción o no tiene estructura completa.
+  → No fue posible extraer todos los campos estructurados.
+  → Validar manualmente la información.
+  → Revisar cantidad, valor unitario, valor total y NIT directamente en SAP.
+
+DATOS EXTRAIDOS DEL TEXTO:
+  Razon Social: No encontrado
+  NIT: No encontrado
+  Correo: No encontrado
+  Concepto: REMITIR A POSICION 10...
+  Cantidad: No encontrado
+  Valor Unitario: No encontrado
+  Valor Total: No encontrado
+  Responsable: No encontrado
+  CECO: No encontrado
+
+CAMPOS OBLIGATORIOS (Segun Texto Extraído):
+  Presentes: 1/4
+  Faltantes:
+    - NIT
+    - Cantidad
+    - Valor Total
+
+VALIDACIONES:
+  ERROR CANTIDAD:
+  ERROR VALOR_UNITARIO:
+  ERROR VALOR_TOTAL:
+  ERROR CONCEPTO:
+      Texto: REMITIR A POSICION 10
+      Tabla: TRANSPORTE DE MATERIALES
+      Solo 0 palabras coinciden (minimo: 2)
+
+0/4 campos coinciden, 1/4 campos obligatorios presentes
+================================================================================

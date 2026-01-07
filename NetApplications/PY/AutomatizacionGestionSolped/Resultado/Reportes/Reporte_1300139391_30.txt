@@ -1,0 +1,49 @@
+
+================================================================================
+REPORTE DE VALIDACION - SOLPED: 1300139391, ITEM: 30
+================================================================================
+
+INFORMACIÓN DE ATTACHMENTS:
+    La SOLPED cuenta con archivos adjuntos.
+    Total de archivos: 2
+    Ejemplos:
+      - COTIZACIONPEÑALISAQUIMICOSPARAPISCINASJUNIO2024_20
+      - COTIZACIONPEÑALISAQUIMICOSPARAPISCINASJUNIO2024_20
+
+CAMPOS OBLIGATORIOS SAP ME53N:
+  Presentes: 12/13
+  Faltantes:
+    - Fix. Vend.
+
+DATOS EXTRAIDOS DEL TEXTO:
+  Razon Social: GRUPO ACUA SAS
+  NIT: 900917369
+  Correo: camilo.torres@acua.com.co
+  Concepto: COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL...
+  Cantidad: 50
+  Valor Unitario: 5.500
+  Valor Total: 275.000
+  Responsable: recibidorhotel.penaliza@colsubsidio.com
+  CECO: No encontrado
+
+CAMPOS OBLIGATORIOS (Segun Texto Extraído):
+  Presentes: 4/4
+  ✓ Todos los campos obligatorios del texto están presentes.
+
+VALIDACIONES:
+  EXITO CANTIDAD:
+      Texto: 50
+      Tabla: 50.0
+  EXITO VALOR_UNITARIO:
+      Texto: $5.50
+      Tabla: $5,500.00
+  EXITO VALOR_TOTAL:
+      Texto: $275.00
+      Tabla: $275,000.00
+  ERROR CONCEPTO:
+      Texto: COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL...
+      Tabla: BICARBONATO DE SODIO C. ALCALINIDAD
+      Solo 1 palabras coinciden (minimo: 2)
+
+3/4 campos coinciden, 4/4 campos obligatorios presentes
+================================================================================

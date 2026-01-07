@@ -24,6 +24,7 @@ from Funciones.GeneralME53N import (
     EnviarNotificacionCorreo,
     EnviarCorreoPersonalizado,
     NotificarRevisionManualSolped,
+    convertir_txt_a_excel,
 )
 from Config.settings import RUTAS, SAP_CONFIG
 import traceback
@@ -114,6 +115,7 @@ def Main_GestionSolped():
             )
 
             EjecutarHU03(session, archivo)
+            # convertir_txt_a_excel(archivo)
 
             WriteLog(
                 mensaje=f"HU03 finalizada correctamente para archivo {archivo}.",

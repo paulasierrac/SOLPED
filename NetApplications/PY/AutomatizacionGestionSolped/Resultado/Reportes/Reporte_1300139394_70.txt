@@ -1,0 +1,48 @@
+
+================================================================================
+REPORTE DE VALIDACION - SOLPED: 1300139394, ITEM: 70
+================================================================================
+
+INFORMACIÓN DE ATTACHMENTS:
+    La SOLPED cuenta con archivos adjuntos.
+    Total de archivos: 2
+    Ejemplos:
+      - Suministrodeelementoscampo8paratorneocopaDavis(1)_
+      - Cotizacionsuministrodecancheros(1)_20251209171003.
+
+CAMPOS OBLIGATORIOS SAP ME53N:
+  Presentes: 13/13
+  ✓ Todos los campos obligatorios ME53N están presentes.
+
+DATOS EXTRAIDOS DEL TEXTO:
+  Razon Social: TECNISERVICIOS BELTAN
+  NIT: 830.143.877-7
+  Correo: tecniserviciosbeltran@hotmail.com
+  Concepto: CANCHEROS...
+  Cantidad: 40
+  Valor Unitario: 151.027
+  Valor Total: 6.041.080
+  Responsable: victor.penuelacas@colsubsidio.com, recreacion.deportesbellavista@colsubsidio.com
+  CECO: 302090201
+
+CAMPOS OBLIGATORIOS (Segun Texto Extraído):
+  Presentes: 4/4
+  ✓ Todos los campos obligatorios del texto están presentes.
+
+VALIDACIONES:
+  EXITO CANTIDAD:
+      Texto: 40
+      Tabla: 40.0
+  EXITO VALOR_UNITARIO:
+      Texto: $151.03
+      Tabla: $151,027.00
+  EXITO VALOR_TOTAL:
+      Texto: 6.041.080
+      Tabla: $6,041,080.00
+  ERROR CONCEPTO:
+      Texto: CANCHEROS
+      Tabla: SERVICIO DE APOYO LOGÍSTICO
+      Solo 0 palabras coinciden (minimo: 2)
+
+3/4 campos coinciden, 4/4 campos obligatorios presentes
+================================================================================
