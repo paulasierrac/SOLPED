@@ -44,3 +44,17 @@ desktop.ini
 # Evitar subida de archivos grandes o sensibles
 *.zip
 *.rar
+
+
+# Carpetas 
+*logs/
+img/
+Insumo/
+Input/
+Resultado/
+Estándar de Configuracion Colsubsidio 1.pdf
+C:\Users\CGRPA042\Documents\Steven\SOLPED\logs
+C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo
+
+Notas.txt
+notas.py
