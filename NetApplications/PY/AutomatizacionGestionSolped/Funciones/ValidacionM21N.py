@@ -1064,7 +1064,6 @@ def ValidarAjustarSolped(session,item=1):
                     "GASTO PROPIO PRODUCTO": "C2",
                     "SAA": "R3", #"SAA SERVICIO": "R3"
                     "SAA PRODUCTO": "R3",
-                    "SONAR": "HOLA MUNDO",
                 }
             nuevo_texto, cambios = editor.replace_in_text(texto, reemplazos)
             #print(f"texto modificado {nuevo_texto}")

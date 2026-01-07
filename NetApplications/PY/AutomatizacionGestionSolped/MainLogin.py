@@ -8,7 +8,7 @@
 # ================================
 from requests import session
 from HU.HU01_LoginSAP import ObtenerSesionActiva,conectar_sap
-from Funciones.ValidacionM21N import SapTextEditor,abrirSolped
+from Funciones.ValidacionM21N import SapTextEditor,AbrirSolped
 from Funciones.GeneralME53N import AbrirTransaccion
 import pyautogui  # Asegúrate de tener pyautogui instalado
 import time
@@ -26,13 +26,13 @@ from typing import List, Optional
 def Main_Login():
     try:
 
-        session = conectar_sap( SAP_CONFIG["sistema"], SAP_CONFIG["mandante"],SAP_CONFIG["user"], SAP_CONFIG["password"], SAP_CONFIG["idioma"] )
-        #session = ObtenerSesionActiva()
-        AbrirTransaccion(session, "ME21N")
+        #session = conectar_sap( SAP_CONFIG["sistema"], SAP_CONFIG["mandante"],SAP_CONFIG["user"], SAP_CONFIG["password"], SAP_CONFIG["idioma"] )
+        session = ObtenerSesionActiva()
+        AbrirTransaccion(session, "ME2L")
         # codigo para pruebas
         #abrirSolped(session, 1300139390, 7)
         #abrirSolped(session, 1300139391, 9)
-        abrirSolped(session, 1300139392, 4)
+        #AbrirSolped(session, 1300139392, 4)
         #abrirSolped(session, 1300139393, 7)
         #abrirSolped(session, 1300139394, 7)
         
