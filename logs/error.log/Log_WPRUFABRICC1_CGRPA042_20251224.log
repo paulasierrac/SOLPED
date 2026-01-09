@@ -1,6 +1,0 @@
-24/12/2025 09:18:55 | ERROR | Main_GestionSOLPED | ERROR GLOBAL: 'SapTextEditor' object has no attribute 'Id' | Traceback (most recent call last):
-  File "C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\MainPruebas4.py", line 71, in Main_Pruebas4
-    print("ID encontrado:", editor.Id)
-                            ^^^^^^^^^
-AttributeError: 'SapTextEditor' object has no attribute 'Id'
- | WPRUFABRICC1 | CGRPA042
