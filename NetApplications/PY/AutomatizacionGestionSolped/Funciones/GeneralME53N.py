@@ -25,6 +25,7 @@ import os
 from Funciones.EmailSender import EmailSender
 from typing import List, Union
 import sys
+from openpyxl import load_workbook
 
 # Configurar encoding para consola de Windows
 if sys.platform == "win32":
@@ -819,7 +820,7 @@ def ObtenerTextoDelPortapapeles():
         return ""
 
 
-def procesarTablaME5A(name, dias=15):
+def procesarTablaME5A(name, dias=None):
     """name: nombre del txt a utilizar
     return data frame
     Procesa txt estructura ME5A y devuelve un df con manejo de columnas dinamico.
@@ -2936,3 +2937,47 @@ def ProcesarYValidarItem(
     )
 
     return datos_texto, validaciones, reporte, estado_final, observaciones
+
+
+def AppendHipervinculoObservaciones(ruta_excel, carpeta_reportes):
+    """
+    Recorre todo el Excel y agrega el hipervínculo del reporte correspondiente por SOLPED e ITEM.
+    """
+
+    wb = load_workbook(ruta_excel)
+    ws = wb.active
+
+    encabezados = [c.value for c in ws[1]]
+
+    col_solped = encabezados.index("PurchReq") + 1
+    col_item = encabezados.index("Item") + 1
+    col_obs = encabezados.index("Observaciones") + 1
+
+    for fila in range(2, ws.max_row + 1):
+
+        solped = str(ws.cell(row=fila, column=col_solped).value).strip()
+        item = str(ws.cell(row=fila, column=col_item).value).strip()
+
+        if not solped or not item:
+            continue
+
+        ruta_reporte = os.path.join(carpeta_reportes, f"Reporte_{solped}_{item}.txt")
+
+        if not os.path.exists(ruta_reporte):
+            continue
+
+        celda_obs = ws.cell(row=fila, column=col_obs)
+
+        texto_link = f"📄 Reporte Item {item}"
+
+        if celda_obs.value:
+            if texto_link in str(celda_obs.value):
+                continue
+            celda_obs.value = f"{celda_obs.value} | {texto_link}"
+        else:
+            celda_obs.value = texto_link
+
+        celda_obs.hyperlink = ruta_reporte
+        celda_obs.style = "Hyperlink"
+
+    wb.save(ruta_excel)
