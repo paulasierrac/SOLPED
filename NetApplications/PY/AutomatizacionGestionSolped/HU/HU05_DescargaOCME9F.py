@@ -1,5 +1,5 @@
 # ============================================
-# HU04: Descarga de Orden de Compra (OC) en ME9F
+# HU05: Descarga de Orden de Compra (OC) en ME9F
 # Autor: Steven Navarro - Configurador RPA
 # Descripcion: Descarga la OC generada desde la transacción ME9F.
 # Ultima modificacion: 08/12/2023

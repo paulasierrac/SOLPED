@@ -7,6 +7,8 @@
 # Cambios: (Si Aplica)
 # ============================================
 import win32com.client
+import traceback
+import pandas as pd
 import re
 import subprocess
 import time
@@ -22,7 +24,7 @@ class SapTextEditor:
     """
     Wrapper para el editor de textos SAP (GuiShell - SAPLMMTE).
     Permite leer y modificar texto línea por línea de forma segura.
-    #Stev: se prueban varios metodos, pero la mejor opcion es tomar todo el texto y luego setearlo todo de nuevo desde la linea 0 
+    #Stev: se prueban varios metodos, pero la mejor opcion es tomar todo el texto y luego setearlo todo de nuevo desde la linea 0
     # usando EditorTxt.SetUnprotectedTextPart(0,".")
     """
 
@@ -53,20 +55,13 @@ class SapTextEditor:
         except Exception:
             return None
 
-    def get_editable_line(self, index):
-        """Obtiene solo la parte editable de una línea."""
-        try:
-            return self.shell.GetUnprotectedTextPart(index)
-        except Exception:
-            return None
-
     def get_all_text(self, max_lines=100):
         """
         Obtiene todo el texto del editor SAP sin saltos de línea finales
         ni líneas vacías generadas por el control.
         """
         lines = []
-    
+
 
         for i in range(max_lines):
             try:
@@ -84,12 +79,12 @@ class SapTextEditor:
 
         # Elimina líneas vacías finales
         while lines and lines[-1] == "":
-            lines.pop()        
-        
+            lines.pop()
+
         return "\n".join(lines)
-    
-        
-    
+
+
+
 
     # ------------------------------------------------------------------
     # ESCRITURA
@@ -103,37 +98,6 @@ class SapTextEditor:
         except Exception:
             return False
 
-    def replace_in_editor(self, replacements: dict, max_lines=300):
-        """
-        Reemplaza textos en todo el editor (solo partes editables).
-
-        Args:
-            replacements (dict): {"VENTA SERVICIO": "V1", ...}
-
-        Returns:
-            cambios (int): número de líneas modificadas
-        """
-        cambios = 0
-
-        for i in range(max_lines):
-            try:
-                editable = self.get_editable_line(i)
-                if not editable:
-                    continue
-
-                nuevo = editable
-                for buscar, reemplazar in replacements.items():
-                    nuevo = nuevo.replace(buscar, reemplazar)
-
-                if nuevo != editable:
-                    self.set_editable_line(i, nuevo)
-                    cambios += 1
-
-            except Exception:
-                break
-
-        return cambios
-    
     def replace_in_text(self, texto: str, replacements: dict):
         """
         Reemplaza textos sobre un string completo, evitando líneas vacías iniciales
@@ -158,6 +122,7 @@ class SapTextEditor:
 
         nuevas_lineas = []
         cambios = 0
+        #CambioExacto=[]
 
         for linea in lineas:
             nueva = linea
@@ -166,6 +131,7 @@ class SapTextEditor:
                 # Reemplazo exacto por línea
                 if linea.strip() == buscar:
                     nueva = reemplazar
+                    print(f"[CAMBIO EXACTO] '{linea}' -> '{reemplazar}'")
                 else:
                     nueva = nueva.replace(buscar, reemplazar)
 
@@ -182,167 +148,14 @@ class SapTextEditor:
             )
 
         return "\n".join(nuevas_lineas), cambios
-    
-    # ------------------------------------------------------------------
-    # UTILIDADES
-    # ------------------------------------------------------------------
 
-    def count_lines(self, max_lines=300):
-        """Cuenta cuántas líneas tiene el editor."""
-        for i in range(max_lines):
-            if self.get_line(i) is None:
-                return i
-        return max_lines
-    
-    def reemplazar_linea_exacta(self, texto_buscar, texto_nuevo):
-        """
-        Reemplaza una línea EXACTA (trim) en el editor SAP.
-        Ej: 'SAA' -> 'R3'
-        Retorna True si hubo cambio.
-        """
-
-        linea = 0
-        hubo_cambio = False
-
-        while True:
-            try:
-                texto = self.shell.GetLineText(linea)
-
-                if texto is None:
-                    break
-
-                if texto.strip() == texto_buscar:
-                    # Seleccionar línea completa
-                    self.shell.SetSelectionIndexes(linea, len(texto))
-                    self.shell.SetUnprotectedTextPart(texto_nuevo)
-                    hubo_cambio = True
-                    break
-
-                linea += 1
-
-            except Exception:
-                # No hay más líneas
-                break
-        return hubo_cambio
-    
-    def set_all_text(self, texto):
-        """
-        Reemplaza todo el texto del editor SAP línea por línea
-        (única forma estable en ME21N).
-        """
-
-        self.shell.SetFocus()
-
-        nuevas_lineas = texto.splitlines()
-
-        for i, linea in enumerate(nuevas_lineas):
-            try:
-                original = self.shell.GetLineText(i)
-
-                if original is None:
-                    break
-
-                # Seleccionar línea completa
-                self.shell.SetSelectionIndexes(i, len(original))
-
-                # Reemplazar contenido de la línea
-                self.shell.SetUnprotectedTextPart(linea)
-
-            except Exception:
-                break
-
-    def set_text(self, texto: list):
-        """
-        Establece el texto completo en el editor SAP, línea por línea.
-        
-        Args:
-            texto (list): El texto completo que se quiere establecer en el editor.
-        
-        Returns:
-            cambios (int): Número de líneas modificadas.
-        """
-        #lineas = texto.splitlines()  # Dividimos el texto en líneas
-        cambios = 0  # Contador de líneas modificadas
-        
-        # Recorremos cada línea y la establecemos en el editor
-        for i, linea in enumerate(texto):
-            try:
-                # Simplemente insertamos o reemplazamos el texto sin comparar
-                self.shell.set_editable_line(i, linea)
-                cambios += 1
-
-            except Exception as e:
-                # Si ocurre un error (por ejemplo, fuera del rango), lo manejamos
-                print(f"Error al insertar texto en la línea {i}: {e}")
-                break  # Si prefieres continuar con la siguiente línea en caso de error, usa `continue`
-
-        return cambios
-# fin class SapTextEditor:    
-# fin utilidades 
+# fin class SapTextEditor:
+# fin utilidades
 
 # ===============================================================================================
-# Funciones para obtener el ID de los objetos dinamicamnete dependiento del objeto padre 
+# Funciones para obtener el ID de los objetos dinamicamnete dependiento del objeto padre
 # devuelve el valor de la propiedad o ejecuta la accion deseada
 # ===============================================================================================
-
-def find_sap_object(
-    root,
-    obj_type: str,
-    id_contains: str = None,
-    id_endswith: str = None,
-):
-    """
-    Busca recursivamente un objeto SAP por tipo y patrón de ID.
-
-    Args:
-        root: objeto raíz (ej: session.findById("wnd[0]/usr"))
-        obj_type (str): tipo SAP (GuiButton, GuiCTextField, etc.)
-        id_contains (str): texto que debe estar en el ID
-        id_endswith (str): texto con el que debe terminar el ID
-
-    Returns:
-        objeto SAP encontrado o None
-    """
-    
-
-    try:
-        if root.Type == obj_type:
-            if id_contains and id_contains not in root.Id:
-                pass
-            elif id_endswith and not root.Id.endswith(id_endswith):
-                pass
-            else:
-                return root
-
-        for child in root.Children:
-            res = find_sap_object(
-                child,
-                obj_type,
-                id_contains,
-                id_endswith
-            )
-            if res:
-                return res
-    except Exception:
-        pass
-
-    return None
-
-def find_sap_object_in_usr(
-    session,
-    obj_type: str,
-    id_contains: str = None,
-    id_endswith: str = None,
-):
-    usr = session.findById("wnd[0]/usr")
-    return find_sap_object(
-        usr,
-        obj_type,
-        id_contains,
-        id_endswith
-    )
-
-
 
 def press_GuiButton(session, button_id):
     """
@@ -394,7 +207,7 @@ def SetGuiComboBoxkey(session, campo_id, key_value="ZRCR"):
 
     Raises:
         Exception si no se encuentra el GuiComboBox
-    Ejemplo de uso:    
+    Ejemplo de uso:
         SetGuiComboBoxkey(session, "TOPLINE-BSART", "ZRCR")
     """
 
@@ -586,15 +399,8 @@ def get_GuiTextField_text(session, campo_posicion):
 def set_GuiTextField_text(session, campo_posicion, valor):
     """
     Setea el texto de un GuiTextField dentro de un TableControl SAP
-    usando una posición lógica (ej: 'NETPR[10,0]').
-
-    Args:
-        session: sesión SAP activa
-        campo_posicion (str): campo con posición SAP (ej: 'NETPR[10,0]')
-        valor (str): texto a escribir en el campo
-
-    Raises:
-        Exception si no se encuentra el objeto
+    usando posición lógica (ej: 'NETPR[10,0]' o 'MENGE[6,0]').
+    Compatible con M21N (MEPO1211).
     """
 
     if not campo_posicion:
@@ -603,10 +409,10 @@ def set_GuiTextField_text(session, campo_posicion, valor):
     if valor is None:
         valor = ""
 
-    # Parsear NETPR[10,0]
-    match = re.match(r"(.+)\[(\d+),(\d+)\]", campo_posicion)
+    # Parseo CAMPO[col,fila]
+    match = re.fullmatch(r"([A-Z0-9_]+)\[(\d+),(\d+)\]", campo_posicion.upper())
     if not match:
-        raise ValueError("Formato inválido. Use: NETPR[10,0]")
+        raise ValueError("Formato inválido. Use: NETPR[10,0] o MENGE[6,0]")
 
     campo, col, fila = match.groups()
     col = int(col)
@@ -614,12 +420,13 @@ def set_GuiTextField_text(session, campo_posicion, valor):
 
     usr = session.findById("wnd[0]/usr")
 
+    objetivo = f"-{campo}[{col},{fila}]"
+
     def buscar_textfield(obj):
         try:
             if (
                 obj.Type == "GuiTextField"
-                and campo in obj.Id
-                and obj.Id.endswith(f"[{col},{fila}]")
+                and objetivo in obj.Id
             ):
                 return obj
 
@@ -634,11 +441,13 @@ def set_GuiTextField_text(session, campo_posicion, valor):
     txt = buscar_textfield(usr)
 
     if not txt:
-        raise Exception(f"No se encontró GuiTextField: {campo_posicion}")
+        raise Exception(f"No se encontró GuiTextField SAP: {campo}[{col},{fila}]")
 
-    # Seteo del valor
+    # Seteo seguro (SAP-friendly)
     txt.SetFocus()
     txt.Text = str(valor)
+    txt.CaretPosition = len(txt.Text)
+    session.findById("wnd[0]").sendVKey(0)
 
 
 def ventana_abierta(session, titulo_parcial):
@@ -700,7 +509,17 @@ def SelectGuiTab(session, tab_id):
     # Select() es seguro incluso si ya está seleccionada
     tab.Select()
 
-def boton_existe(session,id):
+def boton_existe(session, id):
+    """
+    Verifica de forma segura si un objeto SAP existe a partir de su ID completo.
+
+    Args:
+        session: La sesión activa de SAP GUI.
+        id (str): El ID completo del objeto a verificar.
+
+    Returns:
+        bool: True si el objeto existe, False en caso contrario.
+    """
     try:
         session.findById(id)
         return True
@@ -785,212 +604,37 @@ def buscar_y_clickear(
 
     return False
 
-def ejecutar_accion_sap(id_documento="0", ruta_vbs=rf".\scriptsVbs\clickptextos.vbs"):
-    # Asegúrate de poner la ruta correcta donde guardaste el código de arriba
-
-    ruta_vbs = ruta_vbs
-
-
-    if os.path.exists(ruta_vbs):
-        try:
-            # Enviamos el id_documento como argumento
-            subprocess.run(["cscript", "//Nologo", ruta_vbs, str(id_documento)], check=True)
-            print(f"Script ejecutado correctamente para el ID: {id_documento}")
-        except subprocess.CalledProcessError as e:
-            print(f"Error al ejecutar VBS: {e}")
-    else:
-        print("No se encuentra el archivo VBS")
-
-def PressBuscarBoton(session):
-
-    # Asumimos que ya tienes la sesión iniciada
-    # SapGuiAuto = win32com.client.GetObject("SAPGUI")
-    # ... session = ...
-    # 1. Definir el contenedor padre estable (justo antes de donde cambia el número)
-    padre_id = "wnd[0]/usr"
-    obj_padre = session.findById(padre_id)
-
-    # 2. Definir el patrón Regex para la parte cambiante
-    # Buscamos "subSUB0:SAPLMEGUI:001" seguido de un dígito (0-9)
-    patron = re.compile(r"subSUB0:SAPLMEGUI:001\d")
-
-    # 3. Iterar sobre los hijos del padre para encontrar la coincidencia
-    id_contenedor_encontrado = None
-
-    for hijo in obj_padre.Children:
-        # El hijo.Id devuelve la ruta completa, extraemos solo la parte final o comparamos todo
-        if patron.search(hijo.Id):
-            id_contenedor_encontrado = hijo.Id
-            break
-    if id_contenedor_encontrado:
-        print(f"Contenedor variable encontrado: {id_contenedor_encontrado}")
-        # 4. Reconstruir la ruta completa del botón
-        # Esta es la parte de la ruta que va DESPUÉS del número cambiante
-        resto_ruta = "/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL/tabpTABIDT14/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/subTEXTS:SAPLMMTE:0200/subEDITOR:SAPLMMTE:0201/btnDELETE_0201"
-        ruta_final_boton = id_contenedor_encontrado + resto_ruta
-        try:
-            boton = session.findById(ruta_final_boton)
-            boton.Press()
-            print("Botón presionado con éxito.")
-            return True
-        except Exception as e:
-            print(f"Error al presionar el botón: {e}")
-    else:
-        print("No se encontró el contenedor que coincida con la Regex.")
-        return False
-
-def find_sap_control(session, parent_id, dynamic_regex, trailing_path, desired_action=None, value=None):
-
-    # Busca un control SAP cuyo ID contiene una parte dinámica (SAPLMEGUI:0010/0015/etc.)
-    # y ejecuta una acción específica (.press, asignar .text, etc.).
-
-    # Args:
-    #     session         : Objeto SAP GUI Scripting de la sesión actual.
-    #     parent_id       : Punto inicial estable (ej: "wnd[0]/usr")
-    #     dynamic_regex   : Patrón regex para identificar el contenedor variable.
-    #                       Ej: r"subSUB0:SAPLMEGUI:001\d"
-    #     trailing_path   : Ruta que viene DESPUÉS del contenedor dinámico.
-    #     desired_action  : Acción a ejecutar: "press", "set_text", "focus", None
-    #     value           : Valor para acciones como "set_text"
-
-    # Returns:
-    #     El control encontrado (GuiComponent) o None si falla.
-
-
-    parent = session.findById(parent_id)
-    patron = re.compile(dynamic_regex)
-    dynamic_container = None
-
-    # Buscar el contenedor que contiene la parte dinámica
-    for child in parent.Children:
-        if patron.search(child.Id):
-            dynamic_container = child.Id
-            break
-
-    if dynamic_container is None:
-        print("No se encontró un contenedor que coincida con el patrón dinámico.")
-        return None
-
-    ruta_final = dynamic_container + trailing_path
-
-    try:
-        control = session.findById(ruta_final)
-    except:
-        print(f"No se pudo encontrar el control final: {ruta_final}")
-        return None
-
-    # Ejecutar acción solicitada
-    if desired_action == "press":
-        try:
-            control.press()
-            print("Acción .press ejecutada con éxito.")
-        except Exception as e:
-            print(f"Error al ejecutar .press(): {e}")
-            return None
-
-    elif desired_action == "set_text":
-        try:
-            control.text = value
-            print(f"Texto asignado correctamente: {value}")
-        except Exception as e:
-            print(f"Error al asignar texto: {e}")
-            return None
-
-    elif desired_action == "focus":
-        try:
-            control.setFocus()
-            print("Control enfocado correctamente.")
-        except Exception as e:
-            print(f"Error al aplicar setFocus: {e}")
-            return None
-
-    elif desired_action is None:
-        # Solo devolver el control sin hacer nada
-        pass
-
-    return control
-
-def limpiar_id_sap(ruta_absoluta):
-    """
-    Toma una ruta larga tipo '/app/con[0]/ses[0]/wnd[0]/usr...'
-    y devuelve solo desde 'wnd[0]/usr...'
-    """
-    if "/wnd[" in ruta_absoluta:
-        # Dividimos el string en donde aparezca "/wnd["
-        partes = ruta_absoluta.split("/wnd[")
-        # partes[1] contendrá "0]/usr/..." así que le volvemos a pegar el prefijo "wnd["
-        ruta_limpia = "wnd[" + partes[1]
-        return ruta_limpia
-    return ruta_absoluta # Si ya estaba limpia, la devuelve igual
-
-def ejecutar_creacion_hijo(session):
-    # 1. Definir el área padre.
-    # A veces incluso encontrar wnd[0]/usr falla si SAP está muy lag.
-    try:
-        user_area = session.findById("wnd[0]/usr")
-    except:
-        # Si falla de entrada, esperamos un poco y reintentamos una vez
-        time.sleep(1)
-        user_area = session.findById("wnd[0]/usr")
-
-    ruta_restante = "/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:1303/tabsITEM_DETAIL"
-    # 2. BUCLE DE RESILIENCIA (Reintentos)
-    # Intentaremos leer los hijos hasta 3 veces antes de rendirnos.
-    max_intentos = 3
-    for intento in range(max_intentos):
-        try:
-            # Intentamos acceder a la propiedad .Children
-            # Aquí es donde estaba fallando tu código
-            hijos = user_area.Children
-            for hijo in hijos:
-                if "SAPLMEGUI" in hijo.Id:
-                    try:
-                        full_id = hijo.Id + ruta_restante
-                        full_id = limpiar_id_sap(full_id)
-                        # Verificamos si el objeto realmente existe con esa ruta
-                        obj_tabstrip = session.findById(full_id)
-                        # Si llegamos aquí, todo está bien
-                        # print(f"Contenedor encontrado: {full_id}")
-                        return obj_tabstrip
-                    except:
-                        continue
-            # Si terminamos el for y no retornamos nada, es que no se encontró en este intento
-            # pero no hubo error técnico.
-            break
-
-        except Exception as e:
-            # Este bloque captura el error "Data necessary... not available"
-            print(f"Intento {intento + 1}/{max_intentos} fallido esperando a SAP... ({e})")
-            time.sleep(1.5) # Espera importante: Dale tiempo a SAP para terminar de pintar
-            continue
-
-    return None # Si fallaron los 3 intentos o no se encontró
-
-def debug_sap_object(obj, nombre="Objeto SAP"):
-    print(f"--- {nombre} ---")
-    print("Tipo:", getattr(obj, "Type", "N/A"))
-    print("ID:", getattr(obj, "Id", "N/A"))
-    print("Métodos / propiedades:")
-    for m in dir(obj):
-        if not m.startswith("_"):
-            print(" ", m)
-
 # ===============================================================================================
 # BORRA LOS TEXTOS DE LAS SOLPED QUE NO SE USAS DESPUES DE "texto posicion"  HU4 G OC
 # ===============================================================================================
 def obtener_valor(texto: str, contiene: List[str]) -> Optional[str]:
+    """
+    Busca un valor numérico en una línea que contenga
+    alguna de las palabras clave especificadas, con o sin símbolo $.
 
-    patron = re.compile(r"\$\s*([\d\.]+)")
-    
+    Args:
+        texto (str): Texto multilínea donde buscar.
+        contiene (List[str]): Palabras clave a buscar en la línea.
+
+    Returns:
+        Optional[str]: Valor numérico encontrado (como string) o None.
+    """
+
+    # Patrón: opcional $, números con separadores de miles
+    patron = re.compile(r"(?:\$?\s*)(\d{1,3}(?:[.,]\d{3})*|\d+)")
+
     contiene_upper = [c.upper() for c in contiene]
 
     for linea in texto.splitlines():
         linea_upper = linea.upper()
+
         if any(c in linea_upper for c in contiene_upper):
             match = patron.search(linea)
             if match:
-                return match.group(1)
-            
+                # Normalizar valor (quita separadores)
+                valor = match.group(1).replace(".", "").replace(",", "")
+                return valor
+
     return None
 
 def ValidarAjustarSolped(session,item=1):
@@ -1000,12 +644,12 @@ def ValidarAjustarSolped(session,item=1):
 
     Args:
         session: sesión SAP activa
-        item (int): posiciones que tiene la Solped 
+        item (int): posiciones que tiene la Solped
 
     Raises:
         Exception si no se encuentra el objeto
     """
-    
+
     try:
         textoPosicionF = (
             "wnd[0]/usr/"
@@ -1019,7 +663,7 @@ def ValidarAjustarSolped(session,item=1):
             "subTEXTS:SAPLMMTE:0200/" \
             "cntlTEXT_TYPES_0200/shell"
         )
-        
+
 
         EDITOR_ID = (
             "wnd[0]/usr/"
@@ -1034,29 +678,76 @@ def ValidarAjustarSolped(session,item=1):
             "subEDITOR:SAPLMMTE:0201/"
             "cntlTEXT_EDITOR_0201/shellcont/shell"
         )
+        Scroll = session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/subSUB2:SAPLMEVIEWS:1100/" \
+        "subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1211/tblSAPLMEGUITC_1211")
+
+        # Todo: Stev: bucle para revisar visibles en el grid de posiciones
+        filas_visibles = Scroll.VisibleRowCount
+        # Lista de acciones en SAP que sirve de informe
         acciones = []
-       
         #Obtiene los valores de los campos de precio en la tabla de posiciones
-        for fila in range(item):  #cambiar por item 
-            precio = get_GuiTextField_text(session, f"NETPR[10,{fila}]")
+
+        for fila in range(item):  #cambiar por item
+            PosicionSolped = session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/subSUB3:SAPLMEVIEWS:1100/"
+            "subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB1:SAPLMEGUI:6000/cmbDYN_6000-LIST")
+            PosicionSolped.key = f"   {fila+1}"
+            Position=fila
+            print(f"Posicion :{Position} Fila: {fila}")
+            print("Filas visubles ", filas_visibles)
+            # obtiene el Precio de la posicion
+            precio = get_GuiTextField_text(session, f"NETPR[10,0]")
             precio = normalizar_precio_sap(precio)
-            # obtiene el texto del objeto 
+            print(f"precio posicion {fila+1}0:{precio}")
+
+            # Obtine la Cantidad en la Posicion
+            CantidadPosicion = get_GuiTextField_text(session, f"MENGE[6,0]")
+            #CantidadPosicion = normalizar_precio_sap(precio)
+            print(f"Cantidad posicion {fila+1}0:{CantidadPosicion}")
+
+            # obtiene el texto del objeto
             editor = SapTextEditor(session, EDITOR_ID)
             texto = editor.get_all_text()
-            claves = ["VALOR "] # str que busca en el texto 
+
+            # Obtiene el valor en el texto
+            claves = ["VALOR "] # str que busca en el texto
             preciotexto = obtener_valor(texto, claves)
             preciotexto = normalizar_precio_sap(preciotexto)
+            print("este es el precio en los textos :", preciotexto)
+
+            # Obtiene la cantidad en el texto
+            claves = ["CANTIDAD"] # str que busca en el texto
+            cantidadtexto = obtener_valor(texto, claves)
+            print("esta es la cantidad en los textos :", cantidadtexto)
             #print( "Precio obtenido desde el texto: ",preciotexto)
-            acciones.append(f"Precio obtenido desde el texto: {preciotexto}")
-            if precio==preciotexto:
-                #print(f"Precio coincide en la posicion : {fila+1}0: {precio} == {preciotexto}")
-                acciones.append(f"Precio coincide en la posicion : {fila+1}0: {precio} == {preciotexto}")
+            acciones.append(f"Precio en el texto de la posicion {fila+1}0: {preciotexto}")
+            acciones.append(f"Cantid en el texto de la posicion {fila+1}0: {cantidadtexto}")
+
+            # Comparacion de Valores de Cantidad
+            if CantidadPosicion==cantidadtexto or cantidadtexto==None:
+                if CantidadPosicion==cantidadtexto:
+                    print(f"Cantidad coincideen la posicion : {fila+1}0: {CantidadPosicion} == {cantidadtexto}")
+                    acciones.append(f"Cantidad coincideen la posicion : {fila+1}0: {CantidadPosicion} == {cantidadtexto}")
+                elif cantidadtexto==None:
+                    print(f"no hay cantidad en el texto de la posicion: {fila+1}0: {CantidadPosicion} == {cantidadtexto}")
+                    acciones.append(f"no hay cantidad en el texto de la posicion: {fila+1}0: {CantidadPosicion} == {cantidadtexto}")
             else:
-                set_GuiTextField_text(session, f"NETPR[10,{fila}]", preciotexto)
-                #print(f"Se mofico posicion :{fila+1}0: {precio} != {preciotexto}")
-                acciones.append(f"Se mofico posicion :{fila+1}0: {precio} != {preciotexto}")
-                
-            # Realiza los reemplazos en el texto      
+                set_GuiTextField_text(session, f"MENGE[6,0]", cantidadtexto)
+                print(f"Se mofico posicion :{fila+1}0 Cantidad -> {CantidadPosicion} != {cantidadtexto}")
+                acciones.append(f"Se mofico Cantidad en posicion {fila+1}0 = CP: {CantidadPosicion} != CT:{cantidadtexto}")
+
+
+            # Comparacion de Valores de Cantidad TODO: que pasa si el precio texto es nulo
+
+            if precio==preciotexto:
+                print(f"Precio coincide en la posicion : {fila+1}0: {precio} == {preciotexto}")
+                acciones.append(f"Precio en la posicion : {fila+1}0: {precio} == {preciotexto}")
+            else:
+                set_GuiTextField_text(session, f"NETPR[10,0]", preciotexto)
+                print(f"Se mofico posicion :{fila+1}0 Precio -> {precio} != {preciotexto}")
+                acciones.append(f"Se mofico Precio en posicion :{fila+1}0: {precio} != {preciotexto}")
+
+            # Realiza los reemplazos en el texto
+
             reemplazos = {
                     "VENTA SERVICIO": "V1",
                     "VENTA PRODUCTO": "V1",
@@ -1066,43 +757,59 @@ def ValidarAjustarSolped(session,item=1):
                     "SAA PRODUCTO": "R3",
                 }
             nuevo_texto, cambios = editor.replace_in_text(texto, reemplazos)
-            #print(f"texto modificado {nuevo_texto}")
-            #print(f"cambios realizados {cambios}")
-            acciones.append(f"cambios realizados {cambios}")
+
+            acciones.append(f"Cambios realizados: {cambios} en la posicion :{fila+1}0 en el Texto ")
             editext=session.findById(EDITOR_ID)
             editext.SetUnprotectedTextPart(0,nuevo_texto)
-            #Borra los textos de cada editor F02 en adelante 
+            #Borra los textos de cada editor F02 en adelante
             for i in range(2, 6):  # F02 a F05
                 textPF = session.findById(textoPosicionF)
                 nodo = f"F0{i}"
                 textPF.selectedNode = nodo
                 editxt = session.findById(EDITOR_ID)
-                editor = SapTextEditor(session, EDITOR_ID)
+                #editor = SapTextEditor(session, EDITOR_ID)
                 texto = editor.get_all_text()
                 if texto :
                     #print("El texto no esta vacío. Procediendo a borrarlo... :"f"F0{i}")
                     editxt.SetUnprotectedTextPart(0,".")
-                    acciones.append(f"Texto borrado en F0{i} en {fila+1}0")
-                    
-            # Finalmente, presiona el botón abajo siguiente posicion
-            press_GuiButton(session, "AUTOTEXT002")
-            textPF.selectedNode ="F01"
+                    acciones.append(f"Texto borrado en F0{i} en posicion {fila+1}0")
 
+            # presiona el botón abajo siguiente posicion
+            #press_GuiButton(session, "AUTOTEXT002")
+            textPF.selectedNode ="F01"
+            esperar_sap_listo(session)
+            #time.sleep(0.5)
+            # da scroll una posicion hacia abajo para no perder visual de los objetos en la tabla de SAP
+            Scroll = session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/subSUB2:SAPLMEVIEWS:1100/" \
+             "subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1211/tblSAPLMEGUITC_1211")
+            Scroll.verticalScrollbar.position = fila+1
+            SelectGuiTab(session, "TABIDT14")
+            print("Posicion visible despues del Scroll:")
+            print(get_GuiTextField_text(session, f"EBELP[1,0]"))
+            esperar_sap_listo(session)
+        # Devuelve las accines ejecutadas en una lista 
         return acciones
 
     except Exception as e:
-        #todo: canbiar por log 
+        #todo: canbiar por log
         print(f"\nHa ocurrido un error inesperado durante la ejecución: {e}")
         raise
 
 def AbrirSolped(session, solped, item=2):
+    """
+    Navega en la GUI de SAP para tomar una Solicitud de Pedido (SOLPED) específica
+    y prepararla para la creación de una Orden de Compra.
+
+    Args:
+        session: La sesión activa de SAP GUI.
+        solped (str): El número de la Solicitud de Pedido a procesar.
+        item (int): El número de ítems o posiciones que contiene la SOLPED.
+
+    Raises:
+        TimeoutError: Si una ventana esperada de SAP no aparece en el tiempo definido.
+        Exception: Captura y relanza errores generales durante la interacción con SAP.
+    """
     try:
-        """
-        Navega el SAP para abrir una Solped 
-
-
-
-        """
         print("SOLPED            :",solped)
         print("POSICIONES        :",item)
 
@@ -1137,170 +844,35 @@ def AbrirSolped(session, solped, item=2):
             pyautogui.press("down", presses=item)  # Stev: cantidad de items a bajar articulos de la solped
             time.sleep(0.5)
 
-        # Click en tomar pedido 
+        # Click en tomar pedido
         buscar_y_clickear(rf".\img\tomar.png", confidence=0.7, intentos=20, espera=0.5)
-    
+
+        #Docstring for MostrarCabecera
+        MostrarCabecera()
+
+
     except Exception as e:
         print(rf"Error en HU05: {e}", "ERROR")
         raise
 
 
 
-def BorrarTextosDesdeSolped(session, solped, item=2):
-
-    # ============================
-    # Abrir transacción ME21N
-    # ============================
-    AbrirTransaccion(session, "ME21N")
-    time.sleep(0.5)
 
 
-    try:
-        # Validación básica de sesión
-        if not session:
-            raise ValueError("Sesion SAP no valida.")
-        esperar_sap_listo(session)
-        # Click Variante de Seleccion y selecciona el campo Solicitudes de pedido en la lista
-        timeout = time.time() + 25
-        ventana= "Solicitudes de pedido"
-        while not ventana_abierta(session, ventana):
-            if time.time() > timeout:
-                raise TimeoutError(f"No se abrió la ventana :{ventana}")
-            buscar_y_clickear(rf".\img\vSeleccion.png", confidence=0.8, intentos=5, espera=0.5)
-            esperar_sap_listo(session)
-            time.sleep(2)
-            pyautogui.press("s") # selecciona el campo Solicitudes de pedido en la lista
-
-        # ingresa el numero de la solped que va a revisar  #Funciona perfecto
-        esperar_sap_listo(session)
-        session.findById("wnd[0]/usr/ctxtSP$00026-LOW").text = solped
-        session.findById("wnd[0]/tbar[1]/btn[8]").press()
-
-        # Navegar hasta la sol.pedido en la lista
-        buscar_y_clickear(rf".\img\sol.pedido.png", confidence=0.8, intentos=20, espera=0.5)
-        # Despliga los itemns de la solped
-        time.sleep(0.5)
-        pyautogui.hotkey("right")
-        time.sleep(0.5)
-        pyautogui.hotkey("down")
-        time.sleep(0.5)
-
-        # Selecciona todos los items de la solped revisar variable item para ajustar
-        with pyautogui.hold("shift"):
-            pyautogui.press("down", presses=item)  # Stev: cantidad de items a bajar articulos de la solped
-            time.sleep(0.5)
-
-        # Click en tomar pedido 
-        buscar_y_clickear(rf".\img\tomar.png", confidence=0.7, intentos=20, espera=0.5)
-
-        print("Esperando a click en pestana de texto y luego en info.......... ")
-        # Seleccionar la pestaña de textos, asegurándonos de que esté visible
-        SelectGuiTab(session, "TABIDT14")  
-        time.sleep(1)
-        ejecutar_accion_sap(id_documento="click pestaña texto e info ",ruta_vbs=rf".\scriptsVbs\clickptextos.vbs")
-        time.sleep(10)
-
-
-        # Definimos las rutas relativas (colas estáticas)
-        ruta_restante_btnDel = "/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/subTEXTS:SAPLMMTE:0200/subEDITOR:SAPLMMTE:0201/btnDELETE_0201"
-        ruta_restante_textoposicion = "/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/subTEXTS:SAPLMMTE:0200/cntlTEXT_TYPES_0200/shell"
-        ruta_restante_textoarea = "/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/subTEXTS:SAPLMMTE:0200/subEDITOR:SAPLMMTE:0201/cntlTEXT_EDITOR_0201/shellcont/shell"
-        # Bucle principal de items (filas de la solped)
-
-        for i in range(item):
-            selectsFs = [2, 3, 4, 5]
-            # --- CAMBIO CLAVE: Bucle interno de tipos de texto ---
-            for j in selectsFs:
-                print(f"--- Procesando tipo de texto F0{j} ---")
-                # 1. PASO CRÍTICO: RE-DESCUBRIR LA PESTAÑA Y RE-CALCULAR IDs EN CADA VUELTA
-                # Porque el .Press() anterior pudo haber cambiado el ID del contenedor padre (0010 vs 0015)
-                obj_tabstrip = ejecutar_creacion_hijo(session)
-                if not obj_tabstrip:
-                    print("No se pudo encontrar el contenedor dinámico en esta iteración.")
-                    break
-                # Buscar la pestaña "Textos" de nuevo (su ID padre pudo cambiar)
-                full_id_base_pestaña = ""
-                pestaña_encontrada = False
-                esperar_sap_listo(session)
-                for pestaña in obj_tabstrip.Children:
-                    if pestaña.Text == "Textos":
-                        # Capturamos el ID limpio actual de la pestaña
-                        full_id_base_pestaña = limpiar_id_sap(pestaña.Id)
-                        pestaña_encontrada = True
-                        # Aseguramos que esté seleccionada (importante tras un refresh)
-                        try:
-                            pestaña.Select()
-                        except:
-                            pass # A veces ya está seleccionada
-                        break
-                if not pestaña_encontrada:
-                    print("Pestaña Textos no encontrada, saltando...")
-                    continue
-                # 2. CONSTRUIR RUTAS FRESCAS CON EL ID BASE ACTUAL
-                # Ahora estamos seguros de que 'full_id_base_pestaña' es válido para ESTE momento
-                current_id_textoposicion = full_id_base_pestaña + ruta_restante_textoposicion
-                current_id_btnDel = full_id_base_pestaña + ruta_restante_btnDel
-                current_id_textoarea = full_id_base_pestaña + ruta_restante_textoarea
-                try:
-                    # 3. SELECCIONAR NODO EN EL ÁRBOL
-                    F0n = "F0" + str(j)
-                    obj_textoposicion = session.findById(current_id_textoposicion)
-                    obj_textoposicion.selectedNode = F0n
-                    # Pequeña espera para que SAP cargue el texto asociado a ese nodo
-                    time.sleep(1)
-                    # 4. INTENTAR BORRAR
-                    # Verificamos si existe el botón delete (a veces no hay texto y el botón se deshabilita o desaparece)
-                    try:
-                        obj_btnDel = session.findById(current_id_btnDel)
-                        obj_btnDel.Press()
-                        print(f"Texto F0{j} eliminado.")
-                        # --- ESPERA OBLIGATORIA TRAS BORRAR ---
-                        # Aquí SAP destruye y reconstruye la pantalla.
-                        # Esto es lo que rompe los IDs para la siguiente vuelta del 'for j'.
-                        time.sleep(1.5)
-                        # 5. EDITAR TEXTO (Poner el punto)
-                        # Ojo: Como hubo refresh, debemos re-buscar el área de texto con el ID fresco
-                        # Pero cuidado: a veces al borrar, el foco cambia.
-                        # Re-validamos el objeto antes de usarlo.
-                        try:
-                            obj_textoarea = session.findById(current_id_textoarea)
-                            obj_textoarea.text = "."
-                        except:
-                            # Si falla aquí, es probable que necesitemos recalcular el ID de nuevo
-                            # o que el área de texto no esté lista.
-                            pass
-                    except Exception as e_btn:
-                        # Si no encuentra el botón de borrar, es que no había texto o ya estaba vacío
-                        # print(f"No se requiere borrar o botón no disponible: {e_btn}")
-                        pass
-                except Exception as e:
-                    print(f"Error procesando texto F0{j}: {e}")
-                    # Si falla algo grave, intentamos continuar con el siguiente tipo de texto
-                    continue
-            # --- FIN DEL BUCLE INTERNO ---
-            # Lógica para pasar al siguiente item (flecha abajo visual con PyAutoGUI)
-            print("Pasando al siguiente item de la Solped...")
-            time.sleep(1)
-            ruta_img = rf".\img\abajo.png"
-            buscar_y_clickear(ruta_img, confidence=0.8, intentos=20, espera=0.5)
-
-        # Salir de SAP
-        #session.findById("wnd[0]").sendVKey(12)
-        esperar_sap_listo(session)
-        time.sleep(1)
-        pyautogui.hotkey("ctrl", "s")
-        time.sleep(1)
-        pyautogui.press("enter")
-        time.sleep(1)
-        pyautogui.press("F12")
-        time.sleep(1)
-        esperar_sap_listo(session)
-
-    except Exception as e:
-        print(rf"Error en HU05: {e}", "ERROR")
-        raise
 
 def leer_solpeds_desde_archivo(ruta_archivo):
+    """
+    Lee un archivo de texto plano con formato de tabla (| separado) y extrae
+    información de Solicitudes de Pedido (SOLPEDs), agrupando por número de SOLPED.
+
+    Args:
+        ruta_archivo (str): La ruta completa al archivo de texto a leer.
+
+    Returns:
+        dict: Un diccionario donde cada clave es un número de SOLPED y el valor
+              es otro diccionario con el conteo de 'items' y un 'set' de 'estados'.
+              Ej: {'10023456': {'items': 3, 'estados': {'Estado A', 'Estado B'}}}
+    """
     resultados = {}
 
     with open(ruta_archivo, "r", encoding="utf-8", errors="ignore") as f:
@@ -1360,6 +932,16 @@ def obtener_numero_oc(session):
         return None
 
 def esperar_sap_listo(session, timeout=10):
+    """
+    Espera hasta que la sesión de SAP GUI no esté ocupada (session.Busy es False).
+
+    Args:
+        session: La sesión activa de SAP GUI.
+        timeout (int): Tiempo máximo de espera en segundos.
+
+    Raises:
+        TimeoutError: Si SAP sigue ocupado después del tiempo de espera.
+    """
     inicio = time.time()
 
     while time.time() - inicio < timeout:
@@ -1372,21 +954,39 @@ def esperar_sap_listo(session, timeout=10):
 
     raise TimeoutError("SAP GUI no terminó de cargar (session.Busy)")
 
-def CambiarGrupoCompra(session): 
+def CambiarGrupoCompra(session):
+    """
+    Cambia el Grupo de Compras ('EKGRP') basado en la Organización de Compras ('EKORG') actual.
+
+    Args:
+        session: La sesión activa de SAP GUI.
+
+    Returns:
+        list: Una lista de strings con las acciones realizadas.
+
+    Raises:
+        ValueError: Si la Organización de Compras actual no está en el mapa de condiciones.
+    """
     # Obtener el valor actual de la organización de compra
     obj_orgCompra = get_GuiCTextField_text(session, "EKORG")
+    if not obj_orgCompra:
+        obj_orgCompra = obj_orgCompra.upper()
+
     #print(f"Valor de OrgCompra: {obj_orgCompra}")
     condiciones = {
+        "s":"RCC",
+        "S":"RCC",
+        "":"RCC",
         "OC15": "RCC",
         "OC26": "HAB",
         "OC25": "HAB",
         "OC28": "AC2",
-        "OC27": "AC2" 
+        "OC27": "AC2"
     }
 
     if obj_orgCompra not in condiciones:
         raise ValueError(f"Organización de compra '{obj_orgCompra}' no reconocida.")
-    
+
     obj_grupoCompra = condiciones[obj_orgCompra]
 
 
@@ -1397,9 +997,6 @@ def CambiarGrupoCompra(session):
     acciones.append(f"Valor de OrgCompra: {obj_orgCompra}")
     acciones.append(f"Grupo de compra actualizado a: {obj_grupoCompra}")
     return acciones
-
-
-
 
 def normalizar_precio_sap(precio: str) -> int:
     """
@@ -1414,239 +1011,252 @@ def normalizar_precio_sap(precio: str) -> int:
 
     return int(limpio)
 
-# ===============================================================================================
-# INICIO DE CÓDIGO DE VALIDACIÓN INDEPENDIENTE PARA HU04
-# ===============================================================================================
+def MostrarCabecera():
+    """
+    Asegura que las secciones principales de la interfaz (Cabecera, Resumen, Detalle)
+    estén visibles en la transacción ME21N para prevenir errores de "objeto no encontrado".
+    """
+    time.sleep(0.5)
+    pyautogui.hotkey("ctrl","F2")
+    time.sleep(0.5)
+    pyautogui.hotkey("ctrl","F3")
+    time.sleep(0.5)
+    pyautogui.hotkey("ctrl","F4")
 
-import pandas as pd
-import chardet
-import win32clipboard
-from datetime import datetime
-from typing import Dict, Optional, Tuple, List
+def ProcesarTabla(name, dias=None):
+    """name: nombre del txt a utilizar
+    return data frame
+    Procesa txt estructura ME5A y devuelve un df con manejo de columnas dinamico.
+    dias: int|None -> número de días a mantener (si None, no aplica filtro por fecha)"""
 
-# --- Funciones auxiliares de GUI y archivos (reimplementación para HU04) ---
-
-def _DetectarCodificacion_HU04(path: str) -> str:
     try:
-        with open(path, "rb") as f:
-            rawdata = f.read()
-        resultado = chardet.detect(rawdata)
-        return resultado["encoding"]
-    except Exception:
-        return "utf-8"
+        WriteLog(
+            mensaje=f"Procesar archivo nombre {name}",
+            estado="INFO",
+            task_name="procesarTablaME5A",
+            path_log=RUTAS["PathLog"],
+        )
 
-def _TablaItemsDataFrame_HU04(name: str) -> pd.DataFrame:
-    try:
-        path = rf"{RUTAS['PathInsumos']}\TablasME53N\{name}"
-        encoding = _DetectarCodificacion_HU04(path)
+        # path = f".\\AutomatizacionGestionSolped\\Insumo\\{name}"
+        path = rf"{RUTAS["PathInsumos"]}\{name}"
 
-        with open(path, "r", encoding=encoding, errors='ignore') as f:
-            lineas = f.read().splitlines()
+        # INTENTAR LEER CON DIFERENTES CODIFICACIONES
+        lineas = []
+        codificaciones = ["latin-1", "cp1252", "iso-8859-1", "utf-8"]
 
-        tabla = [l for l in lineas if l.strip().startswith("|") and "---" not in l]
-        if not tabla: return pd.DataFrame()
+        for codificacion in codificaciones:
+            try:
+                with open(path, "r", encoding=codificacion) as f:
+                    lineas = f.readlines()
+                #print(f"EXITO: Archivo leido con codificacion {codificacion}")
+                break
+            except UnicodeDecodeError as e:
+                print(f"ERROR con {codificacion}: {e}")
+                continue
+            except Exception as e:
+                print(f"ERROR con {codificacion}: {e}")
+                continue
 
-        encabezado_raw = tabla[0]
-        columnas = [c.strip() for c in encabezado_raw.split("|")[1:-1]]
+        if not lineas:
+            print("ERROR: No se pudo leer el archivo con ninguna codificacion")
+            return pd.DataFrame()
 
-        columnas_unicas = []
-        contador = {}
-        for col in columnas:
-            if col in contador:
-                contador[col] += 1
-                columnas_unicas.append(f"{col}_{contador[col]}")
+        # Filtrar solo lineas de datos
+        filas = [l for l in lineas if l.startswith("|") and not l.startswith("|---")]
+
+        # DETECTAR ESTRUCTURA DE COLUMNAS DINAMICAMENTE
+        if not filas:
+            print("No se encontraron filas de datos en el archivo")
+            return pd.DataFrame()
+
+        # Analizar la primera fila para determinar estructura
+        primera_fila = filas[0].strip().split("|")[1:-1]  # Quitar | inicial y final
+        primera_fila = [p.strip() for p in primera_fila]
+
+        num_columnas = len(primera_fila)
+        #print(f"Estructura detectada: {num_columnas} columnas")
+        #print(f"   Encabezados: {primera_fila}")
+
+        # DEFINIR COLUMNAS BASE SEGUN ESTRUCTURA
+        if num_columnas == 14:
+            # Estructura original (sin Estado ni Observaciones)
+            columnas_base = [
+                "PurchReq",
+                "Item",
+                "ReqDate",
+                "Material",
+                "Created",
+                "ShortText",
+                "PO",
+                "Quantity",
+                "Plnt",
+                "PGr",
+                "Blank1",
+                "D",
+                "Requisnr",
+                "ProcState",
+            ]
+            columnas_extra = ["Estado", "Observaciones"]
+
+        elif num_columnas == 15:
+            # Verificar si la columna 15 es "Estado" o "Observaciones"
+            ultima_columna = primera_fila[-1].lower()
+            if "estado" in ultima_columna:
+                # Estructura con Estado pero sin Observaciones
+                columnas_base = [
+                    "PurchReq",
+                    "Item",
+                    "ReqDate",
+                    "Material",
+                    "Created",
+                    "ShortText",
+                    "PO",
+                    "Quantity",
+                    "Plnt",
+                    "PGr",
+                    "Blank1",
+                    "D",
+                    "Requisnr",
+                    "ProcState",
+                    "Estado",
+                ]
+                columnas_extra = ["Observaciones"]
             else:
-                contador[col] = 0
-                columnas_unicas.append(col)
+                # Estructura con Observaciones pero sin Estado
+                columnas_base = [
+                    "PurchReq",
+                    "Item",
+                    "ReqDate",
+                    "Material",
+                    "Created",
+                    "ShortText",
+                    "PO",
+                    "Quantity",
+                    "Plnt",
+                    "PGr",
+                    "Blank1",
+                    "D",
+                    "Requisnr",
+                    "ProcState",
+                    "Observaciones",
+                ]
+                columnas_extra = ["Estado"]
 
-        filas = []
-        for fila in tabla[1:]:
-            partes = [c.strip() for c in fila.split("|")[1:-1]]
-            if len(partes) == len(columnas_unicas):
-                filas.append(partes)
-
-        return pd.DataFrame(filas, columns=columnas_unicas)
-    except Exception as e:
-        print(f"ERROR en _TablaItemsDataFrame_HU04: {e}")
-        return pd.DataFrame()
-
-
-def _ObtenerItemsME53N_HU04(session, numero_solped: str) -> pd.DataFrame:
-    try:
-        grid = session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0015/subSUB2:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:3212/cntlGRIDCONTROL/shellcont/shell")
-        grid.pressToolbarContextButton("&MB_EXPORT")
-        grid.selectContextMenuItem("&PC")
-        session.findById("wnd[1]/tbar[0]/btn[0]").press()
-        session.findById("wnd[1]/usr/ctxtDY_PATH").text = rf"{RUTAS['PathInsumos']}\TablasME53N"
-        session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = f"TablaSolped{numero_solped}_HU04.txt"
-        session.findById("wnd[1]/tbar[0]/btn[0]").press()
-        time.sleep(1)
-        return _TablaItemsDataFrame_HU04(f"TablaSolped{numero_solped}_HU04.txt")
-    except Exception as e:
-        print(f"ERROR en _ObtenerItemsME53N_HU04: {e}")
-        return pd.DataFrame()
-
-def _ObtenerTextoDelPortapapeles_HU04() -> str:
-    try:
-        win32clipboard.OpenClipboard()
-        texto = win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)
-        win32clipboard.CloseClipboard()
-        return texto or ""
-    except Exception:
-        return ""
-
-def _ObtenerItemTextME53N_HU04(session, numero_solped: str, numero_item: str) -> str:
-    try:
-        editor = session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0015/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:3303/tabsREQ_ITEM_DETAIL/tabpTABREQDT13/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/subTEXTS:SAPLMMTE:0200/subEDITOR:SAPLMMTE:0201/cntlTEXT_EDITOR_0201/shellcont/shell")
-        editor.SetFocus()
-        time.sleep(0.5)
-        pyautogui.hotkey("ctrl", "a")
-        time.sleep(0.3)
-        pyautogui.hotkey("ctrl", "c")
-        time.sleep(0.5)
-        texto_completo = _ObtenerTextoDelPortapapeles_HU04()
-
-        session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0015/subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB1:SAPLMEGUI:6000/btn%#AUTOTEXT002").press()
-        time.sleep(0.5)
-        return texto_completo
-    except Exception as e:
-        print(f"ERROR en _ObtenerItemTextME53N_HU04: {e}")
-        return ""
-
-# --- Funciones de procesamiento y validación (reimplementación para HU04) ---
-
-def _LimpiarNumero_HU04(valor: str) -> float:
-    if not valor or not isinstance(valor, str): return 0.0
-    valor_limpio = valor.strip().replace("$", "").replace(" ", "")
-    if "." in valor_limpio and "," in valor_limpio:
-        if valor_limpio.rfind(".") > valor_limpio.rfind(","):
-            valor_limpio = valor_limpio.replace(",", "")
+        elif num_columnas == 16:
+            # Estructura completa con Estado y Observaciones
+            columnas_base = [
+                "PurchReq",
+                "Item",
+                "ReqDate",
+                "Material",
+                "Created",
+                "ShortText",
+                "PO",
+                "Quantity",
+                "Plnt",
+                "PGr",
+                "Blank1",
+                "D",
+                "Requisnr",
+                "ProcState",
+                "Estado",
+                "Observaciones",
+            ]
+            columnas_extra = []
         else:
-            valor_limpio = valor_limpio.replace(".", "").replace(",", ".")
-    elif "," in valor_limpio:
-        valor_limpio = valor_limpio.replace(",", ".")
-    try:
-        return float(valor_limpio)
-    except (ValueError, TypeError):
-        return 0.0
+            print(f"ERROR: Estructura no soportada: {num_columnas} columnas")
+            return pd.DataFrame()
 
-def _ExtraerDatosTexto_HU04(texto: str) -> Dict:
-    datos = { "nit": "", "concepto_compra": "", "cantidad": "", "valor_total": "", "codigo_operacion": [] }
-    if not texto or not texto.strip(): return datos
+        # PROCESAR TODAS LAS FILAS
+        filas_proc = []
+        for i, fila in enumerate(filas):
+            partes = fila.strip().split("|")[1:-1]
+            partes = [p.strip() for p in partes]
 
-    texto_upper = texto.upper()
+            # Validar que tenga el numero correcto de columnas
+            if len(partes) == num_columnas:
+                filas_proc.append(partes)
+            elif len(partes) == num_columnas + 1 and partes[-1] == "":
+                # Caso: columna extra vacia al final
+                filas_proc.append(partes[:num_columnas])
+                if i < 3:  # Solo log primeras filas
+                    print(f"   ADVERTENCIA Fila {i+1}: Columna extra vacia removida")
+            else:
+                print(
+                    f"   ERROR Fila {i+1} ignorada: {len(partes)} columnas vs {num_columnas} esperadas"
+                )
+                if i == 0:  # Solo mostrar detalle para primera fila
+                    print(f"      Contenido: {partes}")
+                continue
 
-    # --- Lógica de normalización específica de HU04 ---
-    REEMPLAZOS = {
-        "VENTA SERVICIO": "V1", "VENTA PRODUCTO": "V1",
-        "GASTO PROPIO SERVICIO": "C2", "GASTO PROPIO PRODUCTO": "C2",
-        "SAA SERVICIO": "R3", "SAA PRODUCTO": "R3",
-    }
-    codigos_encontrados = set()
-    for keyword, code in REEMPLAZOS.items():
-        if keyword in texto_upper:
-            codigos_encontrados.add(code)
-    datos["codigo_operacion"] = sorted(list(codigos_encontrados))
+        # CREAR DATAFRAME
+        df = pd.DataFrame(filas_proc, columns=columnas_base)
 
-    # --- Extracción de campos ---
-    patrones = {
-        "nit": r"NIT[\s:]*([0-9.\-]+)",
-        "concepto_compra": r"POR CONCEPTO DE[:\s]*(.+?)\s*(?:EMPRESA|FECHA|CANTIDAD|VALOR)",
-        "cantidad": r"CANTIDAD[\s:]*([0-9.,]+)",
-        "valor_total": r"VALOR TOTAL[\s:]*([\$]?\s*[0-9]{1,3}(?:[.,][0-9]{3})*(?:[.,][0-9]{2})?)",
-    }
-    for campo, patron in patrones.items():
-        m = re.search(patron, texto_upper)
-        if m:
-            datos[campo] = m.group(1).strip()
+        # AGREGAR COLUMNAS FALTANTES
+        for col_extra in columnas_extra:
+            if col_extra not in df.columns:
+                df[col_extra] = ""
+                print(f"EXITO: Columna '{col_extra}' agregada al DataFrame")
 
-    return datos
+        # FILTRAR: Si la primera fila es encabezado, eliminarla
+        primera_fila_es_encabezado = any(
+            col in df.iloc[0].values if not df.empty else False
+            for col in [
+                "Purch.Req.",
+                "Item",
+                "Req.Date",
+                "Short Text",
+                "PurchReq",
+                "Estado",
+                "Observaciones",
+            ]
+        )
 
-def _ValidarContraTabla_HU04(datos_texto: Dict, df_items: pd.DataFrame, item_num: str) -> Dict:
-    validaciones = { "cantidad": {"match": False}, "valor_total": {"match": False}, "resumen": "" }
-    if df_items.empty:
-        validaciones["resumen"] = "Tabla vacía"
-        return validaciones
+        if not df.empty and primera_fila_es_encabezado:
+            df = df.iloc[1:].reset_index(drop=True)
+            #print("EXITO: Fila de encabezado removida")
 
-    item_df = df_items[df_items["Item"].astype(str).str.strip() == str(item_num).strip()]
-    if item_df.empty:
-        validaciones["resumen"] = "Item no encontrado"
-        return validaciones
+        #print(f"EXITO: Archivo procesado: {len(df)} filas de datos")
+        #print(f"   - Columnas: {list(df.columns)}")
 
-    fila_item = item_df.iloc[0]
+        if not df.empty:
+            print(f"   - SOLPEDs: {df['PurchReq'].nunique()}")
+            if "Estado" in df.columns:
+                print(f"   - Estados unicos: {df['Estado'].value_counts().to_dict()}")
 
-    # Validar Cantidad
-    if datos_texto["cantidad"] and "Quantity" in fila_item:
-        cantidad_texto = _LimpiarNumero_HU04(datos_texto["cantidad"])
-        cantidad_tabla = _LimpiarNumero_HU04(str(fila_item["Quantity"]))
-        validaciones["cantidad"]["match"] = abs(cantidad_texto - cantidad_tabla) < 0.01
+        # Normalizar formato fecha
+        df["ReqDate_fmt"] = pd.to_datetime(
+            df["ReqDate"], errors="coerce", dayfirst=True
+        )
 
-    # Validar Valor Total
-    columna_total_sap = "Total Value" if "Total Value" in fila_item else "Total Val."
-    if datos_texto["valor_total"] and columna_total_sap in fila_item:
-        valor_texto = _LimpiarNumero_HU04(datos_texto["valor_total"])
-        valor_tabla = _LimpiarNumero_HU04(str(fila_item[columna_total_sap]))
-        if valor_tabla > 0:
-            validaciones["valor_total"]["match"] = abs(valor_texto - valor_tabla) / valor_tabla < 0.01
+        df["ReqDate_fmt"] = pd.to_datetime(
+            df["ReqDate"], errors="coerce", dayfirst=True
+        )
+
+        if dias is not None:
+            hoy = pd.Timestamp.today().normalize()
+            limite = hoy - pd.Timedelta(days=int(dias))
+            filas_antes = len(df)
+            df = df[df["ReqDate_fmt"] >= limite].reset_index(drop=True)
+            filas_despues = len(df)
+            print(
+                f"EXITO: Filtrado por ReqDate últimos {dias} días -> {filas_despues}/{filas_antes}"
+            )
         else:
-            validaciones["valor_total"]["match"] = valor_texto == valor_tabla
+            print("INFO: No se aplicó filtro por ReqDate (dias=None)")
 
-    return validaciones
+        # opcional: eliminar columna auxiliar
+        df.drop(columns=["ReqDate_fmt"], inplace=True)
 
-def _DeterminarEstadoFinal_HU04(datos_texto: Dict, validaciones: Dict) -> Tuple[str, str]:
-    if not all(v.get("match") for v in validaciones.values() if isinstance(v, dict)):
-        return "Datos no coinciden", "Los datos del texto no coinciden con los de la tabla SAP."
-    if not datos_texto.get("codigo_operacion"):
-        return "Sin Codigo Op", "No se encontró código de operación (V1, C2, R3) en el texto."
-    return "Registro validado para orden de compra", "Validación de HU04 exitosa."
+        return df
 
-def _ProcesarYValidarItem_HU04(session, solped: str, item_num: str, texto: str, df_items: pd.DataFrame) -> Tuple[str, str]:
-    datos_texto = _ExtraerDatosTexto_HU04(texto)
-    validaciones = _ValidarContraTabla_HU04(datos_texto, df_items, item_num)
-    estado_final, observaciones = _DeterminarEstadoFinal_HU04(datos_texto, validaciones)
-    return estado_final, observaciones
-
-# --- Función principal de orquestación para HU04 ---
-
-def ValidarSolpedParaOC(session, task_name, solped, df_solpeds_para_actualizar, archivo):
-    WriteLog(f"Iniciando validación tipo HU04 para SOLPED {solped}", "INFO", task_name, RUTAS["PathLog"])
-
-    AbrirTransaccion(session, "ME53N")
-    if not ColsultarSolped(session, solped):
-        WriteLog(f"No se pudo consultar la SOLPED {solped} en ME53N.", "ERROR", task_name, RUTAS["PathLogError"])
-        ActualizarEstadoYObservaciones(df_solpeds_para_actualizar, archivo, solped, nuevo_estado="Error Consulta ME53N", observaciones="No se pudo consultar en SAP para validación.")
-        return False
-
-    df_items = _ObtenerItemsME53N_HU04(session, solped)
-    if df_items.empty:
-        WriteLog(f"SOLPED {solped} no tiene ítems para validar.", "WARNING", task_name, RUTAS["PathLog"])
-        ActualizarEstadoYObservaciones(df_solpeds_para_actualizar, archivo, solped, nuevo_estado="Sin Items", observaciones="No se encontraron items en SAP para validar.")
-        return False
-
-    lista_items = df_items.to_dict(orient="records")
-    if lista_items and (lista_items[-1].get("Status", "").strip() == "*" or lista_items[-1].get("Item", "").strip() == ""):
-        lista_items.pop()
-
-    for item_row in lista_items:
-        numero_item = item_row.get("Item", "").strip()
-        print(f"--- Validando Item {numero_item} de SOLPED {solped} (HU04) ---")
-
-        texto_item = _ObtenerItemTextME53N_HU04(session, solped, numero_item)
-
-        estado_final, observaciones = _ProcesarYValidarItem_HU04(session, solped, numero_item, texto_item, df_items)
-
-        if estado_final != "Registro validado para orden de compra":
-            mensaje_error = f"Item {numero_item} no validado. Estado: {estado_final}. Obs: {observaciones}"
-            WriteLog(f"SOLPED {solped}: {mensaje_error}", "ERROR", task_name, RUTAS["PathLogError"])
-
-            ActualizarEstadoYObservaciones(
-                df_solpeds_para_actualizar, archivo, solped, item=numero_item,
-                nuevo_estado=estado_final, observaciones=observaciones
-            )
-            ActualizarEstadoYObservaciones(
-                df_solpeds_para_actualizar, archivo, solped,
-                nuevo_estado="Error de Validacion HU04", observaciones=f"Fallo en item {numero_item}: {estado_final}"
-            )
-            return False
-
-    return True
+    except Exception as e:
+        WriteLog(
+            mensaje=f"Error en procesarTablaME5A: {e}",
+            estado="ERROR",
+            task_name="procesarTablaME5A",
+            path_log=RUTAS["PathLogError"],
+        )
+        print(f"ERROR en procesarTablaME5A: {e}")
+        traceback.print_exc()
+        return pd.DataFrame()

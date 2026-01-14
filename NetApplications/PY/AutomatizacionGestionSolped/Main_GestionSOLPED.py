@@ -25,10 +25,8 @@ from Funciones.GeneralME53N import (
     EnviarCorreoPersonalizado,
     NotificarRevisionManualSolped,)
 from Funciones.EscribirLog import WriteLog
-from Funciones.ValidacionM21N import (
-    leer_solpeds_desde_archivo,
-    BorrarTextosDesdeSolped 
-)
+from Funciones.ValidacionM21N import leer_solpeds_desde_archivo
+  
 from Config.settings import RUTAS, SAP_CONFIG
 import traceback
 
@@ -133,7 +131,9 @@ def Main_GestionSolped():
                 path_log=RUTAS["PathLog"],
             )
 
-            archivos_validar = ["expSolped05test.txt"] # CAMBIAR A 05 PARA SOLPED LIBERADAS
+            #archivos_validar = ["expSolped05 1.txt"] # 1300139271,1300139272
+            archivos_validar = ["expSolped03 copy.txt"] # CAMBIAR A 05 PARA SOLPED LIBERADAS
+
             for archivo in archivos_validar:
                 EjecutarHU04(session, archivo)
 

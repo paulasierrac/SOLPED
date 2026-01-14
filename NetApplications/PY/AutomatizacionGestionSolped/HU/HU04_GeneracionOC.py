@@ -12,12 +12,14 @@ import subprocess
 import time
 import os
 from Config.settings import RUTAS
-from Funciones.ValidacionM21N import SelectGuiTab, obtener_numero_oc,SetGuiComboBoxkey,CambiarGrupoCompra, ValidarAjustarSolped,AbrirSolped
+from Funciones.ValidacionM21N import (
+SelectGuiTab,obtener_numero_oc,SetGuiComboBoxkey,
+CambiarGrupoCompra, ValidarAjustarSolped,AbrirSolped,ProcesarTabla)
 from Funciones.EscribirInforme import WriteInformeOperacion
 from Funciones.EscribirLog import WriteLog
-from Funciones.GeneralME53N import AbrirTransaccion,procesarTablaME5A
+from Funciones.GeneralME53N import AbrirTransaccion
 import traceback
-import pyautogui  # Asegúrate de tener pyautogui instalado
+import pyautogui  # Asegúrate de tener pyautogui instaladoi
 
 
 def EjecutarHU04(session, archivo):
@@ -39,7 +41,7 @@ def EjecutarHU04(session, archivo):
         # ============================
         # Limpiar textos Solped
         # ============================
-        df_solpeds = procesarTablaME5A(archivo)
+        df_solpeds = ProcesarTabla(archivo)
 
         if df_solpeds.empty:
             WriteLog(
@@ -51,7 +53,7 @@ def EjecutarHU04(session, archivo):
             return
 
         solpeds_unicas = df_solpeds['PurchReq'].unique()
-        #print(f"Solpeds a procesar: {solpeds_unicas}")
+        print(f"Solpeds a procesar: {solpeds_unicas}")
         WriteLog(
                     mensaje=f"listado de Solped cargadas : {solpeds_unicas}",
                     estado="INFO",
@@ -59,7 +61,7 @@ def EjecutarHU04(session, archivo):
                     path_log=RUTAS["PathLog"],
                 )
         
-        for solped in solpeds_unicas[1:]:  # Saltar la primera solped si es necesario (Encabezados)
+        for solped in solpeds_unicas:  # Saltar la primera solped si es necesario (Encabezados)
              # --- Validación de Solped ---
             if (
                 not solped                      # None o vacío
@@ -82,15 +84,14 @@ def EjecutarHU04(session, archivo):
                 estado="INFO",
                 task_name=task_name,
                 path_log=RUTAS["PathLog"]
-                #path_log=f"{RUTAS["PathLog"]}StevInforme.txt", # revisar ruta para hacer el informe 
-                
+                             
             )
             acciones = []
             #print(f"procesando solped: {solped} de items: {item_count}")
             AbrirTransaccion(session, "ME21N")
             #navegacion por SAP que permite abrir Solped 
             AbrirSolped(session, solped, item_count)
-            #se selecciona la clase de docuemnto ZRCR, revisar alcance si es necesario cambiar a otra clase dependiendo de algun criterio
+             #se selecciona la clase de docuemnto ZRCR, revisar alcance si es necesario cambiar a otra clase dependiendo de algun criterio
             SetGuiComboBoxkey(session, "TOPLINE-BSART", "ZRCR")
             #se ingresa a la pestaña  Dat.org. de cabecera, asegurándonos de que esté visible
             SelectGuiTab(session, "TABHDT9") 

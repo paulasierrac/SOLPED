@@ -4,6 +4,7 @@ import getpass
 import subprocess
 import os
 from Config.settings import RUTAS, SAP_CONFIG
+from Funciones.ValidacionM21N import ventana_abierta
 
 import pyautogui
 
@@ -78,6 +79,10 @@ def conectar_sap(conexion, mandante, usuario, password, idioma="ES"):
         session.findById("wnd[0]/usr/txtRSYST-LANGU").text = idioma
         session.findById("wnd[0]").sendVKey(0)
         print(" Conectado correctamente a SAP.")
+
+        if ventana_abierta(session, "Copyrigth"):
+            pyautogui.press("enter")
+
         try:
             if validarLoginDiag(
                 ruta_imagen=rf".\img\logindiag.png",
