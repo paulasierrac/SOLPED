@@ -12,9 +12,9 @@ import subprocess
 import time
 import os
 from Config.settings import RUTAS
+from Funciones.GuiShellFunciones import obtener_numero_oc, ProcesarTabla, SetGuiComboBoxkey, CambiarGrupoCompra
 from Funciones.ValidacionM21N import (
-SelectGuiTab,obtener_numero_oc,SetGuiComboBoxkey,
-CambiarGrupoCompra, ValidarAjustarSolped,AbrirSolped,ProcesarTabla)
+SelectGuiTab, ValidarAjustarSolped,AbrirSolped,MostrarCabecera)
 from Funciones.EscribirInforme import WriteInformeOperacion
 from Funciones.EscribirLog import WriteLog
 from Funciones.GeneralME53N import AbrirTransaccion
@@ -90,6 +90,7 @@ def EjecutarHU04(session, archivo):
             #print(f"procesando solped: {solped} de items: {item_count}")
             AbrirTransaccion(session, "ME21N")
             #navegacion por SAP que permite abrir Solped 
+            MostrarCabecera()
             AbrirSolped(session, solped, item_count)
              #se selecciona la clase de docuemnto ZRCR, revisar alcance si es necesario cambiar a otra clase dependiendo de algun criterio
             SetGuiComboBoxkey(session, "TOPLINE-BSART", "ZRCR")
@@ -101,22 +102,26 @@ def EjecutarHU04(session, archivo):
             SelectGuiTab(session, "TABIDT14")
             # Valores y textos se validan y ajustan 
             acciones.extend(ValidarAjustarSolped(session, item_count))
-            #***********///////////**************///////////********
+            #*********************************
             # Se debe remplazar con guardar OC 
-            #////////////*******///////////////*******
-            # Salir para pruebas 
+            #*********************************
+            # /Salir para pruebas 
             pyautogui.press("F12")
             time.sleep(1)
             pyautogui.hotkey("TAB")
             time.sleep(0.5)
             pyautogui.hotkey("enter")
-            # Salir para pruebas 
-            #***********///////////**************///////////********  
-            
+            # /Salir para pruebas 
+            #********************************* 
+
+            # Obtener el numero de la orden de compra generada desde la barra de estado.
             orden_de_compra = obtener_numero_oc(session)
+
+            # Stev: validar si se debe hacer algo mas con la OC generada
 
             
             ruta = WriteInformeOperacion(
+                    item_count=item_count,
                     solped=solped,
                     orden_compra= orden_de_compra,
                     acciones=acciones,

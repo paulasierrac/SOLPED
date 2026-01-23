@@ -25,7 +25,7 @@ from Funciones.GeneralME53N import (
     EnviarCorreoPersonalizado,
     NotificarRevisionManualSolped,)
 from Funciones.EscribirLog import WriteLog
-from Funciones.ValidacionM21N import leer_solpeds_desde_archivo
+from Funciones.GuiShellFunciones import leer_solpeds_desde_archivo
   
 from Config.settings import RUTAS, SAP_CONFIG
 import traceback
@@ -123,27 +123,29 @@ def Main_GestionSolped():
         # ================================
         # 5. Ejecutar HU04 – Creacion de OC
         # ================================
+        # TODO - revisar si es necesario EL LOG DE INICIO HU04 por cada archivo o solo una vez
 
-            WriteLog(
-                mensaje="Inicia HU04 - Creacion de OC desde ME21N.",
-                estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
-            )
+            # WriteLog(
+            #     mensaje="Inicia HU04 - Creacion de OC desde ME21N.",
+            #     estado="INFO",
+            #     task_name=task_name,
+            #     path_log=RUTAS["PathLog"],
+            # )
 
             #archivos_validar = ["expSolped05 1.txt"] # 1300139271,1300139272
             archivos_validar = ["expSolped03 copy.txt"] # CAMBIAR A 05 PARA SOLPED LIBERADAS
+
 
             for archivo in archivos_validar:
                 EjecutarHU04(session, archivo)
 
 
-            WriteLog(
-                mensaje=f"HU04 finalizada correctamente para archivo {archivo}.",
-                estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
-            )
+            # WriteLog(
+            #     mensaje=f"HU04 finalizada correctamente para archivo {archivo}.",
+            #     estado="INFO",
+            #     task_name=task_name,
+            #     path_log=RUTAS["PathLog"],
+            # )
 
 
         # Finalizacion de HU4 generacion de OC 

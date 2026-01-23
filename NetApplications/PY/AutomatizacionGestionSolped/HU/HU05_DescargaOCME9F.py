@@ -39,9 +39,7 @@ def EjecutarHU05(session, orden_de_compra):
         # Abrir transacción ME9F
         AbrirTransaccion(session, "ME9F")
         esperar_sap_listo(session)   
-        print(session)  
-        time.sleep(60)
-           
+          
 
         session.findById("wnd[0]/usr/ctxtS_EBELN-LOW").text = orden_de_compra
         session.findById("wnd[0]").sendVKey(0)
@@ -53,6 +51,8 @@ def EjecutarHU05(session, orden_de_compra):
         # Seleccionar la línea y "Message Output"
         session.findById("wnd[0]/usr/chk[1,5]").selected = True
         pyautogui.hotkey("shift", "f5") # Botón "Message Output"
+
+        #Adicionar codigo para guardar el PDF resultante, hilo treads para manejo de la ventana emergente 
 
         WriteLog(
             mensaje=f"Procesamiento en ME9F completado para la OC: {orden_de_compra}",

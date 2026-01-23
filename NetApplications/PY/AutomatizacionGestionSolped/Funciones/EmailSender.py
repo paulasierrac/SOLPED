@@ -7,14 +7,15 @@ from email import encoders
 import os
 from typing import List, Optional
 from pathlib import Path
+from Config.settings import CONFIG_EMAIL
 
-# Configuración por defecto (puede ser sobrescrita al instanciar)
-CONFIG_EMAIL = {
-    "smtp_server": "smtp.office365.com",
-    "smtp_port": 587,
-    "email": "paula.sierra@netapplications.com.co",
-    "password": "Hop57050",  # IMPORTANTE: Cambiar por variable de entorno en producción
-}
+# # Configuración por defecto (puede ser sobrescrita al instanciar)
+# CONFIG_EMAIL = {
+#     "smtp_server": "smtp.office365.com",
+#     "smtp_port": 587,
+#     "email": "paula.sierra@netapplications.com.co",
+#     "password": "Hop57050",  # IMPORTANTE: Cambiar por variable de entorno en producción
+# }
 
 
 class EmailSender:

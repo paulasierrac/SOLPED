@@ -5,6 +5,7 @@ import getpass
 
 
 def WriteInformeOperacion(
+    item_count  :int,
     solped: str,
     orden_compra: str,
     acciones: list,
@@ -19,6 +20,7 @@ def WriteInformeOperacion(
 
     solped        : Número de SOLPED
     orden_compra  : Número de Orden de Compra generada
+    item_count    : Cantidad de posiciones en la SOLPED
     acciones      : Lista de acciones realizadas (strings)
     estado        : EXITOSO | PARCIAL | ERROR
     bot_name      : Nombre del Bot RPA (ej. 'Resock')
@@ -55,9 +57,9 @@ def WriteInformeOperacion(
     contenido.append(f"Equipo            : {nombre_maquina}\n")
     contenido.append(f"Bot RPA           : {bot_name}\n")
     contenido.append(f"Proceso           : {task_name}\n\n")
-
     contenido.append(f"SOLPED            : {solped}\n")
     contenido.append(f"ORDEN DE COMPRA   : {orden_compra}\n")
+    contenido.append(f"POSICIONES SOLPED : {item_count}\n")
     contenido.append(f"Estado final      : {estado}\n\n")
 
     contenido.append("Acciones realizadas:\n")
