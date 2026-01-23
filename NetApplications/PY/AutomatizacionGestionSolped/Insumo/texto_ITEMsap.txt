@@ -1,5 +1,5 @@
 
-=====Solped: 1300139390 Item: 10 Registro: 2025-12-23 10:12:10 =====
+=====Solped: 1300139390 Item: 10 Registro: 2026-01-14 14:39:37 =====
 GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
 NIT: 900526437-8
 Correo: facturacionexpressclean@gmail.com
@@ -18,7 +18,7 @@ ELABORA: MARCELA PIZA GUERRERO
 CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139390 Item: 20 Registro: 2025-12-23 10:12:14 =====
+=====Solped: 1300139390 Item: 20 Registro: 2026-01-14 14:39:40 =====
 GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
 NIT: 900526437-8
 Correo: facturacionexpressclean@gmail.com
@@ -37,7 +37,7 @@ ELABORA: MARCELA PIZA GUERRERO
 CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139390 Item: 30 Registro: 2025-12-23 10:12:17 =====
+=====Solped: 1300139390 Item: 30 Registro: 2026-01-14 14:39:43 =====
 GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
 NIT: 900526437-8
 Correo: facturacionexpressclean@gmail.com
@@ -56,7 +56,7 @@ ELABORA: MARCELA PIZA GUERRERO
 CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139390 Item: 40 Registro: 2025-12-23 10:12:21 =====
+=====Solped: 1300139390 Item: 40 Registro: 2026-01-14 14:39:46 =====
 GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
 NIT: 900526437-8
 Correo: facturacionexpressclean@gmail.com
@@ -75,7 +75,7 @@ ELABORA: MARCELA PIZA GUERRERO
 CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139390 Item: 50 Registro: 2025-12-23 10:12:24 =====
+=====Solped: 1300139390 Item: 50 Registro: 2026-01-14 14:39:49 =====
 GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
 NIT: 900526437-8
 Correo: facturacionexpressclean@gmail.com
@@ -94,7 +94,7 @@ ELABORA: MARCELA PIZA GUERRERO
 CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139390 Item: 60 Registro: 2025-12-23 10:12:27 =====
+=====Solped: 1300139390 Item: 60 Registro: 2026-01-14 14:39:52 =====
 GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
 NIT: 900526437-8
 Correo: facturacionexpressclean@gmail.com
@@ -113,7 +113,7 @@ ELABORA: MARCELA PIZA GUERRERO
 CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139390 Item: 70 Registro: 2025-12-23 10:12:31 =====
+=====Solped: 1300139390 Item: 70 Registro: 2026-01-14 14:39:55 =====
 GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
 NIT: 900526437-8
 Correo: facturacionexpressclean@gmail.com
@@ -132,7 +132,7 @@ ELABORA: MARCELA PIZA GUERRERO
 CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 10 Registro: 2025-12-23 10:12:54 =====
+=====Solped: 1300139391 Item: 10 Registro: 2026-01-14 14:40:18 =====
 GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
 
 NIT: 900917369
@@ -168,7 +168,7 @@ DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
 HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 20 Registro: 2025-12-23 10:12:58 =====
+=====Solped: 1300139391 Item: 20 Registro: 2026-01-14 14:40:21 =====
 GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
 
 NIT: 900917369
@@ -204,7 +204,7 @@ DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
 HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 30 Registro: 2025-12-23 10:13:01 =====
+=====Solped: 1300139391 Item: 30 Registro: 2026-01-14 14:40:24 =====
 GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
 
 NIT: 900917369
@@ -242,7 +242,7 @@ HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 40 Registro: 2025-12-23 10:13:05 =====
+=====Solped: 1300139391 Item: 40 Registro: 2026-01-14 14:40:27 =====
 GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
 
 NIT: 900917369
@@ -278,7 +278,7 @@ DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
 HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 50 Registro: 2025-12-23 10:13:08 =====
+=====Solped: 1300139391 Item: 50 Registro: 2026-01-14 14:40:30 =====
 GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
 
 NIT: 900917369
@@ -314,7 +314,7 @@ HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 60 Registro: 2025-12-23 10:13:11 =====
+=====Solped: 1300139391 Item: 60 Registro: 2026-01-14 14:40:33 =====
 GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
 
 NIT: 900917369
@@ -350,7 +350,7 @@ HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 70 Registro: 2025-12-23 10:13:14 =====
+=====Solped: 1300139391 Item: 70 Registro: 2026-01-14 14:40:36 =====
 GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
 
 NIT: 900917369
@@ -387,7 +387,7 @@ HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 80 Registro: 2025-12-23 10:13:18 =====
+=====Solped: 1300139391 Item: 80 Registro: 2026-01-14 14:40:39 =====
 GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
 
 NIT: 900917369
@@ -424,7 +424,7 @@ HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 90 Registro: 2025-12-23 10:13:21 =====
+=====Solped: 1300139391 Item: 90 Registro: 2026-01-14 14:40:42 =====
 GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
 
 NIT: 900917369
@@ -461,7 +461,7 @@ HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item:  Registro: 2025-12-23 10:13:25 =====
+=====Solped: 1300139391 Item:  Registro: 2026-01-14 14:40:45 =====
 GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
 
 NIT: 900917369
@@ -498,7 +498,7 @@ HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139392 Item: 10 Registro: 2025-12-23 10:13:48 =====
+=====Solped: 1300139392 Item: 10 Registro: 2026-01-14 14:41:07 =====
 GENERAR ORDEN DE COMPRA A:
 PROVEEDOR  SONAR  Nit. 900988827
 CORREO ELECTRONICO  "andresnavarro@sonarunisono.com
@@ -524,19 +524,19 @@ ELABORO: CRISTIAN CORTES"
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139392 Item: 20 Registro: 2025-12-23 10:13:51 =====
+=====Solped: 1300139392 Item: 20 Registro: 2026-01-14 14:41:10 =====
 REMITIR A POSICION 10
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139392 Item: 30 Registro: 2025-12-23 10:13:54 =====
+=====Solped: 1300139392 Item: 30 Registro: 2026-01-14 14:41:13 =====
 REMITIR A POSICION 10
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139392 Item: 40 Registro: 2025-12-23 10:13:57 =====
+=====Solped: 1300139392 Item: 40 Registro: 2026-01-14 14:41:16 =====
 REMITIR A POSICION 10
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139393 Item: 10 Registro: 2025-12-23 10:14:18 =====
+=====Solped: 1300139393 Item: 10 Registro: 2026-01-14 14:41:36 =====
 GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
 NIT: 900592400-7.
 CORREO: onproduccionessas@live.com
@@ -552,7 +552,7 @@ COORDINADOR: YEIMY TORRES
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139393 Item: 20 Registro: 2025-12-23 10:14:22 =====
+=====Solped: 1300139393 Item: 20 Registro: 2026-01-14 14:41:39 =====
 GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
 NIT: 900592400-7.
 CORREO: onproduccionessas@live.com
@@ -568,7 +568,7 @@ COORDINADOR: YEIMY TORRES
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139393 Item: 30 Registro: 2025-12-23 10:14:25 =====
+=====Solped: 1300139393 Item: 30 Registro: 2026-01-14 14:41:42 =====
 GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
 NIT: 900592400-7.
 CORREO: onproduccionessas@live.com
@@ -584,7 +584,7 @@ COORDINADOR: YEIMY TORRES
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139393 Item: 40 Registro: 2025-12-23 10:14:28 =====
+=====Solped: 1300139393 Item: 40 Registro: 2026-01-14 14:41:45 =====
 GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
 NIT: 900592400-7.
 CORREO: onproduccionessas@live.com
@@ -600,7 +600,7 @@ COORDINADOR: YEIMY TORRES
 ELABORA: JOSE ROJAS
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139393 Item: 50 Registro: 2025-12-23 10:14:31 =====
+=====Solped: 1300139393 Item: 50 Registro: 2026-01-14 14:41:48 =====
 GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
 NIT: 900592400-7.
 CORREO: onproduccionessas@live.com
@@ -616,7 +616,7 @@ COORDINADOR: YEIMY TORRES
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139393 Item: 60 Registro: 2025-12-23 10:14:35 =====
+=====Solped: 1300139393 Item: 60 Registro: 2026-01-14 14:41:51 =====
 GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
 NIT: 900592400-7.
 CORREO: onproduccionessas@live.com
@@ -632,7 +632,7 @@ COORDINADOR: YEIMY TORRES
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139393 Item: 70 Registro: 2025-12-23 10:14:38 =====
+=====Solped: 1300139393 Item: 70 Registro: 2026-01-14 14:41:54 =====
 GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
 NIT: 900592400-7.
 CORREO: onproduccionessas@live.com
@@ -648,7 +648,7 @@ CECO:  302090202
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139394 Item: 10 Registro: 2025-12-23 10:14:59 =====
+=====Solped: 1300139394 Item: 10 Registro: 2026-01-14 14:42:14 =====
 GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
 NIT:830.143.877-7
 CORREO: tecniserviciosbeltran@hotmail.com
@@ -667,7 +667,7 @@ ENTREGA EN EL CLUB BELLAVISTA
 FACTURADO
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139394 Item: 20 Registro: 2025-12-23 10:15:02 =====
+=====Solped: 1300139394 Item: 20 Registro: 2026-01-14 14:42:17 =====
 GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
 NIT:830.143.877-7
 CORREO: tecniserviciosbeltran@hotmail.com
@@ -686,7 +686,7 @@ FACTURADO
 ENTREGA EN EL CLUB BELLAVISTA
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139394 Item: 30 Registro: 2025-12-23 10:15:05 =====
+=====Solped: 1300139394 Item: 30 Registro: 2026-01-14 14:42:20 =====
 GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
 NIT:830.143.877-7
 CORREO: tecniserviciosbeltran@hotmail.com
@@ -705,7 +705,7 @@ ENTREGA EN EL CLUB BELLAVISTA
 SAA
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139394 Item: 40 Registro: 2025-12-23 10:15:09 =====
+=====Solped: 1300139394 Item: 40 Registro: 2026-01-14 14:42:23 =====
 GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
 NIT:830.143.877-7
 CORREO: tecniserviciosbeltran@hotmail.com
@@ -724,7 +724,7 @@ ENTREGA EN EL CLUB BELLAVISTA
 SAA
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139394 Item: 50 Registro: 2025-12-23 10:15:12 =====
+=====Solped: 1300139394 Item: 50 Registro: 2026-01-14 14:42:26 =====
 GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
 NIT:830.143.877-7
 CORREO: tecniserviciosbeltran@hotmail.com
@@ -743,7 +743,7 @@ ENTREGA EN EL CLUB BELLAVISTA
 GASTO PROPIO
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139394 Item: 60 Registro: 2025-12-23 10:15:15 =====
+=====Solped: 1300139394 Item: 60 Registro: 2026-01-14 14:42:29 =====
 GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
 NIT:830.143.877-7
 CORREO: tecniserviciosbeltran@hotmail.com
@@ -762,7 +762,140 @@ ENTREGA EN EL CLUB BELLAVISTA
 GASTO PROPIO
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139394 Item: 70 Registro: 2025-12-23 10:15:18 =====
+=====Solped: 1300139394 Item: 70 Registro: 2026-01-14 14:42:32 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+NIT:830.143.877-7
+CORREO: tecniserviciosbeltran@hotmail.com
+POR CONCEPTO DE: CANCHEROS
+FECHA:19-12-2025
+CANTIDAD:40
+VALOR UNITARIO:151.027
+VALOR TOTAL:6.041.080
+(IMPUESTO QUE APLICA IVA/IMPO/NA): 1.147.805
+CECO:302090201
+CORDINADOR:VICTOR MANUEL PEÑUELA
+ELABORA VICTOR MANUEL PEÑUELA
+CORREO:victor.penuelacas@colsubsidio.com
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+ENTREGA EN EL CLUB BELLAVISTA
+GASTO PROPIO
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139394 Item: 10 Registro: 2026-01-14 14:52:59 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+NIT:830.143.877-7
+CORREO: tecniserviciosbeltran@hotmail.com
+POR CONCEPTO DE: HARAGANES
+FECHA:19-12-2025
+CANTIDAD:2
+VALOR UNITARIO:170.000
+VALOR TOTAL:340.000
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+CECO:302090201
+CORDINADOR:VICTOR MANUEL PEÑUELA
+ELABORA VICTOR MANUEL PEÑUELA
+CORREO:victor.penuelacas@colsubsidio.com
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+ENTREGA EN EL CLUB BELLAVISTA
+FACTURADO
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139394 Item: 20 Registro: 2026-01-14 14:53:02 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+NIT:830.143.877-7
+CORREO: tecniserviciosbeltran@hotmail.com
+POR CONCEPTO DE: ESPUMA DE ABSORCION 50X50
+FECHA:19-12-2025
+CANTIDAD:5
+VALOR UNITARIO:160.000
+VALOR TOTAL:800.000
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+CECO:302090201
+CORDINADOR:VICTOR MANUEL PEÑUELA
+ELABORA VICTOR MANUEL PEÑUELA
+CORREO:victor.penuelacas@colsubsidio.com
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+FACTURADO
+ENTREGA EN EL CLUB BELLAVISTA
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139394 Item: 30 Registro: 2026-01-14 14:53:05 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+NIT:830.143.877-7
+CORREO: tecniserviciosbeltran@hotmail.com
+POR CONCEPTO DE: CEPILLO CAMPO TENIS
+FECHA:19-12-2025
+CANTIDAD:2
+VALOR UNITARIO:140.000
+VALOR TOTAL:280.000
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+CECO:302090201
+CORDINADOR:VICTOR MANUEL PEÑUELA
+ELABORA VICTOR MANUEL PEÑUELA
+CORREO:victor.penuelacas@colsubsidio.com
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+ENTREGA EN EL CLUB BELLAVISTA
+SAA
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139394 Item: 40 Registro: 2026-01-14 14:53:08 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+NIT:830.143.877-7
+CORREO: tecniserviciosbeltran@hotmail.com
+POR CONCEPTO DE: CEPILLO LIMPIA LINEAS
+FECHA:19-12-2025
+CANTIDAD:2
+VALOR UNITARIO:480.000
+VALOR TOTAL:960.000
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+CECO:302090201
+CORDINADOR:VICTOR MANUEL PEÑUELA
+ELABORA VICTOR MANUEL PEÑUELA
+CORREO:victor.penuelacas@colsubsidio.com
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+ENTREGA EN EL CLUB BELLAVISTA
+SAA
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139394 Item: 50 Registro: 2026-01-14 14:53:11 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+NIT:830.143.877-7
+CORREO: tecniserviciosbeltran@hotmail.com
+POR CONCEPTO DE: MANGUERA DE RIEGO DE 20 MTS
+FECHA:19-12-2025
+CANTIDAD:1
+VALOR UNITARIO:840.000
+VALOR TOTAL:840.000
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+CECO:302090201
+CORDINADOR:VICTOR MANUEL PEÑUELA
+ELABORA VICTOR MANUEL PEÑUELA
+CORREO:victor.penuelacas@colsubsidio.com
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+ENTREGA EN EL CLUB BELLAVISTA
+GASTO PROPIO
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139394 Item: 60 Registro: 2026-01-14 14:53:14 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+NIT:830.143.877-7
+CORREO: tecniserviciosbeltran@hotmail.com
+POR CONCEPTO DE: ACOPLES E INSTALACIONES
+FECHA:19-12-2025
+CANTIDAD:1
+VALOR UNITARIO:200.000
+VALOR TOTAL:200.000
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+CECO:302090201
+CORDINADOR:VICTOR MANUEL PEÑUELA
+ELABORA VICTOR MANUEL PEÑUELA
+CORREO:victor.penuelacas@colsubsidio.com
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+ENTREGA EN EL CLUB BELLAVISTA
+GASTO PROPIO
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139394 Item: 70 Registro: 2026-01-14 14:53:17 =====
 GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
 NIT:830.143.877-7
 CORREO: tecniserviciosbeltran@hotmail.com

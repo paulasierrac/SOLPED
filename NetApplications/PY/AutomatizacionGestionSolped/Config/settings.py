@@ -38,8 +38,8 @@ RUTAS = {
     "PathResultados": get_env_variable("PATHRESULTADOS"),
     "PathReportes": get_env_variable("PATHREPORTES"),
     "PathInsumo": get_env_variable("PATHINSUMO"),
-    "PathTexto": get_env_variable("PATHTEXTO_SAP"),
-    "PathRuta": get_env_variable("PATHRUTA_SAP"),
+    # "PathTexto": get_env_variable("PATHTEXTO_SAP"),
+    # "PathRuta": get_env_variable("PATHRUTA_SAP"),
     # Archivo de configuración de correos
     "ArchivoCorreos": os.path.join(BASE_DIR, "Insumo", "EnvioCorreos.xlsx"),
     # Rutas de archivos
@@ -60,4 +60,3 @@ for key, path in RUTAS.items():
 
 # Crear carpeta de logs
 os.makedirs(os.path.dirname(RUTAS["PathLog"]), exist_ok=True)
-

@@ -15,7 +15,6 @@ import subprocess
 import os
 import time
 import traceback
-import datetime
 from Funciones.EscribirLog import WriteLog
 from Funciones.GeneralME53N import (
     AbrirTransaccion,
@@ -25,15 +24,20 @@ from Funciones.GeneralME53N import (
     ObtenerItemsME53N,
     TablaItemsDataFrame,
     TraerSAPAlFrente_Opcion,
+    ActualizarEstado,
+    ActualizarEstadoYObservaciones,
     ProcesarYValidarItem,
+    GuardarTablaME5A,
     NotificarRevisionManualSolped,
     ValidarAttachmentList,
     GenerarReporteAttachments,
     ParsearTablaAttachments,
+    convertir_txt_a_excel,
+    EnviarNotificacionCorreo,
+    AppendHipervinculoObservaciones,
 )
 
 from Config.settings import RUTAS
-from Funciones.Funciones_ARIA_Python import ConexionDB, Diccionario
 
 
 def EjecutarHU03(session, nombre_archivo):
@@ -60,7 +64,7 @@ def EjecutarHU03(session, nombre_archivo):
 
         # Leer el archivo con las SOLPEDs a procesar
         df_solpeds = procesarTablaME5A(nombre_archivo)
-        # GuardarTablaME5A(df_solpeds, nombre_archivo) # Ya no se guarda en TXT
+        GuardarTablaME5A(df_solpeds, nombre_archivo)
 
         if df_solpeds.empty:
             print("ERROR: No se pudo cargar el archivo o esta vacio")
@@ -180,7 +184,6 @@ def EjecutarHU03(session, nombre_archivo):
             print(f"PROCESANDO SOLPED: {solped}")
             print(f"{'='*80}")
 
-            solped_current_timestamp = datetime.datetime.now()
             # Variables para notificación
             correos_responsables = []
             resumen_validaciones = []
@@ -188,33 +191,26 @@ def EjecutarHU03(session, nombre_archivo):
 
             try:
                 # 1. Marcar SOLPED como "En Proceso"
-                insert_solped_validation(
-                    db_engine,
-                    db_schema,
-                    solped,
-                    "En Proceso",
-                    "Iniciando validación",
-                    None,
-                    None,
-                    solped_current_timestamp,
-                    processing_user,
+                resultado_estado = ActualizarEstado(
+                    df_solpeds, nombre_archivo, solped, nuevo_estado="En Proceso"
                 )
+
+                if not resultado_estado:
+                    print(
+                        f"ADVERTENCIA: No se pudo actualizar estado de SOLPED {solped}"
+                    )
+                    continue
 
                 # 2. Consultar SOLPED en SAP
                 resultado_consulta = ColsultarSolped(session, solped)
                 if not resultado_consulta:
                     print(f"ERROR: No se pudo consultar SOLPED {solped} en SAP")
-                    insert_solped_validation(
-                        db_engine,
-                        db_schema,
+                    ActualizarEstadoYObservaciones(
+                        df_solpeds,
+                        nombre_archivo,
                         solped,
-                        "Error Consulta",
-                        "No se pudo consultar en SAP",
-                        False,
-                        "N/A",
-                        solped_current_timestamp,
-                        processing_user,
-                        "Error al consultar en ME53N",
+                        nuevo_estado="Error Consulta",
+                        observaciones="No se pudo consultar en SAP",
                     )
                     contadores["con_errores"] += 1
                     continue
@@ -244,22 +240,29 @@ def EjecutarHU03(session, nombre_archivo):
                 print(reporte_attachments)
 
                 # Guardar reporte de attachments
-                # Ya no guardamos archivo TXT, usamos la BD
-                reporte_attachments_texto = obs_attachments
-                if not tiene_attachments:
+                # Guardar reporte de attachments SOLO si tiene adjuntos
+                if tiene_attachments and contenido_attachments:
+                    path_reporte_attach = (
+                        f"{RUTAS['PathReportes']}\\Attachments_{solped}.txt"
+                    )
+                    try:
+                        with open(path_reporte_attach, "w", encoding="utf-8") as f:
+                            f.write(reporte_attachments)
+                        print(f"Reporte de attachments guardado: {path_reporte_attach}")
+                    except Exception as e:
+                        print(
+                            f"Advertencia: No se pudo guardar reporte de attachments: {e}"
+                        )
+                else:
                     print(
                         f"⚠️ No se genera archivo de adjuntos para SOLPED {solped} (sin archivos)"
                     )
-                    insert_solped_validation(
-                        db_engine,
-                        db_schema,
+                    ActualizarEstadoYObservaciones(
+                        df_solpeds,
+                        nombre_archivo,
                         solped,
-                        "Sin Adjuntos",
-                        "No cuenta con lista de Adjuntos",
-                        False,
-                        reporte_attachments_texto,
-                        solped_current_timestamp,
-                        processing_user,
+                        nuevo_estado="Sin Adjuntos",
+                        observaciones="No cuenta con lista de Adjuntos",
                     )
 
                 # ⚠️ MARCAR SI NO TIENE ATTACHMENTS (pero continuar validación)
@@ -282,17 +285,6 @@ def EjecutarHU03(session, nombre_archivo):
                         f"   Acción requerida: Adjuntar documentación soporte\n"
                         f"   {obs_attachments}\n"
                         f"   ⚠️ Aunque se complete el resto de validaciones, la SOLPED queda RECHAZADA\n"
-                    )
-                    insert_solped_validation(
-                        db_engine,
-                        db_schema,
-                        solped,
-                        "Sin Adjuntos",
-                        obs_attachments,
-                        False,
-                        reporte_attachments_texto,
-                        solped_current_timestamp,
-                        processing_user,
                     )
 
                 else:
@@ -318,34 +310,18 @@ def EjecutarHU03(session, nombre_archivo):
                             info_attachments += f"   ... y {len(attachments_lista) - 5} archivo(s) más\n"
 
                     resumen_validaciones.append(info_attachments)
-                    # Actualizamos estado parcial indicando que tiene adjuntos
-                    insert_solped_validation(
-                        db_engine,
-                        db_schema,
-                        solped,
-                        "Con Adjuntos",
-                        obs_attachments,
-                        True,
-                        reporte_attachments_texto,
-                        solped_current_timestamp,
-                        processing_user,
-                    )
 
                 # 3. Obtener items de esta SOLPED
                 dtItems = ObtenerItemsME53N(session, solped)
 
                 if dtItems is None or dtItems.empty:
                     contadores["sin_items"] += 1
-                    insert_solped_validation(
-                        db_engine,
-                        db_schema,
+                    ActualizarEstadoYObservaciones(
+                        df_solpeds,
+                        nombre_archivo,
                         solped,
-                        "Sin Items",
-                        "No se encontraron items en SAP",
-                        tiene_attachments,
-                        reporte_attachments_texto,
-                        solped_current_timestamp,
-                        processing_user,
+                        nuevo_estado="Sin Items",
+                        observaciones="No se encontraron items en SAP",
                     )
                     print(f"ADVERTENCIA: SOLPED {solped}: Sin items en SAP")
                     continue
@@ -376,11 +352,13 @@ def EjecutarHU03(session, nombre_archivo):
                 for i, fila in enumerate(lista_dicts):
                     numero_item = fila.get("Item", str(i)).strip()
                     contadores["items_procesados"] += 1
-                    item_current_timestamp = datetime.datetime.now()
 
                     print(f"\n--- Procesando Item {numero_item} ---")
 
-                    # No marcamos "Procesando" en BD por ítem para no saturar, solo el resultado final
+                    # Marcar item como "Procesando"
+                    ActualizarEstado(
+                        df_solpeds, nombre_archivo, solped, numero_item, "Procesando"
+                    )
 
                     time.sleep(0.5)
 
@@ -489,8 +467,24 @@ def EjecutarHU03(session, nombre_archivo):
                                         f"      Diferencia: {validaciones[campo]['diferencia']}"
                                     )
 
-                        # Insertar resultado del ítem en BD
-                        # insert_solped_item_validation(...)
+                        # Guardar reporte detallado en archivo
+                        path_reporte = f"{RUTAS['PathReportes']}\\Reporte_{solped}_{numero_item}.txt"
+                        try:
+                            with open(path_reporte, "w", encoding="utf-8") as f:
+                                f.write(reporte)
+                            print(f"Reporte guardado: {path_reporte}")
+                        except Exception as e:
+                            print(f"ADVERTENCIA: Error al guardar reporte: {e}")
+
+                        # Actualizar estado y observaciones en el archivo principal
+                        ActualizarEstadoYObservaciones(
+                            df_solpeds,
+                            nombre_archivo,
+                            solped,
+                            numero_item,
+                            estado_final,
+                            observaciones,
+                        )
 
                         # ========================================================
                         # CONSTRUIR RESUMEN PARA NOTIFICACIÓN
@@ -542,7 +536,14 @@ def EjecutarHU03(session, nombre_archivo):
                         observaciones_item = (
                             "Texto no encontrado en el editor SAP - No se puede validar"
                         )
-                        # insert_solped_item_validation(...)
+                        ActualizarEstadoYObservaciones(
+                            df_solpeds,
+                            nombre_archivo,
+                            solped,
+                            numero_item,
+                            "Sin Texto",
+                            observaciones_item,
+                        )
                         print(f"Item {numero_item}: Sin texto - No validado")
 
                         # También requiere notificación
@@ -583,16 +584,12 @@ def EjecutarHU03(session, nombre_archivo):
                     observaciones_solped = "No se pudo procesar correctamente"
                     contadores["con_errores"] += 1
 
-                insert_solped_validation(
-                    db_engine,
-                    db_schema,
+                ActualizarEstadoYObservaciones(
+                    df_solpeds,
+                    nombre_archivo,
                     solped,
-                    estado_final_solped,
-                    observaciones_solped,
-                    tiene_attachments,
-                    reporte_attachments_texto,
-                    solped_current_timestamp,
-                    processing_user,
+                    nuevo_estado=estado_final_solped,
+                    observaciones=observaciones_solped,
                 )
                 print(f"\n{'='*60}")
                 if solped_rechazada_por_attachments:
@@ -766,17 +763,12 @@ def EjecutarHU03(session, nombre_archivo):
             except Exception as e:
                 contadores["con_errores"] += 1
                 observaciones_error = f"Error durante procesamiento: {str(e)[:100]}"
-                insert_solped_validation(
-                    db_engine,
-                    db_schema,
+                ActualizarEstadoYObservaciones(
+                    df_solpeds,
+                    nombre_archivo,
                     solped,
-                    "Error",
-                    observaciones_error,
-                    False,
-                    "N/A",
-                    solped_current_timestamp,
-                    processing_user,
-                    observaciones_error,
+                    nuevo_estado="Error",
+                    observaciones=observaciones_error,
                 )
                 print(f"ERROR procesando {solped}: {e}")
                 WriteLog(
@@ -839,17 +831,18 @@ def EjecutarHU03(session, nombre_archivo):
             path_log=RUTAS["PathLog"],
         )
 
-        # Estas funciones ya no interactúan con el dataframe local para estados/observaciones
-        # y los reportes ya no se hacen en archivos de texto.
-        # Por lo tanto, se deben revisar o eliminar.
-        # convertir_txt_a_excel(nombre_archivo)
-        # archivo_descargado = rf"{RUTAS['PathInsumos']}/expSolped03.xlsx"
-        # AppendHipervinculoObservaciones(
-        #     ruta_excel=archivo_descargado, carpeta_reportes=RUTAS["PathReportes"]
-        # )
-        # EnviarNotificacionCorreo(
-        #     codigo_correo=54, task_name=task_name, adjuntos=[archivo_descargado]
-        # )
+        # Ruta del archivo a convertir
+
+        convertir_txt_a_excel(nombre_archivo)
+        archivo_descargado = rf"{RUTAS['PathInsumos']}/expSolped03.xlsx"
+        AppendHipervinculoObservaciones(
+            ruta_excel=archivo_descargado, carpeta_reportes=RUTAS["PathReportes"]
+        )
+
+        # Enviar correo de inicio (código 2 adjunto)
+        EnviarNotificacionCorreo(
+            codigo_correo=54, task_name=task_name, adjuntos=[archivo_descargado]
+        )
 
         return True
 

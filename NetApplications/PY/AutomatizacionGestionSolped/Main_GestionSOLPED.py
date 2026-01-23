@@ -117,7 +117,6 @@ def Main_GestionSolped():
             )
 
             EjecutarHU03(session, archivo)
-            # convertir_txt_a_excel(archivo)
 
             WriteLog(
                 mensaje=f"HU03 finalizada correctamente para archivo {archivo}.",
@@ -139,11 +138,11 @@ def Main_GestionSolped():
                 path_log=RUTAS["PathLog"],
             )
 
-            archivos_validar = [
-                "expSolped05test.txt"
-            ]  # CAMBIAR A 05 PARA SOLPED LIBERADAS
-            for archivo in archivos_validar:
-                EjecutarHU04(session, archivo)
+            # archivos_validar = [
+            #     "expSolped05test.txt"
+            # ]  # CAMBIAR A 05 PARA SOLPED LIBERADAS
+            # for archivo in archivos_validar:
+            #     EjecutarHU04(session, archivo)
 
             WriteLog(
                 mensaje=f"HU04 finalizada correctamente para archivo {archivo}.",
@@ -158,29 +157,29 @@ def Main_GestionSolped():
         # 5. Ejecutar HU05 – Descarga de OC y envio de correo
         # ================================
 
-        archivos_validar = ["expSolped05 1.txt", "expSolped05.txt"]
+        # archivos_validar = ["expSolped05 1.txt", "expSolped05.txt"]
 
-        for archivo in archivos_validar:
-            WriteLog(
-                mensaje=f"Inicia HU05 - Descarga de OC y envio de correo  {archivo}.",
-                estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
-            )
-            ruta = rf"{RUTAS["PathInsumo"]}{archivo}"
-            print("Esta es la ruta: ", ruta)
-            dataSolpeds = leer_solpeds_desde_archivo(ruta)
+        # for archivo in archivos_validar:
+        #     WriteLog(
+        #         mensaje=f"Inicia HU05 - Descarga de OC y envio de correo  {archivo}.",
+        #         estado="INFO",
+        #         task_name=task_name,
+        #         path_log=RUTAS["PathLog"],
+        #     )
+        #     ruta = rf"{RUTAS["PathInsumo"]}{archivo}"
+        #     print("Esta es la ruta: ", ruta)
+        #     dataSolpeds = leer_solpeds_desde_archivo(ruta)
 
-            for solped, info in dataSolpeds.items():
-                print(f"Solped {solped} tiene {info['items']} items")
-                # Cambiar por funcion de descarga de OC
+        #     for solped, info in dataSolpeds.items():
+        #         print(f"Solped {solped} tiene {info['items']} items")
+        #         # Cambiar por funcion de descarga de OC
 
-            WriteLog(
-                mensaje=f"HU05 finalizada correctamente para archivo {archivo}.",
-                estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
-            )
+        #     WriteLog(
+        #         mensaje=f"HU05 finalizada correctamente para archivo {archivo}.",
+        #         estado="INFO",
+        #         task_name=task_name,
+        #         path_log=RUTAS["PathLog"],
+        #     )
 
         # Finalizacion de HU5 generacion de OC
 
