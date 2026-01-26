@@ -156,7 +156,7 @@ def EjecutarHU03(session, nombre_archivo):
         # MODO DESARROLLO - REDIRIGIR CORREOS
         # ========================================================
         MODO_DESARROLLO = True  # ⚠️ Cambiar a False en producción
-        EMAIL_DESARROLLO = "paula.sierra@netapplications.com.co"
+        EMAIL_DESARROLLO = "steven.navarro@netapplications.com.co"
 
         if MODO_DESARROLLO:
             print(f"\n{'='*60}")
@@ -1126,7 +1126,7 @@ def EjecutarHU03(session, nombre_archivo):
                     destinatario=(
                         EMAIL_DESARROLLO
                         if MODO_DESARROLLO
-                        else "paula.sierra@netapplications.com.co"
+                        else "steven.navarro@netapplications.com.co"
                     ),
                     asunto=asunto_final,
                     cuerpo=cuerpo_final,

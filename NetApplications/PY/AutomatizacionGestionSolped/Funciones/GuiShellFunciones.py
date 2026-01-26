@@ -296,6 +296,7 @@ def set_GuiCabeceraTextField_text(session, campo_id, valor):
 
     ctext.Text = str(valor)
 
+
 def get_GuiCabeceraTextField_text(session, campo_id):
     """
     Obtiene el texto (.Text.strip()) de un GuiCTextField en ME21N
@@ -398,7 +399,6 @@ def get_GuiTextField_text(session, campo_posicion):
         raise Exception(f"No se encontró GuiTextField: {campo_posicion}")
 
     return txt.Text.strip()
-
 
 def set_GuiTextField_text(session, campo_posicion, valor):
     """
@@ -607,11 +607,7 @@ def buscar_y_clickear(
 
     return False
 
-import re
-from typing import List, Optional
-
-
-def clasificar_concepto(concepto: str) -> Literal["PRODUCTO", "SERVICIO"]:
+def clasificar_concepto(concepto: str) -> Literal["PRODUCTO", "SERVICIO"]: 
     """
     Clasifica un concepto como PRODUCTO o SERVICIO
     usando reglas de negocio.
@@ -623,6 +619,7 @@ def clasificar_concepto(concepto: str) -> Literal["PRODUCTO", "SERVICIO"]:
     palabras_servicio = [
         "TRANSPORTE",
         "ANIMADOR",
+        "LAVADO",
         "COORDINADOR",
         "SERVICIO",
         "MANTENIMIENTO",
@@ -639,7 +636,7 @@ def clasificar_concepto(concepto: str) -> Literal["PRODUCTO", "SERVICIO"]:
 
     if any(palabra in concepto_upper for palabra in palabras_servicio):
         return "SERVICIO"
-
+    # Stev: añadir mas reglas si es necesario para producto por palabras clave
     # Regla por descarte (objetos físicos)
     return "PRODUCTO"
 
@@ -724,7 +721,6 @@ def obtener_valor(texto: str, contiene: List[str]) -> Optional[str]:
                 return valor
 
     return None
-
 
 def leer_solpeds_desde_archivo(ruta_archivo):
     """
@@ -1134,3 +1130,5 @@ def ProcesarTabla(name, dias=None):
         print(f"ERROR en procesarTablaME5A: {e}")
         traceback.print_exc()
         return pd.DataFrame()
+
+

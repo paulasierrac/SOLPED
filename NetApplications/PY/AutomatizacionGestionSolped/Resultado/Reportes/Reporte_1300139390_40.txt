@@ -9,38 +9,37 @@ CAMPOS OBLIGATORIOS SAP ME53N:
     - Fix. Vend.
     - POrg
 
-ADVERTENCIA IMPORTANTE:
-  Este ítem contiene solo descripción o no tiene estructura completa.
-  → No fue posible extraer todos los campos estructurados.
-  → Validar manualmente la información.
-  → Revisar cantidad, valor unitario, valor total y NIT directamente en SAP.
-
 DATOS EXTRAIDOS DEL TEXTO:
-  Razon Social: No encontrado
-  NIT: No encontrado
-  Correo: No encontrado
-  Concepto: TABLA SAP EXPORTADA...
-  Cantidad: No encontrado
-  Valor Unitario: No encontrado
-  Valor Total: No encontrado
-  Responsable: No encontrado
-  CECO: No encontrado
+  Razon Social: EXPRESS AND CLEAN LAVANDERIA S.A.S.
+  NIT: 900526437-8
+  Correo: facturacionexpressclean@gmail.com
+  Concepto: SERVICIO DE LAVANDERÍA SEGUNDA QUINCENA DEL MES DE...
+  Cantidad: 71
+  Valor Unitario: 5.245
+  Valor Total: 372.395
+  Responsable: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
+  CECO: 302201003
 
 CAMPOS OBLIGATORIOS (Segun Texto Extraído):
-  Presentes: 1/4
-  Faltantes:
-    - NIT
-    - Cantidad
-    - Valor Total
+  Presentes: 4/4
+  ✓ Todos los campos obligatorios del texto están presentes.
 
 VALIDACIONES:
   ERROR CANTIDAD:
-  ERROR VALOR_UNITARIO:
+      Texto: 71
+      Tabla: 59.0
+      Difiere en 12.00
+  EXITO VALOR_UNITARIO:
+      Texto: $5.25
+      Tabla: $5,245.00
   ERROR VALOR_TOTAL:
+      Texto: $372.39
+      Tabla: $309,455.00
+      Difiere en $62,940.00
   ERROR CONCEPTO:
-      Texto: TABLA SAP EXPORTADA
+      Texto: SERVICIO DE LAVANDERÍA SEGUNDA QUINCENA DEL MES DE...
       Tabla: LAVADO TAPA MANTEL LICRA ENCAUCHETADA GR
       Solo 0 palabras coinciden (minimo: 2)
 
-0/4 campos coinciden, 1/4 campos obligatorios presentes
+1/4 campos coinciden, 4/4 campos obligatorios presentes
 ================================================================================

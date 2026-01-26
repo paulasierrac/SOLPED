@@ -13,7 +13,7 @@ from Config.settings import CONFIG_EMAIL
 # CONFIG_EMAIL = {
 #     "smtp_server": "smtp.office365.com",
 #     "smtp_port": 587,
-#     "email": "paula.sierra@netapplications.com.co",
+#     "email": "steven.navarro@netapplications.com.co",
 #     "password": "Hop57050",  # IMPORTANTE: Cambiar por variable de entorno en producción
 # }
 

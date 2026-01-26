@@ -38,7 +38,7 @@ from typing import List, Literal, Optional
 
 def ValidarAjustarSolped(session,item=1):
     """
-    Cambia los precios de la Solped segun el texto del "Texto pedido" (textPF.selectedNode ="F01")
+    Cambia los precios y las cantidades de la Solped segun el texto del "Texto pedido" (textPF.selectedNode ="F01")
     borra los textos adicionales que no se utilizan (textPF.selectedNode ="F02"), hasta el F05
 
     Args:
@@ -89,6 +89,7 @@ def ValidarAjustarSolped(session,item=1):
         acciones = []
 
         for fila in range(item):  #cambiar por item
+            # Selecbox de la posicion de la solped  ejemplo de guia :  1 [10] 80016676 , LAVADO MANTEL GRANDE 
             PosicionSolped = session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/subSUB3:SAPLMEVIEWS:1100/"
             "subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB1:SAPLMEGUI:6000/cmbDYN_6000-LIST")
             PosicionSolped.key = f"   {fila+1}"
@@ -112,12 +113,12 @@ def ValidarAjustarSolped(session,item=1):
             print(f"Precio posicion {fila+1}0:{PrecioPosicion}")
             #Guia Terminal, borrar print 
 
-            # obtiene el texto del objeto
+            # obtiene el texto del objeto ├─ Leer textos
             editor = SapTextEditor(session, EDITOR_ID)
             texto = editor.get_all_text()
 
             # Obtiene el valor en el texto (Precio)
-            claves = ["VALOR "] # str que busca en el texto
+            claves = ["VALOR"] # str que busca en el texto
             preciotexto = obtener_valor(texto, claves)
             preciotexto = normalizar_precio_sap(preciotexto)
           

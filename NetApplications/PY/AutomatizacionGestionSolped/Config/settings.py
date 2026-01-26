@@ -3,13 +3,13 @@
 import os
 from dotenv import load_dotenv
 from pathlib import Path
+from Config.initconfig import in_config
 
 # Cargar .env
 load_dotenv()
 
 # Ruta base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 def get_env_variable(key: str, required: bool = True):
     value = os.getenv(key)
@@ -20,14 +20,22 @@ def get_env_variable(key: str, required: bool = True):
     return value
 
 
+# ========= CONEXION BASE DE DATOS ==========
+DATABASE = {
+    'DB_SERVER': os.getenv('DB_SERVER'),
+    'DB_NAME': os.getenv('DB_NAME'),
+    'DB_USER': os.getenv('DB_USER'),
+    'DB_PASSWORD': os.getenv('DB_PASSWORD')
+}
+
 # ========= CONFIG SAP ==========
 SAP_CONFIG = {
     "user": get_env_variable("SAP_USUARIO"),
     "password": get_env_variable("SAP_PASSWORD"),
-    "mandante": get_env_variable("SAP_MANDANTE"),
-    "sistema": get_env_variable("SAP_SISTEMA"),
-    "idioma": get_env_variable("SAP_IDIOMA"),
-    "logon_path": get_env_variable("SAP_LOGON_PATH"),
+    "mandante": in_config("SAP_MANDANTE"),
+    "sistema": in_config("SAP_SISTEMA"),
+    "idioma": in_config("SAP_IDIOMA"),
+    "logon_path": in_config("SAP_LOGON_PATH"),
 }
 
 CONFIG_EMAIL = {

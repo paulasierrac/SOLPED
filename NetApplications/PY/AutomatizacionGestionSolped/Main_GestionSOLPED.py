@@ -10,6 +10,8 @@
 #   - Manejo de excepciones y log por día
 # ================================
 
+from time import time
+import pyautogui
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
 from HU.HU01_LoginSAP import (
     ObtenerSesionActiva,
@@ -55,7 +57,7 @@ def Main_GestionSolped():
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        #EjecutarHU00()
+        EjecutarHU00()
 
         # ================================
         # 2. Obtener sesión SAP
@@ -87,7 +89,7 @@ def Main_GestionSolped():
         )
 
        
-        # EjecutarHU02(session)
+        #EjecutarHU02(session)
 
         WriteLog(
             mensaje="HU02 finalizada correctamente.",
@@ -99,7 +101,8 @@ def Main_GestionSolped():
         # ================================
         # 4. Ejecutar HU03 – Validación Solped ME53N 
         # ================================
-        archivos_validar = ["expSolped05.txt", "expSolped03.txt"]
+        #archivos_validar = ["expSolped03.txt","expSolped03 copy.txt"]
+        archivos_validar = ["expSolped03.txt"] # Dos solped para prueba 1300139393  1300139394
 
         for archivo in archivos_validar:
             WriteLog(
@@ -134,6 +137,8 @@ def Main_GestionSolped():
 
             #archivos_validar = ["expSolped05 1.txt"] # 1300139271,1300139272
             archivos_validar = ["expSolped03 copy.txt"] # CAMBIAR A 05 PARA SOLPED LIBERADAS
+            #archivos_validar = ["expSolped03.txt"] # CAMBIAR A 05 PARA SOLPED LIBERADAS
+            #archivos_validar = ["expSolped03.txt"] # Dos solped para prueba 1300139393  1300139394 / se daño 
 
 
             for archivo in archivos_validar:
@@ -165,10 +170,11 @@ def Main_GestionSolped():
             )
             ruta = rf"{RUTAS["PathInsumo"]}{archivo}"
             print("Esta es la ruta: ", ruta)
-            dataSolpeds = leer_solpeds_desde_archivo(ruta)
+            dataOC = leer_solpeds_desde_archivo(ruta)
+            print(type(dataOC))
                          
-            for solped, info in dataSolpeds.items():
-                print(f"Solped {solped} tiene {info['items']} items")
+            #for OrdenCompra, info in dataOC.items():
+                #print(f"OrdenCompra {OrdenCompra} tiene {info['items']} items")
                 #Cambiar por funcion de descarga de OC 
                 
 
