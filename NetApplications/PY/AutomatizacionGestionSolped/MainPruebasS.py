@@ -1,5 +1,5 @@
 from HU.HU01_LoginSAP import ObtenerSesionActiva
-from Funciones.GuiShellFunciones import find_sap_object
+from funciones.GuiShellFunciones import find_sap_object
 
 
 
@@ -29,7 +29,7 @@ def MainSantiago():
         res = find_sap_object(varianteSeleccion, "GuiShell")
         print(type(res))
         print(res.Type)
-        
+
 
         #varianteSeleccion.press()
 

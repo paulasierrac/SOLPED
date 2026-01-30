@@ -3,21 +3,25 @@ import time
 import getpass
 import subprocess
 import os
-from Config.settings import RUTAS, SAP_CONFIG
-from Funciones.ValidacionM21N import ventana_abierta
+from config.initconfig import in_config
+from config.settings import RUTAS, SAP_CONFIG 
+from funciones.ValidacionM21N import ventana_abierta
 
 import pyautogui
 
 
+
 def abrir_sap_logon():
     """Abre SAP Logon si no está ya abierto."""
+    #SAP_CONFIG = get_sap_config()
     try:
         # Verificar si SAP ya está abierto
         sapgui = win32com.client.GetObject("SAPGUI")
         return True
     except:
         # Si no está abierto, se lanza el ejecutable
-        subprocess.Popen(SAP_CONFIG["logon_path"])
+        #"logon_path": get_env_variable("SAP_LOGON_PATH"),
+        subprocess.Popen(in_config("SAP_LOGON_PATH"))
         time.sleep(5)  # Esperar a que abra SAP Logon
         return False
 

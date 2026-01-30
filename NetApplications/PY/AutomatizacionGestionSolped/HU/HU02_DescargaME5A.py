@@ -6,10 +6,10 @@
 # Propiedad de Colsubsidio
 # Cambios: (Si Aplica)
 # ============================================
-from Funciones.DescargarSolpedME5A import DescargarSolpedME5A
-from Funciones.EscribirLog import WriteLog
+from funciones.DescargarSolpedME5A import DescargarSolpedME5A
+from funciones.EscribirLog import WriteLog
 import traceback
-from Config.settings import RUTAS
+from config.settings import RUTAS
 
 
 def EjecutarHU02(session):

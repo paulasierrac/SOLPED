@@ -19,5 +19,5 @@ def in_config(nombre, default=None):
             "Configuración no inicializada. "
             "Ejecute HU00_DespliegueAmbiente antes de usar in_config()"
         )
-
+    
     return _CONFIG_CACHE.get(nombre, default)

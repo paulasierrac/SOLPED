@@ -1,5 +1,6 @@
 import pandas as pd
 import smtplib
+import traceback
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
@@ -7,7 +8,10 @@ from email import encoders
 import os
 from typing import List, Optional
 from pathlib import Path
-from Config.settings import CONFIG_EMAIL
+from config.settings import CONFIG_EMAIL,RUTAS, SAP_CONFIG
+from dotenv import load_dotenv
+from funciones.EscribirLog import WriteLog
+
 
 # # Configuración por defecto (puede ser sobrescrita al instanciar)
 # CONFIG_EMAIL = {
@@ -376,3 +380,169 @@ if __name__ == "__main__":
         adjuntos_dinamicos=["reporte.pdf", "log.txt"],
     )
     print(f"Resumen del procesamiento por Excel: {resultados}")
+
+
+
+#*************************
+# Funciones de Envio de Correo PRUEBA DESDE ECXEL 
+#*************************
+
+def EnviarNotificacionCorreo(
+    codigo_correo: int, task_name: str = "Notificacion", adjuntos: list = None
+):
+    """
+    Envía notificaciones por correo según el código especificado
+
+    Args:
+        codigo_correo: Código del correo a enviar (1=Inicio, 2=Éxito, 3=Error, etc.)
+        task_name: Nombre de la tarea para logs
+        adjuntos: Lista de rutas de archivos a adjuntar (opcional)
+
+    Returns:
+        bool: True si se envió correctamente, False en caso contrario
+    """
+    try:
+        WriteLog(
+            mensaje=f"Enviando notificación con código {codigo_correo}...",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
+
+        # Log de adjuntos si existen
+        if adjuntos:
+            WriteLog(
+                mensaje=f"Adjuntos a enviar: {', '.join(adjuntos)}",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+
+        # Crear EmailSender con configuración por defecto
+        sender = EmailSender()
+
+        # Enviar correo según código con adjuntos
+        resultados = sender.procesar_excel_y_enviar(
+            archivo_excel=RUTAS.get(
+                "ArchivoCorreos",
+                # r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\EnvioCorreos.xlsx",
+                rf"{RUTAS["ArchivoCorreos"]}",
+            ),
+            codigo_correo=codigo_correo,
+            columna_codigo="codemailparameter",
+            columna_destinatario="toemailparameter",  # Nombre correcto
+            columna_asunto="asuntoemailparameter",  # Nombre correcto
+            columna_cuerpo="bodyemailparameter",  # Nombre correcto
+            columna_cc="ccemailparameter",  # Nombre correcto
+            columna_bcc="bccemailparameter",  # Nombre correcto
+            adjuntos_dinamicos=adjuntos,
+        )
+
+        if resultados["exitosos"] > 0:
+            WriteLog(
+                mensaje=f"Notificación enviada correctamente. Exitosos: {resultados['exitosos']}",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+            return True
+        else:
+            WriteLog(
+                mensaje=f"No se pudo enviar la notificación. Fallidos: {resultados['fallidos']}",
+                estado="WARNING",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+            return False
+
+    except Exception as e:
+        error_stack = traceback.format_exc()
+        WriteLog(
+            mensaje=f"Error al enviar notificación: {e} | {error_stack}",
+            estado="ERROR",
+            task_name=task_name,
+            path_log=RUTAS["PathLogError"],
+        )
+        return False
+
+
+def EnviarCorreoPersonalizado(
+    destinatario: str,
+    asunto: str,
+    cuerpo: str,
+    task_name: str = "EnvioPersonalizado",
+    adjuntos: list = None,
+    cc: list = None,
+    bcc: list = None,
+) -> bool:
+    """
+    Envía un correo electrónico con estructura personalizada, sin usar el Excel de correos.
+
+    Args:
+        destinatario: Email del destinatario (cadena de texto).
+        asunto: Asunto del correo (cadena de texto).
+        cuerpo: Cuerpo del mensaje (puede ser HTML).
+        task_name: Nombre de la tarea para logs.
+        adjuntos: Lista de rutas de archivos a adjuntar (opcional).
+        cc: Lista de correos en copia (opcional).
+        bcc: Lista de correos en copia oculta (opcional).
+
+    Returns:
+        bool: True si se envió correctamente, False en caso contrario.
+    """
+    try:
+        WriteLog(
+            mensaje=f"Preparando envío personalizado para {destinatario}...",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
+
+        # Log de adjuntos
+        if adjuntos:
+            WriteLog(
+                mensaje=f"Adjuntos a enviar: {', '.join(adjuntos)}",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+
+        # Crear EmailSender con configuración por defecto
+        sender = EmailSender()
+
+        # Llamar al método de envío directo de la clase EmailSender
+        exito = sender.enviar_correo(
+            destinatario=destinatario,
+            asunto=asunto,
+            cuerpo=cuerpo,
+            cc=cc,
+            bcc=bcc,
+            adjuntos=adjuntos,
+        )
+
+        if exito:
+            WriteLog(
+                mensaje=f"Correo personalizado enviado exitosamente a {destinatario}.",
+                estado="INFO",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+            return True
+        else:
+            WriteLog(
+                mensaje=f"Fallo al enviar el correo personalizado a {destinatario}.",
+                estado="WARNING",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
+            return False
+
+    except Exception as e:
+        error_stack = traceback.format_exc()
+        WriteLog(
+            mensaje=f"Error fatal en el envío personalizado: {e} | {error_stack}",
+            estado="ERROR",
+            task_name=task_name,
+            path_log=RUTAS["PathLogError"],
+        )
+        return False

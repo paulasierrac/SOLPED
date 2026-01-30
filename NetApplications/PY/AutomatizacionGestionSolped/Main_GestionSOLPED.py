@@ -11,25 +11,18 @@
 # ================================
 
 from time import time
-import pyautogui
-from HU.HU00_DespliegueAmbiente import EjecutarHU00
-from HU.HU01_LoginSAP import (
-    ObtenerSesionActiva,
-    conectar_sap,
-)
-from HU.HU02_DescargaME5A import (
-    EjecutarHU02,
-)
-from HU.HU03_ValidacionME53N import EjecutarHU03
+
+
 from HU.HU04_GeneracionOC import EjecutarHU04
-from Funciones.GeneralME53N import (
-    EnviarNotificacionCorreo,
-    EnviarCorreoPersonalizado,
-    NotificarRevisionManualSolped,)
-from Funciones.EscribirLog import WriteLog
-from Funciones.GuiShellFunciones import leer_solpeds_desde_archivo
+from HU.HU00_DespliegueAmbiente import EjecutarHU00
+from HU.HU01_LoginSAP import conectar_sap
+from HU.HU02_DescargaME5A import EjecutarHU02
+from config.initconfig import in_config
+from funciones.EscribirLog import WriteLog
+
+from funciones.GuiShellFunciones import leer_solpeds_desde_archivo
   
-from Config.settings import RUTAS, SAP_CONFIG
+from config.settings import RUTAS, SAP_CONFIG
 import traceback
 
 
@@ -58,7 +51,6 @@ def Main_GestionSolped():
             path_log=RUTAS["PathLog"],
         )
         EjecutarHU00()
-
         # ================================
         # 2. Obtener sesión SAP
         # ================================
@@ -68,8 +60,9 @@ def Main_GestionSolped():
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        session = conectar_sap(SAP_CONFIG["sistema"],SAP_CONFIG["mandante"],SAP_CONFIG["user"],SAP_CONFIG["password"],)
-        #session = ObtenerSesionActiva()
+
+        session = conectar_sap(in_config("SAP_SISTEMA"),in_config("SAP_MANDANTE") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
+
 
         WriteLog(
             mensaje="Sesión SAP obtenida correctamente.",
@@ -89,7 +82,7 @@ def Main_GestionSolped():
         )
 
        
-        #EjecutarHU02(session)
+        EjecutarHU02(session)
 
         WriteLog(
             mensaje="HU02 finalizada correctamente.",

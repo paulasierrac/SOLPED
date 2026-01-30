@@ -13,11 +13,11 @@ import re
 import subprocess
 import time
 import os
-from Funciones.EscribirLog import WriteLog
-from Config.settings import RUTAS
+from funciones.EscribirLog import WriteLog
+from config.settings import RUTAS
 import pyautogui
 from pyautogui import ImageNotFoundException
-from Funciones.Login import ObtenerSesionActiva
+from funciones.Login import ObtenerSesionActiva
 from typing import List, Literal, Optional
 
 class SapTextEditor:
@@ -159,6 +159,38 @@ class SapTextEditor:
 # Funciones para obtener el ID de los objetos dinamicamnete dependiento del objeto padre
 # devuelve el valor de la propiedad o ejecuta la accion deseada
 # ===============================================================================================
+
+def set_sap_table_scroll(session, table_id_part, position):
+    """
+    Busca una tabla por su ID técnico y ajusta su scroll vertical.
+    
+    Args:
+        session: Sesión activa.
+        table_id_part (str): Parte única del ID de la tabla (ej: 'TC_1211').
+        position (int): Posición a la que queremos mover el scroll.
+    """
+    usr = session.findById("wnd[0]/usr")
+    
+    def buscar_tabla(obj):
+        try:
+            # Buscamos que sea una tabla y que el ID contenga el nombre técnico
+            if obj.Type == "GuiTableControl" and table_id_part in obj.Id:
+                return obj
+            
+            for child in obj.Children:
+                res = buscar_tabla(child)
+                if res: return res
+        except Exception:
+            pass
+        return None
+
+    tabla = buscar_tabla(usr)
+    
+    if tabla:
+        # Ajustamos la posición del scrollbar
+        tabla.verticalScrollbar.position = position
+    else:
+        raise Exception(f"No se encontró la tabla con ID que contenga: {table_id_part}")
 
 def press_GuiButton(session, button_id):
     """
@@ -851,8 +883,6 @@ def CambiarGrupoCompra(session):
 
     obj_grupoCompra = condiciones[obj_orgCompra]
 
-
-
     set_GuiCabeceraTextField_text(session, "EKGRP", obj_grupoCompra)
     #print(f"Grupo de compra actualizado a: {obj_grupoCompra}")
     acciones = []
@@ -1118,7 +1148,7 @@ def ProcesarTabla(name, dias=None):
         # opcional: eliminar columna auxiliar
         df.drop(columns=["ReqDate_fmt"], inplace=True)
 
-        return df
+        return df, primera_fila
 
     except Exception as e:
         WriteLog(
@@ -1132,3 +1162,125 @@ def ProcesarTabla(name, dias=None):
         return pd.DataFrame()
 
 
+def buscar_objeto_por_id_parcial(session, id_parcial):
+    """
+    Busca de forma recursiva un objeto en la sesión de SAP cuyo ID 
+    contenga la cadena especificada.
+    
+    Args:
+        session: Sesión activa de SAP GUI.
+        id_parcial (str): Parte del ID técnico del objeto (ej: 'TC_1211').
+        
+    Returns:
+        Objeto SAP si se encuentra, de lo contrario None.
+    """
+    # Iniciamos la búsqueda desde el nivel de usuario para mayor eficiencia
+    contenedor_principal = session.findById("wnd[0]/usr")
+    
+    def buscar_recursivo(objeto_padre):
+        try:
+            # Verificamos si el objeto actual contiene el ID buscado
+            if id_parcial in objeto_padre.Id:
+                return objeto_padre
+            
+            # Si el objeto tiene hijos, exploramos cada uno
+            if hasattr(objeto_padre, "Children"):
+                for hijo in objeto_padre.Children:
+                    resultado = buscar_recursivo(hijo)
+                    if resultado:
+                        return resultado
+        except Exception:
+            # Ignorar objetos que no permiten acceso a sus propiedades
+            pass
+        return None
+
+    return buscar_recursivo(contenedor_principal)
+
+def obtener_importe_por_denominacion(session, nombre_buscado="imp.Saludable"):
+    # 1. Identificar la tabla y el scrollbar de forma dinámica
+    # Usando TC_1211 como ejemplo para la tabla de condiciones
+    tabla = buscar_objeto_por_id_parcial(session, "TC_1211") 
+    scrollbar = tabla.verticalScrollbar
+    
+    encontrado = False
+    fila_actual = 0
+    total_filas = scrollbar.maximum
+    visible_row_count = tabla.visibleRowCount
+
+    while scrollbar.position <= total_filas:
+        for i in range(visible_row_count):
+            try:
+                # Obtenemos el texto de la columna Denominación (VTEXT)
+                denominacion = get_GuiTextField_text(session, f"VTEXT[2,{i}]")
+                
+                if nombre_buscado.lower() in denominacion.lower():
+                    # Si coincide, capturamos el valor de la columna Importe (KBETR)
+                    # Nota: Debes verificar el índice de columna para Importe en tu SAP
+                    importe = get_GuiTextField_text(session, f"KBETR[3,{i}]")
+                    return importe
+            except Exception:
+                # Si falla una fila (ej: fila vacía al final), continuamos
+                continue
+        
+        # 2. Si no se encontró en las visibles, bajar el scroll
+        nueva_posicion = scrollbar.position + visible_row_count
+        if nueva_posicion > total_filas:
+            break # Ya llegamos al final
+            
+        scrollbar.position = nueva_posicion
+        # Importante: Pequeña espera para que SAP refresque los datos internos
+        time.sleep(0.5) 
+        
+    return None
+
+
+def extraer_impuesto_saludable(session):
+    # 1. Localizar la tabla sin importar los subSUB intermedios
+    # TC_6800 es el ID estándar para la tabla en la pestaña Condiciones (ME21N/ME22N)
+    tabla = buscar_objeto_por_id_parcial(session, "TABIDT8")
+    
+    if not tabla:
+        print("❌ Error: No se encontró la tabla de condiciones en la pantalla actual.")
+        return None
+
+    scrollbar = tabla.verticalScrollbar
+    filas_visibles = tabla.visibleRowCount
+    total_filas = scrollbar.maximum
+    
+    # Aseguramos empezar desde el inicio de la tabla
+    scrollbar.position = 0
+    time.sleep(0.3)
+
+    while True:
+        for i in range(filas_visibles):
+            try:
+                # El índice 'i' es relativo a lo que se ve en pantalla
+                denominacion = get_GuiTextField_text(session, f"VTEXT[2,{i}]")
+                
+                if "saludable" in denominacion.lower():
+                    # Capturamos el importe (usualmente columna 3 'KBETR')
+                    valor_importe = get_GuiTextField_text(session, f"KBETR[3,{i}]")
+                    print(f"✅ Encontrado: {denominacion} con valor {valor_importe}")
+                    return valor_importe
+            except:
+                continue
+
+        # Lógica de Scroll: Si no lo encontramos, bajamos una "página" de la tabla
+        if scrollbar.position + filas_visibles <= total_filas:
+            scrollbar.position += filas_visibles
+            time.sleep(0.5) # Pausa necesaria para el refresco de datos en SAP
+        else:
+            break
+
+    print("⚠️ No se encontró la denominación 'imp.Saludable' en ninguna fila.")
+    return None
+
+
+def ObtenerColumnasdf(ruta_archivo: str, ):
+
+    """
+    Pruebas obtener columnas de un archivo txt
+    """
+    df= pd.read_csv(ruta_archivo, dtype=str,sep="|")
+    columnas = df.columns.tolist()
+    return columnas

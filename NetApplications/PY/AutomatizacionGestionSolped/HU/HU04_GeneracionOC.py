@@ -11,13 +11,13 @@ import re
 import subprocess
 import time
 import os
-from Config.settings import RUTAS
-from Funciones.GuiShellFunciones import obtener_numero_oc, ProcesarTabla, SetGuiComboBoxkey, CambiarGrupoCompra
-from Funciones.ValidacionM21N import (
+from config.settings import RUTAS
+from funciones.GuiShellFunciones import obtener_numero_oc, ProcesarTabla, SetGuiComboBoxkey, CambiarGrupoCompra
+from funciones.ValidacionM21N import (
 SelectGuiTab, ValidarAjustarSolped,AbrirSolped,MostrarCabecera)
-from Funciones.EscribirInforme import WriteInformeOperacion
-from Funciones.EscribirLog import WriteLog
-from Funciones.GeneralME53N import AbrirTransaccion
+from funciones.EscribirInforme import WriteInformeOperacion
+from funciones.EscribirLog import WriteLog
+from funciones.GeneralME53N import AbrirTransaccion
 import traceback
 import pyautogui  # Asegúrate de tener pyautogui instaladoi
 
@@ -41,6 +41,7 @@ def EjecutarHU04(session, archivo):
         # ============================
         # Limpiar textos Solped
         # ============================
+        # Cambiar Funcion por # df_solpeds = procesarTablaME5A(archivo)
         df_solpeds = ProcesarTabla(archivo)
 
         if df_solpeds.empty:
@@ -102,6 +103,7 @@ def EjecutarHU04(session, archivo):
             SelectGuiTab(session, "TABIDT14")
             # Valores y textos se validan y ajustan 
             acciones.extend(ValidarAjustarSolped(session, item_count))
+
             #*********************************
             # Se debe remplazar con guardar OC 
             #*********************************

@@ -3,7 +3,7 @@
 import os
 from dotenv import load_dotenv
 from pathlib import Path
-from Config.initconfig import in_config
+#from config.initconfig import in_config
 
 # Cargar .env
 load_dotenv()
@@ -32,19 +32,15 @@ DATABASE = {
 SAP_CONFIG = {
     "user": get_env_variable("SAP_USUARIO"),
     "password": get_env_variable("SAP_PASSWORD"),
-    "mandante": in_config("SAP_MANDANTE"),
-    "sistema": in_config("SAP_SISTEMA"),
-    "idioma": in_config("SAP_IDIOMA"),
-    "logon_path": in_config("SAP_LOGON_PATH"),
 }
 
+# ========= CONFIG EMAIL ==========
 CONFIG_EMAIL = {
     "smtp_server": get_env_variable("EMAIL_SMTP_SERVER"),
     "smtp_port": get_env_variable("EMAIL_SMTP_PORT"),
     "email": get_env_variable("EMAIL_USER"),
     "password": get_env_variable("EMAIL_PASSWORD"),  # IMPORTANTE: Cambiar por variable de entorno en producción
 }
-
 
 # ========= RUTAS =========
 RUTAS = {

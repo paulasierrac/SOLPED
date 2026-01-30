@@ -10,7 +10,7 @@ class Database:
     @staticmethod
     def get_connection():
         # IMPORTACIÓN LOCAL PARA EVITAR CÍRCULOS
-        from Config.settings import DATABASE
+        from config.settings import DATABASE
 
         """
         Abre conexión bajo demanda.

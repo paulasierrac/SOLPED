@@ -13,8 +13,10 @@ import pandas as pd
 import shutil
 from PyPDF2 import PdfReader
 from datetime import datetime
-from Funciones.EscribirLog import WriteLog
-from Config.settings import RUTAS
+#from funciones.GeneralME53N import EnviarNotificacionCorreo
+from funciones.EmailSender import EnviarNotificacionCorreo
+from funciones.EscribirLog import WriteLog
+from config.settings import RUTAS
 import csv
 
 
@@ -25,6 +27,9 @@ import csv
 INPUT_DIR = fr"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\Ordenes de Compra"
 OUTPUT_DIR = fr"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Resultado\OC_Proveedores"
 ERROR_DIR = fr"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Resultado\pdf_no_procesados"
+ADJURIDICO = fr"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\Juridicas"
+ADESTANDAR = fr"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\Estandar"
+
 
 REGEX_OC = r"ORDEN\s+DE\s+COMPRA\s*(?:N[°ºo]?\.?)?\s*(\d{8,12})"
 
@@ -54,23 +59,36 @@ def generar_envios_y_reporte(consolidado):
 
         for proveedor, datos in consolidado.items():
             adjuntos_finales = list(datos["rutas_archivos"])
-    
-            if datos["tipo"] == "Juridico":
-                adjuntos_finales.append(RUTAS["AdjuntoJuridico"])
-            else:
-                # Adjuntos para otros (Persona Natural / No Registrado)
-                adjuntos_finales.append(RUTAS["AdjuntoEstandar"])
 
+            # Definir la ruta de adjuntos extra según el tipo
+            ruta_extra = ADJURIDICO if datos["tipo"] == "Juridico" else ADESTANDAR
+            # VALIDACIÓN: Si es una carpeta, recorre y añade cada archivo
+            if os.path.isdir(ruta_extra):
+                for archivo in os.listdir(ruta_extra):
+                    ruta_completa = os.path.join(ruta_extra, archivo)
+                    # Solo añade si es un archivo (evita subcarpetas)
+                    if os.path.isfile(ruta_completa):
+                        adjuntos_finales.append(ruta_completa)
+            else:
+                # Si la ruta era un archivo individual, lo añade directo
+                adjuntos_finales.append(ruta_extra)
+    
             try:
                 ocs_str = ", ".join(datos["ocs"])
                 correos_str = ", ".join(datos["correos"])
+                
                 
                 log(f"--- Enviando Correo Consolidado a: {proveedor} ---")
                 log(f"OCs incluidas: {ocs_str}")
                 log(f"Adjuntos: {len(datos['rutas_archivos'])} archivos")
                 
                 # Aquí iría tu lógica real de Outlook/SMTP enviando todos los datos['adjuntos_finales'] 
+
+                EnviarNotificacionCorreo( codigo_correo= 1 , task_name = "Prueba - Notificacion", adjuntos= adjuntos_finales)
+
+              
                 
+
                 # Registro en informe
                 writer.writerow([proveedor, correos_str, ocs_str, 'Enviado'])
                 

@@ -6,6 +6,7 @@
 # Propiedad de Colsubsidio
 # Cambios: (Si Aplica)
 # ============================================
+from requests import session
 import win32com.client
 import traceback
 import pandas as pd
@@ -13,21 +14,22 @@ import re
 import subprocess
 import time
 import os
-from Funciones.EscribirLog import WriteLog 
-from Config.settings import RUTAS
+from funciones.EscribirLog import WriteLog 
+from config.settings import RUTAS
 import pyautogui
 from pyautogui import ImageNotFoundException
-from Funciones.Login import ObtenerSesionActiva
-from Funciones.GuiShellFunciones import (SapTextEditor,
+from funciones.Login import ObtenerSesionActiva
+from funciones.GuiShellFunciones import (SapTextEditor, extraer_impuesto_saludable,
 set_GuiTextField_text,              
 get_GuiTextField_text,
+buscar_objeto_por_id_parcial,
 obtener_valor,
 extraer_concepto,
 obtener_correos,
 normalizar_precio_sap, 
 clasificar_concepto,
 esperar_sap_listo,
-buscar_y_clickear, 
+buscar_y_clickear, set_sap_table_scroll, 
 ventana_abierta,
 SelectGuiTab,
 MostrarCabecera,
@@ -83,20 +85,15 @@ def ValidarAjustarSolped(session,item=1):
         "subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1211/tblSAPLMEGUITC_1211")
         
 
-        # Todo: Stev: bucle para revisar visibles en el grid de posiciones
-        filas_visibles = Scroll.VisibleRowCount
+        # filas_visibles = Scroll.VisibleRowCount #Todo: Stev: bucle para revisar visibles en el grid de posiciones
+        
         # Lista de acciones en SAP que sirve de informe
         acciones = []
 
         for fila in range(item):  #cambiar por item
             # Selecbox de la posicion de la solped  ejemplo de guia :  1 [10] 80016676 , LAVADO MANTEL GRANDE 
-            PosicionSolped = session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/subSUB3:SAPLMEVIEWS:1100/"
-            "subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB1:SAPLMEGUI:6000/cmbDYN_6000-LIST")
+            PosicionSolped = buscar_objeto_por_id_parcial(session, "cmbDYN_6000-LIST")
             PosicionSolped.key = f"   {fila+1}"
-            #Guia Terminal, borrar print 
-            print(f"Fila: {fila}")
-            print("Filas visubles ", filas_visibles)
-            #Guia Terminal, borrar print 
 
             # Obtiene el Precio de la posicion
             # PrecioPosicion = get_GuiTextField_text(session, f"NETPR[10,{fila}]") #Stev: implementar while para scroll, hacer dinamico el f"NETPR[10,{fila}]"
@@ -108,10 +105,10 @@ def ValidarAjustarSolped(session,item=1):
             CantidadPosicion = get_GuiTextField_text(session, f"MENGE[6,0]")
             #CantidadPosicion = normalizar_precio_sap(CantidadPosicion)
 
-            #Guia Terminal, borrar print 
-            print(f"Cantidad posicion {fila+1}0:{CantidadPosicion}")
-            print(f"Precio posicion {fila+1}0:{PrecioPosicion}")
-            #Guia Terminal, borrar print 
+            # Navega a la pestaña de textos
+            SelectGuiTab(session, "TABIDT14")
+            esperar_sap_listo(session)
+            #textPF.selectedNode ="F01" # Foco en primer Texto IMPORTANTE 
 
             # obtiene el texto del objeto ├─ Leer textos
             editor = SapTextEditor(session, EDITOR_ID)
@@ -122,82 +119,83 @@ def ValidarAjustarSolped(session,item=1):
             preciotexto = obtener_valor(texto, claves)
             preciotexto = normalizar_precio_sap(preciotexto)
           
-
             # Obtiene la cantidad en el texto
             claves = ["CANTIDAD"] # str que busca en el texto
             cantidadtexto = obtener_valor(texto, claves)
 
+            # Obtiene impuestos en el texto
+            claves = ["IMPUESTOS"] # str que busca en el texto
+            impuestostexto = obtener_valor(texto, claves)
+
             correosColdubsidio = obtener_correos(texto,"@colsubsidio.com") # ejemplo de uso de la funcion obtener correos
-            print("Correos encontrados en el texto de la posicion ",fila+1,":",correosColdubsidio)
+            acciones.append(f"Correos encontrados en el texto de la posicion {fila+1}: {correosColdubsidio}")
+            acciones.append(f"Impuestos encontrados en el texto de la posicion {fila+1}: {impuestostexto}")
 
             concepto = extraer_concepto(texto)
             if concepto:
                 tipo = clasificar_concepto(concepto)
-                print(concepto, "=>", tipo)
-
-            #Guia Terminal, borrar print 
-            print("Cantid en el texto :", cantidadtexto)
-            print("Precio en el texto: ",preciotexto)
-            #Guia Terminal, borrar print 
+                acciones.append(f"{concepto} => {tipo}")
 
             # Comparacion de Valores de Cantidad
-
             if cantidadtexto and cantidadtexto.strip() and CantidadPosicion != cantidadtexto:
                 set_GuiTextField_text(session, f"MENGE[6,0]", cantidadtexto)
-                print(f"Se mofico posicion :{fila+1}0 Cantidad -> {CantidadPosicion} != {cantidadtexto}")
+                #print(f"Se mofico posicion :{fila+1}0 Cantidad -> {CantidadPosicion} != {cantidadtexto}")
                 acciones.append(f"Posicion {fila+1}0 => CP: {CantidadPosicion} != CT:{cantidadtexto} ⚠️ Se Actualiza Cantidad")                 
 
             # Comparacion de Valores de Precio
-
             if preciotexto and str(preciotexto).strip() and PrecioPosicion != preciotexto:
                 set_GuiTextField_text(session, f"NETPR[10,0]", preciotexto)
-                print(f"Se mofico posicion :{fila+1}0 Precio -> {PrecioPosicion} != {preciotexto}")
+                #print(f"Se mofico posicion :{fila+1}0 Precio -> {PrecioPosicion} != {preciotexto}")
                 acciones.append(f"Posicion {fila+1}0 => PP:{PrecioPosicion} != PT:{preciotexto}⚠️ Se Actualiza Precio")
             
 
             # Realiza los reemplazos en el texto
-
-            reemplazos = {
-                    "VENTA SERVICIO": "V1",
-                    "VENTA PRODUCTO": "V1",
-                    "GASTO PROPIO SERVICIO": "C2",
-                    "GASTO PROPIO PRODUCTO": "C2",
-                    "SAA": "R3", #"SAA SERVICIO": "R3"
-                    "SAA PRODUCTO": "R3",
-                }
+            reemplazos = {"VENTA SERVICIO": "V1","VENTA PRODUCTO": "V1","GASTO PROPIO SERVICIO": "C2","GASTO PROPIO PRODUCTO": "C2","SAA": "R3","SAA PRODUCTO": "R3"} #"SAA SERVICIO": "R3"
             nuevo_texto, cambios,cambioEcxacto = editor.replace_in_text(texto, reemplazos)
-            print(f"Cambios exactos realizados en el texto de la posicion {fila+1}0:")
-            print(cambioEcxacto)
-
+            #acciones.append(f"Cambios exactos realizados en el texto de la posicion {fila+1}0: ")
             #Si hay cambios, agrega a la lista de acciones
             if cambios > 0:
-                acciones.append(f"Cambios realizados: {cambios} en la posicion :{fila+1}0 en el Texto ")
+                acciones.append(f"Cambios realizados: {cambios} en la posicion :{fila+1}0 en el Texto :{cambioEcxacto}")
             
+            # Actualiza el texto en el editor de SAP
             editext=session.findById(EDITOR_ID)
             editext.SetUnprotectedTextPart(0,nuevo_texto)
+
             #Borra los textos de cada editor F02 en adelante
             for i in range(2, 6):  # F02 a F05
                 textPF = session.findById(textoPosicionF)
                 nodo = f"F0{i}"
                 textPF.selectedNode = nodo
                 editxt = session.findById(EDITOR_ID)
-                #editor = SapTextEditor(session, EDITOR_ID)
                 texto = editor.get_all_text()
                 if texto :
                     #print("El texto no esta vacío. Procediendo a borrarlo... :"f"F0{i}")
                     editxt.SetUnprotectedTextPart(0,".")
-                    #acciones.append(f"Texto borrado en F0{i} en posicion {fila+1}0")
-            #press_GuiButton(session, "AUTOTEXT002") #presiona el botón abajo siguiente posicion
-            textPF.selectedNode ="F01" # Foco en primer Texto IMPORTANTE 
+            
             esperar_sap_listo(session)
-            time.sleep(0.5)
+
+            # Tomar impuesto Saludable en la pestaña de Condiciones 
+            SelectGuiTab(session, "TABIDT8")
+            esperar_sap_listo(session)
+
+            for i in range(5):  # Revisa las primeras 5 condiciones
+                impuestosCondiciones = get_GuiTextField_text(session, f"VTEXT[2,{i}]")
+                print(f"Impuesto en la pestaña de condiciones: {impuestosCondiciones}")
+                #if impuestosCondiciones == "imp.Saludable":
+            
+            extraer_impuesto_saludable(session)
+            
             # da scroll una posicion hacia abajo para no perder visual de los objetos en la tabla de SAP
-            Scroll = session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/subSUB2:SAPLMEVIEWS:1100/" \
-             "subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1211/tblSAPLMEGUITC_1211")
-            Scroll.verticalScrollbar.position = fila+1
-            SelectGuiTab(session, "TABIDT14")
-            #print("Posicion visible despues del Scroll:")
-            print(get_GuiTextField_text(session, f"EBELP[1,0]"))
+            set_sap_table_scroll(session, "TC_1211", fila+1)
+
+            set_sap_table_scroll(session, "tblSAPLV69ATCTRL_KONDITIONEN", fila+1)
+         
+            # Scroll = session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/subSUB2:SAPLMEVIEWS:1100/" \
+            #  "subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1211/tblSAPLMEGUITC_1211")
+            # Scroll.verticalScrollbar.position = fila+1
+            
+            #print("primera posicion visible despues del Scroll:")
+            print(f"Primera posicion visible : {get_GuiTextField_text(session, f'EBELP[1,0]')}")
             esperar_sap_listo(session)
         # Devuelve las accines ejecutadas en una lista 
         return acciones

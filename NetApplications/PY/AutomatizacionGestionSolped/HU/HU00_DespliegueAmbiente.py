@@ -9,7 +9,11 @@
 
 import os
 import json
-from Config.settings import init_config
+
+from config.initconfig import init_config
+
+#from config.initconfig import init_config
+
 
 
 
@@ -48,7 +52,7 @@ def EjecutarHU00():
     # 3. (Opcional) Cargar parámetros desde config.json o BD
     # ==========================================================
     init_config()
-    print("HU00: Despliegue de ambiente completado exitosamente.")
+   
 
     ruta_config = os.path.join(ruta_base, "config.json")
 
