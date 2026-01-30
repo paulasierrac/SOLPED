@@ -30,6 +30,14 @@ SAP_CONFIG = {
     "logon_path": get_env_variable("SAP_LOGON_PATH"),
 }
 
+# ========= Database ==========
+DB_CONFIG = {
+    "host": get_env_variable("SERVERDB"),
+    "database": get_env_variable("NAMEDB"),
+    "user": get_env_variable("USERDB"),
+    "password": get_env_variable("PASSWORDDB"),
+    "schema": get_env_variable("SCHEMA"),
+}
 
 # ========= RUTAS =========
 RUTAS = {
