@@ -14,21 +14,20 @@ from time import time
 
 
 from HU.HU04_GeneracionOC import EjecutarHU04
-from Funciones.GeneralME53N import (
+from funciones.GeneralME53N import (
     EnviarNotificacionCorreo,
     EnviarCorreoPersonalizado,
     NotificarRevisionManualSolped,
     convertir_txt_a_excel,
     NotificarRevisionManualSolped,
 )
-from Funciones.EscribirLog import WriteLog
-from Funciones.ValidacionM21N import leer_solpeds_desde_archivo, BorrarTextosDesdeSolped
-from Config.settings import RUTAS, SAP_CONFIG
+from funciones.EscribirLog import WriteLog
+from funciones.ValidacionM21N import leer_solpeds_desde_archivo, BorrarTextosDesdeSolped
+from config.settings import RUTAS, SAP_CONFIG
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
 from HU.HU01_LoginSAP import conectar_sap
 from HU.HU02_DescargaME5A import EjecutarHU02
 from config.initconfig import in_config
-from funciones.EscribirLog import WriteLog
 
 from funciones.GuiShellFunciones import leer_solpeds_desde_archivo
 from config.settings import RUTAS, SAP_CONFIG
