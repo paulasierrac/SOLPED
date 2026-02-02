@@ -15,8 +15,8 @@ import subprocess
 import os
 import time
 import traceback
-from Funciones.EscribirLog import WriteLog
-from Funciones.GeneralME53N import (
+from funciones.EscribirLog import WriteLog
+from funciones.GeneralME53N import (
     AbrirTransaccion,
     ColsultarSolped,
     procesarTablaME5A,
@@ -36,8 +36,7 @@ from Funciones.GeneralME53N import (
     EnviarNotificacionCorreo,
     AppendHipervinculoObservaciones,
 )
-
-from Config.settings import RUTAS
+from config.settings import RUTAS
 
 
 def EjecutarHU03(session, nombre_archivo):
@@ -820,7 +819,10 @@ def EjecutarHU03(session, nombre_archivo):
                         print(f"  '{obs[:50]}...': {count}")
 
         print("\n")
+<<<<<<< HEAD
 
+=======
+>>>>>>> fb4710ec9fc386c041b75a57e10de4974bd18ccf
         WriteLog(
             mensaje=f"HU03 completado exitosamente. "
             f"SOLPEDs: {contadores['procesadas_exitosamente']}/{contadores['total_solpeds']}, "

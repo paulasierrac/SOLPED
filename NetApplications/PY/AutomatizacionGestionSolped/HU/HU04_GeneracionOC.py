@@ -11,12 +11,16 @@ import re
 import subprocess
 import time
 import os
-from Config.settings import RUTAS
-from Funciones.ValidacionM21N import BorrarTextosDesdeSolped,obtener_numero_oc
-from Funciones.EscribirLog import WriteLog
-from Funciones.GeneralME53N import AbrirTransaccion,procesarTablaME5A
+from config.settings import RUTAS
+from funciones.GuiShellFunciones import esperar_sap_listo, obtener_numero_oc, ProcesarTabla, SetGuiComboBoxkey, CambiarGrupoCompra
+from funciones.ValidacionM21N import (
+SelectGuiTab, ValidarAjustarSolped,AbrirSolped,MostrarCabecera)
+from funciones.EscribirInforme import WriteInformeOperacion
+from funciones.EscribirLog import WriteLog
+from funciones.GeneralME53N import AbrirTransaccion
 import traceback
-import pyautogui  # Asegúrate de tener pyautogui instalado
+import pyautogui  # Asegúrate de tener pyautogui instaladoi
+
 
 def EjecutarHU04(session, archivo):
     
@@ -32,12 +36,13 @@ def EjecutarHU04(session, archivo):
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        
 
+        
         # ============================
         # Limpiar textos Solped
         # ============================
-        df_solpeds = procesarTablaME5A(archivo)
+        # Cambiar Funcion por # df_solpeds = procesarTablaME5A(archivo)
+        df_solpeds = ProcesarTabla(archivo)
 
         if df_solpeds.empty:
             WriteLog(
@@ -49,9 +54,15 @@ def EjecutarHU04(session, archivo):
             return
 
         solpeds_unicas = df_solpeds['PurchReq'].unique()
-        print(f"Solpeds únicas a procesar: {solpeds_unicas}")
+        print(f"Solpeds a procesar: {solpeds_unicas}")
+        WriteLog(
+                    mensaje=f"listado de Solped cargadas : {solpeds_unicas}",
+                    estado="INFO",
+                    task_name=task_name,
+                    path_log=RUTAS["PathLog"],
+                )
         
-        for solped in solpeds_unicas[1:]:  # Saltar la primera solped si es necesario (Encabezados)
+        for solped in solpeds_unicas:  # Saltar la primera solped si es necesario (Encabezados)
              # --- Validación de Solped ---
             if (
                 not solped                      # None o vacío
@@ -70,18 +81,71 @@ def EjecutarHU04(session, archivo):
             item_count = df_solpeds[df_solpeds['PurchReq'] == solped].shape[0]
             
             WriteLog(
-                mensaje=f"Procesando Solped: {solped} con {item_count} item(s).",
+                mensaje=f"Procesando Solped: {solped} de items: {item_count} .",
                 estado="INFO",
                 task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                path_log=RUTAS["PathLog"]
+                             
             )
-            print(f"Session actual: {session}")
-            print(f"procesando solped: {solped} de items: {item_count}")
-            BorrarTextosDesdeSolped(session, solped, item_count)
+            acciones = []
+            #print(f"procesando solped: {solped} de items: {item_count}")
+            AbrirTransaccion(session, "ME21N")
+            #navegacion por SAP que permite abrir Solped 
+            
+            AbrirSolped(session, solped, item_count)
+
+             #se selecciona la clase de docuemnto ZRCR, revisar alcance si es necesario cambiar a otra clase dependiendo de algun criterio
+            SetGuiComboBoxkey(session, "TOPLINE-BSART", "ZRCR")
+
+            esperar_sap_listo(session)
+            pyautogui.hotkey("ctrl","F2")
+            #se ingresa a la pestaña  Dat.org. de cabecera, asegurándonos de que esté visible
+            SelectGuiTab(session, "TABHDT9") 
+            # Se cambia el grupo de compra dependiendo de la org de compra, y se guardan acciones
+            acciones.extend(CambiarGrupoCompra(session))
+            # Seleccionar la pestaña de textos, asegurándonos de que esté visible
+            esperar_sap_listo(session)
+            #time.sleep(0.5)
+            pyautogui.hotkey("ctrl","F4")
+            SelectGuiTab(session, "TABIDT14")
+            # Valores y textos se validan y ajustan 
+            acciones.extend(ValidarAjustarSolped(session, item_count))
+
+            #*********************************
+            # Se debe remplazar con guardar OC 
+            #*********************************
+            # /Salir para pruebas 
+            pyautogui.press("F12")
+            time.sleep(1)
+            pyautogui.hotkey("TAB")
+            time.sleep(0.5)
+            pyautogui.hotkey("enter")
+            # /Salir para pruebas 
+            #********************************* 
+
+            # Obtener el numero de la orden de compra generada desde la barra de estado.
             orden_de_compra = obtener_numero_oc(session)
+
+            # Stev: validar si se debe hacer algo mas con la OC generada
+
+            
+            ruta = WriteInformeOperacion(
+                    item_count=item_count,
+                    solped=solped,
+                    orden_compra= orden_de_compra,
+                    acciones=acciones,
+                    estado="EXITOSO",
+                    bot_name="Resock",
+                    task_name=task_name,
+                    path_informes=r".\Salida",
+                    observaciones="Proceso ejecutado sin errores."
+            )
+
+            print(f"Informe generado en: {ruta}")
+
             # Después de procesar todas las solpeds y (presumiblemente) guardar la OC.        
             WriteLog(
-                mensaje=f"Se generó la Orden de Compra: {orden_de_compra}",
+                mensaje=f" para la solped : {solped} Se generó la Orden de Compra: {orden_de_compra}",
                 estado="INFO",
                 task_name=task_name,
                 path_log=RUTAS["PathLog"],

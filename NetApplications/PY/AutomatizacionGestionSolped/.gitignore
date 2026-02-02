@@ -52,9 +52,25 @@ img/
 Insumo/
 Input/
 Resultado/
+Salida/
+logs/
+estandar de configuracion.txt
 Estándar de Configuracion Colsubsidio 1.pdf
-C:\Users\CGRPA042\Documents\Steven\SOLPED\logs
-C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo
+
+# ===========================
+# ARCHIVOS LOCALES / PRUEBAS
+# ===========================
 
 Notas.txt
 notas.py
+MainLogin.py
+MainPruebas1.py
+MainPruebas2.py
+MainPruebas3.py
+MainPruebas4.py
+MainPruebasS.py
+
+NetApplications/PY/AutomatizacionGestionSolped/Notas.txt
+NetApplications/PY/AutomatizacionGestionSolped/notas.py
+NetApplications/PY/AutomatizacionGestionSolped/MainLogin.py
+NetApplications/PY/AutomatizacionGestionSolped/MainPruebas*.py
