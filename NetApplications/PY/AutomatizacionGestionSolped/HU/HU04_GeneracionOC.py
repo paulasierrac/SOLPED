@@ -12,7 +12,7 @@ import subprocess
 import time
 import os
 from config.settings import RUTAS
-from funciones.GuiShellFunciones import obtener_numero_oc, ProcesarTabla, SetGuiComboBoxkey, CambiarGrupoCompra
+from funciones.GuiShellFunciones import esperar_sap_listo, obtener_numero_oc, ProcesarTabla, SetGuiComboBoxkey, CambiarGrupoCompra
 from funciones.ValidacionM21N import (
 SelectGuiTab, ValidarAjustarSolped,AbrirSolped,MostrarCabecera)
 from funciones.EscribirInforme import WriteInformeOperacion
@@ -91,15 +91,22 @@ def EjecutarHU04(session, archivo):
             #print(f"procesando solped: {solped} de items: {item_count}")
             AbrirTransaccion(session, "ME21N")
             #navegacion por SAP que permite abrir Solped 
-            MostrarCabecera()
+            
             AbrirSolped(session, solped, item_count)
+
              #se selecciona la clase de docuemnto ZRCR, revisar alcance si es necesario cambiar a otra clase dependiendo de algun criterio
             SetGuiComboBoxkey(session, "TOPLINE-BSART", "ZRCR")
+
+            esperar_sap_listo(session)
+            pyautogui.hotkey("ctrl","F2")
             #se ingresa a la pestaña  Dat.org. de cabecera, asegurándonos de que esté visible
             SelectGuiTab(session, "TABHDT9") 
             # Se cambia el grupo de compra dependiendo de la org de compra, y se guardan acciones
             acciones.extend(CambiarGrupoCompra(session))
             # Seleccionar la pestaña de textos, asegurándonos de que esté visible
+            esperar_sap_listo(session)
+            #time.sleep(0.5)
+            pyautogui.hotkey("ctrl","F4")
             SelectGuiTab(session, "TABIDT14")
             # Valores y textos se validan y ajustan 
             acciones.extend(ValidarAjustarSolped(session, item_count))

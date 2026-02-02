@@ -6,6 +6,7 @@
 # Propiedad de Colsubsidio
 # Cambios: (Si Aplica)
 # ============================================
+from requests import session
 import win32com.client
 import traceback
 import pandas as pd
@@ -1148,7 +1149,7 @@ def ProcesarTabla(name, dias=None):
         # opcional: eliminar columna auxiliar
         df.drop(columns=["ReqDate_fmt"], inplace=True)
 
-        return df, primera_fila
+        return df
 
     except Exception as e:
         WriteLog(
@@ -1234,48 +1235,6 @@ def obtener_importe_por_denominacion(session, nombre_buscado="imp.Saludable"):
     return None
 
 
-def extraer_impuesto_saludable(session):
-    # 1. Localizar la tabla sin importar los subSUB intermedios
-    # TC_6800 es el ID estándar para la tabla en la pestaña Condiciones (ME21N/ME22N)
-    tabla = buscar_objeto_por_id_parcial(session, "TABIDT8")
-    
-    if not tabla:
-        print("❌ Error: No se encontró la tabla de condiciones en la pantalla actual.")
-        return None
-
-    scrollbar = tabla.verticalScrollbar
-    filas_visibles = tabla.visibleRowCount
-    total_filas = scrollbar.maximum
-    
-    # Aseguramos empezar desde el inicio de la tabla
-    scrollbar.position = 0
-    time.sleep(0.3)
-
-    while True:
-        for i in range(filas_visibles):
-            try:
-                # El índice 'i' es relativo a lo que se ve en pantalla
-                denominacion = get_GuiTextField_text(session, f"VTEXT[2,{i}]")
-                
-                if "saludable" in denominacion.lower():
-                    # Capturamos el importe (usualmente columna 3 'KBETR')
-                    valor_importe = get_GuiTextField_text(session, f"KBETR[3,{i}]")
-                    print(f"✅ Encontrado: {denominacion} con valor {valor_importe}")
-                    return valor_importe
-            except:
-                continue
-
-        # Lógica de Scroll: Si no lo encontramos, bajamos una "página" de la tabla
-        if scrollbar.position + filas_visibles <= total_filas:
-            scrollbar.position += filas_visibles
-            time.sleep(0.5) # Pausa necesaria para el refresco de datos en SAP
-        else:
-            break
-
-    print("⚠️ No se encontró la denominación 'imp.Saludable' en ninguna fila.")
-    return None
-
-
 def ObtenerColumnasdf(ruta_archivo: str, ):
 
     """
@@ -1284,3 +1243,45 @@ def ObtenerColumnasdf(ruta_archivo: str, ):
     df= pd.read_csv(ruta_archivo, dtype=str,sep="|")
     columnas = df.columns.tolist()
     return columnas
+
+
+def get_importesCondiciones(session, impuesto_buscado="Imp. Saludable IBUE"):
+    """
+    Obtiene los importes de la pestaña condiciones en ME21N
+    segun un impuesto específico.
+    
+    Args:
+        session: Sesión activa de SAP GUI. 
+        impuesto_buscado (str): Impuesto a buscar.
+
+    Returns:
+        str: Importe del impuesto encontrado o None si no se encuentra.
+    
+    """
+
+    # Tomar impuesto Saludable en la pestaña de Condiciones 
+    SelectGuiTab(session, "TABIDT8")
+    bandera = True
+    # asegura que empieza en la posición 1 de la tabla de Condiciones
+    set_sap_table_scroll(session, "tblSAPLV69ATCTRL_KONDITIONEN", 1)
+
+    while (bandera == True):
+        try :
+            for i in range(20):  # Revisa las condiciones
+                impuestosCondiciones = get_GuiTextField_text(session, f"VTEXT[2,{i}]")
+                print(f"Impuesto en la pestaña de condiciones: {impuestosCondiciones}")
+                if impuestosCondiciones == impuesto_buscado: 
+                    print("Impuesto encontrado:", impuestosCondiciones)
+                    bandera=False
+                    return get_GuiTextField_text(session, f"KBETR[3,{i}]")  # Retorna el importe asociado
+                                        
+                elif impuestosCondiciones == "" :
+                    print("no encontrado:", impuestosCondiciones)
+                    bandera=False
+                    return None  # Salir si se encuentra una fila vacía
+                    
+        except Exception as e:
+            SelectGuiTab(session, "TABIDT8")
+            set_sap_table_scroll(session, "tblSAPLV69ATCTRL_KONDITIONEN", i)
+            print("Error al obtener los impuestos de las condiciones:", str(e))
+            #continue

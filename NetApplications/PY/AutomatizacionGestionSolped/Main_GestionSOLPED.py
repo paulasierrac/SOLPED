@@ -82,7 +82,7 @@ def Main_GestionSolped():
         )
 
        
-        EjecutarHU02(session)
+        #EjecutarHU02(session)
 
         WriteLog(
             mensaje="HU02 finalizada correctamente.",

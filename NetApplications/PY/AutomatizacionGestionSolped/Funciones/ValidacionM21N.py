@@ -19,10 +19,11 @@ from config.settings import RUTAS
 import pyautogui
 from pyautogui import ImageNotFoundException
 from funciones.Login import ObtenerSesionActiva
-from funciones.GuiShellFunciones import (SapTextEditor, extraer_impuesto_saludable,
+from funciones.GuiShellFunciones import (SapTextEditor,
 set_GuiTextField_text,              
 get_GuiTextField_text,
 buscar_objeto_por_id_parcial,
+get_importesCondiciones,
 obtener_valor,
 extraer_concepto,
 obtener_correos,
@@ -53,48 +54,12 @@ def ValidarAjustarSolped(session,item=1):
 
 
     try:
-        textoPosicionF = (
-            "wnd[0]/usr/"
-            "subSUB0:SAPLMEGUI:0010/" \
-            "subSUB3:SAPLMEVIEWS:1100/" \
-            "subSUB2:SAPLMEVIEWS:1200/" \
-            "subSUB1:SAPLMEGUI:1301/" \
-            "subSUB2:SAPLMEGUI:1303/" \
-            "tabsITEM_DETAIL/tabpTABIDT14/"
-            "ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/"
-            "subTEXTS:SAPLMMTE:0200/" \
-            "cntlTEXT_TYPES_0200/shell"
-        )
-
-
-        EDITOR_ID = (
-            "wnd[0]/usr/"
-            "subSUB0:SAPLMEGUI:0010/"
-            "subSUB3:SAPLMEVIEWS:1100/"
-            "subSUB2:SAPLMEVIEWS:1200/"
-            "subSUB1:SAPLMEGUI:1301/"
-            "subSUB2:SAPLMEGUI:1303/"
-            "tabsITEM_DETAIL/tabpTABIDT14/"
-            "ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/"
-            "subTEXTS:SAPLMMTE:0200/"
-            "subEDITOR:SAPLMMTE:0201/"
-            "cntlTEXT_EDITOR_0201/shellcont/shell"
-        )
-
-        Scroll = session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/subSUB2:SAPLMEVIEWS:1100/" \
-        "subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1211/tblSAPLMEGUITC_1211")
-        
-
-        # filas_visibles = Scroll.VisibleRowCount #Todo: Stev: bucle para revisar visibles en el grid de posiciones
         
         # Lista de acciones en SAP que sirve de informe
         acciones = []
 
         for fila in range(item):  #cambiar por item
-            # Selecbox de la posicion de la solped  ejemplo de guia :  1 [10] 80016676 , LAVADO MANTEL GRANDE 
-            PosicionSolped = buscar_objeto_por_id_parcial(session, "cmbDYN_6000-LIST")
-            PosicionSolped.key = f"   {fila+1}"
-
+            
             # Obtiene el Precio de la posicion
             # PrecioPosicion = get_GuiTextField_text(session, f"NETPR[10,{fila}]") #Stev: implementar while para scroll, hacer dinamico el f"NETPR[10,{fila}]"
             PrecioPosicion = get_GuiTextField_text(session, f"NETPR[10,0]")
@@ -105,13 +70,21 @@ def ValidarAjustarSolped(session,item=1):
             CantidadPosicion = get_GuiTextField_text(session, f"MENGE[6,0]")
             #CantidadPosicion = normalizar_precio_sap(CantidadPosicion)
 
-            # Navega a la pestaña de textos
-            SelectGuiTab(session, "TABIDT14")
-            esperar_sap_listo(session)
-            #textPF.selectedNode ="F01" # Foco en primer Texto IMPORTANTE 
+            # Selecbox de la posicion de la solped  ejemplo de guia :  1 [10] 80016676 , LAVADO MANTEL GRANDE 
+            PosicionSolped = buscar_objeto_por_id_parcial(session, "cmbDYN_6000-LIST")
+            PosicionSolped.key = f"   {fila+1}"
 
+            # Navega a la pestaña de textos
+            esperar_sap_listo(session)
+            SelectGuiTab(session, "TABIDT14")
+            textPF1 = buscar_objeto_por_id_parcial(session, "cntlTEXT_TYPES_0200/shell")
+            textPF1.selectedNode = "F01" # Foco en primer Texto IMPORTANTE
+            esperar_sap_listo(session)
+            EDITOR_ID= buscar_objeto_por_id_parcial(session, "cntlTEXT_EDITOR_0201/shellcont/shell")
+        
+            esperar_sap_listo(session)
             # obtiene el texto del objeto ├─ Leer textos
-            editor = SapTextEditor(session, EDITOR_ID)
+            editor = SapTextEditor(session, EDITOR_ID.id)
             texto = editor.get_all_text()
 
             # Obtiene el valor en el texto (Precio)
@@ -124,7 +97,7 @@ def ValidarAjustarSolped(session,item=1):
             cantidadtexto = obtener_valor(texto, claves)
 
             # Obtiene impuestos en el texto
-            claves = ["IMPUESTOS"] # str que busca en el texto
+            claves = ["IMPUESTO QUE APLICA"] # str que busca en el texto
             impuestostexto = obtener_valor(texto, claves)
 
             correosColdubsidio = obtener_correos(texto,"@colsubsidio.com") # ejemplo de uso de la funcion obtener correos
@@ -151,50 +124,37 @@ def ValidarAjustarSolped(session,item=1):
 
             # Realiza los reemplazos en el texto
             reemplazos = {"VENTA SERVICIO": "V1","VENTA PRODUCTO": "V1","GASTO PROPIO SERVICIO": "C2","GASTO PROPIO PRODUCTO": "C2","SAA": "R3","SAA PRODUCTO": "R3"} #"SAA SERVICIO": "R3"
-            nuevo_texto, cambios,cambioEcxacto = editor.replace_in_text(texto, reemplazos)
-            #acciones.append(f"Cambios exactos realizados en el texto de la posicion {fila+1}0: ")
+            nuevo_texto,cambios,cambioEcxacto = editor.replace_in_text(texto, reemplazos)
+
             #Si hay cambios, agrega a la lista de acciones
             if cambios > 0:
                 acciones.append(f"Cambios realizados: {cambios} en la posicion :{fila+1}0 en el Texto :{cambioEcxacto}")
             
             # Actualiza el texto en el editor de SAP
-            editext=session.findById(EDITOR_ID)
+            editext=session.findById(EDITOR_ID.id)
             editext.SetUnprotectedTextPart(0,nuevo_texto)
 
             #Borra los textos de cada editor F02 en adelante
             for i in range(2, 6):  # F02 a F05
-                textPF = session.findById(textoPosicionF)
+                SelectGuiTab(session, "TABIDT14")               
+                textPF = buscar_objeto_por_id_parcial(session, "cntlTEXT_TYPES_0200/shell")
                 nodo = f"F0{i}"
                 textPF.selectedNode = nodo
-                editxt = session.findById(EDITOR_ID)
+                editxt = session.findById(EDITOR_ID.id)
                 texto = editor.get_all_text()
                 if texto :
                     #print("El texto no esta vacío. Procediendo a borrarlo... :"f"F0{i}")
                     editxt.SetUnprotectedTextPart(0,".")
-            
-            esperar_sap_listo(session)
 
-            # Tomar impuesto Saludable en la pestaña de Condiciones 
-            SelectGuiTab(session, "TABIDT8")
             esperar_sap_listo(session)
-
-            for i in range(5):  # Revisa las primeras 5 condiciones
-                impuestosCondiciones = get_GuiTextField_text(session, f"VTEXT[2,{i}]")
-                print(f"Impuesto en la pestaña de condiciones: {impuestosCondiciones}")
-                #if impuestosCondiciones == "imp.Saludable":
+            valorImpSaludable = get_importesCondiciones(session)
+            if valorImpSaludable:
+                acciones.append(f"Impuesto Saludable en la posicion {fila+1}0: {valorImpSaludable}")
             
-            extraer_impuesto_saludable(session)
-            
+                   
             # da scroll una posicion hacia abajo para no perder visual de los objetos en la tabla de SAP
             set_sap_table_scroll(session, "TC_1211", fila+1)
 
-            set_sap_table_scroll(session, "tblSAPLV69ATCTRL_KONDITIONEN", fila+1)
-         
-            # Scroll = session.findById("wnd[0]/usr/subSUB0:SAPLMEGUI:0010/subSUB2:SAPLMEVIEWS:1100/" \
-            #  "subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1211/tblSAPLMEGUITC_1211")
-            # Scroll.verticalScrollbar.position = fila+1
-            
-            #print("primera posicion visible despues del Scroll:")
             print(f"Primera posicion visible : {get_GuiTextField_text(session, f'EBELP[1,0]')}")
             esperar_sap_listo(session)
         # Devuelve las accines ejecutadas en una lista 
