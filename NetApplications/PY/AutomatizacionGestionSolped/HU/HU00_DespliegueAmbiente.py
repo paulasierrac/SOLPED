@@ -10,6 +10,12 @@
 import os
 import json
 
+from config.initconfig import init_config
+
+#from config.initconfig import init_config
+
+
+
 
 def EjecutarHU00():
     """
@@ -45,6 +51,9 @@ def EjecutarHU00():
     # ==========================================================
     # 3. (Opcional) Cargar parámetros desde config.json o BD
     # ==========================================================
+    init_config()
+   
+
     ruta_config = os.path.join(ruta_base, "config.json")
 
     if os.path.exists(ruta_config):

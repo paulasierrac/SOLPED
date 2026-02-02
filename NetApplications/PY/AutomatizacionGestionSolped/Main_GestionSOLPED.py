@@ -10,15 +10,9 @@
 #   - Manejo de excepciones y log por día
 # ================================
 
-from HU.HU00_DespliegueAmbiente import EjecutarHU00
-from HU.HU01_LoginSAP import (
-    ObtenerSesionActiva,
-    conectar_sap,
-)
-from HU.HU02_DescargaME5A import (
-    EjecutarHU02,
-)
-from HU.HU03_ValidacionME53N import EjecutarHU03
+from time import time
+
+
 from HU.HU04_GeneracionOC import EjecutarHU04
 from Funciones.GeneralME53N import (
     EnviarNotificacionCorreo,
@@ -30,7 +24,16 @@ from Funciones.GeneralME53N import (
 from Funciones.EscribirLog import WriteLog
 from Funciones.ValidacionM21N import leer_solpeds_desde_archivo, BorrarTextosDesdeSolped
 from Config.settings import RUTAS, SAP_CONFIG
+from HU.HU00_DespliegueAmbiente import EjecutarHU00
+from HU.HU01_LoginSAP import conectar_sap
+from HU.HU02_DescargaME5A import EjecutarHU02
+from config.initconfig import in_config
+from funciones.EscribirLog import WriteLog
+
+from funciones.GuiShellFunciones import leer_solpeds_desde_archivo
+from config.settings import RUTAS, SAP_CONFIG
 import traceback
+
 
 
 def Main_GestionSolped():
@@ -106,7 +109,8 @@ def Main_GestionSolped():
         # ================================
         # 4. Ejecutar HU03 – Validación Solped ME53N
         # ================================
-        archivos_validar = ["expSolped05.txt", "expSolped03.txt"]
+        #archivos_validar = ["expSolped03.txt","expSolped03 copy.txt"]
+        archivos_validar = ["expSolped03.txt"] # Dos solped para prueba 1300139393  1300139394
 
         for archivo in archivos_validar:
             WriteLog(
@@ -128,29 +132,34 @@ def Main_GestionSolped():
 
             # Notificación de finalización HU02 con archivo descargado (código 2)
 
-            # ================================
-            # 5. Ejecutar HU04 – Creacion de OC
-            # ================================
+        # ================================
+        # 5. Ejecutar HU04 – Creacion de OC
+        # ================================
+        # TODO - revisar si es necesario EL LOG DE INICIO HU04 por cada archivo o solo una vez
 
-            WriteLog(
-                mensaje="Inicia HU04 - Creacion de OC desde ME21N.",
-                estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
-            )
+            # WriteLog(
+            #     mensaje="Inicia HU04 - Creacion de OC desde ME21N.",
+            #     estado="INFO",
+            #     task_name=task_name,
+            #     path_log=RUTAS["PathLog"],
+            # )
 
-            archivos_validar = [
-                "expSolped05test.txt"
-            ]  # CAMBIAR A 05 PARA SOLPED LIBERADAS
+            #archivos_validar = ["expSolped05 1.txt"] # 1300139271,1300139272
+            archivos_validar = ["expSolped03 copy.txt"] # CAMBIAR A 05 PARA SOLPED LIBERADAS
+            #archivos_validar = ["expSolped03.txt"] # CAMBIAR A 05 PARA SOLPED LIBERADAS
+            #archivos_validar = ["expSolped03.txt"] # Dos solped para prueba 1300139393  1300139394 / se daño 
+
+
             for archivo in archivos_validar:
                 EjecutarHU04(session, archivo)
 
-            WriteLog(
-                mensaje=f"HU04 finalizada correctamente para archivo {archivo}.",
-                estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
-            )
+
+            # WriteLog(
+            #     mensaje=f"HU04 finalizada correctamente para archivo {archivo}.",
+            #     estado="INFO",
+            #     task_name=task_name,
+            #     path_log=RUTAS["PathLog"],
+            # )
 
         # Finalizacion de HU4 generacion de OC
 
@@ -174,6 +183,15 @@ def Main_GestionSolped():
             for solped, info in dataSolpeds.items():
                 print(f"Solped {solped} tiene {info['items']} items")
                 # Cambiar por funcion de descarga de OC
+            dataOC = leer_solpeds_desde_archivo(ruta)
+            print(type(dataOC))
+                         
+            #for OrdenCompra, info in dataOC.items():
+                #print(f"OrdenCompra {OrdenCompra} tiene {info['items']} items")
+                #Cambiar por funcion de descarga de OC 
+                
+
+
 
             WriteLog(
                 mensaje=f"HU05 finalizada correctamente para archivo {archivo}.",

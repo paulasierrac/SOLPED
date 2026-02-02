@@ -7,8 +7,8 @@
 # Cambios: (Si Aplica)
 # ============================================
 import pyautogui
-from Config.settings import RUTAS
-from Funciones.GeneralME53N import AbrirTransaccion
+from config.settings import RUTAS
+from funciones.GeneralME53N import AbrirTransaccion
 import win32com.client
 import time
 import os
@@ -36,7 +36,7 @@ def DescargarSolpedME5A(session, estado):
     # Alcance de la lista
     session.findById("wnd[0]/usr/ctxtP_LSTUB").text = "ALV"
 
-    # Tipo de documento
+    # Clase de documento
     session.findById("wnd[0]/usr/btn%_S_BSART_%_APP_%-VALU_PUSH").press()
 
     # Tabla de selección

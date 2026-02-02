@@ -143,7 +143,7 @@ print("\n" + "=" * 70)
 #     ),
 #     task_name=task_name,
 #     adjuntos=["C:/Archivos/log_error_20251204.txt"],
-#     cc=["paula.sierra@netapplications.com.co"],
+#     cc=["steven.navarro@netapplications.com.co"],
 # )
 
 # if exito_personalizado:

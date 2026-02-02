@@ -10,8 +10,8 @@ import traceback
 import win32com.client
 import time
 import os
-from Funciones.EscribirLog import WriteLog
-from Config.settings import RUTAS
+from funciones.EscribirLog import WriteLog
+from config.settings import RUTAS
 import pandas as pd
 import datetime
 import re
@@ -22,7 +22,7 @@ from datetime import datetime
 from typing import Dict, List, Tuple
 import smtplib
 import os
-from Funciones.EmailSender import EmailSender
+from funciones.EmailSender import EmailSender
 from typing import List, Union
 import sys
 
