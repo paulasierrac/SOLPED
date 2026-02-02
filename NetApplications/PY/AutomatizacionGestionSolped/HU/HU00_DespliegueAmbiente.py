@@ -12,15 +12,17 @@ import json
 
 from config.initconfig import init_config
 
-#from config.initconfig import init_config
-
-
+# from config.initconfig import init_config
 
 
 def EjecutarHU00():
     """
     Prepara el entorno: valida carpetas, carga parámetros y estructura inicial.
     """
+    # ==========================================================
+    # 0. (Opcional) Cargar parámetros desde config.json o BD
+    # ==========================================================
+    init_config()
 
     # ==========================================================
     # 1. Ruta base del proyecto (importante)
@@ -47,12 +49,6 @@ def EjecutarHU00():
 
         if not os.path.exists(ruta_completa):
             os.makedirs(ruta_completa)
-
-    # ==========================================================
-    # 3. (Opcional) Cargar parámetros desde config.json o BD
-    # ==========================================================
-    init_config()
-   
 
     ruta_config = os.path.join(ruta_base, "config.json")
 

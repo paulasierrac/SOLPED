@@ -34,7 +34,6 @@ from config.settings import RUTAS, SAP_CONFIG
 import traceback
 
 
-
 def Main_GestionSolped():
     try:
         task_name = "Main_GestionSOLPED"
@@ -69,13 +68,13 @@ def Main_GestionSolped():
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        # session = conectar_sap(
-        #     SAP_CONFIG["sistema"],
-        #     SAP_CONFIG["mandante"],
-        #     SAP_CONFIG["user"],
-        #     SAP_CONFIG["password"],
-        #     "EN",
-        # )
+        session = conectar_sap(
+            SAP_CONFIG["sistema"],
+            SAP_CONFIG["mandante"],
+            SAP_CONFIG["user"],
+            SAP_CONFIG["password"],
+            "EN",
+        )
 
         session = ObtenerSesionActiva()
 
@@ -108,8 +107,10 @@ def Main_GestionSolped():
         # ================================
         # 4. Ejecutar HU03 – Validación Solped ME53N
         # ================================
-        #archivos_validar = ["expSolped03.txt","expSolped03 copy.txt"]
-        archivos_validar = ["expSolped03.txt"] # Dos solped para prueba 1300139393  1300139394
+        # archivos_validar = ["expSolped03.txt","expSolped03 copy.txt"]
+        archivos_validar = [
+            "expSolped03.txt"
+        ]  # Dos solped para prueba 1300139393  1300139394
 
         for archivo in archivos_validar:
             WriteLog(
@@ -131,10 +132,10 @@ def Main_GestionSolped():
 
             # Notificación de finalización HU02 con archivo descargado (código 2)
 
-        # ================================
-        # 5. Ejecutar HU04 – Creacion de OC
-        # ================================
-        # TODO - revisar si es necesario EL LOG DE INICIO HU04 por cada archivo o solo una vez
+            # ================================
+            # 5. Ejecutar HU04 – Creacion de OC
+            # ================================
+            # TODO - revisar si es necesario EL LOG DE INICIO HU04 por cada archivo o solo una vez
 
             # WriteLog(
             #     mensaje="Inicia HU04 - Creacion de OC desde ME21N.",
@@ -143,15 +144,15 @@ def Main_GestionSolped():
             #     path_log=RUTAS["PathLog"],
             # )
 
-            #archivos_validar = ["expSolped05 1.txt"] # 1300139271,1300139272
-            archivos_validar = ["expSolped03 copy.txt"] # CAMBIAR A 05 PARA SOLPED LIBERADAS
-            #archivos_validar = ["expSolped03.txt"] # CAMBIAR A 05 PARA SOLPED LIBERADAS
-            #archivos_validar = ["expSolped03.txt"] # Dos solped para prueba 1300139393  1300139394 / se daño 
-
+            # archivos_validar = ["expSolped05 1.txt"] # 1300139271,1300139272
+            archivos_validar = [
+                "expSolped03 copy.txt"
+            ]  # CAMBIAR A 05 PARA SOLPED LIBERADAS
+            # archivos_validar = ["expSolped03.txt"] # CAMBIAR A 05 PARA SOLPED LIBERADAS
+            # archivos_validar = ["expSolped03.txt"] # Dos solped para prueba 1300139393  1300139394 / se daño
 
             for archivo in archivos_validar:
                 EjecutarHU04(session, archivo)
-
 
             # WriteLog(
             #     mensaje=f"HU04 finalizada correctamente para archivo {archivo}.",
@@ -184,13 +185,10 @@ def Main_GestionSolped():
                 # Cambiar por funcion de descarga de OC
             dataOC = leer_solpeds_desde_archivo(ruta)
             print(type(dataOC))
-                         
-            #for OrdenCompra, info in dataOC.items():
-                #print(f"OrdenCompra {OrdenCompra} tiene {info['items']} items")
-                #Cambiar por funcion de descarga de OC 
-                
 
-
+            # for OrdenCompra, info in dataOC.items():
+            # print(f"OrdenCompra {OrdenCompra} tiene {info['items']} items")
+            # Cambiar por funcion de descarga de OC
 
             WriteLog(
                 mensaje=f"HU05 finalizada correctamente para archivo {archivo}.",

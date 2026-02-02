@@ -12,7 +12,7 @@ class ParametrosRepository:
 
         query = """
             SELECT Nombre, Valor
-            FROM GestionSolped.parametros
+            FROM GestionSolped.Parametros
         """
         cursor.execute(query)
 

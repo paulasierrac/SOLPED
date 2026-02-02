@@ -3,13 +3,15 @@
 import os
 from dotenv import load_dotenv
 from pathlib import Path
-#from config.initconfig import in_config
+
+# from config.initconfig import in_config
 
 # Cargar .env
 load_dotenv()
 
 # Ruta base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
+
 
 def get_env_variable(key: str, required: bool = True):
     value = os.getenv(key)
@@ -22,10 +24,10 @@ def get_env_variable(key: str, required: bool = True):
 
 # ========= CONEXION BASE DE DATOS ==========
 DATABASE = {
-    'DB_SERVER': os.getenv('DB_SERVER'),
-    'DB_NAME': os.getenv('DB_NAME'),
-    'DB_USER': os.getenv('DB_USER'),
-    'DB_PASSWORD': os.getenv('DB_PASSWORD')
+    "DB_SERVER": os.getenv("SERVERDB"),
+    "DB_NAME": os.getenv("NAMEDB"),
+    "DB_USER": os.getenv("USERDB"),
+    "DB_PASSWORD": os.getenv("PASSWORDDB"),
 }
 
 # ========= CONFIG SAP ==========
@@ -34,12 +36,23 @@ SAP_CONFIG = {
     "password": get_env_variable("SAP_PASSWORD"),
 }
 
+# ========= Database ==========
+DB_CONFIG = {
+    "host": get_env_variable("SERVERDB"),
+    "database": get_env_variable("NAMEDB"),
+    "user": get_env_variable("USERDB"),
+    "password": get_env_variable("PASSWORDDB"),
+    "schema": get_env_variable("SCHEMA"),
+}
+
 # ========= CONFIG EMAIL ==========
 CONFIG_EMAIL = {
     "smtp_server": get_env_variable("EMAIL_SMTP_SERVER"),
     "smtp_port": get_env_variable("EMAIL_SMTP_PORT"),
     "email": get_env_variable("EMAIL_USER"),
-    "password": get_env_variable("EMAIL_PASSWORD"),  # IMPORTANTE: Cambiar por variable de entorno en producción
+    "password": get_env_variable(
+        "EMAIL_PASSWORD"
+    ),  # IMPORTANTE: Cambiar por variable de entorno en producción
 }
 
 # ========= RUTAS =========
@@ -71,4 +84,3 @@ for key, path in RUTAS.items():
 
 # Crear carpeta de logs
 os.makedirs(os.path.dirname(RUTAS["PathLog"]), exist_ok=True)
-
