@@ -13,6 +13,7 @@ import getpass
 import socket
 
 
+
 def WriteLog(mensaje: str, estado: str, task_name: str, path_log: str):
     """
     mensaje  : Texto del log
@@ -64,3 +65,4 @@ def WriteLog(mensaje: str, estado: str, task_name: str, path_log: str):
     # === Guardar log ===
     with open(ruta_archivo, "a", encoding="utf-8") as f:
         f.write(linea)
+
