@@ -70,7 +70,29 @@ def EjecutarHU05(session, ordenes_de_compra: list):
 
         print (df_Ocliberadas)
 
+        df_Ocliberadas.columns = [col.strip() for col in df_Ocliberadas.columns]
+
+        # 2. Definir las columnas deseadas
+        columnas_interes = ["Doc.compr.", "EstadLib"]
+
+        # 3. Crear el nuevo DataFrame validando que las columnas existan
+        if all(col in df_Ocliberadas.columns for col in columnas_interes):
+            df_filtrado = df_Ocliberadas[columnas_interes].copy()
+            print("Nuevo DataFrame creado exitosamente.")
+        else:
+            # Caso alternativo: Si las columnas tienen nombres ligeramente distintos
+            print(f"Columnas encontradas en el archivo: {list(df_Ocliberadas.columns)}")
+            # Intento de búsqueda por coincidencia parcial si falla la exacta
+            col_doc = next((c for c in df_Ocliberadas.columns if "Doc.compr" in c), None)
+            col_est = next((c for c in df_Ocliberadas.columns if "EstadLib" in c), None)
+            
+            if col_doc and col_est:
+                df_filtrado = df_Ocliberadas[[col_doc, col_est]].copy()
+                df_filtrado.columns = ["Doc.compr.", "EstadLib"] # Renombrar para estandarizar
         
+        print(df_filtrado)
+
+
 
 
         WriteLog(
