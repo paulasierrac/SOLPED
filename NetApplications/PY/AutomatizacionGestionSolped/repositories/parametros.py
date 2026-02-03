@@ -11,11 +11,7 @@ class ParametrosRepository:
 
         query = f"""
             SELECT Nombre, Valor
-<<<<<<< HEAD
-            FROM GestionSolped.parametros
-=======
             FROM {self.schema}.Parametros
->>>>>>> origin/and-refactor
         """
         cursor.execute(query)
 
