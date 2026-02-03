@@ -1,18 +1,21 @@
 from config.database import Database
-import logging
-
-logger = logging.getLogger(__name__)
 
 class ParametrosRepository:
 
-    @staticmethod
-    def cargar_parametros() -> dict:
+    def __init__(self, schema: str):
+        self.schema = schema 
+        
+    def cargar_parametros(self) -> dict:
         conn = Database.get_connection()
         cursor = conn.cursor()
 
-        query = """
+        query = f"""
             SELECT Nombre, Valor
+<<<<<<< HEAD
             FROM GestionSolped.parametros
+=======
+            FROM {self.schema}.Parametros
+>>>>>>> origin/and-refactor
         """
         cursor.execute(query)
 
