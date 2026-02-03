@@ -13,7 +13,8 @@
 from time import time
 
 
-from HU.HU04_GeneracionOC import EjecutarHU04
+
+
 from funciones.GeneralME53N import (
     EnviarNotificacionCorreo,
     EnviarCorreoPersonalizado,
@@ -22,12 +23,16 @@ from funciones.GeneralME53N import (
     NotificarRevisionManualSolped,
 )
 from funciones.EscribirLog import WriteLog
-from funciones.ValidacionM21N import leer_solpeds_desde_archivo, BorrarTextosDesdeSolped
+
 from config.settings import RUTAS, SAP_CONFIG
+from config.initconfig import in_config
+
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
 from HU.HU01_LoginSAP import conectar_sap
 from HU.HU02_DescargaME5A import EjecutarHU02
-from config.initconfig import in_config
+from HU.HU03_ValidacionME53N import EjecutarHU03
+from HU.HU04_GeneracionOC import EjecutarHU04
+from HU.HU05_DescargaOC import EjecutarHU05
 
 from funciones.GuiShellFunciones import leer_solpeds_desde_archivo
 from config.settings import RUTAS, SAP_CONFIG
@@ -58,7 +63,7 @@ def Main_GestionSolped():
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        # EjecutarHU00()
+        EjecutarHU00()
 
         # ================================
         # 2. Obtener sesión SAP
@@ -69,15 +74,10 @@ def Main_GestionSolped():
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        # session = conectar_sap(
-        #     SAP_CONFIG["sistema"],
-        #     SAP_CONFIG["mandante"],
-        #     SAP_CONFIG["user"],
-        #     SAP_CONFIG["password"],
-        #     "EN",
-        # )
 
-        session = ObtenerSesionActiva()
+
+        session = conectar_sap(in_config("SAP_SISTEMA"),in_config("SAP_MANDANTE") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
+     
 
         WriteLog(
             mensaje="Sesión SAP obtenida correctamente.",
@@ -95,8 +95,8 @@ def Main_GestionSolped():
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-
-        # EjecutarHU02(session)
+        ordenes_de_compra = ["4200339200", "4200339201", "4200339202", "4200339203", "4200339204", "4200339205", "4200339206"]
+        EjecutarHU05(session,ordenes_de_compra)
 
         WriteLog(
             mensaje="HU02 finalizada correctamente.",
@@ -119,7 +119,7 @@ def Main_GestionSolped():
                 path_log=RUTAS["PathLog"],
             )
 
-            EjecutarHU03(session, archivo)
+            #EjecutarHU03(session, archivo)
             # convertir_txt_a_excel(archivo)
 
             WriteLog(

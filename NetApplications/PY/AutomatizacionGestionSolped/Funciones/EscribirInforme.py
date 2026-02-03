@@ -30,7 +30,7 @@ def WriteInformeOperacion(
     """
 
     # === Fecha ===
-    ahora = datetime.datetime.now()
+    ahora = datetime.now()
     fecha_hora = ahora.strftime("%d/%m/%Y %H:%M:%S")
     fecha_archivo = ahora.strftime("%Y%m%d_%H%M%S")
 

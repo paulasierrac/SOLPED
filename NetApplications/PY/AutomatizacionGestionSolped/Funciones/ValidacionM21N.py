@@ -189,7 +189,14 @@ def AbrirSolped(session, solped, item=2):
             if time.time() > timeout:
                 raise TimeoutError(f"No se abrió la ventana :{ventana}")
             buscar_y_clickear(rf".\img\vSeleccion.png", confidence=0.8, intentos=5, espera=0.5)
-            esperar_sap_listo(session)
+            
+            # VarianteSeleccion = buscar_objeto_por_id_parcial(session, "/shell[0]")
+            # VarianteSeleccion1= buscar_objeto_por_id_parcial(session, "SELECT")
+            # VarianteSeleccion.pressContextButton (VarianteSeleccion1.id)
+            # esperar_sap_listo(session)
+            # SolicitudesdePedido = buscar_objeto_por_id_parcial(session, ":REQ_QUERY")
+            # VarianteSeleccion.selectContextMenuItem (SolicitudesdePedido.id)
+            
             time.sleep(2)
             pyautogui.press("s") # selecciona el campo Solicitudes de pedido en la lista
 

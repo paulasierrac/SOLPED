@@ -456,6 +456,7 @@ def set_GuiTextField_text(session, campo_posicion, valor):
     fila = int(fila)
 
     usr = session.findById("wnd[0]/usr")
+    
 
     objetivo = f"-{campo}[{col},{fila}]"
 
@@ -485,6 +486,60 @@ def set_GuiTextField_text(session, campo_posicion, valor):
     txt.Text = str(valor)
     txt.CaretPosition = len(txt.Text)
     session.findById("wnd[0]").sendVKey(0)
+
+def set_GuiTextField_Ventana1_text(session, campo_posicion, valor):
+    """
+    Setea el texto de un GuiTextField dentro de un TableControl SAP
+    usando posición lógica (ej: 'NETPR[10,0]' o 'MENGE[6,0]').
+    Compatible con M21N (MEPO1211).
+    """
+
+    if not campo_posicion:
+        raise ValueError("campo_posicion es obligatorio")
+
+    if valor is None:
+        valor = ""
+
+    # Parseo CAMPO[col,fila]
+    match = re.fullmatch(r"([A-Z0-9_]+)\[(\d+),(\d+)\]", campo_posicion.upper())
+    if not match:
+        raise ValueError("Formato inválido. Use: NETPR[10,0] o MENGE[6,0]")
+
+    campo, col, fila = match.groups()
+    col = int(col)
+    fila = int(fila)
+    #ventana 1
+    usr = session.findById("wnd[1]/usr")
+    
+
+    objetivo = f"-{campo}[{col},{fila}]"
+
+    def buscar_textfield(obj):
+        try:
+            if (
+                obj.Type == "GuiCTextField"
+                and objetivo in obj.Id
+            ):
+                return obj
+
+            for child in obj.Children:
+                res = buscar_textfield(child)
+                if res:
+                    return res
+        except Exception:
+            pass
+        return None
+
+    txt = buscar_textfield(usr)
+
+    if not txt:
+        raise Exception(f"No se encontró GuiTextField SAP: {campo}[{col},{fila}]")
+
+    # Seteo seguro (SAP-friendly)
+    txt.SetFocus()
+    txt.Text = str(valor)
+    txt.CaretPosition = len(txt.Text)
+    session.findById("wnd[1]").sendVKey(0)
 
 def ventana_abierta(session, titulo_parcial):
     """
@@ -1162,6 +1217,92 @@ def ProcesarTabla(name, dias=None):
         traceback.print_exc()
         return pd.DataFrame()
 
+def ProcesarTablaMejorada(name, dias=None):
+    try:
+        # 1. Carga de archivo con manejo de rutas
+        path = rf"{RUTAS['PathInsumos']}\{name}"
+        lineas_puras = []
+        for cod in ["latin-1", "utf-8", "cp1252"]:
+            try:
+                with open(path, "r", encoding=cod) as f:
+                    lineas_puras = [l.strip() for l in f.readlines()]
+                break
+            except: continue
+
+        if not lineas_puras: return pd.DataFrame()
+
+        # 2. Unificación de filas (Manejo de multilinealidad de SAP)
+        filas_unificadas = []
+        buffer_fila = ""
+        for linea in lineas_puras:
+            # Ignorar separadores visuales de SAP
+            if not linea.startswith("|") or linea.strip().startswith("|---"):
+                continue
+            
+            # Si la línea tiene muchos campos (pipes), es una nueva entrada [cite: 1, 4]
+            if linea.count("|") > 10: 
+                if buffer_fila: filas_unificadas.append(buffer_fila)
+                buffer_fila = linea
+            else:
+                # Es continuación de la línea anterior (ej. Valor Neto o Moneda) [cite: 3, 6]
+                buffer_fila += linea[1:]
+
+        if buffer_fila: filas_unificadas.append(buffer_fila)
+
+        # 3. Limpieza de datos y normalización de columnas
+        data_final = []
+        for f in filas_unificadas:
+            # Dividir y limpiar espacios, ignorando elementos vacíos resultantes del split lateral
+            partes = [p.strip() for p in f.split("|")]
+            # Eliminar el primer y último elemento si son vacíos (por los pipes laterales)
+            if partes[0] == "": partes.pop(0)
+            if partes and partes[-1] == "": partes.pop(-1)
+            
+            if partes and not all(x == "*" for x in partes):
+                data_final.append(partes)
+
+        if not data_final: return pd.DataFrame()
+
+        # 4. Construcción del DataFrame con validación de longitud
+        encabezados = data_final[0]
+        cuerpo = data_final[1:]
+        
+        # Validar si el primer elemento del cuerpo es en realidad el resto del encabezado
+        # (A veces SAP usa 2 filas para el encabezado) 
+        if cuerpo and "Material" not in encabezados and "Material" in cuerpo[0]:
+            encabezados = [f"{e} {c}".strip() for e, c in zip(encabezados, cuerpo[0])]
+            cuerpo = cuerpo[1:]
+
+        # Forzar a que cada fila tenga exactamente la longitud de 'encabezados'
+        cuerpo_ajustado = []
+        for fila in cuerpo:
+            if len(fila) > len(encabezados):
+                cuerpo_ajustado.append(fila[:len(encabezados)]) # Recortar excedente
+            elif len(fila) < len(encabezados):
+                cuerpo_ajustado.append(fila + [""] * (len(encabezados) - len(fila))) # Rellenar faltante
+            else:
+                cuerpo_ajustado.append(fila)
+
+        df = pd.DataFrame(cuerpo_ajustado, columns=encabezados)
+
+        # 5. Limpieza de columnas "fantasma" y duplicados de encabezado
+        df = df[df.iloc[:, 0] != encabezados[0]] # Eliminar si el encabezado se repite en medio
+        
+        # 6. Filtro por fecha (ReqDate o Fecha doc.) [cite: 4, 11, 48]
+        col_fecha = next((c for c in df.columns if any(x in c for x in ["Date", "Fecha", "ReqDate"])), None)
+        
+        if col_fecha and not df.empty:
+            df[col_fecha] = pd.to_datetime(df[col_fecha], errors="coerce", dayfirst=True)
+            if dias is not None:
+                limite = pd.Timestamp.today().normalize() - pd.Timedelta(days=int(dias))
+                df = df[df[col_fecha] >= limite]
+
+        return df.reset_index(drop=True)
+
+    except Exception as e:
+        print(f"Error crítico en ProcesarTablaMejorada: {e}")
+        traceback.print_exc()
+        return pd.DataFrame()
 
 def buscar_objeto_por_id_parcial(session, id_parcial):
     """
