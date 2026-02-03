@@ -819,10 +819,6 @@ def EjecutarHU03(session, nombre_archivo):
                         print(f"  '{obs[:50]}...': {count}")
 
         print("\n")
-<<<<<<< HEAD
-
-=======
->>>>>>> fb4710ec9fc386c041b75a57e10de4974bd18ccf
         WriteLog(
             mensaje=f"HU03 completado exitosamente. "
             f"SOLPEDs: {contadores['procesadas_exitosamente']}/{contadores['total_solpeds']}, "
