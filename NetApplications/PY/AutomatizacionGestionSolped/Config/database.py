@@ -1,6 +1,6 @@
 import pyodbc
 import logging
-#from Config.settings import DATABASE   # revisar estandar de nombre de carpetas Config / config
+#from config.settings import DATABASE   
 logger = logging.getLogger(__name__)
 
 class Database:

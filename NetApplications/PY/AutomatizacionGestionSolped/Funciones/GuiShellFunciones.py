@@ -1220,7 +1220,7 @@ def ProcesarTabla(name, dias=None):
 def ProcesarTablaMejorada(name, dias=None):
     try:
         # 1. Carga de archivo con manejo de rutas
-        path = rf"{RUTAS['PathInsumos']}\{name}"
+        path = rf"{RUTAS['PathTempFileServer']}\{name}"
         lineas_puras = []
         for cod in ["latin-1", "utf-8", "cp1252"]:
             try:

@@ -55,27 +55,28 @@ def EjecutarHU05(session, ordenes_de_compra: list):
 
         # === Fecha ===
         ahora = datetime.now()
-        fecha_hora = ahora.strftime("%d/%m/%Y %H:%M:%S")
+        #fecha_hora = ahora.strftime("%d/%m/%Y %H:%M:%S")
         fecha_archivo = ahora.strftime("%Y%m%d_%H%M%S")
         #Guardar el archivo txt en la ruta especificada
-        ruta_guardar = rf"{RUTAS["PathInsumo"]}"
+        ruta_guardar = rf"{RUTAS["PathTempFileServer"]}"
         session.findById("wnd[1]/usr/ctxtDY_PATH").text = ruta_guardar
         session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = rf"LiberadasOC_{fecha_archivo}.txt"
         session.findById("wnd[1]/usr/ctxtDY_FILENAME").caretPosition = 10
         session.findById("wnd[1]/tbar[0]/btn[0]").press
         session.findById("wnd[1]/tbar[0]/btn[11]").press()  # Guardar
-     
+
+        print(RUTAS["PathTempFileServer"])
+        print(ruta_guardar)
         archivo = rf"LiberadasOC_{fecha_archivo}.txt"
+
         df_Ocliberadas = ProcesarTablaMejorada(archivo)
-
-        print (df_Ocliberadas)
-
+        #print (df_Ocliberadas)
         df_Ocliberadas.columns = [col.strip() for col in df_Ocliberadas.columns]
 
-        # 2. Definir las columnas deseadas
+        # Definir las columnas deseadas
         columnas_interes = ["Doc.compr.", "EstadLib"]
 
-        # 3. Crear el nuevo DataFrame validando que las columnas existan
+        # Crear el nuevo DataFrame validando que las columnas existan
         if all(col in df_Ocliberadas.columns for col in columnas_interes):
             df_filtrado = df_Ocliberadas[columnas_interes].copy()
             print("Nuevo DataFrame creado exitosamente.")
