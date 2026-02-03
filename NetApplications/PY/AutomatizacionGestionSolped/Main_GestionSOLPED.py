@@ -10,10 +10,12 @@
 #   - Manejo de excepciones y log por día
 # ================================
 
-from time import time
+import time
+import pyautogui
+import traceback
 
-
-
+from config.settings import RUTAS, SAP_CONFIG
+from config.init_config import in_config
 
 from funciones.GeneralME53N import (
     EnviarNotificacionCorreo,
@@ -23,9 +25,7 @@ from funciones.GeneralME53N import (
     NotificarRevisionManualSolped,
 )
 from funciones.EscribirLog import WriteLog
-
-from config.settings import RUTAS, SAP_CONFIG
-from config.initconfig import in_config
+from funciones.GuiShellFunciones import leer_solpeds_desde_archivo
 
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
 from HU.HU01_LoginSAP import conectar_sap
@@ -33,11 +33,6 @@ from HU.HU02_DescargaME5A import EjecutarHU02
 from HU.HU03_ValidacionME53N import EjecutarHU03
 from HU.HU04_GeneracionOC import EjecutarHU04
 from HU.HU05_DescargaOC import EjecutarHU05
-
-from funciones.GuiShellFunciones import leer_solpeds_desde_archivo
-from config.settings import RUTAS, SAP_CONFIG
-import traceback
-
 
 def Main_GestionSolped():
     try:
@@ -74,7 +69,6 @@ def Main_GestionSolped():
             path_log=RUTAS["PathLog"],
         )
 
-
         session = conectar_sap(in_config("SAP_SISTEMA"),in_config("SAP_MANDANTE") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
      
 
@@ -96,6 +90,20 @@ def Main_GestionSolped():
         )
         ordenes_de_compra = ["4200339200", "4200339201", "4200339202", "4200339203", "4200339204", "4200339205", "4200339206"]
         EjecutarHU05(session,ordenes_de_compra)
+
+        #*********************************
+        # Se debe remplazar con guardar OC 
+        #*********************************
+        # /Salir para pruebas 
+        pyautogui.press("F12")
+        time.sleep(1)
+        pyautogui.hotkey("TAB")
+        time.sleep(0.5)
+        pyautogui.hotkey("enter")
+        # /Salir para pruebas 
+        #********************************* 
+
+
 
         WriteLog(
             mensaje="HU02 finalizada correctamente.",

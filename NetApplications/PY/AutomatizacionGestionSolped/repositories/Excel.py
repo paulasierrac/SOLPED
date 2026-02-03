@@ -1,9 +1,10 @@
 from config.database import Database
-
+from config.settings import DB_CONFIG
+schemadb = DB_CONFIG.get("schema")
 class ExcelRepo:
 
     def __init__(self, schema: str):
-        self.schema = schema
+        self.schema = schema or schemadb
         
     # -----------------------------
     # CREAR COLUMNAS DINÁMICAS

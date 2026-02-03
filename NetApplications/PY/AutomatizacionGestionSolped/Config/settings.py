@@ -34,6 +34,17 @@ SAP_CONFIG = {
     "password": get_env_variable("SAP_PASSWORD"),
 }
 
+# ========= Database ==========
+DB_CONFIG = {
+    "host": get_env_variable("SERVERDB"),
+    "database": get_env_variable("NAMEDB"),
+    "user": get_env_variable("USERDB"),
+    "password": get_env_variable("PASSWORDDB"),
+    "schema": get_env_variable("SCHEMA"),
+    
+}
+
+
 # ========= CONFIG EMAIL ==========
 CONFIG_EMAIL = {
     "smtp_server": get_env_variable("EMAIL_SMTP_SERVER"),

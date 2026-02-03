@@ -8,17 +8,29 @@
 # ============================================
 
 from datetime import datetime
-import pyperclip
+import pandas as pd
+
 from requests import session
-import win32com.client  # pyright: ignore[reportMissingModuleSource]
 import time
 import traceback
-import pyautogui
+
+from config.settings import RUTAS, DB_CONFIG
 from funciones.GuiShellFunciones import ProcesarTablaMejorada
 from funciones.EscribirLog import WriteLog
-from config.settings import RUTAS
 from funciones.GeneralME53N import AbrirTransaccion
 from funciones.ValidacionM21N import esperar_sap_listo
+
+from funciones.FuncionesExcel import ExcelService
+
+
+def obtener_columnas_excel(ruta_excel: str, header: int) -> list[str]:
+        df = pd.read_excel(
+            ruta_excel,
+            header=header,
+            nrows=0,
+            engine="openpyxl"
+        )
+        return  df.columns.tolist()
 
 def EjecutarHU05(session, ordenes_de_compra: list):
     """
@@ -92,6 +104,16 @@ def EjecutarHU05(session, ordenes_de_compra: list):
                 df_filtrado.columns = ["Doc.compr.", "EstadLib"] # Renombrar para estandarizar
         
         print(df_filtrado)
+        # Guardar el DataFrame filtrado en un archivo Excel
+        df_filtrado.to_excel(rf"{RUTAS['PathTempFileServer']}\OC_Liberadas_{fecha_archivo}.xlsx", index=False)
+        
+        schema = DB_CONFIG.get("schema")
+        print(schema)
+
+        print(obtener_columnas_excel(rf"{RUTAS['PathTempFileServer']}\OC_Liberadas_{fecha_archivo}.xlsx", header=0))
+        
+        ExcelService.ejecutar_bulk_desde_excel(rf"{RUTAS['PathTempFileServer']}\OC_Liberadas_{fecha_archivo}.xlsx", header=2)
+
 
 
 

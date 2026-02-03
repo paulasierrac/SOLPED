@@ -95,7 +95,7 @@ class ExcelService:
     # OBTENER COLUMNAS DEL EXCEL
     # -----------------------------
     @staticmethod
-    def obtener_columnas_excel(ruta_excel: str, header: int) -> list[str]:
+    def obtener_columnas_excel(ruta_excel: str, header: int = 0) -> list[str]:
         df = pd.read_excel(
             ruta_excel,
             header=header,
@@ -103,7 +103,8 @@ class ExcelService:
             engine="openpyxl"
         )
         return [ExcelService.normalize_column(c) for c in df.columns]
-
+    
+    
     # -----------------------------
     # EXCEL → CSV
     # -----------------------------
@@ -189,7 +190,8 @@ class ExcelService:
             ruta_txt = ExcelService.convertir_txt(ruta_csv)
 
             # 4. Bulk con tabla temporal + final
-            ExcelRepo.ejecutar_bulk_dinamico(
+            VariableExcelRepo = ExcelRepo(schema="GestionSolped") 
+            VariableExcelRepo.ejecutar_bulk_dinamico(
                 ruta_txt=ruta_txt,
                 tabla=nombre_tabla,
                 columnas=orden_columnas
