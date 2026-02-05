@@ -1,19 +1,20 @@
 from config.database import Database
+from config.settings import DB_CONFIG
+
+schemadb = DB_CONFIG.get("schema")
+
 
 class ExcelRepo:
 
     def __init__(self, schema: str):
-        self.schema = schema
-        
+        self.schema = schema or schemadb
+
     # -----------------------------
     # CREAR COLUMNAS DINÁMICAS
     # -----------------------------
     @staticmethod
     def _construir_columnas(columnas: list[str]) -> str:
-        return ",\n".join(
-            f"{col} VARCHAR(MAX) NULL"
-            for col in columnas
-        )
+        return ",\n".join(f"{col} VARCHAR(MAX) NULL" for col in columnas)
 
     # -----------------------------
     # CREAR TABLA TEMPORAL
@@ -24,10 +25,7 @@ class ExcelRepo:
         if not columnas:
             raise ValueError("La lista de columnas está vacía")
 
-        columnas_sql = ",\n".join(
-            f"[{col}] NVARCHAR(MAX)"
-            for col in columnas
-        )
+        columnas_sql = ",\n".join(f"[{col}] NVARCHAR(MAX)" for col in columnas)
 
         query = f"""
         IF OBJECT_ID('{self.schema}.{tabla_temp}', 'U') IS NOT NULL
@@ -82,12 +80,7 @@ class ExcelRepo:
     # -----------------------------
     # BULK A TEMP + TRANSFERENCIA
     # -----------------------------
-    def ejecutar_bulk_dinamico(
-        self,
-        ruta_txt: str,
-        tabla: str,
-        columnas: list[str]
-    ):
+    def ejecutar_bulk_dinamico(self, ruta_txt: str, tabla: str, columnas: list[str]):
 
         tabla_temp = f"{tabla}_temp"
         columnas_sql = ", ".join(columnas)
@@ -119,10 +112,12 @@ class ExcelRepo:
                 conn.autocommit = True
                 cursor = conn.cursor()
 
-                if not ExcelRepo.crear_tabla_temp(tabla, columnas):
+                exrepo = ExcelRepo("GestionSolped")
+
+                if not exrepo.crear_tabla_temp(tabla, columnas):
                     return
 
-                ExcelRepo.crear_tabla_final(tabla, columnas)
+                exrepo.crear_tabla_final(tabla, columnas)
 
                 cursor.execute(bulk_query)
                 cursor.execute(insert_query)
@@ -134,7 +129,6 @@ class ExcelRepo:
 
         except Exception as e:
             print(f"Error durante BULK dinámico en {tabla}: {e}")
-
 
     # -----------------------------
     # OBTENER SOLO PENDIENTES

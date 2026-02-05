@@ -34,6 +34,7 @@ from funciones.GeneralME53N import (
     ParsearTablaAttachments,
     convertir_txt_a_excel,
     EnviarNotificacionCorreo,
+    AppendHipervinculoObservaciones,
 )
 from config.settings import RUTAS
 
@@ -58,7 +59,7 @@ def EjecutarHU03(session, nombre_archivo):
         )
 
         # Traer SAP al frente
-        #TraerSAPAlFrente_Opcion()
+        # TraerSAPAlFrente_Opcion()
 
         # Leer el archivo con las SOLPEDs a procesar
         df_solpeds = procesarTablaME5A(nombre_archivo)
@@ -162,8 +163,8 @@ def EjecutarHU03(session, nombre_archivo):
 
         if MODO_DESARROLLO:
             print(f"\n{'='*60}")
-            print(f"⚠️  MODO DESARROLLO ACTIVO")
-            print(f"📧 Todos los correos se enviarán a: {EMAIL_DESARROLLO}")
+            print(f"MODO DESARROLLO ACTIVO")
+            print(f"Todos los correos se enviarán a: {EMAIL_DESARROLLO}")
             print(f"{'='*60}\n")
             WriteLog(
                 mensaje=f"MODO DESARROLLO: Correos redirigidos a {EMAIL_DESARROLLO}",
@@ -216,7 +217,7 @@ def EjecutarHU03(session, nombre_archivo):
                 time.sleep(0.5)
 
                 # ========================================================
-                # ✅ 3. VALIDAR ATTACHMENT LIST (NUEVA VALIDACIÓN)
+                # 3. VALIDAR ATTACHMENT LIST (NUEVA VALIDACIÓN)
                 # ========================================================
                 print(f"\n--- Validando Attachment List ---")
 
@@ -253,7 +254,7 @@ def EjecutarHU03(session, nombre_archivo):
                         )
                 else:
                     print(
-                        f"⚠️ No se genera archivo de adjuntos para SOLPED {solped} (sin archivos)"
+                        f"No se genera archivo de adjuntos para SOLPED {solped} (sin archivos)"
                     )
                     ActualizarEstadoYObservaciones(
                         df_solpeds,
@@ -263,13 +264,13 @@ def EjecutarHU03(session, nombre_archivo):
                         observaciones="No cuenta con lista de Adjuntos",
                     )
 
-                # ⚠️ MARCAR SI NO TIENE ATTACHMENTS (pero continuar validación)
+                # MARCAR SI NO TIENE ATTACHMENTS (pero continuar validación)
                 solped_rechazada_por_attachments = False
 
                 if not tiene_attachments:
-                    print(f"\n❌ SOLPED {solped} SERÁ RECHAZADA: Sin archivos adjuntos")
+                    print(f"\nSOLPED {solped} SERÁ RECHAZADA: Sin archivos adjuntos")
                     print(
-                        f"⚠️  Continuando con validaciones de items para reporte completo..."
+                        f"Continuando con validaciones de items para reporte completo..."
                     )
 
                     contadores["rechazadas_sin_attachments"] += 1
@@ -278,17 +279,15 @@ def EjecutarHU03(session, nombre_archivo):
 
                     # Agregar a resumen de validaciones
                     resumen_validaciones.append(
-                        f"\n🚫 MOTIVO DE RECHAZO PRINCIPAL\n"
-                        f"   ❌ No cuenta con Attachment List\n"
+                        f"\nMOTIVO DE RECHAZO PRINCIPAL\n"
+                        f"   No cuenta con Attachment List\n"
                         f"   Acción requerida: Adjuntar documentación soporte\n"
                         f"   {obs_attachments}\n"
-                        f"   ⚠️ Aunque se complete el resto de validaciones, la SOLPED queda RECHAZADA\n"
+                        f"   Aunque se complete el resto de validaciones, la SOLPED queda RECHAZADA\n"
                     )
 
                 else:
-                    print(
-                        f"✅ SOLPED {solped} tiene attachments - Continuando validación"
-                    )
+                    print(f"SOLPED {solped} tiene attachments - Continuando validación")
 
                     # Agregar info detallada de attachments a validaciones
                     info_attachments = (
@@ -399,7 +398,7 @@ def EjecutarHU03(session, nombre_archivo):
                             ]
                             correos_responsables.extend(correos_encontrados)
                             print(
-                                f"📧 Correo responsable detectado: {', '.join(correos_encontrados)}"
+                                f"Correo responsable detectado: {', '.join(correos_encontrados)}"
                             )
 
                         # Imprimir resumen de validacion DETALLADO
@@ -510,7 +509,7 @@ def EjecutarHU03(session, nombre_archivo):
                             if validaciones.get("campos_obligatorios", {}).get(
                                 "faltantes"
                             ):
-                                item_info += f"   ⚠️ Campos faltantes: {', '.join(validaciones['campos_obligatorios']['faltantes'])}\n"
+                                item_info += f"   Campos faltantes: {', '.join(validaciones['campos_obligatorios']['faltantes'])}\n"
 
                             resumen_validaciones.append(item_info)
 
@@ -557,9 +556,9 @@ def EjecutarHU03(session, nombre_archivo):
                 # ========================================================
                 if solped_rechazada_por_attachments:
                     # SOLPED rechazada por falta de attachments (independiente de items)
-                    estado_final_solped = "Rechazada - Sin Attachments"
+                    estado_final_solped = "Rechazada"
                     observaciones_solped = (
-                        f"❌ RECHAZADA por falta de adjuntos | "
+                        f"RECHAZADA por falta de adjuntos | "
                         f"Items: {contador_validados} validados, "
                         f"{contador_verificar_manual} requieren revisión, "
                         f"{items_procesados_en_solped - contador_con_texto} sin texto"
@@ -568,13 +567,13 @@ def EjecutarHU03(session, nombre_archivo):
 
                 elif contador_validados == items_procesados_en_solped:
                     estado_final_solped = "Registro validado para orden de compra"
-                    observaciones_solped = f"✅ Todos validados ({contador_validados}/{items_procesados_en_solped}) + Attachments OK"
+                    observaciones_solped = f"Todos validados ({contador_validados} de {items_procesados_en_solped}) + Contiene Adjuntos"
                     contadores["procesadas_exitosamente"] += 1
                     requiere_notificacion = False
 
                 elif contador_verificar_manual > 0:
                     estado_final_solped = "Verificar manualmente"
-                    observaciones_solped = f"⚠️ {contador_verificar_manual}/{items_procesados_en_solped} items requieren revisión + Attachments OK"
+                    observaciones_solped = f"{contador_verificar_manual} de {items_procesados_en_solped} items requieren revisión + Contiene Adjuntos"
                     contadores["procesadas_exitosamente"] += 1
 
                 else:
@@ -591,9 +590,9 @@ def EjecutarHU03(session, nombre_archivo):
                 )
                 print(f"\n{'='*60}")
                 if solped_rechazada_por_attachments:
-                    print(f"❌ SOLPED {solped} RECHAZADA (Sin Attachments)")
+                    print(f"SOLPED {solped} RECHAZADA (Sin Attachments)")
                 else:
-                    print(f"✅ SOLPED {solped} completada")
+                    print(f"SOLPED {solped} completada")
                 print(f"  Estado final: {estado_final_solped}")
                 print(f"  Observaciones: {observaciones_solped}")
                 print(f"{'='*60}")
@@ -612,7 +611,7 @@ def EjecutarHU03(session, nombre_archivo):
                         correos_originales = correos_unicos.copy()
                         correos_unicos = [EMAIL_DESARROLLO]
                         print(f"\n{'='*60}")
-                        print(f"📧 NOTIFICACIÓN (MODO DESARROLLO)")
+                        print(f"NOTIFICACIÓN (MODO DESARROLLO)")
                         print(f"{'='*60}")
                         print(
                             f"Destinatarios originales: {', '.join(correos_originales)}"
@@ -620,7 +619,7 @@ def EjecutarHU03(session, nombre_archivo):
                         print(f"Redirigido a: {EMAIL_DESARROLLO}")
                     else:
                         print(f"\n{'='*60}")
-                        print(f"📧 ENVIANDO NOTIFICACIÓN DE REVISIÓN MANUAL")
+                        print(f"ENVIANDO NOTIFICACIÓN DE REVISIÓN MANUAL")
                         print(f"{'='*60}")
                         print(f"Destinatarios: {', '.join(correos_unicos)}")
 
@@ -629,9 +628,7 @@ def EjecutarHU03(session, nombre_archivo):
 
                     # Agregar info de modo desarrollo
                     if MODO_DESARROLLO:
-                        texto_validaciones += (
-                            f"\n⚠️ MODO DESARROLLO - CORREO DE PRUEBA\n"
-                        )
+                        texto_validaciones += f"\nMODO DESARROLLO - CORREO DE PRUEBA\n"
                         texto_validaciones += f"Destinatarios originales: {', '.join(correos_originales)}\n"
                         texto_validaciones += f"{'='*60}\n\n"
 
@@ -658,12 +655,12 @@ def EjecutarHU03(session, nombre_archivo):
                         if exito_notificacion:
                             if MODO_DESARROLLO:
                                 print(
-                                    f"✅ [DESARROLLO] Correo enviado a {EMAIL_DESARROLLO}"
+                                    f"[DESARROLLO] Correo enviado a {EMAIL_DESARROLLO}"
                                 )
                                 print(f"   (Original: {', '.join(correos_originales)})")
                             else:
                                 print(
-                                    f"✅ Notificación enviada correctamente a {len(correos_unicos)} destinatario(s)"
+                                    f"Notificación enviada correctamente a {len(correos_unicos)} destinatario(s)"
                                 )
                             contadores["notificaciones_enviadas"] += 1
 
@@ -712,11 +709,11 @@ def EjecutarHU03(session, nombre_archivo):
                                 }
                             )
                         else:
-                            print(f"❌ Error al enviar notificación")
+                            print(f"Error al enviar notificación")
                             contadores["notificaciones_fallidas"] += 1
 
                     except Exception as e_notif:
-                        print(f"❌ Error al enviar notificación: {e_notif}")
+                        print(f"Error al enviar notificación: {e_notif}")
                         contadores["notificaciones_fallidas"] += 1
                         WriteLog(
                             mensaje=f"Error al enviar notificación para SOLPED {solped}: {e_notif}",
@@ -731,10 +728,10 @@ def EjecutarHU03(session, nombre_archivo):
                     mensaje_advertencia = f"SOLPED {solped} requiere revisión pero NO se encontró correo @colsubsidio.com"
 
                     if MODO_DESARROLLO:
-                        print(f"⚠️  [DESARROLLO] {mensaje_advertencia}")
+                        print(f"[DESARROLLO] {mensaje_advertencia}")
                         print(f"   Se enviaría notificación genérica en producción")
                     else:
-                        print(f"⚠️  {mensaje_advertencia}")
+                        print(f"{mensaje_advertencia}")
 
                     WriteLog(
                         mensaje=f"SOLPED {solped}: Requiere revisión pero sin correo de responsable",
@@ -831,8 +828,11 @@ def EjecutarHU03(session, nombre_archivo):
         # Ruta del archivo a convertir
 
         convertir_txt_a_excel(nombre_archivo)
-
         archivo_descargado = rf"{RUTAS['PathInsumos']}/expSolped03.xlsx"
+        AppendHipervinculoObservaciones(
+            ruta_excel=archivo_descargado, carpeta_reportes=RUTAS["PathReportes"]
+        )
+
         # Enviar correo de inicio (código 2 adjunto)
         EnviarNotificacionCorreo(
             codigo_correo=54, task_name=task_name, adjuntos=[archivo_descargado]

@@ -189,7 +189,8 @@ class ExcelService:
             ruta_txt = ExcelService.convertir_txt(ruta_csv)
 
             # 4. Bulk con tabla temporal + final
-            ExcelRepo.ejecutar_bulk_dinamico(
+            VariableExcelRepo = ExcelRepo(schema="GestionSolped")
+            VariableExcelRepo.ejecutar_bulk_dinamico(
                 ruta_txt=ruta_txt,
                 tabla=nombre_tabla,
                 columnas=orden_columnas

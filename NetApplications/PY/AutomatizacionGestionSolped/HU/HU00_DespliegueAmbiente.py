@@ -12,7 +12,7 @@ import json
 
 from config.init_config import init_config
 
-# from config.initconfig import init_config
+# from config.init_config import init_config
 
 
 def EjecutarHU00():

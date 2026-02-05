@@ -25,12 +25,26 @@ import os
 from funciones.EmailSender import EmailSender
 from typing import List, Union
 import sys
+from openpyxl import load_workbook
 
 # Configurar encoding para consola de Windows
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")
 
-
+def eliminar_archivo_si_existe(ruta_archivo):
+    try:
+        if os.path.exists(ruta_archivo):
+            WriteLog(f"Eliminando archivo: {ruta_archivo}", "INFO")
+            os.remove(ruta_archivo)
+            WriteLog(f"Archivo eliminado correctamente: {ruta_archivo}", "INFO")
+        else:
+            WriteLog(f"No existe archivo para eliminar: {ruta_archivo}", "INFO")
+    except Exception as e:
+        WriteLog(
+            f"Error al eliminar archivo {ruta_archivo} | Error: {str(e)}",
+            "ERROR"
+        )
+        
 def convertir_txt_a_excel(archivo):
     """
     Convierte un archivo TXT delimitado por pipes (|) a Excel.
@@ -819,7 +833,7 @@ def ObtenerTextoDelPortapapeles():
         return ""
 
 
-def procesarTablaME5A(name, dias=15):
+def procesarTablaME5A(name, dias=None):
     """name: nombre del txt a utilizar
     return data frame
     Procesa txt estructura ME5A y devuelve un df con manejo de columnas dinamico.
@@ -2936,3 +2950,63 @@ def ProcesarYValidarItem(
     )
 
     return datos_texto, validaciones, reporte, estado_final, observaciones
+
+def extraerDatosReporte(fila, df, mapeo):
+    """
+    Extrae datos de una fila ALV SAP usando mapeo dinámico
+    """
+    datos = {}
+
+    for campo_reporte, variantes in mapeo.items():
+        valor = ""
+        for nombre_col in variantes:
+            if nombre_col in df.columns:
+                valor = str(fila.get(nombre_col, "")).strip()
+                if valor:
+                    break
+        datos[campo_reporte] = valor
+
+    return datos
+
+def AppendHipervinculoObservaciones(ruta_excel, carpeta_reportes):
+    """
+    Recorre todo el Excel y agrega el hipervínculo del reporte correspondiente por SOLPED e ITEM.
+    """
+
+    wb = load_workbook(ruta_excel)
+    ws = wb.active
+
+    encabezados = [c.value for c in ws[1]]
+
+    col_solped = encabezados.index("PurchReq") + 1
+    col_item = encabezados.index("Item") + 1
+    col_obs = encabezados.index("Observaciones") + 1
+
+    for fila in range(2, ws.max_row + 1):
+
+        solped = str(ws.cell(row=fila, column=col_solped).value).strip()
+        item = str(ws.cell(row=fila, column=col_item).value).strip()
+
+        if not solped or not item:
+            continue
+
+        ruta_reporte = os.path.join(carpeta_reportes, f"Reporte_{solped}_{item}.txt")
+
+        if not os.path.exists(ruta_reporte):
+            continue
+
+        celda_obs = ws.cell(row=fila, column=col_obs)
+
+        texto_link = f"📄 Reporte Item {item}"
+
+        if celda_obs.value:
+            if texto_link in str(celda_obs.value):
+                continue
+            celda_obs.value = f"{celda_obs.value} | {texto_link}"
+        else:
+            celda_obs.value = texto_link
+
+        celda_obs.hyperlink = ruta_reporte
+        celda_obs.style = "Hyperlink"
+
+    wb.save(ruta_excel)

@@ -1,12 +1,16 @@
 from config.init_config import in_config
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
+from funciones.FuncionesExcel import ExcelService
+import pandas as pd
 
 
 def Prueba():
     EjecutarHU00()
+    ruta_excel = r"\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped03.xlsx"
+    df = pd.read_excel(ruta_excel)
+    print(df)
 
-    parametro_ejemplo = in_config("SAP_LOGON_PATH")
-    print(f"El valor del parametro 'SAP_LOGON_PATH' es: {parametro_ejemplo}")
+    ExcelService.ejecutar_bulk_desde_excel(ruta_excel)
 
 
 if __name__ == "__main__":
