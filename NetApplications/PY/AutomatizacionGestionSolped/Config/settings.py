@@ -34,6 +34,7 @@ DATABASE = {
 SAP_CONFIG = {
     "user": get_env_variable("SAP_USUARIO"),
     "password": get_env_variable("SAP_PASSWORD"),
+    "language": get_env_variable("SAP_IDIOMA"),
 }
 
 # ========= Database ==========
