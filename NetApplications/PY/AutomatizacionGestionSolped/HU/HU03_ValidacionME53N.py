@@ -2,19 +2,25 @@
 # NombreDeLaIniciativa – HU03: ValidacionME53N
 # Autor: Paula Sierra - NetApplications
 # Descripcion: Ejecuta la búsqueda de una SOLPED en la transacción ME53N
-# Ultima modificacion: 08/12/2025
+# Ultima modificacion: 06/02/2026
 # Propiedad de Colsubsidio
 # Cambios:
 #   - Versión con validación completa y uso correcto de validaciones
 #   - Notificaciones automáticas a responsables de Colsubsidio
+#   - FIX: Corrección de datos faltantes en reporte final
+#   - FIX: Corrección de duplicados en reporte
+#   - FIX: Manejo robusto de errores de conversión
 # =========================================
 import win32com.client  # pyright: ignore[reportMissingModuleSource]
 import time
 import getpass
 import subprocess
 import os
-import time
 import traceback
+from funciones.ReporteFinalME53N import (
+    construir_fila_reporte_final,
+    generar_reporte_final_excel,
+)
 from funciones.EscribirLog import WriteLog
 from funciones.GeneralME53N import (
     AbrirTransaccion,
@@ -35,9 +41,11 @@ from funciones.GeneralME53N import (
     convertir_txt_a_excel,
     EnviarNotificacionCorreo,
     AppendHipervinculoObservaciones,
+    obtener_fila_expsolped,
+    limpiar_numero_robusto, 
+    obtener_valor_desde_fila
 )
 from config.settings import RUTAS
-
 
 def EjecutarHU03(session, nombre_archivo):
     try:
@@ -45,21 +53,14 @@ def EjecutarHU03(session, nombre_archivo):
         # CONFIGURACIÓN DEL PROCESO
         # ==========================
         task_name = "HU03_ValidacionME53N"
-        # Controla si el proceso debe detener validaciones cuando NO hay adjuntos
-        CANCELAR_SI_NO_HAY_ADJUNTOS = (
-            True  # ← ponlo en False si quieres seguir validando
-        )
-
+        TraerSAPAlFrente_Opcion()
         # === Inicio HU03 ===
         WriteLog(
-            mensaje="Inicio HU03 - Validación ME53N",
+            mensaje="Inicio HU03 - Validación ME53N (Versión Corregida)",
             estado="INFO",
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-
-        # Traer SAP al frente
-        # TraerSAPAlFrente_Opcion()
 
         # Leer el archivo con las SOLPEDs a procesar
         df_solpeds = procesarTablaME5A(nombre_archivo)
@@ -175,6 +176,10 @@ def EjecutarHU03(session, nombre_archivo):
 
         # Almacenar SOLPEDs que requirieron revisión para reporte final
         solpeds_con_problemas = []
+
+        # fila reporte final
+        filas_reporte_final = []
+
         # ========================================================
         # PROCESAR CADA SOLPED
         # ========================================================
@@ -217,7 +222,7 @@ def EjecutarHU03(session, nombre_archivo):
                 time.sleep(0.5)
 
                 # ========================================================
-                # 3. VALIDAR ATTACHMENT LIST (NUEVA VALIDACIÓN)
+                # 3. VALIDAR ATTACHMENT LIST
                 # ========================================================
                 print(f"\n--- Validando Attachment List ---")
 
@@ -238,7 +243,6 @@ def EjecutarHU03(session, nombre_archivo):
                 )
                 print(reporte_attachments)
 
-                # Guardar reporte de attachments
                 # Guardar reporte de attachments SOLO si tiene adjuntos
                 if tiene_attachments and contenido_attachments:
                     path_reporte_attach = (
@@ -308,8 +312,32 @@ def EjecutarHU03(session, nombre_archivo):
 
                     resumen_validaciones.append(info_attachments)
 
-                # 3. Obtener items de esta SOLPED
+                # 4. Obtener items de esta SOLPED
                 dtItems = ObtenerItemsME53N(session, solped)
+
+                # ============================================
+                # DEBUG: Verificar columnas y datos de ME53N
+                # ============================================
+                if MODO_DESARROLLO and dtItems is not None and not dtItems.empty:
+                    print(f"\n🔍 DEBUG - Columnas de dtItems:")
+                    for col in dtItems.columns:
+                        print(f"  '{col}'")
+
+                    print(f"\n🔍 DEBUG - Primera fila de dtItems:")
+                    primera_fila = dtItems.iloc[0].to_dict()
+                    for key, val in primera_fila.items():
+                        if any(
+                            palabra in str(key)
+                            for palabra in [
+                                "Precio",
+                                "Valor",
+                                "Price",
+                                "Total",
+                                "Cantidad",
+                            ]
+                        ):
+                            print(f"  {key}: '{val}' (tipo: {type(val).__name__})")
+                # ============================================
 
                 if dtItems is None or dtItems.empty:
                     contadores["sin_items"] += 1
@@ -325,7 +353,7 @@ def EjecutarHU03(session, nombre_archivo):
 
                 print(f"Items encontrados en SAP: {dtItems.shape[0]}")
 
-                # 4. Convertir a lista de diccionarios y filtrar totales
+                # 5. Convertir a lista de diccionarios y filtrar totales
                 lista_dicts = dtItems.to_dict(orient="records")
 
                 # Filtrar: Eliminar la ultima fila si es un total
@@ -338,8 +366,9 @@ def EjecutarHU03(session, nombre_archivo):
                     ):
                         lista_dicts.pop()
                         print(f"Fila de total eliminada")
+
                 # ========================================================
-                # 5. PROCESAR CADA ITEM
+                # 6. PROCESAR CADA ITEM
                 # ========================================================
                 contador_con_texto = 0
                 contador_validados = 0
@@ -347,10 +376,75 @@ def EjecutarHU03(session, nombre_archivo):
                 items_procesados_en_solped = len(lista_dicts)
 
                 for i, fila in enumerate(lista_dicts):
-                    numero_item = fila.get("Item", str(i)).strip()
+
+                    print(f"\n🧩 ITEM {i} - Detalle de columnas ME53N:")
+                    for col, val in fila.items():
+                        print(f"  {col}: {str(val)[:50]}")
+
+                    numero_item = fila.get("Pos.", str(i)).strip()
                     contadores["items_procesados"] += 1
 
                     print(f"\n--- Procesando Item {numero_item} ---")
+
+                    # ============================================
+                    # NUEVO: Obtener datos de expSolped03.txt
+                    # ============================================
+                    fila_exp = obtener_fila_expsolped(df_solpeds, solped, numero_item)
+
+                    if fila_exp:
+                        print(f"✅ Datos expSolped encontrados para item {numero_item}")
+                        if MODO_DESARROLLO:
+                            print(f"🔍 Valores clave de expSolped:")
+                            print(f"  PurchReq: {fila_exp.get('PurchReq', 'N/A')}")
+                            print(f"  ReqDate: {fila_exp.get('ReqDate', 'N/A')}")
+                            print(f"  Created: {fila_exp.get('Created', 'N/A')}")
+                            print(f"  ShortText: {fila_exp.get('ShortText', 'N/A')}")
+                            print(f"  Quantity: {fila_exp.get('Quantity', 'N/A')}")
+                    else:
+                        print(
+                            f"⚠️ No se encontraron datos expSolped para item {numero_item}"
+                        )
+                        fila_exp = {}
+                    # ============================================
+
+                    # ============================================
+                    # NUEVO: Obtener datos específicos de ME53N
+                    # ============================================
+                    fila_me53n = fila  # Por defecto usar los mismos datos
+
+                    if dtItems is not None and not dtItems.empty:
+                        try:
+                            # Buscar la fila correspondiente en dtItems
+                            mascara = (
+                                dtItems["Pos."].astype(str).str.strip()
+                                == str(numero_item).strip()
+                            )
+                            filas_encontradas = dtItems[mascara]
+
+                            if not filas_encontradas.empty:
+                                fila_me53n = filas_encontradas.iloc[0].to_dict()
+                                print(
+                                    f"✅ Datos ME53N encontrados para item {numero_item}"
+                                )
+
+                                if MODO_DESARROLLO:
+                                    print(f"🔍 Valores clave de ME53N:")
+                                    print(
+                                        f"  Cantidad: {fila_me53n.get('Cantidad', 'N/A')}"
+                                    )
+                                    print(
+                                        f"  PrecioVal.: {fila_me53n.get('PrecioVal.', 'N/A')}"
+                                    )
+                                    print(
+                                        f"  Valor tot.: {fila_me53n.get('Valor tot.', 'N/A')}"
+                                    )
+                            else:
+                                print(
+                                    f"⚠️ No se encontraron datos ME53N para item {numero_item}"
+                                )
+                        except Exception as e:
+                            print(f"⚠️ Error buscando datos ME53N: {e}")
+                    # ============================================
 
                     # Marcar item como "Procesando"
                     ActualizarEstado(
@@ -361,7 +455,6 @@ def EjecutarHU03(session, nombre_archivo):
 
                     # Obtener texto del editor SAP
                     texto = ObtenerItemTextME53N(session, solped, numero_item)
-                    # print(texto)
 
                     # Procesar y validar el texto
                     if texto and texto.strip():
@@ -379,7 +472,7 @@ def EjecutarHU03(session, nombre_archivo):
                             solped,
                             numero_item,
                             texto,
-                            dtItems,
+                            dtItems,  # ← CORREGIDO: DataFrame completo (no dict)
                             tiene_attachments,
                             obs_attachments,
                             attachments_lista,
@@ -434,8 +527,8 @@ def EjecutarHU03(session, nombre_archivo):
                         for campo in campos_clave:
                             if datos_texto.get(campo):
                                 valor = datos_texto[campo]
-                                if len(valor) > 50:
-                                    valor = valor[:50] + "..."
+                                if len(str(valor)) > 50:
+                                    valor = str(valor)[:50] + "..."
                                 print(f"    {campo}: {valor}")
                             else:
                                 print(f"    {campo}: NO ENCONTRADO")
@@ -450,7 +543,9 @@ def EjecutarHU03(session, nombre_archivo):
                         ]
                         print(f"  Detalles de validacion:")
                         for campo in campos_validacion:
-                            if campo in validaciones and validaciones[campo]["texto"]:
+                            if campo in validaciones and validaciones[campo].get(
+                                "texto"
+                            ):
                                 estado_val = (
                                     "COINCIDE"
                                     if validaciones[campo]["match"]
@@ -482,6 +577,65 @@ def EjecutarHU03(session, nombre_archivo):
                             estado_final,
                             observaciones,
                         )
+                    # DEBUG TEMPORAL
+                    if MODO_DESARROLLO:
+                        print(
+                            f"\n🔍 DEBUG - Verificando datos antes de construir fila:"
+                        )
+                        print(f"  fila_exp keys: {list(fila_exp.keys())}")
+                        print(f"  fila_me53n keys: {list(fila_me53n.keys())}")
+                        print(f"  datos_texto keys: {list(datos_texto.keys())}")
+
+                        print(
+                            f"\n  fila_exp['PurchReq']: {fila_exp.get('PurchReq', 'FALTA')}"
+                        )
+                        print(f"  fila_exp['Item']: {fila_exp.get('Item', 'FALTA')}")
+                        print(
+                            f"  datos_texto['razon_social']: {datos_texto.get('razon_social', 'FALTA')}"
+                        )
+                        print(
+                            f"  datos_texto['nit']: {datos_texto.get('nit', 'FALTA')}"
+                        )
+                        # ========================================================
+                        # CONSTRUIR FILA PARA REPORTE FINAL (UNA SOLA VEZ)
+                        # ========================================================
+                        fila_reporte = construir_fila_reporte_final(
+                            solped=solped,
+                            item=numero_item,
+                            datos_exp=fila_exp,  # ← CORREGIDO: Datos de expSolped03.txt
+                            datos_adjuntos={
+                                "cantidad": len(attachments_lista),
+                                "nombres": ", ".join(
+                                    [a["title"] for a in attachments_lista]
+                                ),
+                            },
+                            datos_me53n=fila_me53n,  # ← CORREGIDO: Datos de ME53N
+                            datos_texto=datos_texto,
+                            resultado_validaciones={
+                                "faltantes_me53n": validaciones.get(
+                                    "campos_obligatorios", {}
+                                ).get("faltantes"),
+                                "faltantes_texto": validaciones.get("faltantes_texto"),
+                                "cantidad": validaciones.get("cantidad", {}).get(
+                                    "match"
+                                ),
+                                "valor_unitario": validaciones.get(
+                                    "valor_unitario", {}
+                                ).get("match"),
+                                "valor_total": validaciones.get("valor_total", {}).get(
+                                    "match"
+                                ),
+                                "concepto": validaciones.get("concepto", {}).get(
+                                    "match"
+                                ),
+                                "estado": estado_final,
+                                "observaciones": observaciones,
+                            },
+                        )
+
+                        filas_reporte_final.append(fila_reporte)
+                        print(f"📊 Fila agregada al reporte para item {numero_item}")
+                        # ========================================================
 
                         # ========================================================
                         # CONSTRUIR RESUMEN PARA NOTIFICACIÓN
@@ -490,7 +644,7 @@ def EjecutarHU03(session, nombre_archivo):
                             requiere_notificacion = True
 
                             # Construir texto de validación del item
-                            item_info = f"\n ITEM {numero_item}:\n"
+                            item_info = f"\n📋 ITEM {numero_item}:\n"
                             item_info += f"   Estado: {estado_final}\n"
                             item_info += f"   Observaciones: {observaciones}\n"
 
@@ -552,18 +706,17 @@ def EjecutarHU03(session, nombre_archivo):
                         )
 
                 # ========================================================
-                # 6. ESTADO FINAL DE LA SOLPED (considerando attachments)
+                # 7. ESTADO FINAL DE LA SOLPED (considerando attachments)
                 # ========================================================
                 if solped_rechazada_por_attachments:
                     # SOLPED rechazada por falta de attachments (independiente de items)
                     estado_final_solped = "Rechazada"
                     observaciones_solped = (
-                        f"RECHAZADA por falta de adjuntos | "
+                        f"RECHAZADA por falta de adjuntos - "
                         f"Items: {contador_validados} validados, "
                         f"{contador_verificar_manual} requieren revisión, "
                         f"{items_procesados_en_solped - contador_con_texto} sin texto"
                     )
-                    # Ya fue contada en rechazadas_sin_attachments
 
                 elif contador_validados == items_procesados_en_solped:
                     estado_final_solped = "Aprovado"
@@ -588,6 +741,7 @@ def EjecutarHU03(session, nombre_archivo):
                     nuevo_estado=estado_final_solped,
                     observaciones=observaciones_solped,
                 )
+
                 print(f"\n{'='*60}")
                 if solped_rechazada_por_attachments:
                     print(f"SOLPED {solped} RECHAZADA (Sin Attachments)")
@@ -595,6 +749,7 @@ def EjecutarHU03(session, nombre_archivo):
                     print(f"SOLPED {solped} completada")
                 print(f"  Estado final: {estado_final_solped}")
                 print(f"  Observaciones: {observaciones_solped}")
+                print(f"  Total filas en reporte: {len(filas_reporte_final)}")
                 print(f"{'='*60}")
 
                 # ========================================================
@@ -675,31 +830,12 @@ def EjecutarHU03(session, nombre_archivo):
                                         attachments_lista[:10]
                                         if attachments_lista
                                         else []
-                                    ),  # Máximo 10 para el reporte
-                                    "items_total": (
-                                        items_procesados_en_solped
-                                        if "items_procesados_en_solped" in locals()
-                                        else 0
                                     ),
-                                    "items_ok": (
-                                        contador_validados
-                                        if "contador_validados" in locals()
-                                        else 0
-                                    ),
-                                    "items_revisar": (
-                                        contador_verificar_manual
-                                        if "contador_verificar_manual" in locals()
-                                        else 0
-                                    ),
-                                    "items_sin_texto": (
-                                        (
-                                            items_procesados_en_solped
-                                            - contador_con_texto
-                                        )
-                                        if "items_procesados_en_solped" in locals()
-                                        and "contador_con_texto" in locals()
-                                        else 0
-                                    ),
+                                    "items_total": items_procesados_en_solped,
+                                    "items_ok": contador_validados,
+                                    "items_revisar": contador_verificar_manual,
+                                    "items_sin_texto": items_procesados_en_solped
+                                    - contador_con_texto,
                                     "responsables": (
                                         correos_originales
                                         if MODO_DESARROLLO
@@ -772,9 +908,10 @@ def EjecutarHU03(session, nombre_archivo):
                     task_name="EjecutarHU03",
                     path_log=RUTAS["PathLogError"],
                 )
+                traceback.print_exc()
                 continue
 
-        # 7. Mostrar resumen final del proceso
+        # 8. Mostrar resumen final del proceso
         print(f"\n{'='*80}")
         print("PROCESO COMPLETADO - RESUMEN FINAL")
         print(f"{'='*80}")
@@ -787,6 +924,9 @@ def EjecutarHU03(session, nombre_archivo):
         )
         print(f"  SOLPEDs con errores: {contadores['con_errores']}")
         print(f"  SOLPEDs sin items: {contadores['sin_items']}")
+        print(
+            f"  SOLPEDs rechazadas sin attachments: {contadores['rechazadas_sin_attachments']}"
+        )
         print(f"  Items procesados: {contadores['items_procesados']}")
         print(f"  Items validados para OC: {contadores['items_validados']}")
         print(f"  Items para verificar manual: {contadores['items_verificar_manual']}")
@@ -794,6 +934,8 @@ def EjecutarHU03(session, nombre_archivo):
         print(f"\nNOTIFICACIONES:")
         print(f"  Notificaciones enviadas: {contadores['notificaciones_enviadas']}")
         print(f"  Notificaciones fallidas: {contadores['notificaciones_fallidas']}")
+        print(f"\nREPORTE FINAL:")
+        print(f"  Total filas en reporte: {len(filas_reporte_final)}")
 
         # Recargar archivo para mostrar estados finales
         df_final = procesarTablaME5A(nombre_archivo)
@@ -819,21 +961,62 @@ def EjecutarHU03(session, nombre_archivo):
             mensaje=f"HU03 completado exitosamente. "
             f"SOLPEDs: {contadores['procesadas_exitosamente']}/{contadores['total_solpeds']}, "
             f"Items validados: {contadores['items_validados']}/{contadores['items_procesados']}, "
-            f"Notificaciones enviadas: {contadores['notificaciones_enviadas']}",
+            f"Notificaciones enviadas: {contadores['notificaciones_enviadas']}, "
+            f"Filas en reporte: {len(filas_reporte_final)}",
             estado="INFO",
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
 
-        # Ruta del archivo a convertir
+        # ========================================================
+        # GENERAR ARCHIVO FINAL
+        # ========================================================
+        if filas_reporte_final:
 
+            print("📊 Generando reporte final consolidado ME53N...")
+            WriteLog(
+                mensaje="Generando reporte final consolidado ME53N",
+                estado="INFO",
+                task_name="HU03_ValidacionME53N",
+                path_log=RUTAS["PathLog"],
+            )
+
+            path_reporte = generar_reporte_final_excel(filas_reporte_final)
+
+            if path_reporte:
+                print(f"✅ Reporte final generado correctamente: {path_reporte}")
+                WriteLog(
+                    mensaje=f"Reporte final generado correctamente: {path_reporte}",
+                    estado="OK",
+                    task_name="HU03_ValidacionME53N",
+                    path_log=RUTAS["PathLog"],
+                )
+            else:
+                print("⚠️ No se pudo generar el reporte final")
+                WriteLog(
+                    mensaje="No se pudo generar el reporte final",
+                    estado="WARNING",
+                    task_name="HU03_ValidacionME53N",
+                    path_log=RUTAS["PathLog"],
+                )
+
+        else:
+            print("⚠️ No hay filas para generar el reporte final")
+            WriteLog(
+                mensaje="No hay filas para generar el reporte final",
+                estado="WARNING",
+                task_name="HU03_ValidacionME53N",
+                path_log=RUTAS["PathLog"],
+            )
+
+        # Convertir a Excel y agregar hipervínculos
         convertir_txt_a_excel(nombre_archivo)
         archivo_descargado = rf"{RUTAS['PathInsumos']}/expSolped03.xlsx"
         AppendHipervinculoObservaciones(
             ruta_excel=archivo_descargado, carpeta_reportes=RUTAS["PathReportes"]
         )
 
-        # Enviar correo de inicio (código 2 adjunto)
+        # Enviar correo de finalización
         EnviarNotificacionCorreo(
             codigo_correo=10, task_name=task_name, adjuntos=[archivo_descargado]
         )

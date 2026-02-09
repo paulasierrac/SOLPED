@@ -31,6 +31,7 @@ from openpyxl import load_workbook
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")
 
+
 def eliminar_archivo_si_existe(ruta_archivo):
     try:
         if os.path.exists(ruta_archivo):
@@ -40,11 +41,9 @@ def eliminar_archivo_si_existe(ruta_archivo):
         else:
             WriteLog(f"No existe archivo para eliminar: {ruta_archivo}", "INFO")
     except Exception as e:
-        WriteLog(
-            f"Error al eliminar archivo {ruta_archivo} | Error: {str(e)}",
-            "ERROR"
-        )
-        
+        WriteLog(f"Error al eliminar archivo {ruta_archivo} | Error: {str(e)}", "ERROR")
+
+
 def convertir_txt_a_excel(archivo):
     """
     Convierte un archivo TXT delimitado por pipes (|) a Excel.
@@ -1449,6 +1448,14 @@ def TablaItemsDataFrame(name) -> pd.DataFrame:
         return pd.DataFrame()
 
 
+def obtenerValorTabla(fila, posibles_nombres, default=0):
+    """Intenta múltiples nombres de columna"""
+    for nombre in posibles_nombres:
+        if nombre in fila and fila[nombre] not in [None, "", " "]:
+            return fila[nombre]
+    return default
+
+
 def ObtenerItemsME53N(session, numero_solped):
     """session: objeto de SAP GUI
     numero_solped: numero de solicitud
@@ -1629,265 +1636,44 @@ def FormatoMoneda(valor):
         return str(valor)
 
 
-# def ValidarContraTabla(
-#     datos_texto: Dict, df_items: pd.DataFrame, item_num: str = ""
-# ) -> Dict:
-#     """Compara los datos extraidos del texto con la tabla de items SAP"""
-#     validaciones = {
-#         "cantidad": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
-#         "valor_unitario": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
-#         "valor_total": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
-#         # "fecha_entrega": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
-#         "concepto": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
-#         "campos_obligatorios": {"presentes": 0, "total": 0, "faltantes": []},
-#         "resumen": "",
-#         "campos_validados": 0,
-#         "total_campos": 0,
-#     }
+def limpiar_numero(valor):
+    """
+    Limpia y convierte un valor a número
+    Maneja valores None, vacíos, y no numéricos
+    """
+    if valor is None or valor == "":
+        return 0.0
 
-#     if df_items.empty:
-#         validaciones["resumen"] = "Tabla vacia - No se puede validar"
-#         return validaciones
+    # Convertir a string
+    valor_str = str(valor).strip()
 
-#     # Buscar el item especifico en el DataFrame
-#     item_df = df_items
-#     if item_num and "Item" in df_items.columns:
-#         item_df = df_items[
-#             df_items["Item"].astype(str).str.strip() == str(item_num).strip()
-#         ]
-#         if item_df.empty:
-#             item_df = df_items.iloc[[0]]  # usar primera fila si no encuentra
+    # Si es vacío después de strip
+    if not valor_str:
+        return 0.0
 
-#     if item_df.empty:
-#         validaciones["resumen"] = "Item no encontrado en tabla - No se puede validar"
-#         return validaciones
+    # ============================================
+    # NUEVO: Validar que es numérico
+    # ============================================
+    # Si contiene solo letras (como 'K', 'D'), retornar 0
+    if valor_str.isalpha():
+        return 0.0
 
-#     # ------------------------------------------------------------------
-#     # VALIDACIÓN DE CAMPOS OBLIGATORIOS DE LA TABLA SAP ME53N (con alias)
-#     # ------------------------------------------------------------------
+    # Si es muy corto y no es numérico, retornar 0
+    if len(valor_str) <= 2 and not any(c.isdigit() for c in valor_str):
+        return 0.0
+    # ============================================
 
-#     # Diccionario: nombre estándar → lista de nombres equivalentes que puede traer SAP
-#     alias_campos = {
-#         "Material": ["Material"],
-#         "Short Text": ["Short Text"],
-#         "Quantity": ["Quantity"],
-#         "Un": ["Un"],
-#         "Valn Price": ["Val. Price"],
-#         "Crcy": ["Crcy"],
-#         # ESTE CAMPO CAMBIA POR IDIOMA / CONFIGURACIÓN SAP
-#         "Total Val.": ["Total Val.", "Total Value"],
-#         "Deliv.Date": ["Deliv.Date"],
-#         "Fix. Vend.": ["Fix. Vend."],
-#         "Plant": ["Plant"],
-#         "PGr": ["PGr"],
-#         "POrg": ["POrg"],
-#         "Matl Group": ["Matl Group"],
-#     }
+    try:
+        # Remover símbolos de moneda y separadores
+        valor_limpio = valor_str.replace("$", "").replace("COP", "").replace("USD", "")
+        valor_limpio = valor_limpio.replace(".", "").replace(",", ".")
+        valor_limpio = valor_limpio.strip()
 
-#     faltantes_me53n = []
-#     fila = item_df.iloc[0]  # se toma la primera fila del item
-
-#     for campo_estandar, posibles_nombres in alias_campos.items():
-
-#         # Buscar si alguna columna coincide con los alias permitidos
-#         columna_encontrada = None
-#         for alias in posibles_nombres:
-#             if alias in item_df.columns:
-#                 columna_encontrada = alias
-#                 break
-
-#         # Si ninguna columna existe → campo faltante
-#         if columna_encontrada is None:
-#             faltantes_me53n.append(campo_estandar)
-#             continue
-
-#         # Validar contenido vacío o nulo
-#         val = fila.get(columna_encontrada, "")
-#         if val is None or str(val).strip() in ["", "nan", "None"]:
-#             faltantes_me53n.append(campo_estandar)
-
-#     # Construcción del resultado de validaciones
-#     validaciones["campos_me53n"] = {
-#         "presentes": len(alias_campos) - len(faltantes_me53n),
-#         "total": len(alias_campos),
-#         "faltantes": faltantes_me53n,
-#     }
-
-#     # --- VALIDAR CANTIDAD ---
-#     if datos_texto["cantidad"]:
-#         cantidad_texto = LimpiarNumero(datos_texto["cantidad"])
-#         if "Quantity" in item_df.columns:
-#             # CORREGIDO: Asegurar que obtenemos un valor escalar
-#             cantidad_tabla_val = item_df["Quantity"].iloc[0]
-#             cantidad_tabla = LimpiarNumero(str(cantidad_tabla_val))
-#             validaciones["cantidad"]["texto"] = datos_texto["cantidad"]
-#             validaciones["cantidad"]["tabla"] = str(cantidad_tabla)
-#             validaciones["cantidad"]["match"] = (
-#                 abs(cantidad_texto - cantidad_tabla) < 0.01
-#             )
-#             if not validaciones["cantidad"]["match"]:
-#                 validaciones["cantidad"][
-#                     "diferencia"
-#                 ] = f"Difiere en {abs(cantidad_texto - cantidad_tabla):.2f}"
-
-#     # --- VALIDAR VALOR UNITARIO ---
-#     if datos_texto["valor_unitario"]:
-#         valor_texto = LimpiarNumero(datos_texto["valor_unitario"])
-#         if "Valn Price" in item_df.columns:
-#             valor_tabla = LimpiarNumero(str(item_df["Valn Price"].iloc[0]))
-#             # validaciones["valor_unitario"]["texto"] = datos_texto["valor_unitario"]
-#             # validaciones["valor_unitario"]["tabla"] = str(valor_tabla)
-
-#             validaciones["valor_unitario"]["texto"] = FormatoMoneda(
-#                 datos_texto["valor_unitario"]
-#             )
-#             validaciones["valor_unitario"]["tabla"] = FormatoMoneda(valor_tabla)
-
-#             # Tolerancia del 1%
-#             if valor_tabla > 0:
-#                 diferencia_relativa = abs(valor_texto - valor_tabla) / valor_tabla
-#                 validaciones["valor_unitario"]["match"] = diferencia_relativa < 0.01
-#             else:
-#                 validaciones["valor_unitario"]["match"] = valor_texto == valor_tabla
-
-#             if not validaciones["valor_unitario"]["match"]:
-#                 diferencia = abs(valor_texto - valor_tabla)
-#                 validaciones["valor_unitario"][
-#                     "diferencia"
-#                 ] = f"Difiere en {FormatoMoneda(diferencia)}"
-#                 # validaciones["valor_unitario"][
-#                 #     "diferencia"
-#                 # ] = f"Difiere en ${diferencia:,.2f}"
-
-#     # --- VALIDAR VALOR TOTAL ---
-#     if datos_texto["valor_total"]:
-#         valor_texto = LimpiarNumero(datos_texto["valor_total"])
-
-#         # ACEPTAR AMBOS CAMPOS DE SAP
-#         columna_total = None
-#         if "Total Value" in item_df.columns:
-#             columna_total = "Total Value"
-#         elif "Total Val." in item_df.columns:
-#             columna_total = "Total Val."
-
-#         if columna_total:
-#             valor_tabla = LimpiarNumero(str(item_df[columna_total].iloc[0]))
-
-#             # validaciones["valor_total"]["texto"] = datos_texto["valor_total"]
-#             # validaciones["valor_total"]["tabla"] = str(valor_tabla)
-
-#             validaciones["valor_total"]["texto"] = FormatoMoneda(
-#                 datos_texto["valor_total"]
-#             )
-#             validaciones["valor_total"]["tabla"] = FormatoMoneda(valor_tabla)
-
-#             # Tolerancia del 1%
-#             if valor_tabla > 0:
-#                 diferencia_relativa = abs(valor_texto - valor_tabla) / valor_tabla
-#                 validaciones["valor_total"]["match"] = diferencia_relativa < 0.01
-#             else:
-#                 validaciones["valor_total"]["match"] = valor_texto == valor_tabla
-
-#             if not validaciones["valor_total"]["match"]:
-#                 diferencia = abs(valor_texto - valor_tabla)
-#                 validaciones["valor_total"][
-#                     "diferencia"
-#                 ] = f"Difiere en {FormatoMoneda(diferencia)}"
-
-#                 # validaciones["valor_total"][
-#                 #     "diferencia"
-#                 # ] = f"Difiere en ${diferencia:,.2f}"
-#         else:
-#             # Si no existe ninguna columna válida
-#             validaciones["valor_total"]["tabla"] = "Campo no encontrado en SAP"
-#             validaciones["valor_total"]["match"] = False
-
-#     # # --- VALIDAR FECHA DE ENTREGA ---
-#     # if datos_texto["fecha_prestacion"] and "Deliv.Date" in item_df.columns:
-#     #     fecha_texto = datos_texto["fecha_prestacion"]
-#     #     fecha_tabla = str(item_df["Deliv.Date"].iloc[0]) if not item_df.empty else ""
-#     #     validaciones["fecha_entrega"]["texto"] = fecha_texto
-#     #     validaciones["fecha_entrega"]["tabla"] = fecha_tabla
-#     #     validaciones["fecha_entrega"]["match"] = NormalizarFecha(
-#     #         fecha_texto
-#     #     ) == NormalizarFecha(fecha_tabla)
-#     #     if not validaciones["fecha_entrega"]["match"]:
-#     #         validaciones["fecha_entrega"]["diferencia"] = "Fechas no coinciden"
-
-#     # --- VALIDAR CONCEPTO ---
-#     if datos_texto["concepto_compra"] and "Short Text" in item_df.columns:
-#         concepto_texto = datos_texto["concepto_compra"].upper()
-#         concepto_tabla_val = item_df["Short Text"].iloc[0] if not item_df.empty else ""
-#         concepto_tabla = str(concepto_tabla_val).upper()
-
-#         validaciones["concepto"]["texto"] = datos_texto["concepto_compra"][:50] + (
-#             "..." if len(datos_texto["concepto_compra"]) > 50 else ""
-#         )
-#         validaciones["concepto"]["tabla"] = concepto_tabla[:50] + (
-#             "..." if len(concepto_tabla) > 50 else ""
-#         )
-
-#         # Verificar coincidencia de palabras clave
-#         palabras_texto = set(re.findall(r"\w+", concepto_texto))
-#         palabras_tabla = set(re.findall(r"\w+", concepto_tabla))
-#         coincidencias = len(palabras_texto & palabras_tabla)
-
-#         # CORREGIDO: Mejorar logica de validacion de palabras
-#         if palabras_texto and palabras_tabla:
-#             palabras_minimas = max(
-#                 2, min(len(palabras_texto), len(palabras_tabla)) // 3
-#             )
-#             validaciones["concepto"]["match"] = coincidencias >= palabras_minimas
-#         else:
-#             validaciones["concepto"]["match"] = False
-
-#         if not validaciones["concepto"]["match"]:
-#             validaciones["concepto"][
-#                 "diferencia"
-#             ] = f"Solo {coincidencias} palabras coinciden (minimo: {palabras_minimas if 'palabras_minimas' in locals() else 2})"
-
-#     # --- VALIDAR CAMPOS OBLIGATORIOS ---
-#     campos_obligatorios = {
-#         "nit": "NIT",
-#         "concepto_compra": "Concepto de Compra",
-#         "cantidad": "Cantidad",
-#         "valor_total": "Valor Total",
-#     }
-
-#     campos_presentes = 0
-#     campos_faltantes = []
-
-#     for campo, nombre in campos_obligatorios.items():
-#         if datos_texto.get(campo) and str(datos_texto[campo]).strip():
-#             campos_presentes += 1
-#         else:
-#             campos_faltantes.append(nombre)
-
-#     validaciones["campos_obligatorios"]["presentes"] = campos_presentes
-#     validaciones["campos_obligatorios"]["total"] = len(campos_obligatorios)
-#     validaciones["campos_obligatorios"]["faltantes"] = campos_faltantes
-
-#     # --- CALCULAR RESUMEN ---
-#     campos_para_validar = [
-#         "cantidad",
-#         "valor_unitario",
-#         "valor_total",
-#         # "fecha_entrega",
-#         "concepto",
-#     ]
-#     campos_validados = sum(
-#         [1 for campo in campos_para_validar if validaciones[campo]["match"]]
-#     )
-
-#     validaciones["campos_validados"] = campos_validados
-#     validaciones["total_campos"] = len(campos_para_validar)
-
-#     validaciones["resumen"] = (
-#         f"{campos_validados}/{len(campos_para_validar)} campos coinciden, "
-#         f"{campos_presentes}/{len(campos_obligatorios)} campos obligatorios presentes"
-#     )
-
-#     return validaciones
+        # Convertir a float
+        return float(valor_limpio)
+    except (ValueError, AttributeError) as e:
+        print(f"ERROR limpiando numero '{valor}': {e}")
+        return 0.0
 
 
 def ValidarContraTabla(
@@ -1914,16 +1700,20 @@ def ValidarContraTabla(
 
     # Buscar el item especifico en el DataFrame
     item_df = df_items
-    if item_num and "Item" in df_items.columns:
+    if item_num and "Pos." in df_items.columns:
         item_df = df_items[
-            df_items["Item"].astype(str).str.strip() == str(item_num).strip()
+            df_items["Pos."].astype(str).str.strip() == str(item_num).strip()
         ]
-        if item_df.empty:
-            item_df = df_items.iloc[[0]]
-
+    # Si no encuentra, tomar primera fila como fallback
     if item_df.empty:
-        validaciones["resumen"] = "Item no encontrado en tabla - No se puede validar"
-        return validaciones
+        item_df = df_items.iloc[[0]]
+
+    # Tomar SOLO la fila del item
+    fila_sap = item_df.iloc[0]
+
+    cantidad_tabla = limpiar_numero(fila_sap.get("Cantidad"))
+    precio_tabla = limpiar_numero(fila_sap.get("PrecioVal."))
+    total_tabla = limpiar_numero(fila_sap.get("Valor tot."))
 
     # ==================================================================
     # MAPEO DE CAMPOS SAP ME53N
@@ -2232,13 +2022,13 @@ def ValidarContraTabla(
     # VALIDAR CANTIDAD
     # ==================================================================
     if datos_texto.get("cantidad"):
-        cantidad_texto = LimpiarNumero(datos_texto["cantidad"])
+        cantidad_texto = limpiar_numero_robusto(datos_texto["cantidad"])
         col_quantity = buscar_columna("Quantity")
 
         if col_quantity and col_quantity in item_df.columns:
             try:
                 cantidad_tabla_val = item_df[col_quantity].iloc[0]
-                cantidad_tabla = LimpiarNumero(str(cantidad_tabla_val))
+                cantidad_tabla = limpiar_numero_robusto(str(cantidad_tabla_val))
                 validaciones["cantidad"]["texto"] = datos_texto["cantidad"]
                 validaciones["cantidad"]["tabla"] = str(cantidad_tabla)
                 validaciones["cantidad"]["match"] = (
@@ -2255,12 +2045,12 @@ def ValidarContraTabla(
     # VALIDAR VALOR UNITARIO
     # ==================================================================
     if datos_texto.get("valor_unitario"):
-        valor_texto = LimpiarNumero(datos_texto["valor_unitario"])
+        valor_texto = limpiar_numero_robusto(datos_texto["valor_unitario"])
         col_price = buscar_columna("Valn Price")
 
         if col_price and col_price in item_df.columns:
             try:
-                valor_tabla = LimpiarNumero(str(item_df[col_price].iloc[0]))
+                valor_tabla = limpiar_numero_robusto(str(item_df[col_price].iloc[0]))
 
                 validaciones["valor_unitario"]["texto"] = FormatoMoneda(
                     datos_texto["valor_unitario"]
@@ -2285,12 +2075,12 @@ def ValidarContraTabla(
     # VALIDAR VALOR TOTAL
     # ==================================================================
     if datos_texto.get("valor_total"):
-        valor_texto = LimpiarNumero(datos_texto["valor_total"])
+        valor_texto = limpiar_numero_robusto(datos_texto["valor_total"])
         col_total = buscar_columna("Total Val.")
 
         if col_total and col_total in item_df.columns:
             try:
-                valor_tabla = LimpiarNumero(str(item_df[col_total].iloc[0]))
+                valor_tabla = limpiar_numero_robusto(str(item_df[col_total].iloc[0]))
 
                 validaciones["valor_total"]["texto"] = FormatoMoneda(
                     datos_texto["valor_total"]
@@ -2951,6 +2741,7 @@ def ProcesarYValidarItem(
 
     return datos_texto, validaciones, reporte, estado_final, observaciones
 
+
 def extraerDatosReporte(fila, df, mapeo):
     """
     Extrae datos de una fila ALV SAP usando mapeo dinámico
@@ -2967,6 +2758,7 @@ def extraerDatosReporte(fila, df, mapeo):
         datos[campo_reporte] = valor
 
     return datos
+
 
 def AppendHipervinculoObservaciones(ruta_excel, carpeta_reportes):
     """
@@ -3010,3 +2802,94 @@ def AppendHipervinculoObservaciones(ruta_excel, carpeta_reportes):
         celda_obs.style = "Hyperlink"
 
     wb.save(ruta_excel)
+
+
+def obtener_fila_expsolped(df_solpeds, solped, numero_item):
+    """
+    Obtiene la fila correspondiente de df_solpeds (expSolped03.txt)
+    para un item específico
+
+    Args:
+        df_solpeds: DataFrame con datos de expSolped03.txt
+        solped: Número de SOLPED
+        numero_item: Número del item
+
+    Returns:
+        Dict con los datos de expSolped03.txt para ese item
+    """
+    try:
+        # Buscar la fila que corresponde a esta SOLPED y este item
+        mascara = (
+            df_solpeds["PurchReq"].astype(str).str.replace(".", "") == str(solped)
+        ) & (df_solpeds["Item"].astype(str).str.strip() == str(numero_item).strip())
+
+        filas_encontradas = df_solpeds[mascara]
+
+        if not filas_encontradas.empty:
+            return filas_encontradas.iloc[0].to_dict()
+        else:
+            print(
+                f"⚠️ No se encontró fila en expSolped para SOLPED {solped}, Item {numero_item}"
+            )
+            return {}
+
+    except Exception as e:
+        print(f"⚠️ Error buscando en expSolped: {e}")
+        return {}
+
+
+def limpiar_numero_robusto(valor):
+    """
+    Convierte valores tipo SAP a float de forma segura.
+    Soporta:
+    2.800
+    218.400
+    6.994
+    1.615.614
+    $6.99
+    """
+
+    if valor is None:
+        return 0.0
+
+    s = str(valor).strip()
+
+    if s == "" or s.isalpha():
+        return 0.0
+
+    # Quitar moneda y espacios
+    s = s.replace("COP", "").replace("USD", "").replace("$", "").replace(" ", "")
+
+    # Si tiene puntos y NO tiene coma → formato miles SAP
+    if "." in s and "," not in s:
+        s = s.replace(".", "")
+
+    # Si tiene coma decimal
+    if "," in s:
+        s = s.replace(".", "")
+        s = s.replace(",", ".")
+
+    try:
+        return float(s)
+    except:
+        return 0.0
+
+
+def obtener_valor_desde_fila(fila, posibles_nombres, default=None):
+    """
+    Obtiene un valor de una fila probando múltiples nombres de columna posibles
+
+    Args:
+        fila: Dict con los datos de la fila
+        posibles_nombres: Lista de nombres posibles para la columna
+        default: Valor por defecto si no se encuentra
+
+    Returns:
+        El valor encontrado o el default
+    """
+    for nombre in posibles_nombres:
+        if nombre in fila:
+            valor = fila[nombre]
+            if valor not in [None, "", " ", "nan"]:
+                return valor
+    return default
