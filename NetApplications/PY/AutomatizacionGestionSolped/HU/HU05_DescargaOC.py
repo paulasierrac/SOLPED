@@ -9,28 +9,23 @@
 
 from datetime import datetime
 import pandas as pd
+import pyperclip
 
 from requests import session
 import time
 import traceback
 
 from config.settings import RUTAS, DB_CONFIG
+from config.init_config import in_config
+
 from funciones.GuiShellFunciones import ProcesarTablaMejorada
 from funciones.EscribirLog import WriteLog
 from funciones.GeneralME53N import AbrirTransaccion
-from funciones.ValidacionM21N import esperar_sap_listo
+from funciones.ValidacionME21N import esperar_sap_listo
+
 
 from funciones.FuncionesExcel import ExcelService
 
-
-def obtener_columnas_excel(ruta_excel: str, header: int) -> list[str]:
-        df = pd.read_excel(
-            ruta_excel,
-            header=header,
-            nrows=0,
-            engine="openpyxl"
-        )
-        return  df.columns.tolist()
 
 def EjecutarHU05(session, ordenes_de_compra: list):
     """
@@ -51,12 +46,13 @@ def EjecutarHU05(session, ordenes_de_compra: list):
         session.findById("wnd[0]/usr/ctxtLISTU").text = "ALV"
         # Presionar Enter
         session.findById("wnd[0]/usr/btn%_S_EBELN_%_APP_%-VALU_PUSH").press()
-
-        # Ingresar las órdenes de compra en la tabla
-        for i in range(len(ordenes_de_compra)):
-            ventanaobj = session.findById(f"wnd[1]/usr/tabsTAB_STRIP/tabpSIVA/ssubSCREEN_HEADER:SAPLALDB:3010/tblSAPLALDBSINGLE/ctxtRSCSEL_255-SLOW_I[1,{i}]")
-            ventanaobj.text = ordenes_de_compra[i]
-          
+        # Alistar Texto para pegar desde el portapapeles, estándar de Windows \r\n (Carriage Return + Line Feed).
+        texto_para_copiar = '\r\n'.join(ordenes_de_compra)
+        pyperclip.copy(texto_para_copiar)
+        esperar_sap_listo(session)
+        #Boton Pegar desde el portapapeles
+        session.findById("wnd[1]/tbar[0]/btn[24]").press()
+        esperar_sap_listo(session) 
         session.findById("wnd[1]/tbar[0]/btn[8]").press()
         # Presionar el botón de ejecutar
         session.findById("wnd[0]/tbar[1]/btn[8]").press()
@@ -70,20 +66,22 @@ def EjecutarHU05(session, ordenes_de_compra: list):
         #fecha_hora = ahora.strftime("%d/%m/%Y %H:%M:%S")
         fecha_archivo = ahora.strftime("%Y%m%d_%H%M%S")
         #Guardar el archivo txt en la ruta especificada
-        ruta_guardar = rf"{RUTAS["PathTempFileServer"]}"
+        ruta_guardar = rf"{in_config("PathTemp")}"
         session.findById("wnd[1]/usr/ctxtDY_PATH").text = ruta_guardar
         session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = rf"LiberadasOC_{fecha_archivo}.txt"
         session.findById("wnd[1]/usr/ctxtDY_FILENAME").caretPosition = 10
         session.findById("wnd[1]/tbar[0]/btn[0]").press
         session.findById("wnd[1]/tbar[0]/btn[11]").press()  # Guardar
 
-        print(RUTAS["PathTempFileServer"])
-        print(ruta_guardar)
+
+
         archivo = rf"LiberadasOC_{fecha_archivo}.txt"
 
         df_Ocliberadas = ProcesarTablaMejorada(archivo)
         #print (df_Ocliberadas)
         df_Ocliberadas.columns = [col.strip() for col in df_Ocliberadas.columns]
+
+        print(df_Ocliberadas)
 
         # Definir las columnas deseadas
         columnas_interes = ["Doc.compr.", "EstadLib"]
@@ -105,18 +103,9 @@ def EjecutarHU05(session, ordenes_de_compra: list):
         
         print(df_filtrado)
         # Guardar el DataFrame filtrado en un archivo Excel
-        df_filtrado.to_excel(rf"{RUTAS['PathTempFileServer']}\OC_Liberadas_{fecha_archivo}.xlsx", index=False)
-        
-        schema = DB_CONFIG.get("schema")
-        print(schema)
-
-        print(obtener_columnas_excel(rf"{RUTAS['PathTempFileServer']}\OC_Liberadas_{fecha_archivo}.xlsx", header=0))
-        
-        ExcelService.ejecutar_bulk_desde_excel(rf"{RUTAS['PathTempFileServer']}\OC_Liberadas_{fecha_archivo}.xlsx", header=2)
-
-
-
-
+        df_filtrado.to_excel(rf"{in_config("PathTemp")}\OC_Liberadas.xlsx", index=False)
+        #Sube el Excel a la base de datos
+        ExcelService.ejecutar_bulk_desde_excel(rf"{in_config("PathTemp")}\OC_Liberadas.xlsx")
 
         WriteLog(
             mensaje=f"Procesamiento en ME9F completado para la OC: {ordenes_de_compra}",

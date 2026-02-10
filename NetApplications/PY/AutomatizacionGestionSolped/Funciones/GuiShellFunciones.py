@@ -16,10 +16,14 @@ import time
 import os
 from funciones.EscribirLog import WriteLog
 from config.settings import RUTAS
+from config.init_config import in_config
 import pyautogui
 from pyautogui import ImageNotFoundException
 from funciones.Login import ObtenerSesionActiva
 from typing import List, Literal, Optional
+
+from datetime import datetime, timedelta
+import calendar
 
 class SapTextEditor:
     """
@@ -1220,7 +1224,7 @@ def ProcesarTabla(name, dias=None):
 def ProcesarTablaMejorada(name, dias=None):
     try:
         # 1. Carga de archivo con manejo de rutas
-        path = rf"{RUTAS['PathTempFileServer']}\{name}"
+        path = rf"{in_config('PathInsumos')}\{name}"
         lineas_puras = []
         for cod in ["latin-1", "utf-8", "cp1252"]:
             try:
@@ -1238,14 +1242,27 @@ def ProcesarTablaMejorada(name, dias=None):
             # Ignorar separadores visuales de SAP
             if not linea.startswith("|") or linea.strip().startswith("|---"):
                 continue
-            
-            # Si la línea tiene muchos campos (pipes), es una nueva entrada [cite: 1, 4]
-            if linea.count("|") > 10: 
-                if buffer_fila: filas_unificadas.append(buffer_fila)
+            pipes = linea.count("|")
+
+            if pipe_ref is None:
+                pipe_ref = pipes
+                buffer_fila = linea
+                continue
+
+            if pipes == pipe_ref:
+                if buffer_fila:
+                    filas_unificadas.append(buffer_fila)
                 buffer_fila = linea
             else:
-                # Es continuación de la línea anterior (ej. Valor Neto o Moneda) [cite: 3, 6]
                 buffer_fila += linea[1:]
+            
+            # # Si la línea tiene muchos campos (pipes), es una nueva entrada [cite: 1, 4]
+            # if linea.count("|") > 10: 
+            #     if buffer_fila: filas_unificadas.append(buffer_fila)
+            #     buffer_fila = linea
+            # else:
+            #     # Es continuación de la línea anterior (ej. Valor Neto o Moneda) [cite: 3, 6]
+            #     buffer_fila += linea[1:]
 
         if buffer_fila: filas_unificadas.append(buffer_fila)
 
@@ -1426,3 +1443,29 @@ def get_importesCondiciones(session, impuesto_buscado="Imp. Saludable IBUE"):
             set_sap_table_scroll(session, "tblSAPLV69ATCTRL_KONDITIONEN", i)
             print("Error al obtener los impuestos de las condiciones:", str(e))
             #continue
+
+
+def obtener_ultimo_dia_habil_actual():
+    """
+    Docstring for obtener_ultimo_dia_habil_actual
+
+    # Ejemplo de ejecución
+    # resultado = obtener_ultimo_dia_habil_actual()
+    # print(resultado)
+    """
+    # Obtener fecha actual
+    hoy = datetime.now()
+    anio = hoy.year
+    mes = hoy.month
+    
+    # Obtener el último día del mes
+    ultimo_dia_mes = calendar.monthrange(anio, mes)[1]
+    fecha = datetime(anio, mes, ultimo_dia_mes)
+    
+    # Retroceder si es Sábado (5) o Domingo (6)
+    while fecha.weekday() > 4:
+        fecha -= timedelta(days=1)
+        
+    # 4. Formatear como DD.MM.YYYY
+    return fecha.strftime('%d.%m.%Y')
+

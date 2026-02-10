@@ -1,6 +1,6 @@
 # ============================================
 # Función Local: DescargarSolpedME5A
-# Autor: Tu Nombre - Configurador RPA
+# Autor: Steven Navarro - Configurador RPA
 # Descripcion: Ejecuta ME5A y exporta archivo TXT según estado.
 # Ultima modificacion: 24/11/2025
 # Propiedad de Colsubsidio

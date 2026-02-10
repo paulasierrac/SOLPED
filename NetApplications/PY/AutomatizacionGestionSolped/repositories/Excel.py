@@ -1,5 +1,8 @@
+#repositories.Excel.py
+
 from config.database import Database
 from config.settings import DB_CONFIG
+
 schemadb = DB_CONFIG.get("schema")
 class ExcelRepo:
 
@@ -120,10 +123,12 @@ class ExcelRepo:
                 conn.autocommit = True
                 cursor = conn.cursor()
 
-                if not ExcelRepo.crear_tabla_temp(tabla, columnas):
+                exrepo = ExcelRepo("GestionSolped")
+
+                if not exrepo.crear_tabla_temp(tabla, columnas):
                     return
 
-                ExcelRepo.crear_tabla_final(tabla, columnas)
+                exrepo.crear_tabla_final(tabla, columnas)
 
                 cursor.execute(bulk_query)
                 cursor.execute(insert_query)

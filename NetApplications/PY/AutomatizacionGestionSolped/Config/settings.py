@@ -20,21 +20,13 @@ def get_env_variable(key: str, required: bool = True):
     return value
 
 
-# ========= CONEXION BASE DE DATOS ==========
-DATABASE = {
-    'DB_SERVER': os.getenv('DB_SERVER'),
-    'DB_NAME': os.getenv('DB_NAME'),
-    'DB_USER': os.getenv('DB_USER'),
-    'DB_PASSWORD': os.getenv('DB_PASSWORD')
-}
-
 # ========= CONFIG SAP ==========
 SAP_CONFIG = {
     "user": get_env_variable("SAP_USUARIO"),
     "password": get_env_variable("SAP_PASSWORD"),
 }
 
-# ========= Database ==========
+# ========= CONEXION BASE DE DATOS ==========
 DB_CONFIG = {
     "host": get_env_variable("SERVERDB"),
     "database": get_env_variable("NAMEDB"),
@@ -62,7 +54,7 @@ RUTAS = {
     "PathInsumo": get_env_variable("PATHINSUMO"),
     "PathTexto": get_env_variable("PATHTEXTO_SAP"),
     "PathRuta": get_env_variable("PATHRUTA_SAP"),
-    "PathTempFileServer": get_env_variable("SAP_TEMP_PATH"),
+    #"PathTempFileServer": get_env_variable("SAP_TEMP_PATH"),
     # Archivo de configuración de correos
     "ArchivoCorreos": os.path.join(BASE_DIR, "Insumo", "EnvioCorreos.xlsx"),
     # Rutas de archivos

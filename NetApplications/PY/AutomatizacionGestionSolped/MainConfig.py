@@ -1,12 +1,19 @@
 from config.init_config import in_config
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
-
+from funciones.FuncionesExcel import ExcelService
+import pandas as pd
 
 def Prueba():
     EjecutarHU00()
+    ruta_excel = r"\\192.168.50.169\RPA_SAMIR_GestionSolped\Temp\OC_Liberadas.xlsx"
 
-    parametro_ejemplo = in_config("SAP_LOGON_PATH")
-    print(f"El valor del parametro 'SAP_LOGON_PATH' es: {parametro_ejemplo}")
+    df = pd.read_excel(ruta_excel)
+    print(df)
+
+    ExcelService.excel_a_csv(ruta_excel, 0)
+
+    ExcelService.ejecutar_bulk_desde_excel(ruta_excel)
+
 
 
 if __name__ == "__main__":

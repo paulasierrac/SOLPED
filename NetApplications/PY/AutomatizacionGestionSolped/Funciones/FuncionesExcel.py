@@ -1,3 +1,6 @@
+
+#funciones.FuncionesExcel.py
+
 import os
 import csv
 import re
@@ -52,7 +55,9 @@ class ExcelService:
         df_limpio = df_limpio.rename(columns=columnas_mapeo)
 
         # Guardar archivo limpio
-        ruta_salida=in_config("PathTemp")+f"\{nombre_archivo}Limpio.xlsx"
+        
+        carpeta_temp = in_config("PathTemp")
+        ruta_salida = os.path.join(carpeta_temp, f"{nombre_archivo}limpio.xlsx")
         df_limpio.to_excel(ruta_salida, index=False)
 
         print(f"Archivo limpio generado correctamente en: {ruta_salida}")
@@ -109,34 +114,36 @@ class ExcelService:
     # EXCEL → CSV
     # -----------------------------
     @staticmethod
-    def excel_a_csv(ruta_excel: str, header: int) -> tuple[str, list]:
+    def excel_a_csv(ruta_excel: str, header: int = 0) -> tuple[str, list]:
 
         warnings.filterwarnings("ignore", category=UserWarning, module="openpyxl")
+        try:
+            df = pd.read_excel(
+                ruta_excel,
+                header=header,
+                dtype=str,
+                engine="openpyxl"
+            )
 
-        df = pd.read_excel(
-            ruta_excel,
-            header=header,
-            dtype=str,
-            engine="openpyxl"
-        )
+            df.columns = [ExcelService.normalize_column(c) for c in df.columns]
+            orden_columnas = list(df.columns)
 
-        df.columns = [ExcelService.normalize_column(c) for c in df.columns]
-        orden_columnas = list(df.columns)
+            df = df.map(ExcelService.limpiar_texto)
 
-        df = df.map(ExcelService.limpiar_texto)
+            nombre_base = os.path.splitext(os.path.basename(ruta_excel))[0]
+            carpeta_temp = in_config("PathTemp")
+            ruta_csv = os.path.join(carpeta_temp, f"{nombre_base}.csv")
 
-        nombre_base = os.path.splitext(os.path.basename(ruta_excel))[0]
-        carpeta_temp = in_config("PathTemp")
-        ruta_csv = os.path.join(carpeta_temp, f"{nombre_base}.csv")
-
-        df.to_csv(
-            ruta_csv,
-            sep=";",
-            index=False,
-            encoding="utf-8-sig"
-        )
-
-        return ruta_csv, orden_columnas
+            df.to_csv(
+                ruta_csv,
+                sep=";",
+                index=False,
+                encoding="utf-8-sig"
+            )
+            return ruta_csv, orden_columnas
+        except Exception as e:
+            print(f"Error convirtiendo Excel a CSV: {e}")
+            raise
 
     # -----------------------------
     # CSV → TXT
@@ -190,7 +197,8 @@ class ExcelService:
             ruta_txt = ExcelService.convertir_txt(ruta_csv)
 
             # 4. Bulk con tabla temporal + final
-            VariableExcelRepo = ExcelRepo(schema="GestionSolped") 
+            VariableExcelRepo = ExcelRepo(schema="GestionSolped")
+            print(orden_columnas)
             VariableExcelRepo.ejecutar_bulk_dinamico(
                 ruta_txt=ruta_txt,
                 tabla=nombre_tabla,

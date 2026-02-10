@@ -1,26 +1,6 @@
 ---------------------------------------------------------------------------------------------------------------------------------------------------
 |Purch.Req.|Item|Req. Date |Material|Created by|Short Text                              |PO        |  Quantity|Plnt|PGr||D|Requisnr.   |Proc.state|
 ---------------------------------------------------------------------------------------------------------------------------------------------------
-|1300139390|  10|09.12.2025|80016676|OSCAVILN  |LAVADO MANTEL GRANDE                    |          |      231 |CE53|C53|| |            |03        |
-|1300139390|  20|09.12.2025|80019221|OSCAVILN  |LAVADO MULETON                          |          |       20 |CE53|C53|| |            |03        |
-|1300139390|  30|09.12.2025|80019225|OSCAVILN  |LAVADO TAPA  GRANDE                     |          |       71 |CE53|C53|| |            |03        |
-|1300139390|  40|09.12.2025|80019229|OSCAVILN  |LAVADO TAPA MANTEL LICRA ENCAUCHETADA GR|          |       59 |CE53|C53|| |            |03        |
-|1300139390|  50|09.12.2025|80019234|OSCAVILN  |LAVADO CHAQUETA CAPITAN                 |          |        1 |CE53|C53|| |            |03        |
-|1300139390|  60|09.12.2025|80019224|OSCAVILN  |LAVADO SERVILLETA                       |          |      229 |CE53|C53|| |            |03        |
-|1300139390|  70|09.12.2025|80019223|OSCAVILN  |LAVADO PETO COCINA                      |          |       78 |CE53|C53|| |            |03        |
-|1300139391|  10|09.12.2025|80011043|OSCAVILN  |HTH. PULSAR BRIQUETTES                  |          |  317,520 |CA09|H01|| |            |03        |
-|1300139391|  20|09.12.2025|80014748|OSCAVILN  |WATERCHLOR BOLSA x 1 KILO               |          |       20 |CA09|H01|| |            |03        |
-|1300139391|  30|09.12.2025|80016063|OSCAVILN  |BICARBONATO DE SODIO C. ALCALINIDAD     |          |       50 |CA09|H01|| |            |03        |
-|1300139391|  40|09.12.2025|80004191|OSCAVILN  |CLORO GRANULADO                         |          |       20 |CA09|H01|| |            |03        |
-|1300139391|  50|09.12.2025|80003065|OSCAVILN  |CRISTALIN ALGICIDA                      |          |       20 |CA09|H01|| |            |03        |
-|1300139391|  60|09.12.2025|80009686|OSCAVILN  |CLORO SHOCK                             |          |       20 |CA09|H01|| |            |03        |
-|1300139391|  70|09.12.2025|80018083|OSCAVILN  |REACTIVO TAYLOR N. 10                   |          |        2 |CA09|H01|| |            |03        |
-|1300139391|  80|09.12.2025|80018085|OSCAVILN  |REACTIVO TAYLOR N. 12                   |          |        2 |CA09|H01|| |            |03        |
-|1300139391|  90|09.12.2025|80023818|OSCAVILN  |REACTIVO TAYLOR ROJO FENOL # 4 (INNV WA)|          |        2 |CA09|H01|| |            |03        |
-|1300139392|  10|09.12.2025|80023744|OSCAVILN  |PERSONAJE ITINERANTE                    |          |        1 |CA65|RD4|| |            |03        |
-|1300139392|  20|09.12.2025|80001113|OSCAVILN  |SERVICIOS COMPL. DE  FOTOGRAFÍAS        |          |        1 |CA65|RD4|| |            |03        |
-|1300139392|  30|09.12.2025|80013126|OSCAVILN  |SERVICIO DE APOYO LOGÍSTICO             |          |        1 |CA65|RD4|| |            |03        |
-|1300139392|  40|09.12.2025|80001140|OSCAVILN  |TRANSPORTE DE MATERIALES                |          |        1 |CA65|RD4|| |            |03        |
 |1300139393|  10|09.12.2025|80001039|OSCAVILN  |ALQUILER DE CARPAS                      |          |        9 |CA15|RD2|| |            |03        |
 |1300139393|  20|09.12.2025|80001039|OSCAVILN  |ALQUILER DE CARPAS                      |          |       11 |CA15|RD2|| |            |03        |
 |1300139393|  30|09.12.2025|80001069|OSCAVILN  |SONIDO BÁSICO COLSUBSIDIO RECREACION    |          |        1 |CA15|RD2|| |            |03        |

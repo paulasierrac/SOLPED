@@ -13,7 +13,7 @@ import time
 import os
 from config.settings import RUTAS
 from funciones.GuiShellFunciones import esperar_sap_listo, obtener_numero_oc, ProcesarTabla, SetGuiComboBoxkey, CambiarGrupoCompra
-from funciones.ValidacionM21N import (
+from funciones.ValidacionME21N import (
 SelectGuiTab, ValidarAjustarSolped,AbrirSolped,MostrarCabecera)
 from funciones.EscribirInforme import WriteInformeOperacion
 from funciones.EscribirLog import WriteLog
@@ -21,6 +21,7 @@ from funciones.GeneralME53N import AbrirTransaccion
 import traceback
 import pyautogui  # Asegúrate de tener pyautogui instaladoi
 
+from repositories.Consultas import Querys
 
 def EjecutarHU04(session, archivo):
     
@@ -43,7 +44,13 @@ def EjecutarHU04(session, archivo):
         # ============================
         # Cambiar Funcion por # df_solpeds = procesarTablaME5A(archivo)
         df_solpeds = ProcesarTabla(archivo)
+        """
+        #STEV: se trata de llenar el data frame desde la base de datos pero falla 
 
+        query = Querys("GestionSolped")
+        df_solpeds = query.fetch_all(tabla="expsolped03")
+        print(df_solpeds)
+        """
         if df_solpeds.empty:
             WriteLog(
                 mensaje=f"No se encontraron Solpeds para procesar en el archivo {archivo}.",
@@ -90,6 +97,8 @@ def EjecutarHU04(session, archivo):
             acciones = []
             #print(f"procesando solped: {solped} de items: {item_count}")
             AbrirTransaccion(session, "ME21N")
+      
+            esperar_sap_listo(session)
             #navegacion por SAP que permite abrir Solped 
             
             AbrirSolped(session, solped, item_count)
@@ -98,8 +107,9 @@ def EjecutarHU04(session, archivo):
             SetGuiComboBoxkey(session, "TOPLINE-BSART", "ZRCR")
 
             esperar_sap_listo(session)
-            pyautogui.hotkey("ctrl","F2")
+            
             #se ingresa a la pestaña  Dat.org. de cabecera, asegurándonos de que esté visible
+            pyautogui.hotkey("ctrl","F2")
             SelectGuiTab(session, "TABHDT9") 
             # Se cambia el grupo de compra dependiendo de la org de compra, y se guardan acciones
             acciones.extend(CambiarGrupoCompra(session))
@@ -122,6 +132,17 @@ def EjecutarHU04(session, archivo):
             pyautogui.hotkey("enter")
             # /Salir para pruebas 
             #********************************* 
+            # Boton Guardar para generar OC 
+            #********************************* 
+            # session.findById("wnd[0]/tbar[0]/btn[11]").press()
+            # session.findById("wnd[1]/usr/btnSPOP-VAROPTION1").press()
+
+            #********************************* 
+            # Boton Guardar para generar OC 
+            #********************************* 
+
+
+
 
             # Obtener el numero de la orden de compra generada desde la barra de estado.
             orden_de_compra = obtener_numero_oc(session)

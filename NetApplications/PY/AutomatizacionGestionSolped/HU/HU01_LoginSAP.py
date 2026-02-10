@@ -1,3 +1,13 @@
+# ================================
+# GestionSOLPED – HU00: DespliegueAmbiente
+# Autor: Steven Navarro - NetApplications
+# Descripcion: Carga parámetros, valida carpetas y prepara entorno
+# Ultima modificacion: 30/11/2025
+# Propiedad de Colsubsidio
+# Cambios: Ajuste ruta base dinámica + estándar Colsubsidio
+# ================================
+
+
 import win32com.client  # pyright: ignore[reportMissingModuleSource]
 import time
 import getpass
@@ -5,7 +15,7 @@ import subprocess
 import os
 from config.init_config import in_config
 from config.settings import RUTAS, SAP_CONFIG 
-from funciones.ValidacionM21N import ventana_abierta
+from funciones.ValidacionME21N import ventana_abierta
 
 import pyautogui
 
@@ -97,6 +107,26 @@ def conectar_sap(conexion, mandante, usuario, password, idioma="ES"):
                 print("Ventana loginDiag Copyrigth inesperada superada correctamente")
         except Exception as e:
             print(f"no se encontro ventana Copyrigth en login {e}")
+
+        if ventana_abierta(session, "Info de licencia en entrada al sistema múltiple"):
+            
+            print("entro a la funcion click")
+            time.sleep(20)  
+            pyautogui.click()
+            pyautogui.press("enter")
+               
+            try:
+                if validarLoginDiag(
+                    ruta_imagen=rf".\img\Infodelicenciaenentradaalsistemamultiple.png",
+                    confidence=0.8,
+                    intentos=20,
+                    espera=0.5
+                ):  
+                    pyautogui.click()
+                    print("encontro la imagen ")
+                    print("Ventana info de licencia inesperada superada correctamente")
+            except Exception as e:
+                print(f"no se encontro ventana Copyrigth en login {e}")
         return session
 
     except Exception as e:

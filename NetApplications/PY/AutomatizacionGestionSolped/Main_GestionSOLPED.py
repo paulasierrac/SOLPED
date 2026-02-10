@@ -13,6 +13,7 @@
 import time
 import pyautogui
 import traceback
+import sys
 
 from config.settings import RUTAS, SAP_CONFIG
 from config.init_config import in_config
@@ -70,6 +71,8 @@ def Main_GestionSolped():
         )
 
         session = conectar_sap(in_config("SAP_SISTEMA"),in_config("SAP_MANDANTE") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
+
+        time.sleep(3)
      
 
         WriteLog(
@@ -88,18 +91,22 @@ def Main_GestionSolped():
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        ordenes_de_compra = ["4200339200", "4200339201", "4200339202", "4200339203", "4200339204", "4200339205", "4200339206"]
-        EjecutarHU05(session,ordenes_de_compra)
-
+        ordenes_de_compra = ["4200339200", "4200339201", "4200339202", "4200339203", "4200339204", "4200339205", "4200339206","4001155884","4001155889","4001155889","4001155852"]
+        #EjecutarHU05(session,ordenes_de_compra)
+        #sys.exit()
         #*********************************
         # Se debe remplazar con guardar OC 
         #*********************************
         # /Salir para pruebas 
-        pyautogui.press("F12")
-        time.sleep(1)
-        pyautogui.hotkey("TAB")
-        time.sleep(0.5)
-        pyautogui.hotkey("enter")
+
+        # pyautogui.hotkey("shift","F3")
+        # time.sleep(2)
+        # pyautogui.hotkey("alt","TAB")
+        # time.sleep(2)   
+        # pyautogui.hotkey("enter")
+
+        #
+              
         # /Salir para pruebas 
         #********************************* 
 
@@ -152,6 +159,8 @@ def Main_GestionSolped():
             #     path_log=RUTAS["PathLog"],
             # )
 
+            #session = conectar_sap(in_config("SAP_SISTEMA"),in_config("SAP_MANDANTE") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
+
             # archivos_validar = ["expSolped05 1.txt"] # 1300139271,1300139272
             archivos_validar = [
                 "expSolped03 copy.txt"
@@ -188,9 +197,9 @@ def Main_GestionSolped():
             print("Esta es la ruta: ", ruta)
             dataSolpeds = leer_solpeds_desde_archivo(ruta)
 
-            for solped, info in dataSolpeds.items():
-                print(f"Solped {solped} tiene {info['items']} items")
-                # Cambiar por funcion de descarga de OC
+            # for solped, info in dataSolpeds.items():
+            #     #print(f"Solped {solped} tiene {info['items']} items")
+            #     # Cambiar por funcion de descarga de OC
             dataOC = leer_solpeds_desde_archivo(ruta)
             print(type(dataOC))
 

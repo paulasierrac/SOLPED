@@ -1,7 +1,7 @@
 # ============================================
 # Función Local: validacionME53N
-# Autor: Paula Sierra - NetApplications
-# Descripcion: Ejecuta ME5A y exporta archivo TXT según estado.
+# Autor: Steven Navarro - NetApplications
+# Descripcion: Funciones 
 # Ultima modificacion: 24/11/2025
 # Propiedad de Colsubsidio
 # Cambios: (Si Aplica)
@@ -122,7 +122,7 @@ def ValidarAjustarSolped(session,item=1):
                 acciones.append(f"Posicion {fila+1}0 => PP:{PrecioPosicion} != PT:{preciotexto}⚠️ Se Actualiza Precio")
             
 
-            # Realiza los reemplazos en el texto
+            # Realiza los reemplazos en el texto segun cuadro 
             reemplazos = {"VENTA SERVICIO": "V1","VENTA PRODUCTO": "V1","GASTO PROPIO SERVICIO": "C2","GASTO PROPIO PRODUCTO": "C2","SAA": "R3","SAA PRODUCTO": "R3"} #"SAA SERVICIO": "R3"
             nuevo_texto,cambios,cambioEcxacto = editor.replace_in_text(texto, reemplazos)
 
@@ -135,29 +135,30 @@ def ValidarAjustarSolped(session,item=1):
             editext.SetUnprotectedTextPart(0,nuevo_texto)
 
             #Borra los textos de cada editor F02 en adelante
-            for i in range(2, 6):  # F02 a F05
-                SelectGuiTab(session, "TABIDT14")               
+            for i in range(2, 3):  # F02 a F05  2,6   F02 a F03 2,
+                SelectGuiTab(session, "TABIDT14")
+                nodo = f"F0{i}"               
                 textPF = buscar_objeto_por_id_parcial(session, "cntlTEXT_TYPES_0200/shell")
-                nodo = f"F0{i}"
                 textPF.selectedNode = nodo
-                editxt = session.findById(EDITOR_ID.id)
                 texto = editor.get_all_text()
                 if texto :
                     #print("El texto no esta vacío. Procediendo a borrarlo... :"f"F0{i}")
+                    editxt=session.findById(EDITOR_ID.id)
                     editxt.SetUnprotectedTextPart(0,".")
 
             esperar_sap_listo(session)
-            valorImpSaludable = get_importesCondiciones(session)
-            if valorImpSaludable:
-                acciones.append(f"Impuesto Saludable en la posicion {fila+1}0: {valorImpSaludable}")
+            """
+            #STEV: Codigo para recuperar impuesto saludable desde la pestaña Condiciones, por lentitud del bot se desactiva po ahora 2/9/2026
             
-                   
-            # da scroll una posicion hacia abajo para no perder visual de los objetos en la tabla de SAP
-            set_sap_table_scroll(session, "TC_1211", fila+1)
-
-            print(f"Primera posicion visible : {get_GuiTextField_text(session, f'EBELP[1,0]')}")
+            # valorImpSaludable = get_importesCondiciones(session)
+            # if valorImpSaludable:
+            #     acciones.append(f"Impuesto Saludable en la posicion {fila+1}0: {valorImpSaludable}")
+            """                   
+            set_sap_table_scroll(session, "TC_1211", fila+1) # da scroll una posicion hacia abajo para no perder visual de los objetos en la tabla de SAP
+            #print(f"Primera posicion visible : {get_GuiTextField_text(session, f'EBELP[1,0]')}") # Muestra la primera posicion Visible despues del scroll 
             esperar_sap_listo(session)
-        # Devuelve las accines ejecutadas en una lista 
+
+        # Devuelve las acciones ejecutadas en una lista 
         return acciones
 
     except Exception as e:
@@ -181,22 +182,23 @@ def AbrirSolped(session, solped, item=2):
     """
     try:
           
-        esperar_sap_listo(session)
+        #esperar_sap_listo(session)
         # Click Variante de Seleccion y selecciona el campo Solicitudes de pedido en la lista
         timeout = time.time() + 25
         ventana= "Solicitudes de pedido"
         while not ventana_abierta(session, ventana):
             if time.time() > timeout:
                 raise TimeoutError(f"No se abrió la ventana :{ventana}")
-            buscar_y_clickear(rf".\img\vSeleccion.png", confidence=0.8, intentos=5, espera=0.5)
             
+            buscar_y_clickear(rf".\img\vSeleccion.png", confidence=0.8, intentos=5, espera=0.5)
+            #session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]").pressContextButton("SELECT")
             # VarianteSeleccion = buscar_objeto_por_id_parcial(session, "/shell[0]")
             # VarianteSeleccion1= buscar_objeto_por_id_parcial(session, "SELECT")
             # VarianteSeleccion.pressContextButton (VarianteSeleccion1.id)
             # esperar_sap_listo(session)
             # SolicitudesdePedido = buscar_objeto_por_id_parcial(session, ":REQ_QUERY")
             # VarianteSeleccion.selectContextMenuItem (SolicitudesdePedido.id)
-            
+            #session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]").pressContextButton("SELECT")
             time.sleep(2)
             pyautogui.press("s") # selecciona el campo Solicitudes de pedido en la lista
 
@@ -214,14 +216,22 @@ def AbrirSolped(session, solped, item=2):
         pyautogui.hotkey("down")
         time.sleep(0.5)
 
+        """
         # Selecciona todos los items de la solped revisar variable item para ajustar
         with pyautogui.hold("shift"):
             pyautogui.press("down", presses=item)  # Stev: cantidad de items a bajar articulos de la solped
             time.sleep(0.5)
+        """
+        primerItem = 2 #desde donde se toman las pociciones TODO: que se pase por parametro, segun cliente con posiciones 
+        ultimoItem = item + 2 # Ultima posicion tomada 
+        for i in range(primerItem,ultimoItem):   # recordar que en range no incluye el ultimo 
+            session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[1]").selectNode(f"          {i}")
 
+        esperar_sap_listo(session)
         # Click en tomar pedido
-        buscar_y_clickear(rf".\img\tomar.png", confidence=0.7, intentos=20, espera=0.5)
-
+        #buscar_y_clickear(rf".\img\tomar.png", confidence=0.7, intentos=20, espera=0.5)
+        session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]").pressButton ("COPY")
+        
         #Docstring for MostrarCabecera
         MostrarCabecera()
 

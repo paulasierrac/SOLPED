@@ -10,7 +10,9 @@
 import os
 import json
 
-from config.init_config import init_config
+from config.init_config import init_config, in_config
+from funciones.FuncionesExcel import ExcelService
+
 
 #from config.initconfig import init_config
 
@@ -49,9 +51,20 @@ def EjecutarHU00():
             os.makedirs(ruta_completa)
 
     # ==========================================================
-    # 3. (Opcional) Cargar parámetros desde config.json o BD
+    # 3. Cargar parámetros desde o BD
     # ==========================================================
     init_config()
+ 
+    # ==========================================================
+    # 4. Cargar Ecxel con hojas que van a ser las tablas de parametros en la BD
+    # ==========================================================
+
+    
+
+    rutaParametros = os.path.join(in_config("PathInsumo"),"Parametros SAMIR.xlsx")
+    ExcelService.ejecutar_bulk_desde_excel(rutaParametros)
+
+
    
 
     ruta_config = os.path.join(ruta_base, "config.json")
