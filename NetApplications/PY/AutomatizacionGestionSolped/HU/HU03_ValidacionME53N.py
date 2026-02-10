@@ -46,6 +46,7 @@ from funciones.GeneralME53N import (
     obtener_valor_desde_fila,
 )
 from config.settings import RUTAS
+from funciones.FuncionesExcel import ExcelService
 
 
 def EjecutarHU03(session, nombre_archivo):
@@ -1041,7 +1042,10 @@ def EjecutarHU03(session, nombre_archivo):
         AppendHipervinculoObservaciones(
             ruta_excel=archivo_descargado, carpeta_reportes=RUTAS["PathReportes"]
         )
-
+        # Sube el Excel a la base de datos
+        ExcelService.ejecutar_bulk_desde_excel(
+            rf"{path_reporte}"
+        )
         # Enviar correo de finalización
         EnviarNotificacionCorreo(
             codigo_correo=10, task_name=task_name, adjuntos=[archivo_descargado]

@@ -285,6 +285,7 @@ def generar_reporte_final_excel(filas_reporte):
             print("⚠️ No hay filas para generar el reporte")
             return None
 
+
         # Crear DataFrame
         df = pd.DataFrame(filas_reporte)
 
