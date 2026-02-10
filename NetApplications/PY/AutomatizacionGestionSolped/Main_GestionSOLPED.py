@@ -11,11 +11,8 @@
 # ================================
 
 from time import time
-
-
 from HU.HU04_GeneracionOC import EjecutarHU04
 from funciones.GeneralME53N import (
-    EnviarNotificacionCorreo,
     EnviarCorreoPersonalizado,
     NotificarRevisionManualSolped,
     convertir_txt_a_excel,
@@ -31,6 +28,7 @@ from HU.HU03_ValidacionME53N import EjecutarHU03
 from config.init_config import in_config
 
 from funciones.GuiShellFunciones import leer_solpeds_desde_archivo
+from funciones.EmailSender import EnviarNotificacionCorreo
 from config.settings import RUTAS, SAP_CONFIG
 import traceback
 
@@ -42,12 +40,16 @@ def Main_GestionSolped():
         # ================================
         # Inicio de Main
         # ================================
+
+        # Enviar correo de inicio
         WriteLog(
             mensaje="Inicio ejecución Main GestionSolped.",
             estado="INFO",
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
+
+        EnviarNotificacionCorreo(codigo_correo=1, task_name=task_name)
 
         # ================================
         # 1. Despliegue de ambiente
@@ -202,6 +204,9 @@ def Main_GestionSolped():
         # ================================
         # Fin de Main
         # ================================
+        # Enviar correo de Finalización
+        EnviarNotificacionCorreo(codigo_correo=17, task_name=task_name, adjuntos=[])
+
         WriteLog(
             mensaje="Main GestionSolped finalizado correctamente.",
             estado="INFO",
