@@ -17,6 +17,7 @@ import getpass
 import subprocess
 import os
 import traceback
+from funciones.EmailSender import EnviarNotificacionCorreo
 from funciones.ReporteFinalME53N import (
     construir_fila_reporte_final,
     generar_reporte_final_excel,
@@ -39,13 +40,13 @@ from funciones.GeneralME53N import (
     GenerarReporteAttachments,
     ParsearTablaAttachments,
     convertir_txt_a_excel,
-    EnviarNotificacionCorreo,
     AppendHipervinculoObservaciones,
     obtener_fila_expsolped,
-    limpiar_numero_robusto, 
-    obtener_valor_desde_fila
+    limpiar_numero_robusto,
+    obtener_valor_desde_fila,
 )
 from config.settings import RUTAS
+
 
 def EjecutarHU03(session, nombre_archivo):
     try:
@@ -244,7 +245,7 @@ def EjecutarHU03(session, nombre_archivo):
                 print(reporte_attachments)
 
                 # Guardar reporte de attachments SOLO si tiene adjuntos
-                if tiene_attachments and contenido_attachments:
+                if attachments_lista:
                     path_reporte_attach = (
                         f"{RUTAS['PathReportes']}\\Attachments_{solped}.txt"
                     )
@@ -271,7 +272,7 @@ def EjecutarHU03(session, nombre_archivo):
                 # MARCAR SI NO TIENE ATTACHMENTS (pero continuar validación)
                 solped_rechazada_por_attachments = False
 
-                if not tiene_attachments:
+                if not attachments_lista:
                     print(f"\nSOLPED {solped} SERÁ RECHAZADA: Sin archivos adjuntos")
                     print(
                         f"Continuando con validaciones de items para reporte completo..."
@@ -597,6 +598,19 @@ def EjecutarHU03(session, nombre_archivo):
                             f"  datos_texto['nit']: {datos_texto.get('nit', 'FALTA')}"
                         )
                         # ========================================================
+                        # FILTRO CRÍTICO: evitar fila TOTAL / sin item válido
+                        # ========================================================
+                        if (
+                            not numero_item
+                            or not str(numero_item).strip().isdigit()
+                            or str(numero_item).strip() in ["", "0"]
+                        ):
+                            print(
+                                f"Fila ignorada (item inválido o total): '{numero_item}'"
+                            )
+                            continue
+
+                        # ========================================================
                         # CONSTRUIR FILA PARA REPORTE FINAL (UNA SOLA VEZ)
                         # ========================================================
                         fila_reporte = construir_fila_reporte_final(
@@ -636,39 +650,51 @@ def EjecutarHU03(session, nombre_archivo):
                         filas_reporte_final.append(fila_reporte)
                         print(f"📊 Fila agregada al reporte para item {numero_item}")
                         # ========================================================
+                        # CONSTRUIR RESUMEN PARA NOTIFICACIÓN (DETALLADO POR ITEM)
+                        # ========================================================
 
-                        # ========================================================
-                        # CONSTRUIR RESUMEN PARA NOTIFICACIÓN
-                        # ========================================================
-                        if estado_final != "Aprovado":
+                        if estado_final != "Aprobado":
+
                             requiere_notificacion = True
 
-                            # Construir texto de validación del item
-                            item_info = f"\n📋 ITEM {numero_item}:\n"
-                            item_info += f"   Estado: {estado_final}\n"
-                            item_info += f"   Observaciones: {observaciones}\n"
+                            item_info = f"\n📋 ITEM {numero_item}\n"
+                            item_info += f"Estado: {estado_final}\n"
+                            item_info += f"Observaciones: {observaciones}\n\n"
 
-                            # Agregar campos clave
-                            if datos_texto.get("nit"):
-                                item_info += f"   NIT: {datos_texto['nit']}\n"
-                            if datos_texto.get("razon_social"):
+                            # -------- ME53N --------
+                            faltantes_me53n = validaciones.get(
+                                "campos_obligatorios", {}
+                            ).get("faltantes", [])
+                            if faltantes_me53n:
                                 item_info += (
-                                    f"   Razón Social: {datos_texto['razon_social']}\n"
+                                    f"- ME53N faltantes: {', '.join(faltantes_me53n)}\n"
                                 )
-                            if datos_texto.get("concepto_compra"):
-                                concepto_corto = datos_texto["concepto_compra"][:100]
-                                item_info += f"   Concepto: {concepto_corto}...\n"
+                            else:
+                                item_info += "- ME53N faltantes: Ninguno\n"
 
-                            # Agregar problemas de validación
-                            if validaciones.get("campos_obligatorios", {}).get(
-                                "faltantes"
-                            ):
-                                item_info += f"   Campos faltantes: {', '.join(validaciones['campos_obligatorios']['faltantes'])}\n"
+                            # -------- TEXTO --------
+                            faltantes_texto = validaciones.get("faltantes_texto", [])
+                            if faltantes_texto:
+                                item_info += (
+                                    f"- Texto faltantes: {', '.join(faltantes_texto)}\n"
+                                )
+                            else:
+                                item_info += "- Texto faltantes: Ninguno\n"
+
+                            # -------- VALIDACIONES --------
+                            def estado_ok(flag):
+                                return "OK" if flag else "ERROR"
+
+                            item_info += "\nValidaciones:\n"
+                            item_info += f"  Cantidad: {estado_ok(validaciones.get('cantidad', {}).get('match', False))}\n"
+                            item_info += f"  Valor Unitario: {estado_ok(validaciones.get('valor_unitario', {}).get('match', False))}\n"
+                            item_info += f"  Valor Total: {estado_ok(validaciones.get('valor_total', {}).get('match', False))}\n"
+                            item_info += f"  Concepto: {estado_ok(validaciones.get('concepto', {}).get('match', False))}\n"
 
                             resumen_validaciones.append(item_info)
 
                         # Contar segun el resultado
-                        if estado_final == "Aprovado":
+                        if estado_final == "Aprobado":
                             contador_validados += 1
                             contadores["items_validados"] += 1
                             print(
@@ -719,7 +745,7 @@ def EjecutarHU03(session, nombre_archivo):
                     )
 
                 elif contador_validados == items_procesados_en_solped:
-                    estado_final_solped = "Aprovado"
+                    estado_final_solped = "Aprobado"
                     observaciones_solped = f"Todos validados ({contador_validados} de {items_procesados_en_solped}) + Contiene Adjuntos"
                     contadores["procesadas_exitosamente"] += 1
                     requiere_notificacion = False

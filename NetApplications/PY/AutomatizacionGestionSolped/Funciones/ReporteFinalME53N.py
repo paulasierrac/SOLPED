@@ -72,6 +72,36 @@ COLUMNAS_REPORTE_FINAL = [
 # ======================================================
 
 
+def determinar_estado_reporte(
+    tiene_adjuntos: bool,
+    faltantes_me53n: list,
+    faltantes_texto: list,
+    resultado_validaciones: dict,
+):
+    """
+    Estados permitidos:
+    Aprobado | Rechazado | Pendiente
+    """
+
+    # 🔴 RECHAZADO
+    if not tiene_adjuntos:
+        return "Rechazado"
+
+    # 🟡 PENDIENTE
+    if (
+        faltantes_me53n
+        or faltantes_texto
+        or not resultado_validaciones.get("cantidad", True)
+        or not resultado_validaciones.get("valor_unitario", True)
+        or not resultado_validaciones.get("valor_total", True)
+        or not resultado_validaciones.get("concepto", True)
+    ):
+        return "Pendiente"
+
+    # 🟢 APROBADO
+    return "Aprobado"
+
+
 def construir_fila_reporte_final(
     solped,
     item,
@@ -97,12 +127,77 @@ def construir_fila_reporte_final(
         Dict con todos los datos para una fila del reporte
     """
 
+    # ========================================================
+    # 1. CAMPOS OBLIGATORIOS ME53N
+    # ========================================================
+
+    campos_me53n_obligatorios = {
+        "Material": datos_me53n.get("Material"),
+        "Cantidad": datos_me53n.get("Cantidad"),
+        "Precio valoración": datos_me53n.get("PrecioVal."),
+        "Fecha entrega": datos_me53n.get("Fe.entrega"),
+        "Centro": datos_me53n.get("Centro"),
+        "Grupo de compras": datos_me53n.get("GCp"),
+        "Organización de compras": datos_me53n.get("OrgC"),
+        "Proveedor fijo": datos_me53n.get("ProvFijo"),
+    }
+
+    faltantes_me53n = [
+        campo
+        for campo, valor in campos_me53n_obligatorios.items()
+        if valor is None or str(valor).strip() == ""
+    ]
+
+    faltantes_me53n_texto = ", ".join(faltantes_me53n)
+
+    # ========================================================
+    # 2. CAMPOS OBLIGATORIOS DEL TEXTO
+    # ========================================================
+
+    campos_texto_obligatorios = {
+        "nit": datos_texto.get("nit"),
+        "concepto": datos_texto.get("concepto_compra"),
+        "cantidad": datos_texto.get("cantidad"),
+        "valor_total": datos_texto.get("valor_total"),
+    }
+
+    faltantes_texto = [
+        campo
+        for campo, valor in campos_texto_obligatorios.items()
+        if valor is None or str(valor).strip() == ""
+    ]
+
+    faltantes_texto_texto = ", ".join(faltantes_texto)
+
+    # ========================================================
+    # 3. NORMALIZAR ADJUNTOS
+    # ========================================================
+
+    cant_adj = datos_adjuntos.get("cantidad", 0)
+    nombres_adj = datos_adjuntos.get("nombres", "")
+
+    if cant_adj in [None, ""]:
+        cant_adj = 0
+
+    if nombres_adj is None:
+        nombres_adj = ""
+
+    # ========================================================
+    # 4. DETERMINAR ESTADO FINAL
+    # ========================================================
+
+    estado_final = determinar_estado_reporte(
+        tiene_adjuntos=cant_adj > 0,
+        faltantes_me53n=faltantes_me53n,
+        faltantes_texto=faltantes_texto,
+        resultado_validaciones=resultado_validaciones,
+    )
     # ========================================
     # CONSTRUIR FILA DEL REPORTE
     # ========================================
     fila = {
         # ID único del reporte
-        "ID_REPORTE": f"{solped}.{item}",
+        "ID_REPORTE": f"{solped}{item}",
         # ========================================
         # DATOS DE expSolped03.txt
         # ========================================
@@ -159,17 +254,13 @@ def construir_fila_reporte_final(
         # ========================================
         # RESULTADOS DE VALIDACIONES
         # ========================================
-        "CAMPOS OBLIGATORIOS FALTANTES ME53N": resultado_validaciones.get(
-            "faltantes_me53n", []
-        ),
-        "DATOS EXTRAIDOS DEL TEXTO FALTANTES": resultado_validaciones.get(
-            "faltantes_texto", []
-        ),
+        "CAMPOS OBLIGATORIOS FALTANTES ME53N": faltantes_me53n_texto,
+        "DATOS EXTRAIDOS DEL TEXTO FALTANTES": faltantes_texto_texto,
         "CANTIDAD": resultado_validaciones.get("cantidad", False),
         "VALOR_UNITARIO": resultado_validaciones.get("valor_unitario", False),
         "VALOR_TOTAL": resultado_validaciones.get("valor_total", False),
         "CONCEPTO": resultado_validaciones.get("concepto", False),
-        "Estado": resultado_validaciones.get("estado", ""),
+        "Estado": estado_final,
         "Observaciones": resultado_validaciones.get("observaciones", ""),
     }
 
@@ -198,7 +289,7 @@ def generar_reporte_final_excel(filas_reporte):
         df = pd.DataFrame(filas_reporte)
 
         # Generar nombre del archivo con timestamp
-        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        timestamp = datetime.now().strftime("%Y%m%d")
         nombre_archivo = f"Reporte_final_consolidado_ME53N_{timestamp}.xlsx"
         ruta_completa = os.path.join(RUTAS["PathReportes"], nombre_archivo)
 
@@ -229,6 +320,7 @@ def generar_reporte_final_excel(filas_reporte):
 
     except Exception as e:
         print(f"❌ Error generando reporte Excel: {e}")
+        print("ERROR REAL:", e)
         import traceback
 
         traceback.print_exc()

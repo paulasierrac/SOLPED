@@ -8,7 +8,7 @@ from email import encoders
 import os
 from typing import List, Optional
 from pathlib import Path
-from config.settings import CONFIG_EMAIL,RUTAS, SAP_CONFIG
+from config.settings import CONFIG_EMAIL, RUTAS, SAP_CONFIG
 from dotenv import load_dotenv
 from funciones.EscribirLog import WriteLog
 
@@ -382,25 +382,14 @@ if __name__ == "__main__":
     print(f"Resumen del procesamiento por Excel: {resultados}")
 
 
+# *************************
+# Funciones de Envio de Correo PRUEBA DESDE ECXEL
+# *************************
 
-#*************************
-# Funciones de Envio de Correo PRUEBA DESDE ECXEL 
-#*************************
 
 def EnviarNotificacionCorreo(
     codigo_correo: int, task_name: str = "Notificacion", adjuntos: list = None
 ):
-    """
-    Envía notificaciones por correo según el código especificado
-
-    Args:
-        codigo_correo: Código del correo a enviar (1=Inicio, 2=Éxito, 3=Error, etc.)
-        task_name: Nombre de la tarea para logs
-        adjuntos: Lista de rutas de archivos a adjuntar (opcional)
-
-    Returns:
-        bool: True si se envió correctamente, False en caso contrario
-    """
     try:
         WriteLog(
             mensaje=f"Enviando notificación con código {codigo_correo}...",
@@ -409,32 +398,17 @@ def EnviarNotificacionCorreo(
             path_log=RUTAS["PathLog"],
         )
 
-        # Log de adjuntos si existen
-        if adjuntos:
-            WriteLog(
-                mensaje=f"Adjuntos a enviar: {', '.join(adjuntos)}",
-                estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
-            )
-
-        # Crear EmailSender con configuración por defecto
         sender = EmailSender()
 
-        # Enviar correo según código con adjuntos
         resultados = sender.procesar_excel_y_enviar(
-            archivo_excel=RUTAS.get(
-                "ArchivoCorreos",
-                # r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\EnvioCorreos.xlsx",
-                rf"{RUTAS["ArchivoCorreos"]}",
-            ),
+            archivo_excel=RUTAS["ArchivoCorreos"],
             codigo_correo=codigo_correo,
             columna_codigo="codemailparameter",
-            columna_destinatario="toemailparameter",  # Nombre correcto
-            columna_asunto="asuntoemailparameter",  # Nombre correcto
-            columna_cuerpo="bodyemailparameter",  # Nombre correcto
-            columna_cc="ccemailparameter",  # Nombre correcto
-            columna_bcc="bccemailparameter",  # Nombre correcto
+            columna_destinatario="toemailparameter",
+            columna_asunto="asuntoemailparameter",
+            columna_cuerpo="bodyemailparameter",
+            columna_cc="ccemailparameter",
+            columna_bcc="bccemailparameter",
             adjuntos_dinamicos=adjuntos,
         )
 
@@ -456,9 +430,8 @@ def EnviarNotificacionCorreo(
             return False
 
     except Exception as e:
-        error_stack = traceback.format_exc()
         WriteLog(
-            mensaje=f"Error al enviar notificación: {e} | {error_stack}",
+            mensaje=f"Error al enviar notificación: {e}",
             estado="ERROR",
             task_name=task_name,
             path_log=RUTAS["PathLogError"],

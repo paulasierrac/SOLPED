@@ -434,9 +434,13 @@ def ParsearTablaAttachments(contenido: str) -> list:
         for i, linea in enumerate(lineas):
             if (
                 "|" in linea
-                and "Title" in linea
-                and ("Creator" in linea or "Created" in linea)
+                and (
+                    "Title" in linea
+                    or "Título" in linea
+                    or "Titulo" in linea
+                )
             ):
+
                 header_idx = i
                 break
 
@@ -525,9 +529,10 @@ def GenerarReporteAttachments(
     )
     reporte += f"Observaciones: {observaciones}\n\n"
 
-    if tiene_attachments and contenido:
+    attachments = ParsearTablaAttachments(contenido)
+
+    if attachments:
         # Parsear tabla de attachments
-        attachments = ParsearTablaAttachments(contenido)
 
         if attachments:
             reporte += f"ARCHIVOS ADJUNTOS ENCONTRADOS ({len(attachments)}):\n"
@@ -622,85 +627,6 @@ def NotificarRevisionManualSolped(
         cc=cc_list,
         adjuntos=None,  # No se esperan adjuntos para esta notificación
     )
-
-
-def EnviarNotificacionCorreo(
-    codigo_correo: int, task_name: str = "Notificacion", adjuntos: list = None
-):
-    """
-    Envía notificaciones por correo según el código especificado
-
-    Args:
-        codigo_correo: Código del correo a enviar (1=Inicio, 2=Éxito, 3=Error, etc.)
-        task_name: Nombre de la tarea para logs
-        adjuntos: Lista de rutas de archivos a adjuntar (opcional)
-
-    Returns:
-        bool: True si se envió correctamente, False en caso contrario
-    """
-    try:
-        WriteLog(
-            mensaje=f"Enviando notificación con código {codigo_correo}...",
-            estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
-        )
-
-        # Log de adjuntos si existen
-        if adjuntos:
-            WriteLog(
-                mensaje=f"Adjuntos a enviar: {', '.join(adjuntos)}",
-                estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
-            )
-
-        # Crear EmailSender con configuración por defecto
-        sender = EmailSender()
-
-        # Enviar correo según código con adjuntos
-        resultados = sender.procesar_excel_y_enviar(
-            archivo_excel=RUTAS.get(
-                "ArchivoCorreos",
-                # r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\EnvioCorreos.xlsx",
-                rf"{RUTAS["ArchivoCorreos"]}",
-            ),
-            codigo_correo=codigo_correo,
-            columna_codigo="codemailparameter",
-            columna_destinatario="toemailparameter",  # Nombre correcto
-            columna_asunto="asuntoemailparameter",  # Nombre correcto
-            columna_cuerpo="bodyemailparameter",  # Nombre correcto
-            columna_cc="ccemailparameter",  # Nombre correcto
-            columna_bcc="bccemailparameter",  # Nombre correcto
-            adjuntos_dinamicos=adjuntos,
-        )
-
-        if resultados["exitosos"] > 0:
-            WriteLog(
-                mensaje=f"Notificación enviada correctamente. Exitosos: {resultados['exitosos']}",
-                estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
-            )
-            return True
-        else:
-            WriteLog(
-                mensaje=f"No se pudo enviar la notificación. Fallidos: {resultados['fallidos']}",
-                estado="WARNING",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
-            )
-            return False
-
-    except Exception as e:
-        error_stack = traceback.format_exc()
-        WriteLog(
-            mensaje=f"Error al enviar notificación: {e} | {error_stack}",
-            estado="ERROR",
-            task_name=task_name,
-            path_log=RUTAS["PathLogError"],
-        )
-        return False
 
 
 def EnviarCorreoPersonalizado(
@@ -1693,28 +1619,38 @@ def ValidarContraTabla(
         "campos_validados": 0,
         "total_campos": 0,
     }
+    
+    campos_obligatorios_me53n = {
+    "Material": "Material",
+    "Quantity": "Cantidad",
+    "Valn Price": "Precio valoración",
+    "Deliv.Date": "Fecha entrega",
+    "Plant": "Centro",
+    "PGr": "Grupo de compras",
+    "POrg": "Organización de compras",
+    "Fix. Vend.": "Proveedor fijo",
+}
+
 
     if df_items.empty:
         validaciones["resumen"] = "Tabla vacia - No se puede validar"
         return validaciones
 
-    # Buscar el item especifico en el DataFrame
+    # ============================================================
+    # FILTRAR ITEM
+    # ============================================================
     item_df = df_items
     if item_num and "Pos." in df_items.columns:
         item_df = df_items[
             df_items["Pos."].astype(str).str.strip() == str(item_num).strip()
         ]
-    # Si no encuentra, tomar primera fila como fallback
+
     if item_df.empty:
         item_df = df_items.iloc[[0]]
 
-    # Tomar SOLO la fila del item
-    fila_sap = item_df.iloc[0]
+    fila = item_df.iloc[0]  # ← FILA REAL
 
-    cantidad_tabla = limpiar_numero(fila_sap.get("Cantidad"))
-    precio_tabla = limpiar_numero(fila_sap.get("PrecioVal."))
-    total_tabla = limpiar_numero(fila_sap.get("Valor tot."))
-
+    columnas_disponibles = [str(c).strip() for c in fila.index]
     # ==================================================================
     # MAPEO DE CAMPOS SAP ME53N
     # Basado en nombres reales de la transacción según idioma
@@ -1803,6 +1739,8 @@ def ValidarContraTabla(
             # Español
             "Precio valoración",
             "Precio val.",
+            "PrecioVal.",
+            "PrecioVal",
             "Val. Price",
             "Precio unit.",
             "Precio unitario",
@@ -1843,6 +1781,8 @@ def ValidarContraTabla(
             "Importe",
             "Imp.total",
             "Total Val.",
+            "Valor tot.",
+            "Valor tot",
             "Valor neto",
             "Importe neto",
             # Inglés
@@ -1966,227 +1906,149 @@ def ValidarContraTabla(
     # ==================================================================
     # FUNCIÓN DE BÚSQUEDA MEJORADA
     # ==================================================================
-    def buscar_columna(campo_estandar: str) -> str:
-        """
-        Busca la columna real en item_df que coincida con algún alias.
-        Prioriza coincidencias exactas, luego parciales.
-        """
-        posibles_nombres = alias_campos.get(campo_estandar, [])
-        columnas_disponibles = [str(col).strip() for col in item_df.columns]
+    def buscar_columna(campo_estandar):
+        posibles = alias_campos.get(campo_estandar, [])
 
-        # PASO 1: Búsqueda exacta (case-insensitive)
-        for alias in posibles_nombres:
-            alias_lower = alias.lower().strip()
+        for alias in posibles:
             for col in columnas_disponibles:
-                if col.lower() == alias_lower:
+                if alias.lower().strip() == col.lower():
                     return col
 
-        # PASO 2: Búsqueda parcial (contiene)
-        for alias in posibles_nombres:
-            alias_lower = alias.lower().strip()
+        for alias in posibles:
             for col in columnas_disponibles:
-                col_lower = col.lower()
-                # Verificar si el alias está contenido en la columna o viceversa
-                if alias_lower in col_lower or col_lower in alias_lower:
-                    # Evitar falsos positivos con palabras muy cortas
-                    if len(alias_lower) >= 3:
-                        return col
+                if alias.lower() in col.lower() or col.lower() in alias.lower():
+                    return col
 
         return None
 
-    # ==================================================================
-    # VALIDACIÓN DE CAMPOS OBLIGATORIOS ME53N
-    # ==================================================================
+    # ============================================================
+    # VALIDAR CAMPOS OBLIGATORIOS ME53N (NEGOCIO)
+    # ============================================================
 
-    faltantes_me53n = []
-    fila = item_df.iloc[0]
+    faltantes = []
 
-    for campo_estandar in alias_campos.keys():
-        columna_encontrada = buscar_columna(campo_estandar)
+    for campo_estandar, nombre_negocio in campos_obligatorios_me53n.items():
+        col = buscar_columna(campo_estandar)
 
-        if columna_encontrada is None:
-            faltantes_me53n.append(campo_estandar)
+        if not col:
+            faltantes.append(nombre_negocio)
             continue
 
-        val = fila.get(columna_encontrada, "")
-        if val is None or str(val).strip() in ["", "nan", "None", "NaN"]:
-            faltantes_me53n.append(campo_estandar)
+        val = fila.get(col, "")
+        if val is None or str(val).strip() in ["", "nan", "None"]:
+            faltantes.append(nombre_negocio)
 
     validaciones["campos_me53n"] = {
-        "presentes": len(alias_campos) - len(faltantes_me53n),
-        "total": len(alias_campos),
-        "faltantes": faltantes_me53n,
+        "presentes": len(campos_obligatorios_me53n) - len(faltantes),
+        "total": len(campos_obligatorios_me53n),
+        "faltantes": faltantes,
     }
 
     # ==================================================================
     # VALIDAR CANTIDAD
     # ==================================================================
     if datos_texto.get("cantidad"):
-        cantidad_texto = limpiar_numero_robusto(datos_texto["cantidad"])
-        col_quantity = buscar_columna("Quantity")
+        cantidad_txt = limpiar_numero_robusto(datos_texto["cantidad"])
+        col = buscar_columna("Quantity")
 
-        if col_quantity and col_quantity in item_df.columns:
-            try:
-                cantidad_tabla_val = item_df[col_quantity].iloc[0]
-                cantidad_tabla = limpiar_numero_robusto(str(cantidad_tabla_val))
-                validaciones["cantidad"]["texto"] = datos_texto["cantidad"]
-                validaciones["cantidad"]["tabla"] = str(cantidad_tabla)
-                validaciones["cantidad"]["match"] = (
-                    abs(cantidad_texto - cantidad_tabla) < 0.01
-                )
-                if not validaciones["cantidad"]["match"]:
-                    validaciones["cantidad"][
-                        "diferencia"
-                    ] = f"Difiere en {abs(cantidad_texto - cantidad_tabla):.2f}"
-            except Exception as e:
-                validaciones["cantidad"]["tabla"] = f"Error al leer: {str(e)}"
+        if col:
+            cantidad_tabla = limpiar_numero_robusto(fila.get(col))
+            validaciones["cantidad"]["texto"] = datos_texto["cantidad"]
+            validaciones["cantidad"]["tabla"] = str(cantidad_tabla)
+            diff = abs(cantidad_txt - cantidad_tabla)
+
+            validaciones["cantidad"]["match"] = diff < 0.01
+            if not validaciones["cantidad"]["match"]:
+                validaciones["cantidad"]["diferencia"] = f"Difiere en {diff:.2f}"
 
     # ==================================================================
     # VALIDAR VALOR UNITARIO
     # ==================================================================
     if datos_texto.get("valor_unitario"):
-        valor_texto = limpiar_numero_robusto(datos_texto["valor_unitario"])
-        col_price = buscar_columna("Valn Price")
+        val_txt = limpiar_numero_robusto(datos_texto["valor_unitario"])
+        col = buscar_columna("Valn Price")
 
-        if col_price and col_price in item_df.columns:
-            try:
-                valor_tabla = limpiar_numero_robusto(str(item_df[col_price].iloc[0]))
+        if col:
+            val_tabla = limpiar_numero_robusto(fila.get(col))
+            validaciones["valor_unitario"]["texto"] = FormatoMoneda(val_txt)
+            validaciones["valor_unitario"]["tabla"] = FormatoMoneda(val_tabla)
 
-                validaciones["valor_unitario"]["texto"] = FormatoMoneda(
-                    datos_texto["valor_unitario"]
-                )
-                validaciones["valor_unitario"]["tabla"] = FormatoMoneda(valor_tabla)
+            diff = abs(val_txt - val_tabla)
+            validaciones["valor_unitario"]["match"] = diff < 0.01
 
-                if valor_tabla > 0:
-                    diferencia_relativa = abs(valor_texto - valor_tabla) / valor_tabla
-                    validaciones["valor_unitario"]["match"] = diferencia_relativa < 0.01
-                else:
-                    validaciones["valor_unitario"]["match"] = valor_texto == valor_tabla
-
-                if not validaciones["valor_unitario"]["match"]:
-                    diferencia = abs(valor_texto - valor_tabla)
-                    validaciones["valor_unitario"][
-                        "diferencia"
-                    ] = f"Difiere en {FormatoMoneda(diferencia)}"
-            except Exception as e:
-                validaciones["valor_unitario"]["tabla"] = f"Error al leer: {str(e)}"
+            if not validaciones["valor_unitario"]["match"]:
+                validaciones["valor_unitario"][
+                    "diferencia"
+                ] = f"Difiere en {FormatoMoneda(diff)}"
 
     # ==================================================================
     # VALIDAR VALOR TOTAL
     # ==================================================================
     if datos_texto.get("valor_total"):
-        valor_texto = limpiar_numero_robusto(datos_texto["valor_total"])
-        col_total = buscar_columna("Total Val.")
+        val_txt = limpiar_numero_robusto(datos_texto["valor_total"])
+        col = buscar_columna("Total Val.")
 
-        if col_total and col_total in item_df.columns:
-            try:
-                valor_tabla = limpiar_numero_robusto(str(item_df[col_total].iloc[0]))
+        if col:
+            val_tabla = limpiar_numero_robusto(fila.get(col))
+            validaciones["valor_total"]["texto"] = FormatoMoneda(val_txt)
+            validaciones["valor_total"]["tabla"] = FormatoMoneda(val_tabla)
 
-                validaciones["valor_total"]["texto"] = FormatoMoneda(
-                    datos_texto["valor_total"]
-                )
-                validaciones["valor_total"]["tabla"] = FormatoMoneda(valor_tabla)
+            diff = abs(val_txt - val_tabla)
+            validaciones["valor_total"]["match"] = diff < 0.01
 
-                if valor_tabla > 0:
-                    diferencia_relativa = abs(valor_texto - valor_tabla) / valor_tabla
-                    validaciones["valor_total"]["match"] = diferencia_relativa < 0.01
-                else:
-                    validaciones["valor_total"]["match"] = valor_texto == valor_tabla
-
-                if not validaciones["valor_total"]["match"]:
-                    diferencia = abs(valor_texto - valor_tabla)
-                    validaciones["valor_total"][
-                        "diferencia"
-                    ] = f"Difiere en {FormatoMoneda(diferencia)}"
-            except Exception as e:
-                validaciones["valor_total"]["tabla"] = f"Error al leer: {str(e)}"
-        else:
-            validaciones["valor_total"]["tabla"] = "Campo no encontrado en SAP"
-            validaciones["valor_total"]["match"] = False
-
+            if not validaciones["valor_total"]["match"]:
+                validaciones["valor_total"][
+                    "diferencia"
+                ] = f"Difiere en {FormatoMoneda(diff)}"
     # ==================================================================
     # VALIDAR CONCEPTO
     # ==================================================================
     if datos_texto.get("concepto_compra"):
-        col_text = buscar_columna("Short Text")
+        col = buscar_columna("Short Text")
 
-        if col_text and col_text in item_df.columns:
-            try:
-                concepto_texto = datos_texto["concepto_compra"].upper()
-                concepto_tabla_val = item_df[col_text].iloc[0]
-                concepto_tabla = str(concepto_tabla_val).upper()
+        if col:
+            txt = datos_texto["concepto_compra"].upper()
+            tabla = str(fila.get(col)).upper()
 
-                validaciones["concepto"]["texto"] = datos_texto["concepto_compra"][
-                    :50
-                ] + ("..." if len(datos_texto["concepto_compra"]) > 50 else "")
-                validaciones["concepto"]["tabla"] = concepto_tabla[:50] + (
-                    "..." if len(concepto_tabla) > 50 else ""
-                )
+            palabras_txt = set(re.findall(r"\w+", txt))
+            palabras_tabla = set(re.findall(r"\w+", tabla))
 
-                palabras_texto = set(re.findall(r"\w+", concepto_texto))
-                palabras_tabla = set(re.findall(r"\w+", concepto_tabla))
-                coincidencias = len(palabras_texto & palabras_tabla)
+            coincidencias = len(palabras_txt & palabras_tabla)
 
-                if palabras_texto and palabras_tabla:
-                    palabras_minimas = max(
-                        2, min(len(palabras_texto), len(palabras_tabla)) // 3
-                    )
-                    validaciones["concepto"]["match"] = (
-                        coincidencias >= palabras_minimas
-                    )
-                else:
-                    validaciones["concepto"]["match"] = False
+            validaciones["concepto"]["texto"] = txt[:50]
+            validaciones["concepto"]["tabla"] = tabla[:50]
+            validaciones["concepto"]["match"] = coincidencias >= 2
 
-                if not validaciones["concepto"]["match"]:
-                    validaciones["concepto"]["diferencia"] = (
-                        f"Solo {coincidencias} palabras coinciden "
-                        f"(minimo: {palabras_minimas if palabras_texto and palabras_tabla else 2})"
-                    )
-            except Exception as e:
-                validaciones["concepto"]["tabla"] = f"Error al leer: {str(e)}"
+            if not validaciones["concepto"]["match"]:
+                validaciones["concepto"][
+                    "diferencia"
+                ] = f"Solo {coincidencias} palabras coinciden"
 
-    # ==================================================================
-    # VALIDAR CAMPOS OBLIGATORIOS
-    # ==================================================================
-    campos_obligatorios = {
-        "nit": "NIT",
-        "concepto_compra": "Concepto de Compra",
-        "cantidad": "Cantidad",
-        "valor_total": "Valor Total",
+    # ============================================================
+    # CAMPOS OBLIGATORIOS TEXTO
+    # ============================================================
+    oblig = ["nit", "concepto_compra", "cantidad", "valor_total"]
+    presentes = sum(1 for c in oblig if datos_texto.get(c))
+    faltan = [c for c in oblig if not datos_texto.get(c)]
+
+    validaciones["campos_obligatorios"] = {
+        "presentes": presentes,
+        "total": len(oblig),
+        "faltantes": faltan,
     }
 
-    campos_presentes = 0
-    campos_faltantes = []
+    # ============================================================
+    # RESUMEN
+    # ============================================================
+    campos = ["cantidad", "valor_unitario", "valor_total", "concepto"]
+    ok = sum(1 for c in campos if validaciones[c]["match"])
 
-    for campo, nombre in campos_obligatorios.items():
-        if datos_texto.get(campo) and str(datos_texto[campo]).strip():
-            campos_presentes += 1
-        else:
-            campos_faltantes.append(nombre)
-
-    validaciones["campos_obligatorios"]["presentes"] = campos_presentes
-    validaciones["campos_obligatorios"]["total"] = len(campos_obligatorios)
-    validaciones["campos_obligatorios"]["faltantes"] = campos_faltantes
-
-    # ==================================================================
-    # CALCULAR RESUMEN
-    # ==================================================================
-    campos_para_validar = [
-        "cantidad",
-        "valor_unitario",
-        "valor_total",
-        "concepto",
-    ]
-    campos_validados = sum(
-        [1 for campo in campos_para_validar if validaciones[campo]["match"]]
-    )
-
-    validaciones["campos_validados"] = campos_validados
-    validaciones["total_campos"] = len(campos_para_validar)
+    validaciones["campos_validados"] = ok
+    validaciones["total_campos"] = len(campos)
 
     validaciones["resumen"] = (
-        f"{campos_validados}/{len(campos_para_validar)} campos coinciden, "
-        f"{campos_presentes}/{len(campos_obligatorios)} campos obligatorios presentes"
+        f"{ok}/{len(campos)} campos coinciden, "
+        f"{presentes}/{len(oblig)} campos obligatorios presentes"
     )
 
     return validaciones
@@ -2715,6 +2577,45 @@ def ProcesarYValidarItem(
 
     # 1. Extraer datos del texto
     datos_texto = ExtraerDatosTexto(texto)
+
+    # ======================================================
+    # FALLBACK: Texto SAP sin estructura (tabla_sap)
+    # Usar valores desde ME53N
+    # ======================================================
+    if datos_texto.get("tipo_texto") == "tabla_sap":
+
+        try:
+            # Buscar la fila del item en ME53N
+            fila_item = df_items[
+                df_items["Pos."].astype(str).str.strip() == str(item_num).strip()
+            ]
+
+            if not fila_item.empty:
+                fila_item = fila_item.iloc[0]
+
+                datos_texto["cantidad"] = datos_texto.get("cantidad") or fila_item.get(
+                    "Cantidad", ""
+                )
+
+                datos_texto["valor_unitario"] = datos_texto.get(
+                    "valor_unitario"
+                ) or fila_item.get("PrecioVal.", "")
+
+                datos_texto["valor_total"] = datos_texto.get(
+                    "valor_total"
+                ) or fila_item.get("Valor tot.", "")
+
+                datos_texto["concepto_compra"] = datos_texto.get(
+                    "concepto_compra"
+                ) or fila_item.get("Texto breve", "")
+
+                datos_texto["observacion_texto"] = (
+                    "Texto del editor SAP sin estructura. "
+                    "Valores tomados directamente desde ME53N."
+                )
+
+        except Exception as e:
+            print(f"⚠️ Error aplicando fallback ME53N: {e}")
 
     # 2. Validar contra tabla (pasando el numero de item para busqueda especifica)
     validaciones = ValidarContraTabla(datos_texto, df_items, item_num)
