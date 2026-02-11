@@ -101,26 +101,8 @@ def Main_GestionSolped():
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        ordenes_de_compra = ["4200339200", "4200339201", "4200339202", "4200339203", "4200339204", "4200339205", "4200339206","4001155884","4001155889","4001155889","4001155852"]
-        #EjecutarHU05(session,ordenes_de_compra)
-        #sys.exit()
-        #*********************************
-        # Se debe remplazar con guardar OC 
-        #*********************************
-        # /Salir para pruebas 
-
-        # pyautogui.hotkey("shift","F3")
-        # time.sleep(2)
-        # pyautogui.hotkey("alt","TAB")
-        # time.sleep(2)   
-        # pyautogui.hotkey("enter")
-
-        #
-              
-        # /Salir para pruebas 
-        #********************************* 
-
-
+        
+        EjecutarHU02(session)
 
         WriteLog(
             mensaje="HU02 finalizada correctamente.",
