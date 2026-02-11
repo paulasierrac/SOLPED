@@ -18,7 +18,7 @@ from Funciones.EscribirLog import WriteLog
 from Config.settings import RUTAS
 from Funciones.GeneralME53N import AbrirTransaccion
 from Funciones.ValidacionM21N import esperar_sap_listo
-
+from Funciones.ControlHU import control_hu
 
 def EjecutarHU05(session, ordenes_de_compra):
     """

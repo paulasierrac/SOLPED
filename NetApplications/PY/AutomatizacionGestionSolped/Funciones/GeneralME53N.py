@@ -200,9 +200,7 @@ def GenerarReporteAttachments(
     reporte += f"VALIDACIÓN ATTACHMENT LIST - SOLPED: {solped}\n"
     reporte += f"{'='*80}\n\n"
 
-    reporte += (
-        f"Estado: {'✅ CON ADJUNTOS' if tiene_attachments else '❌ SIN ADJUNTOS'}\n"
-    )
+    reporte += f"Estado: {'CON ADJUNTOS' if tiene_attachments else 'SIN ADJUNTOS'}\n"
     reporte += f"Observaciones: {observaciones}\n\n"
 
     attachments = ParsearTablaAttachments(contenido)

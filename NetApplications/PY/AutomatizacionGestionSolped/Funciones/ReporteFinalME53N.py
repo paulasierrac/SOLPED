@@ -290,11 +290,11 @@ def GenerarReporteFinalExcel(filas_reporte):
 
         # Generar nombre del archivo con timestamp
         timestamp = datetime.now().strftime("%Y%m%d")
-        nombre_archivo = f"Reporte_final_consolidado_ME53N_{timestamp}.xlsx"
-        ruta_completa = os.path.join(RUTAS["PathReportes"], nombre_archivo)
+        nombre_archivo = f"ReporteFinal{timestamp}.xlsx"
+        ruta_completa = os.path.join(RUTAS["PathResultados"], nombre_archivo)
 
         # Asegurar que existe el directorio
-        os.makedirs(RUTAS["PathReportes"], exist_ok=True)
+        os.makedirs(RUTAS["PathResultados"], exist_ok=True)
 
         # Guardar Excel con formato
         with pd.ExcelWriter(ruta_completa, engine="openpyxl") as writer:
@@ -315,11 +315,11 @@ def GenerarReporteFinalExcel(filas_reporte):
             # Congelar primera fila (encabezados)
             worksheet.freeze_panes = "A2"
 
-        print(f"✅ Reporte Excel generado: {ruta_completa}")
+        print(f"Reporte Excel generado: {ruta_completa}")
         return ruta_completa
 
     except Exception as e:
-        print(f"❌ Error generando reporte Excel: {e}")
+        print(f"Error generando reporte Excel: {e}")
         print("ERROR REAL:", e)
         import traceback
 
@@ -490,9 +490,9 @@ def exportar_a_csv(filas_reporte, nombre_archivo=None):
         ruta_completa = os.path.join(RUTAS["PathReportes"], nombre_archivo)
         df.to_csv(ruta_completa, index=False, encoding="utf-8-sig")
 
-        print(f"✅ Reporte CSV generado: {ruta_completa}")
+        print(f"Reporte CSV generado: {ruta_completa}")
         return ruta_completa
 
     except Exception as e:
-        print(f"❌ Error generando CSV: {e}")
+        print(f"Error generando CSV: {e}")
         return None

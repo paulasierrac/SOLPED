@@ -12,6 +12,7 @@ import subprocess
 import time
 import os
 from Config.settings import RUTAS
+from Funciones.ControlHU import control_hu
 from Funciones.GuiShellFunciones import (
     esperar_sap_listo,
     obtener_numero_oc,
@@ -30,6 +31,7 @@ from Funciones.EscribirLog import WriteLog
 from Funciones.GeneralME53N import AbrirTransaccion
 import traceback
 import pyautogui  # Asegúrate de tener pyautogui instaladoi
+from Funciones.ControlHU import control_hu
 
 
 def EjecutarHU04(session, archivo):
@@ -40,6 +42,7 @@ def EjecutarHU04(session, archivo):
     generacion de OC desde la transacción ME21N.
     """
     try:
+        control_hu(task_name=task_name, estado=0)
         WriteLog(
             mensaje=f"HU04 Inicia para el archivo {archivo}",
             estado="INFO",
@@ -166,11 +169,13 @@ def EjecutarHU04(session, archivo):
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
+        control_hu(task_name=task_name, estado=100)
+
 
     except Exception as e:
-        error_text = traceback.format_exc()
+        control_hu(task_name=task_name, estado=99)
         WriteLog(
-            mensaje=f"ERROR GLOBAL en HU04: {e} | {error_text}",
+            mensaje=f"ERROR GLOBAL en HU04: {e}",
             estado="ERROR",
             task_name=task_name,
             path_log=RUTAS["PathLogError"],

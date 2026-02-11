@@ -942,7 +942,7 @@ def ValidarAttachmentList(session, numero_solped):
         )
 
         # Construir observación detallada con nombres de archivos
-        observaciones_exito = f"✅ {num_attachments} archivo(s) adjunto(s)"
+        observaciones_exito = f"{num_attachments} archivo(s) adjunto(s)"
 
         if num_attachments <= 3:
             # Mostrar nombres si son pocos archivos

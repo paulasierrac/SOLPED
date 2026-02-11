@@ -12,12 +12,9 @@
 #   - FIX: Manejo robusto de errores de conversión
 #   - UPDATE: WriteLog optimizado solo en puntos esenciales
 # =========================================
-import win32com.client  # pyright: ignore[reportMissingModuleSource]
 import time
-import getpass
-import subprocess
-import os
 import traceback
+from Funciones.ControlHU import control_hu
 from Funciones.EmailSender import EnviarNotificacionCorreo
 from Funciones.ReporteFinalME53N import (
     ConstruirFilaReporteFinal,
@@ -42,6 +39,7 @@ from Funciones.SAPFuncionesME53N import (
     ObtenerItemsME53N,
     GuardarTablaME5A,
     ValidarAttachmentList,
+    ParsearTablaAttachments,
 )
 
 from Config.settings import RUTAS
@@ -63,8 +61,10 @@ from Funciones.ValidacionME53N import (
 def EjecutarHU03(session, nombre_archivo):
     try:
         task_name = "HU03_ValidacionME53N"
+        control_hu(task_name=task_name, estado=0)
+
         TraerSAPAlFrenteOpcion()
-        
+
         WriteLog(
             mensaje="Inicio HU03 - Validación ME53N",
             estado="INFO",
@@ -699,18 +699,20 @@ def EjecutarHU03(session, nombre_archivo):
         AppendHipervinculoObservaciones(
             ruta_excel=archivo_descargado, carpeta_reportes=RUTAS["PathReportes"]
         )
-        
+
         # Sube el Excel a la base de datos
         ExcelService.ejecutar_bulk_desde_excel(rf"{path_reporte}")
-        
+
         # Enviar correo de finalización
         EnviarNotificacionCorreo(
-            codigo_correo=10, task_name=task_name, adjuntos=[archivo_descargado]
+            codigo_correo=3, task_name=task_name, adjuntos=[path_reporte]
         )
 
+        control_hu(task_name=task_name, estado=100)
         return True
 
     except Exception as e:
+        control_hu(task_name=task_name, estado=99)
         WriteLog(
             mensaje=f"Error en EjecutarHU03: {e}",
             estado="ERROR",

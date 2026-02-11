@@ -3,6 +3,7 @@
 import os
 from dotenv import load_dotenv
 from pathlib import Path
+from Config.init_config import in_config
 
 # from Config.init_config import in_config
 
@@ -58,9 +59,9 @@ CONFIG_EMAIL = {
 
 # ========= RUTAS =========
 RUTAS = {
-    "PathLog": get_env_variable("PATHLOG"),
+    "PathLog": in_config("PathLog"),
     "PathLogError": get_env_variable("PATHLOGERROR"),
-    "PathResultados": get_env_variable("PATHRESULTADOS"),
+    "PathResultados": in_config("PathResultado"),
     "PathReportes": get_env_variable("PATHREPORTES"),
     "PathInsumo": get_env_variable("PATHINSUMO"),
     "PathTexto": get_env_variable("PATHTEXTO_SAP"),
