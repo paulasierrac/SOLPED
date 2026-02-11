@@ -1,18 +1,21 @@
-# ============================================================
-# ConexionSAP
-# Autor: Automatizacion RPA
-# Descripcion: Funciones para apertura y conexion a SAP GUI
-# Ultima modificacion: 11/02/2026
+# ================================
+# GestionSOLPED – HU00: DespliegueAmbiente
+# Autor: Steven Navarro - NetApplications
+# Descripcion: Carga parámetros, valida carpetas y prepara entorno
+# Ultima modificacion: 30/11/2025
 # Propiedad de Colsubsidio
-# Cambios:
-# - Se agregan comentarios estándar
-# - Se agrega trazabilidad
-# - Se mejora control de errores
-# ============================================================
+# Cambios: Ajuste ruta base dinámica + estándar Colsubsidio
+# ================================
+
 
 import win32com.client  # pyright: ignore[reportMissingModuleSource]
 import time
 import subprocess
+import os
+from Config.InitConfig import inConfig
+from Config.settings import RUTAS, SAP_CONFIG 
+from Funciones.ValidacionME21N import ventana_abierta
+
 import pyautogui
 
 from Config.init_config import in_config
@@ -21,12 +24,9 @@ from Funciones.ValidacionM21N import ventana_abierta
 from Funciones.ControlHU import control_hu
 
 
-# ============================================================
-# abrir_sap_logon
-# Autor: Automatizacion RPA
-# Descripcion: Abre SAP Logon si no está abierto
-# ============================================================
-def abrir_sap_logon():
+def AbrirSAPLogon():
+    """Abre SAP Logon si no está ya abierto."""
+    #SAP_CONFIG = get_sap_config()
     try:
         # WriteLog | INFO | INICIA abrir_sap_logon
 
@@ -35,28 +35,22 @@ def abrir_sap_logon():
 
         # WriteLog | INFO | FINALIZA abrir_sap_logon
         return True
-
-    except Exception:
-        try:
-            print("INFO | Abriendo SAP Logon...")
-            subprocess.Popen(in_config("SAP_LOGON_PATH"))
-            time.sleep(5)
-
-            # WriteLog | INFO | SAP Logon abierto correctamente
-            return False
-
-        except Exception as e:
-            print(f"ERROR | No fue posible abrir SAP Logon: {e}")
-            # WriteLog | ERROR | Error abriendo SAP Logon
-            return False
+    except:
+        # Si no está abierto, se lanza el ejecutable
+        #"logon_path": LeerVariableEntorno("SAP_LOGON_PATH"),
+        subprocess.Popen(inConfig("SapRutaLogon"))
+        time.sleep(5)  # Esperar a que abra SAP Logon
+        return False
 
 
-# ============================================================
-# conectar_sap
-# Autor: Automatizacion RPA
-# Descripcion: Realiza conexion a SAP y retorna sesion
-# ============================================================
-def conectar_sap(conexion, mandante, usuario, password, idioma="ES"):
+def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
+
+    abrir_sap = AbrirSAPLogon()
+    time.sleep(3)
+    if abrir_sap:
+        print(" SAP Logon 750 ya se encuentra abierto")
+    else:
+        print(" SAP Logon 750 abierto ")
 
     try:
         # WriteLog | INFO | INICIA conectar_sap
@@ -119,10 +113,27 @@ def conectar_sap(conexion, mandante, usuario, password, idioma="ES"):
             ):
                 print("INFO | Ventana loginDiag superada correctamente")
         except Exception as e:
-            print(f"WARN | No se encontró ventana loginDiag: {e}")
+            print(f"no se encontro ventana Copyrigth en login {e}")
 
-        # WriteLog | INFO | FINALIZA conectar_sap
-        control_hu(task_name=task_name, estado=100)
+        if ventana_abierta(session, "Info de licencia en entrada al sistema múltiple"):
+            
+            print("entro a la funcion click")
+            time.sleep(20)  
+            pyautogui.click()
+            pyautogui.press("enter")
+               
+            try:
+                if validarLoginDiag(
+                    ruta_imagen=rf".\img\Infodelicenciaenentradaalsistemamultiple.png",
+                    confidence=0.8,
+                    intentos=20,
+                    espera=0.5
+                ):  
+                    pyautogui.click()
+                    print("encontro la imagen ")
+                    print("Ventana info de licencia inesperada superada correctamente")
+            except Exception as e:
+                print(f"no se encontro ventana Copyrigth en login {e}")
         return session
 
     except Exception as e:

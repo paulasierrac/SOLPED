@@ -1,20 +1,21 @@
 # config/settings.py
 
 import os
+
+
 from dotenv import load_dotenv
 from pathlib import Path
 from Config.init_config import in_config
 
-# from Config.init_config import in_config
-
 # Cargar .env
 load_dotenv()
+#from Config.InitConfig import inConfig
+
 
 # Ruta base del proyecto
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-
-def get_env_variable(key: str, required: bool = True):
+def LeerVariableEntorno(key: str, required: bool = True):
     value = os.getenv(key)
 
     if required and not value:
@@ -22,50 +23,40 @@ def get_env_variable(key: str, required: bool = True):
 
     return value
 
-
 # ========= CONEXION BASE DE DATOS ==========
-DATABASE = {
-    "DB_SERVER": os.getenv("SERVERDB"),
-    "DB_NAME": os.getenv("NAMEDB"),
-    "DB_USER": os.getenv("USERDB"),
-    "DB_PASSWORD": os.getenv("PASSWORDDB"),
+DB_CONFIG = {
+    "host": LeerVariableEntorno("SERVERDB"),
+    "database": LeerVariableEntorno("NAMEDB"),
+    "user": LeerVariableEntorno("USERDB"),
+    "password": LeerVariableEntorno("PASSWORDDB"),
+    "schema": LeerVariableEntorno("SCHEMA"),
 }
 
 # ========= CONFIG SAP ==========
 SAP_CONFIG = {
-    "user": get_env_variable("SAP_USUARIO"),
-    "password": get_env_variable("SAP_PASSWORD"),
-    "language": get_env_variable("SAP_IDIOMA"),
-}
-
-# ========= Database ==========
-DB_CONFIG = {
-    "host": get_env_variable("SERVERDB"),
-    "database": get_env_variable("NAMEDB"),
-    "user": get_env_variable("USERDB"),
-    "password": get_env_variable("PASSWORDDB"),
-    "schema": get_env_variable("SCHEMA"),
+    "user": LeerVariableEntorno("SAP_USUARIO"),
+    "password": LeerVariableEntorno("SAP_PASSWORD"),
 }
 
 # ========= CONFIG EMAIL ==========
 CONFIG_EMAIL = {
-    "smtp_server": get_env_variable("EMAIL_SMTP_SERVER"),
-    "smtp_port": get_env_variable("EMAIL_SMTP_PORT"),
-    "email": get_env_variable("EMAIL_USER"),
-    "password": get_env_variable(
-        "EMAIL_PASSWORD"
-    ),  # IMPORTANTE: Cambiar por variable de entorno en producción
+    "smtp_server": LeerVariableEntorno("EMAIL_SMTP_SERVER"),
+    "smtp_port": LeerVariableEntorno("EMAIL_SMTP_PORT"),
+    "email": LeerVariableEntorno("EMAIL_USER"),
+    "password": LeerVariableEntorno("EMAIL_PASSWORD"),  # IMPORTANTE: Cambiar por variable de entorno en producción
 }
 
 # ========= RUTAS =========
 RUTAS = {
-    "PathLog": in_config("PathLog"),
-    "PathLogError": get_env_variable("PATHLOGERROR"),
-    "PathResultados": in_config("PathResultado"),
-    "PathReportes": get_env_variable("PATHREPORTES"),
-    "PathInsumo": get_env_variable("PATHINSUMO"),
-    "PathTexto": get_env_variable("PATHTEXTO_SAP"),
-    "PathRuta": get_env_variable("PATHRUTA_SAP"),
+    "PathLog": LeerVariableEntorno("PATHLOG"),
+    # "PathLogError":inConfig("PathErrorLog"),   
+    "PathLogError": LeerVariableEntorno("PATHLOGERROR"),
+    "PathResultados": LeerVariableEntorno("PATHRESULTADOS"),
+    "PathReportes": LeerVariableEntorno("PATHREPORTES"),
+    "PathInsumo": LeerVariableEntorno("PATHINSUMO"),
+    "PathTexto": LeerVariableEntorno("PATHTEXTO_SAP"),
+    "PathRuta": LeerVariableEntorno("PATHRUTA_SAP"),
+    #"PathTempFileServer": LeerVariableEntorno("SAP_TEMP_PATH"),
     # Archivo de configuración de correos
     "ArchivoCorreos": os.path.join(BASE_DIR, "Insumo", "EnvioCorreos.xlsx"),
     # Rutas de archivos
@@ -86,3 +77,4 @@ for key, path in RUTAS.items():
 
 # Crear carpeta de logs
 os.makedirs(os.path.dirname(RUTAS["PathLog"]), exist_ok=True)
+

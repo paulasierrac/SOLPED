@@ -10,7 +10,6 @@ from Funciones.DescargarSolpedME5A import DescargarSolpedME5A
 from Funciones.EscribirLog import WriteLog
 import traceback
 from Config.settings import RUTAS
-from Funciones.ControlHU import control_hu
 
 
 def EjecutarHU02(session):

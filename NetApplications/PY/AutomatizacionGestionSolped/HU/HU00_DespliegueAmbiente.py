@@ -12,39 +12,32 @@
 
 import os
 import json
-from Funciones.ControlHU import control_hu
-from Config.init_config import in_config,init_config
+import random
+
+from Config.InitConfig import initConfig, inConfig
+from Funciones.FuncionesExcel import ExcelService
+from repositories.TicketInsumo import TicketInsumoRepo 
+
+
+#from Config.initconfig import initConfig
 
 
 def EjecutarHU00():
+
     """
     Prepara el entorno: valida carpetas, carga parámetros y estructura inicial.
     """
-
-    task_name = "HU00_DespliegueAmbiente"
-
-    try:
-        # WriteLog | INFO | INICIA HU00
-
+    try : 
+            
         # ==========================================================
-        # 0. Cargar parámetros iniciales
+        # 1. Ruta base del proyecto (importante)
         # ==========================================================
-        init_config()
-        control_hu(task_name=task_name, estado=0)
-
-        # ==========================================================
-        # 1. Obtener ruta base del proyecto
-        # ==========================================================
-        ruta_base = os.path.dirname(os.path.abspath(__file__))
+        ruta_base = os.path.dirname(os.path.abspath(__file__))  # ruta de HU00
         ruta_base = os.path.abspath(os.path.join(ruta_base, ".."))
-
-        if not os.path.exists(ruta_base):
-            raise Exception(f"Ruta base no existe: {ruta_base}")
-
-        # WriteLog | DEBUG | Ruta base: ruta_base
+        # Sube un nivel para quedar en /AutomatizacionGestionSolped
 
         # ==========================================================
-        # 2. Definir carpetas obligatorias
+        # 2. Definir las carpetas obligatorias según estándar
         # ==========================================================
         carpetas = [
             "Audit/Logs",
@@ -61,34 +54,25 @@ def EjecutarHU00():
 
             if not os.path.exists(ruta_completa):
                 os.makedirs(ruta_completa)
-                # WriteLog | INFO | Carpeta creada: ruta_completa
-            else:
-                # WriteLog | DEBUG | Carpeta existente: ruta_completa
-                pass
 
         # ==========================================================
-        # 3. Cargar archivo config.json si existe
+        # 3. Cargar parámetros desde o BD
         # ==========================================================
-        ruta_config = os.path.join(ruta_base, "config.json")
-
-        if os.path.exists(ruta_config):
-            try:
-                with open(ruta_config, "r", encoding="utf-8") as f:
-                    config = json.load(f)
-                # WriteLog | INFO | config.json cargado correctamente
-            except Exception as e:
-                # WriteLog | ERROR | Error leyendo config.json
-                print(f"ERROR | Error leyendo config.json: {e}")
-                config = {}
-        else:
-            # WriteLog | WARN | No existe config.json
-            config = {}
-
-        rutaParametros = os.path.join(in_config("PathInsumo"),"Parametros SAMIR.xlsx")
-        ExcelService.ejecutar_bulk_desde_excel(rutaParametros)
-
-
+        initConfig()
     
+        # ==========================================================
+        # 4. Cargar Ecxel con hojas que van a ser las tablas de parametros en la BD
+        # ==========================================================
+
+
+        # try : 
+        #     idTablaticket= random.randint(1, 10)
+        #     TicketInsumoRepo.crearPCTicketInsumo( "Inicio cargue de insumo " ) 0
+        #     rutaParametros = os.path.join(inConfig("PathInsumo"),"Parametros SAMIR.xlsx")
+        #     ExcelService.ejecutar_bulk_desde_excel(rutaParametros)
+        #     TicketInsumoRepo.crearPCTicketInsumo( "Finalizo cargue de insumo " ) 100 
+        # except: 
+        #     TicketInsumoRepo.crearPCTicketInsumo( error  "Finalizo cargue de insumo " ) 99 
 
         ruta_config = os.path.join(ruta_base, "Config.json")
 
@@ -98,12 +82,16 @@ def EjecutarHU00():
         else:
             config = {}
 
-        # WriteLog | INFO | FINALIZA HU00
-        control_hu(task_name=task_name, estado=100)
         return config
 
     except Exception as e:
-        # WriteLog | ERROR | Error grave en HU00
-        control_hu(task_name=task_name, estado=99)
-        print(f"ERROR | Error en HU00_DespliegueAmbiente: {e}")
-        return {}
+         print("Error")
+
+         
+    #     WriteLog(
+    #         mensaje=f"Error Global en Main: {e} | {error_stack}",
+    #         estado="ERROR",
+    #         task_name=task_name,
+    #         path_log=RUTAS["PathLogError"],
+    #     )
+    #     raise

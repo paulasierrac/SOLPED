@@ -1,10 +1,10 @@
 import os
-import datetime
+from datetime import datetime
 import socket
 import getpass
 
 
-def WriteInformeOperacion(
+def EscribirIformeOperacion(
     item_count  :int,
     solped: str,
     orden_compra: str,
@@ -30,7 +30,7 @@ def WriteInformeOperacion(
     """
 
     # === Fecha ===
-    ahora = datetime.datetime.now()
+    ahora = datetime.now()
     fecha_hora = ahora.strftime("%d/%m/%Y %H:%M:%S")
     fecha_archivo = ahora.strftime("%Y%m%d_%H%M%S")
 

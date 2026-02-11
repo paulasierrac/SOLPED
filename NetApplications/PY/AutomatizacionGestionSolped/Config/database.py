@@ -19,6 +19,7 @@ class Database:
                 f"PWD={DB_CONFIG.get('password')};"
                 "TrustServerCertificate=yes;"
             )
+            print("Conexion a DB exitosa")
             return conn
 
         except Exception:

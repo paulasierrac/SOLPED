@@ -1,6 +1,7 @@
 from datetime import datetime
 from Config.database import Database
 from Config.settings import DB_CONFIG
+from Config.InitConfig import inConfig 
 
 schemadb = DB_CONFIG["schema"]
 
@@ -26,7 +27,7 @@ class TicketInsumoRepo:
             INSERT INTO {self.schema}.TicketInsumo
             (Codigo, fechainsercion, estado, numeroreintentos, maquina)
             VALUES (?, ?, ?, ?, ?)
-        """
+        """ 
         with Database.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(
@@ -67,4 +68,31 @@ class TicketInsumoRepo:
                     fechafin,
                     codigo
                 )
+            )
+    
+    def crearPCTicketInsumo():
+        """
+         EXEC [GestionSolped].[GestionarTicketInsumo]
+            @ID             = 1,
+            @Estado         = 100,
+            @Maquina        = 'CGRPA042',
+            @Observaciones  = 'Prueba Error cargue lectura de insumo plantilla';
+        """
+
+        #schemadb = DB_CONFIG["schema"]
+
+        PCTicketInsumo = inConfig("PCTicketInsumo")
+
+        query = f"""
+            EXEC {PCTicketInsumo}
+                @ID             = 1,
+                @Estado         = 100,
+                @Maquina        = 'CGRPA042',
+                @Observaciones  = 'Steven Error cargue lectura de insumo plantilla';
+        """
+        with Database.get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(
+                query,
+                #(codigo, datetime.now(), "PENDIENTE", 0, maquina)
             )

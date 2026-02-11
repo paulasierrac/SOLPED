@@ -6,7 +6,7 @@
 # Propiedad de Colsubsidio
 # Cambios: Ajuste inicial para cumplimiento de estándar
 # ================================
-from HU.HU01_LoginSAP import conectar_sap
+from HU.HU01_LoginSAP import ConectarSAP
 from HU.HU04_GeneracionOC import GenerarOCDesdeSolped
 
 
@@ -19,7 +19,7 @@ from Config.settings import RUTAS, SAP_CONFIG
 def Main_Pruebas3():
     try:
 
-        session = conectar_sap(
+        session = ConectarSAP(
             SAP_CONFIG["sistema"],
             SAP_CONFIG["mandante"],
             SAP_CONFIG["user"],

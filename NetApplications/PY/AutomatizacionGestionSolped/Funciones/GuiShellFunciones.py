@@ -16,11 +16,14 @@ import time
 import os
 from Funciones.EscribirLog import WriteLog
 from Config.settings import RUTAS
+from Config.InitConfig import inConfig
 import pyautogui
 from pyautogui import ImageNotFoundException
 from Funciones.Login import ObtenerSesionActiva
 from typing import List, Literal, Optional
 
+from datetime import datetime, timedelta
+import calendar
 
 class SapTextEditor:
     """
@@ -453,6 +456,7 @@ def set_GuiTextField_text(session, campo_posicion, valor):
     fila = int(fila)
 
     usr = session.findById("wnd[0]/usr")
+    
 
     objetivo = f"-{campo}[{col},{fila}]"
 
@@ -480,6 +484,59 @@ def set_GuiTextField_text(session, campo_posicion, valor):
     txt.CaretPosition = len(txt.Text)
     session.findById("wnd[0]").sendVKey(0)
 
+def set_GuiTextField_Ventana1_text(session, campo_posicion, valor):
+    """
+    Setea el texto de un GuiTextField dentro de un TableControl SAP
+    usando posición lógica (ej: 'NETPR[10,0]' o 'MENGE[6,0]').
+    Compatible con M21N (MEPO1211).
+    """
+
+    if not campo_posicion:
+        raise ValueError("campo_posicion es obligatorio")
+
+    if valor is None:
+        valor = ""
+
+    # Parseo CAMPO[col,fila]
+    match = re.fullmatch(r"([A-Z0-9_]+)\[(\d+),(\d+)\]", campo_posicion.upper())
+    if not match:
+        raise ValueError("Formato inválido. Use: NETPR[10,0] o MENGE[6,0]")
+
+    campo, col, fila = match.groups()
+    col = int(col)
+    fila = int(fila)
+    #ventana 1
+    usr = session.findById("wnd[1]/usr")
+    
+
+    objetivo = f"-{campo}[{col},{fila}]"
+
+    def buscar_textfield(obj):
+        try:
+            if (
+                obj.Type == "GuiCTextField"
+                and objetivo in obj.Id
+            ):
+                return obj
+
+            for child in obj.Children:
+                res = buscar_textfield(child)
+                if res:
+                    return res
+        except Exception:
+            pass
+        return None
+
+    txt = buscar_textfield(usr)
+
+    if not txt:
+        raise Exception(f"No se encontró GuiTextField SAP: {campo}[{col},{fila}]")
+
+    # Seteo seguro (SAP-friendly)
+    txt.SetFocus()
+    txt.Text = str(valor)
+    txt.CaretPosition = len(txt.Text)
+    session.findById("wnd[1]").sendVKey(0)
 
 def ventana_abierta(session, titulo_parcial):
     """
@@ -790,8 +847,7 @@ def leer_solpeds_desde_archivo(ruta_archivo):
 
     return resultados
 
-
-def obtener_numero_oc(session):
+def ObtenerNumeroOC(session):
     """
     Obtiene el número de la Orden de Compra creada desde la barra de estado.
     """
@@ -812,8 +868,7 @@ def obtener_numero_oc(session):
         print(f"Error al obtener el número de OC: {e}")
         return None
 
-
-def esperar_sap_listo(session, timeout=10):
+def EsperarSAPListo(session, timeout=10):
     """
     Espera hasta que la sesión de SAP GUI no esté ocupada (session.Busy es False).
 
@@ -855,11 +910,13 @@ def CambiarGrupoCompra(session):
     if not obj_orgCompra:
         obj_orgCompra = obj_orgCompra.upper()
 
-    # print(f"Valor de OrgCompra: {obj_orgCompra}")
+    #print(f"Valor de OrgCompra: {obj_orgCompra}")
+
+    #TODO: Cambiar diccionario que se cargue desde la base de datos 
     condiciones = {
-        "s": "RCC",
-        "S": "RCC",
-        "": "RCC",
+        "s":"RCC",
+        "S":"RCC",
+        "":"RCC", # Se deja validacion de Blancos y s S por ambiente de prueba para evitar saltos de error 
         "OC15": "RCC",
         "OC26": "HAB",
         "OC25": "HAB",
@@ -900,19 +957,19 @@ def MostrarCabecera():
     estén visibles en la transacción ME21N para prevenir errores de "objeto no encontrado".
     """
     session = ObtenerSesionActiva()
-    # time.sleep(0.2)
-    esperar_sap_listo(session)
-    pyautogui.hotkey("ctrl", "F2")
-    esperar_sap_listo(session)
-    # time.sleep(0.2)
-    pyautogui.hotkey("ctrl", "F3")
-    esperar_sap_listo(session)
-    # time.sleep(0.5)
-    pyautogui.hotkey("ctrl", "F4")
-    esperar_sap_listo(session)
-    # time.sleep(0.5)
-    pyautogui.hotkey("ctrl", "F8")
-    esperar_sap_listo(session)
+    #time.sleep(0.2)
+    EsperarSAPListo(session)
+    pyautogui.hotkey("ctrl","F2")
+    EsperarSAPListo(session)
+    #time.sleep(0.2)
+    pyautogui.hotkey("ctrl","F3")
+    EsperarSAPListo(session)
+    #time.sleep(0.5)
+    pyautogui.hotkey("ctrl","F4")
+    EsperarSAPListo(session)
+    #time.sleep(0.5)
+    pyautogui.hotkey("ctrl","F8")
+    EsperarSAPListo(session)
 
 
 def ProcesarTabla(name, dias=None):
@@ -1153,6 +1210,105 @@ def ProcesarTabla(name, dias=None):
         traceback.print_exc()
         return pd.DataFrame()
 
+def ProcesarTablaMejorada(name, dias=None):
+    try:
+        # 1. Carga de archivo con manejo de rutas
+        path = rf"{inConfig('PathInsumos')}\{name}"
+        lineas_puras = []
+        for cod in ["latin-1", "utf-8", "cp1252"]:
+            try:
+                with open(path, "r", encoding=cod) as f:
+                    lineas_puras = [l.strip() for l in f.readlines()]
+                break
+            except: continue
+
+        if not lineas_puras: return pd.DataFrame()
+
+        # 2. Unificación de filas (Manejo de multilinealidad de SAP)
+        filas_unificadas = []
+        buffer_fila = ""
+        for linea in lineas_puras:
+            # Ignorar separadores visuales de SAP
+            if not linea.startswith("|") or linea.strip().startswith("|---"):
+                continue
+            pipes = linea.count("|")
+
+            if pipe_ref is None:
+                pipe_ref = pipes
+                buffer_fila = linea
+                continue
+
+            if pipes == pipe_ref:
+                if buffer_fila:
+                    filas_unificadas.append(buffer_fila)
+                buffer_fila = linea
+            else:
+                buffer_fila += linea[1:]
+            
+            # # Si la línea tiene muchos campos (pipes), es una nueva entrada [cite: 1, 4]
+            # if linea.count("|") > 10: 
+            #     if buffer_fila: filas_unificadas.append(buffer_fila)
+            #     buffer_fila = linea
+            # else:
+            #     # Es continuación de la línea anterior (ej. Valor Neto o Moneda) [cite: 3, 6]
+            #     buffer_fila += linea[1:]
+
+        if buffer_fila: filas_unificadas.append(buffer_fila)
+
+        # 3. Limpieza de datos y normalización de columnas
+        data_final = []
+        for f in filas_unificadas:
+            # Dividir y limpiar espacios, ignorando elementos vacíos resultantes del split lateral
+            partes = [p.strip() for p in f.split("|")]
+            # Eliminar el primer y último elemento si son vacíos (por los pipes laterales)
+            if partes[0] == "": partes.pop(0)
+            if partes and partes[-1] == "": partes.pop(-1)
+            
+            if partes and not all(x == "*" for x in partes):
+                data_final.append(partes)
+
+        if not data_final: return pd.DataFrame()
+
+        # 4. Construcción del DataFrame con validación de longitud
+        encabezados = data_final[0]
+        cuerpo = data_final[1:]
+        
+        # Validar si el primer elemento del cuerpo es en realidad el resto del encabezado
+        # (A veces SAP usa 2 filas para el encabezado) 
+        if cuerpo and "Material" not in encabezados and "Material" in cuerpo[0]:
+            encabezados = [f"{e} {c}".strip() for e, c in zip(encabezados, cuerpo[0])]
+            cuerpo = cuerpo[1:]
+
+        # Forzar a que cada fila tenga exactamente la longitud de 'encabezados'
+        cuerpo_ajustado = []
+        for fila in cuerpo:
+            if len(fila) > len(encabezados):
+                cuerpo_ajustado.append(fila[:len(encabezados)]) # Recortar excedente
+            elif len(fila) < len(encabezados):
+                cuerpo_ajustado.append(fila + [""] * (len(encabezados) - len(fila))) # Rellenar faltante
+            else:
+                cuerpo_ajustado.append(fila)
+
+        df = pd.DataFrame(cuerpo_ajustado, columns=encabezados)
+
+        # 5. Limpieza de columnas "fantasma" y duplicados de encabezado
+        df = df[df.iloc[:, 0] != encabezados[0]] # Eliminar si el encabezado se repite en medio
+        
+        # 6. Filtro por fecha (ReqDate o Fecha doc.) [cite: 4, 11, 48]
+        col_fecha = next((c for c in df.columns if any(x in c for x in ["Date", "Fecha", "ReqDate"])), None)
+        
+        if col_fecha and not df.empty:
+            df[col_fecha] = pd.to_datetime(df[col_fecha], errors="coerce", dayfirst=True)
+            if dias is not None:
+                limite = pd.Timestamp.today().normalize() - pd.Timedelta(days=int(dias))
+                df = df[df[col_fecha] >= limite]
+
+        return df.reset_index(drop=True)
+
+    except Exception as e:
+        print(f"Error crítico en ProcesarTablaMejorada: {e}")
+        traceback.print_exc()
+        return pd.DataFrame()
 
 def buscar_objeto_por_id_parcial(session, id_parcial):
     """
@@ -1279,4 +1435,30 @@ def get_importesCondiciones(session, impuesto_buscado="Imp. Saludable IBUE"):
             SelectGuiTab(session, "TABIDT8")
             set_sap_table_scroll(session, "tblSAPLV69ATCTRL_KONDITIONEN", i)
             print("Error al obtener los impuestos de las condiciones:", str(e))
-            # continue
+            #continue
+
+
+def obtener_ultimo_dia_habil_actual():
+    """
+    Docstring for obtener_ultimo_dia_habil_actual
+
+    # Ejemplo de ejecución
+    # resultado = obtener_ultimo_dia_habil_actual()
+    # print(resultado)
+    """
+    # Obtener fecha actual
+    hoy = datetime.now()
+    anio = hoy.year
+    mes = hoy.month
+    
+    # Obtener el último día del mes
+    ultimo_dia_mes = calendar.monthrange(anio, mes)[1]
+    fecha = datetime(anio, mes, ultimo_dia_mes)
+    
+    # Retroceder si es Sábado (5) o Domingo (6)
+    while fecha.weekday() > 4:
+        fecha -= timedelta(days=1)
+        
+    # 4. Formatear como DD.MM.YYYY
+    return fecha.strftime('%d.%m.%Y')
+

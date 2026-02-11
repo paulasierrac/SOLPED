@@ -1,7 +1,7 @@
 # ============================================
 # Función Local: validacionME53N
-# Autor: Paula Sierra - NetApplications
-# Descripcion: Ejecuta ME5A y exporta archivo TXT según estado.
+# Autor: Steven Navarro - NetApplications
+# Descripcion: Funciones 
 # Ultima modificacion: 24/11/2025
 # Propiedad de Colsubsidio
 # Cambios: (Si Aplica)
@@ -14,29 +14,27 @@ import re
 import subprocess
 import time
 import os
-from Funciones.EscribirLog import WriteLog
+from Funciones.EscribirLog import WriteLog 
 from Config.settings import RUTAS
 import pyautogui
 from pyautogui import ImageNotFoundException
 from Funciones.Login import ObtenerSesionActiva
-from Funciones.GuiShellFunciones import (
-    SapTextEditor,
-    set_GuiTextField_text,
-    get_GuiTextField_text,
-    buscar_objeto_por_id_parcial,
-    get_importesCondiciones,
-    obtener_valor,
-    extraer_concepto,
-    obtener_correos,
-    normalizar_precio_sap,
-    clasificar_concepto,
-    esperar_sap_listo,
-    buscar_y_clickear,
-    set_sap_table_scroll,
-    ventana_abierta,
-    SelectGuiTab,
-    MostrarCabecera,
-    obtener_numero_oc,
+from Funciones.GuiShellFunciones import (SapTextEditor,
+set_GuiTextField_text,              
+get_GuiTextField_text,
+buscar_objeto_por_id_parcial,
+get_importesCondiciones,
+obtener_valor,
+extraer_concepto,
+obtener_correos,
+normalizar_precio_sap, 
+clasificar_concepto,
+EsperarSAPListo,
+buscar_y_clickear, set_sap_table_scroll, 
+ventana_abierta,
+SelectGuiTab,
+MostrarCabecera,
+ObtenerNumeroOC
 )
 from typing import List, Literal, Optional
 
@@ -71,24 +69,31 @@ def ValidarAjustarSolped(session, item=1):
             CantidadPosicion = get_GuiTextField_text(session, f"MENGE[6,0]")
             # CantidadPosicion = normalizar_precio_sap(CantidadPosicion)
 
-            # Selecbox de la posicion de la solped  ejemplo de guia :  1 [10] 80016676 , LAVADO MANTEL GRANDE
+            FechaPosicion = get_GuiTextField_text(session, f"EEIND[9,0]")
+            #CantidadPosicion = normalizar_precio_sap(CantidadPosicion)
+
+            # Selecbox de la posicion de la solped  ejemplo de guia :  1 [10] 80016676 , LAVADO MANTEL GRANDE 
             PosicionSolped = buscar_objeto_por_id_parcial(session, "cmbDYN_6000-LIST")
             PosicionSolped.key = f"   {fila+1}"
 
             # Navega a la pestaña de textos
-            esperar_sap_listo(session)
+            EsperarSAPListo(session)
             SelectGuiTab(session, "TABIDT14")
             textPF1 = buscar_objeto_por_id_parcial(session, "cntlTEXT_TYPES_0200/shell")
-            textPF1.selectedNode = "F01"  # Foco en primer Texto IMPORTANTE
-            esperar_sap_listo(session)
-            EDITOR_ID = buscar_objeto_por_id_parcial(
-                session, "cntlTEXT_EDITOR_0201/shellcont/shell"
-            )
-
-            esperar_sap_listo(session)
+            textPF1.selectedNode = "F01" # Foco en primer Texto IMPORTANTE
+            EsperarSAPListo(session)
+            EDITOR_ID= buscar_objeto_por_id_parcial(session, "cntlTEXT_EDITOR_0201/shellcont/shell")
+        
+            EsperarSAPListo(session)
             # obtiene el texto del objeto ├─ Leer textos
             editor = SapTextEditor(session, EDITOR_ID.id)
             texto = editor.get_all_text()
+
+            # Obtiene la FECHA: en el texto (Precio)
+            claves = ["FECHA:"] # str que busca en el texto
+            FechaTexto = obtener_valor(texto, claves)
+            print(FechaTexto)
+            #preciotexto = normalizar_precio_sap(preciotexto)
 
             # Obtiene el valor en el texto (Precio)
             claves = ["VALOR"]  # str que busca en el texto
@@ -142,18 +147,9 @@ def ValidarAjustarSolped(session, item=1):
                     f"Posicion {fila+1}0 => PP:{PrecioPosicion} != PT:{preciotexto}⚠️ Se Actualiza Precio"
                 )
 
-            # Realiza los reemplazos en el texto
-            reemplazos = {
-                "VENTA SERVICIO": "V1",
-                "VENTA PRODUCTO": "V1",
-                "GASTO PROPIO SERVICIO": "C2",
-                "GASTO PROPIO PRODUCTO": "C2",
-                "SAA": "R3",
-                "SAA PRODUCTO": "R3",
-            }  # "SAA SERVICIO": "R3"
-            nuevo_texto, cambios, cambioEcxacto = editor.replace_in_text(
-                texto, reemplazos
-            )
+            # Realiza los reemplazos en el texto segun cuadro 
+            reemplazos = {"VENTA SERVICIO": "V1","VENTA PRODUCTO": "V1","GASTO PROPIO SERVICIO": "C2","GASTO PROPIO PRODUCTO": "C2","SAA": "R3","SAA PRODUCTO": "R3"} #"SAA SERVICIO": "R3"
+            nuevo_texto,cambios,cambioEcxacto = editor.replace_in_text(texto, reemplazos)
 
             # Si hay cambios, agrega a la lista de acciones
             if cambios > 0:
@@ -161,39 +157,31 @@ def ValidarAjustarSolped(session, item=1):
                     f"Cambios realizados: {cambios} en la posicion :{fila+1}0 en el Texto :{cambioEcxacto}"
                 )
 
-            # Actualiza el texto en el editor de SAP
-            editext = session.findById(EDITOR_ID.id)
-            editext.SetUnprotectedTextPart(0, nuevo_texto)
-
-            # Borra los textos de cada editor F02 en adelante
-            for i in range(2, 6):  # F02 a F05
+            #Borra los textos de cada editor F02 en adelante
+            for i in range(2, 6):  # F02 a F05  2,6   F02 a F03 2,
                 SelectGuiTab(session, "TABIDT14")
-                textPF = buscar_objeto_por_id_parcial(
-                    session, "cntlTEXT_TYPES_0200/shell"
-                )
-                nodo = f"F0{i}"
+                nodo = f"F0{i}"               
+                textPF = buscar_objeto_por_id_parcial(session, "cntlTEXT_TYPES_0200/shell")
                 textPF.selectedNode = nodo
-                editxt = session.findById(EDITOR_ID.id)
                 texto = editor.get_all_text()
-                if texto:
-                    # print("El texto no esta vacío. Procediendo a borrarlo... :"f"F0{i}")
-                    editxt.SetUnprotectedTextPart(0, ".")
+                if texto :
+                    #print("El texto no esta vacío. Procediendo a borrarlo... :"f"F0{i}")
+                    editxt=session.findById(EDITOR_ID.id)
+                    editxt.SetUnprotectedTextPart(0,".")
 
-            esperar_sap_listo(session)
-            valorImpSaludable = get_importesCondiciones(session)
-            if valorImpSaludable:
-                acciones.append(
-                    f"Impuesto Saludable en la posicion {fila+1}0: {valorImpSaludable}"
-                )
+            EsperarSAPListo(session)
+            """
+            #STEV: Codigo para recuperar impuesto saludable desde la pestaña Condiciones, por lentitud del bot se desactiva po ahora 2/9/2026
+            
+            # valorImpSaludable = get_importesCondiciones(session)
+            # if valorImpSaludable:
+            #     acciones.append(f"Impuesto Saludable en la posicion {fila+1}0: {valorImpSaludable}")
+            """                   
+            set_sap_table_scroll(session, "TC_1211", fila+1) # da scroll una posicion hacia abajo para no perder visual de los objetos en la tabla de SAP
+            #print(f"Primera posicion visible : {get_GuiTextField_text(session, f'EBELP[1,0]')}") # Muestra la primera posicion Visible despues del scroll 
+            EsperarSAPListo(session)
 
-            # da scroll una posicion hacia abajo para no perder visual de los objetos en la tabla de SAP
-            set_sap_table_scroll(session, "TC_1211", fila + 1)
-
-            print(
-                f"Primera posicion visible : {get_GuiTextField_text(session, f'EBELP[1,0]')}"
-            )
-            esperar_sap_listo(session)
-        # Devuelve las accines ejecutadas en una lista
+        # Devuelve las acciones ejecutadas en una lista 
         return acciones
 
     except Exception as e:
@@ -217,25 +205,31 @@ def AbrirSolped(session, solped, item=2):
         Exception: Captura y relanza errores generales durante la interacción con SAP.
     """
     try:
-
-        esperar_sap_listo(session)
+          
+        #EsperarSAPListo(session)
         # Click Variante de Seleccion y selecciona el campo Solicitudes de pedido en la lista
         timeout = time.time() + 25
         ventana = "Solicitudes de pedido"
         while not ventana_abierta(session, ventana):
             if time.time() > timeout:
                 raise TimeoutError(f"No se abrió la ventana :{ventana}")
-            buscar_y_clickear(
-                rf".\img\vSeleccion.png", confidence=0.8, intentos=5, espera=0.5
-            )
-            esperar_sap_listo(session)
+            
+            buscar_y_clickear(rf".\img\vSeleccion.png", confidence=0.8, intentos=5, espera=0.5)
+            #session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]").pressContextButton("SELECT")
+            # VarianteSeleccion = buscar_objeto_por_id_parcial(session, "/shell[0]")
+            # VarianteSeleccion1= buscar_objeto_por_id_parcial(session, "SELECT")
+            # VarianteSeleccion.pressContextButton (VarianteSeleccion1.id)
+            # EsperarSAPListo(session)
+            # SolicitudesdePedido = buscar_objeto_por_id_parcial(session, ":REQ_QUERY")
+            # VarianteSeleccion.selectContextMenuItem (SolicitudesdePedido.id)
+            #session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]").pressContextButton("SELECT")
             time.sleep(2)
             pyautogui.press(
                 "s"
             )  # selecciona el campo Solicitudes de pedido en la lista
 
         # ingresa el numero de la solped que va a revisar  #Funciona perfecto
-        esperar_sap_listo(session)
+        EsperarSAPListo(session)
         session.findById("wnd[0]/usr/ctxtSP$00026-LOW").text = solped
         session.findById("wnd[0]/tbar[1]/btn[8]").press()
 
@@ -250,17 +244,25 @@ def AbrirSolped(session, solped, item=2):
         pyautogui.hotkey("down")
         time.sleep(0.5)
 
+        """
         # Selecciona todos los items de la solped revisar variable item para ajustar
         with pyautogui.hold("shift"):
             pyautogui.press(
                 "down", presses=item
             )  # Stev: cantidad de items a bajar articulos de la solped
             time.sleep(0.5)
+        """
+        primerItem = 2 #desde donde se toman las pociciones TODO: que se pase por parametro, segun cliente con posiciones 
+        ultimoItem = item + 2 # Ultima posicion tomada 
+        for i in range(primerItem,ultimoItem):   # recordar que en range no incluye el ultimo 
+            session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[1]").selectNode(f"          {i}")
 
+        EsperarSAPListo(session)
         # Click en tomar pedido
-        buscar_y_clickear(rf".\img\tomar.png", confidence=0.7, intentos=20, espera=0.5)
-
-        # Docstring for MostrarCabecera
+        #buscar_y_clickear(rf".\img\tomar.png", confidence=0.7, intentos=20, espera=0.5)
+        session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]").pressButton ("COPY")
+        
+        #Docstring for MostrarCabecera
         MostrarCabecera()
 
     except Exception as e:
