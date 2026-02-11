@@ -14,12 +14,12 @@ import re
 import subprocess
 import time
 import os
-from funciones.EscribirLog import WriteLog
-from config.settings import RUTAS
-from config.init_config import in_config
+from Funciones.EscribirLog import WriteLog
+from Config.settings import RUTAS
+from Config.InitConfig import inConfig
 import pyautogui
 from pyautogui import ImageNotFoundException
-from funciones.Login import ObtenerSesionActiva
+from Funciones.Login import ObtenerSesionActiva
 from typing import List, Literal, Optional
 
 from datetime import datetime, timedelta
@@ -864,7 +864,7 @@ def leer_solpeds_desde_archivo(ruta_archivo):
 
     return resultados
 
-def obtener_numero_oc(session):
+def ObtenerNumeroOC(session):
     """
     Obtiene el número de la Orden de Compra creada desde la barra de estado.
     """
@@ -885,7 +885,7 @@ def obtener_numero_oc(session):
         print(f"Error al obtener el número de OC: {e}")
         return None
 
-def esperar_sap_listo(session, timeout=10):
+def EsperarSAPListo(session, timeout=10):
     """
     Espera hasta que la sesión de SAP GUI no esté ocupada (session.Busy es False).
 
@@ -927,10 +927,12 @@ def CambiarGrupoCompra(session):
         obj_orgCompra = obj_orgCompra.upper()
 
     #print(f"Valor de OrgCompra: {obj_orgCompra}")
+
+    #TODO: Cambiar diccionario que se cargue desde la base de datos 
     condiciones = {
         "s":"RCC",
         "S":"RCC",
-        "":"RCC",
+        "":"RCC", # Se deja validacion de Blancos y s S por ambiente de prueba para evitar saltos de error 
         "OC15": "RCC",
         "OC26": "HAB",
         "OC25": "HAB",
@@ -970,18 +972,18 @@ def MostrarCabecera():
     """
     session = ObtenerSesionActiva()
     #time.sleep(0.2)
-    esperar_sap_listo(session)
+    EsperarSAPListo(session)
     pyautogui.hotkey("ctrl","F2")
-    esperar_sap_listo(session)
+    EsperarSAPListo(session)
     #time.sleep(0.2)
     pyautogui.hotkey("ctrl","F3")
-    esperar_sap_listo(session)
+    EsperarSAPListo(session)
     #time.sleep(0.5)
     pyautogui.hotkey("ctrl","F4")
-    esperar_sap_listo(session)
+    EsperarSAPListo(session)
     #time.sleep(0.5)
     pyautogui.hotkey("ctrl","F8")
-    esperar_sap_listo(session)
+    EsperarSAPListo(session)
 
 def ProcesarTabla(name, dias=None):
     """name: nombre del txt a utilizar
@@ -1224,7 +1226,7 @@ def ProcesarTabla(name, dias=None):
 def ProcesarTablaMejorada(name, dias=None):
     try:
         # 1. Carga de archivo con manejo de rutas
-        path = rf"{in_config('PathInsumos')}\{name}"
+        path = rf"{inConfig('PathInsumos')}\{name}"
         lineas_puras = []
         for cod in ["latin-1", "utf-8", "cp1252"]:
             try:

@@ -13,10 +13,10 @@ import pandas as pd
 import shutil
 from PyPDF2 import PdfReader
 from datetime import datetime
-#from funciones.GeneralME53N import EnviarNotificacionCorreo
-from funciones.EmailSender import EnviarNotificacionCorreo
-from funciones.EscribirLog import WriteLog
-from config.settings import RUTAS
+#from Funciones.GeneralME53N import EnviarNotificacionCorreo
+from Funciones.EmailSender import EnviarNotificacionCorreo
+from Funciones.EscribirLog import WriteLog
+from Config.settings import RUTAS
 import csv
 
 

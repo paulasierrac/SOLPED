@@ -15,16 +15,16 @@ from requests import session
 import time
 import traceback
 
-from config.settings import RUTAS, DB_CONFIG
-from config.init_config import in_config
+from Config.settings import RUTAS, DB_CONFIG
+from Config.InitConfig import inConfig
 
-from funciones.GuiShellFunciones import ProcesarTablaMejorada
-from funciones.EscribirLog import WriteLog
-from funciones.GeneralME53N import AbrirTransaccion
-from funciones.ValidacionME21N import esperar_sap_listo
+from Funciones.GuiShellFunciones import ProcesarTablaMejorada
+from Funciones.EscribirLog import WriteLog
+from Funciones.GeneralME53N import AbrirTransaccion
+from Funciones.ValidacionME21N import EsperarSAPListo
 
 
-from funciones.FuncionesExcel import ExcelService
+from Funciones.FuncionesExcel import ExcelService
 
 
 def EjecutarHU05(session, ordenes_de_compra: list):
@@ -37,22 +37,18 @@ def EjecutarHU05(session, ordenes_de_compra: list):
 
         if not session:
             raise ValueError("Sesion SAP no valida.")
-
-        # Abrir transacción ME9F
+        
         AbrirTransaccion(session, "ME2L")
-        esperar_sap_listo(session)   
-          
-        # Alcance de la lista
-        session.findById("wnd[0]/usr/ctxtLISTU").text = "ALV"
-        # Presionar Enter
-        session.findById("wnd[0]/usr/btn%_S_EBELN_%_APP_%-VALU_PUSH").press()
+        EsperarSAPListo(session)   
+        session.findById("wnd[0]/usr/ctxtLISTU").text = "ALV" # Alcance de la lista
+        session.findById("wnd[0]/usr/btn%_S_EBELN_%_APP_%-VALU_PUSH").press() # Presionar Enter
         # Alistar Texto para pegar desde el portapapeles, estándar de Windows \r\n (Carriage Return + Line Feed).
         texto_para_copiar = '\r\n'.join(ordenes_de_compra)
         pyperclip.copy(texto_para_copiar)
-        esperar_sap_listo(session)
+        EsperarSAPListo(session)
         #Boton Pegar desde el portapapeles
         session.findById("wnd[1]/tbar[0]/btn[24]").press()
-        esperar_sap_listo(session) 
+        EsperarSAPListo(session) 
         session.findById("wnd[1]/tbar[0]/btn[8]").press()
         # Presionar el botón de ejecutar
         session.findById("wnd[0]/tbar[1]/btn[8]").press()
@@ -66,7 +62,7 @@ def EjecutarHU05(session, ordenes_de_compra: list):
         #fecha_hora = ahora.strftime("%d/%m/%Y %H:%M:%S")
         fecha_archivo = ahora.strftime("%Y%m%d_%H%M%S")
         #Guardar el archivo txt en la ruta especificada
-        ruta_guardar = rf"{in_config("PathTemp")}"
+        ruta_guardar = rf"{inConfig("PathTemp")}"
         session.findById("wnd[1]/usr/ctxtDY_PATH").text = ruta_guardar
         session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = rf"LiberadasOC_{fecha_archivo}.txt"
         session.findById("wnd[1]/usr/ctxtDY_FILENAME").caretPosition = 10
@@ -103,9 +99,9 @@ def EjecutarHU05(session, ordenes_de_compra: list):
         
         print(df_filtrado)
         # Guardar el DataFrame filtrado en un archivo Excel
-        df_filtrado.to_excel(rf"{in_config("PathTemp")}\OC_Liberadas.xlsx", index=False)
+        df_filtrado.to_excel(rf"{inConfig("PathTemp")}\OC_Liberadas.xlsx", index=False)
         #Sube el Excel a la base de datos
-        ExcelService.ejecutar_bulk_desde_excel(rf"{in_config("PathTemp")}\OC_Liberadas.xlsx")
+        ExcelService.ejecutar_bulk_desde_excel(rf"{inConfig("PathTemp")}\OC_Liberadas.xlsx")
 
         WriteLog(
             mensaje=f"Procesamiento en ME9F completado para la OC: {ordenes_de_compra}",

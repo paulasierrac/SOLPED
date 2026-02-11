@@ -7,8 +7,8 @@
 # Cambios: (Si Aplica)
 # ============================================
 import pyautogui
-from config.settings import RUTAS
-from funciones.GeneralME53N import AbrirTransaccion
+from Config.settings import RUTAS
+from Funciones.GeneralME53N import AbrirTransaccion
 import win32com.client
 import time
 import os

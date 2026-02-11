@@ -4,7 +4,7 @@ import socket
 import getpass
 
 
-def WriteInformeOperacion(
+def EscribirIformeOperacion(
     item_count  :int,
     solped: str,
     orden_compra: str,

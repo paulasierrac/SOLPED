@@ -15,21 +15,21 @@ import pyautogui
 import traceback
 import sys
 
-from config.settings import RUTAS, SAP_CONFIG
-from config.init_config import in_config
+from Config.settings import RUTAS, SAP_CONFIG
+from Config.InitConfig import inConfig
 
-from funciones.GeneralME53N import (
+from Funciones.GeneralME53N import (
     EnviarNotificacionCorreo,
     EnviarCorreoPersonalizado,
     NotificarRevisionManualSolped,
     convertir_txt_a_excel,
     NotificarRevisionManualSolped,
 )
-from funciones.EscribirLog import WriteLog
-from funciones.GuiShellFunciones import leer_solpeds_desde_archivo
+from Funciones.EscribirLog import WriteLog
+from Funciones.GuiShellFunciones import leer_solpeds_desde_archivo
 
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
-from HU.HU01_LoginSAP import conectar_sap
+from HU.HU01_LoginSAP import ConectarSAP
 from HU.HU02_DescargaME5A import EjecutarHU02
 from HU.HU03_ValidacionME53N import EjecutarHU03
 from HU.HU04_GeneracionOC import EjecutarHU04
@@ -70,7 +70,7 @@ def Main_GestionSolped():
             path_log=RUTAS["PathLog"],
         )
 
-        session = conectar_sap(in_config("SAP_SISTEMA"),in_config("SAP_MANDANTE") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
+        session = ConectarSAP(inConfig("SAP_SISTEMA"),inConfig("SAP_MANDANTE") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
 
         time.sleep(3)
      
@@ -159,7 +159,7 @@ def Main_GestionSolped():
             #     path_log=RUTAS["PathLog"],
             # )
 
-            #session = conectar_sap(in_config("SAP_SISTEMA"),in_config("SAP_MANDANTE") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
+            #session = ConectarSAP(inConfig("SAP_SISTEMA"),inConfig("SAP_MANDANTE") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
 
             # archivos_validar = ["expSolped05 1.txt"] # 1300139271,1300139272
             archivos_validar = [

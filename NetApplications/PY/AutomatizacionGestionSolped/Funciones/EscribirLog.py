@@ -51,7 +51,7 @@ def WriteLog(mensaje: str, estado: str, task_name: str, path_log: str):
 
     # === Construcción de línea con estructura estándar ===
     """
-    FECHA HORA | ESTADO | TASKNAME | MENSAJE | NOMBRE_MAQUINA | USUARIO
+    FECHA HORA | ESTADO | MENSAJE | CODIGOROBOT | TASKNAME   #| USUARIO | NOMBRE_MAQUINA 
     """
     linea = (
         f"{fecha_linea} | "

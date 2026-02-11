@@ -14,12 +14,12 @@ import re
 import subprocess
 import time
 import os
-from funciones.EscribirLog import WriteLog 
-from config.settings import RUTAS
+from Funciones.EscribirLog import WriteLog 
+from Config.settings import RUTAS
 import pyautogui
 from pyautogui import ImageNotFoundException
-from funciones.Login import ObtenerSesionActiva
-from funciones.GuiShellFunciones import (SapTextEditor,
+from Funciones.Login import ObtenerSesionActiva
+from Funciones.GuiShellFunciones import (SapTextEditor,
 set_GuiTextField_text,              
 get_GuiTextField_text,
 buscar_objeto_por_id_parcial,
@@ -29,12 +29,12 @@ extraer_concepto,
 obtener_correos,
 normalizar_precio_sap, 
 clasificar_concepto,
-esperar_sap_listo,
+EsperarSAPListo,
 buscar_y_clickear, set_sap_table_scroll, 
 ventana_abierta,
 SelectGuiTab,
 MostrarCabecera,
-obtener_numero_oc
+ObtenerNumeroOC
 )
 from typing import List, Literal, Optional
 
@@ -75,14 +75,14 @@ def ValidarAjustarSolped(session,item=1):
             PosicionSolped.key = f"   {fila+1}"
 
             # Navega a la pestaña de textos
-            esperar_sap_listo(session)
+            EsperarSAPListo(session)
             SelectGuiTab(session, "TABIDT14")
             textPF1 = buscar_objeto_por_id_parcial(session, "cntlTEXT_TYPES_0200/shell")
             textPF1.selectedNode = "F01" # Foco en primer Texto IMPORTANTE
-            esperar_sap_listo(session)
+            EsperarSAPListo(session)
             EDITOR_ID= buscar_objeto_por_id_parcial(session, "cntlTEXT_EDITOR_0201/shellcont/shell")
         
-            esperar_sap_listo(session)
+            EsperarSAPListo(session)
             # obtiene el texto del objeto ├─ Leer textos
             editor = SapTextEditor(session, EDITOR_ID.id)
             texto = editor.get_all_text()
@@ -146,7 +146,7 @@ def ValidarAjustarSolped(session,item=1):
                     editxt=session.findById(EDITOR_ID.id)
                     editxt.SetUnprotectedTextPart(0,".")
 
-            esperar_sap_listo(session)
+            EsperarSAPListo(session)
             """
             #STEV: Codigo para recuperar impuesto saludable desde la pestaña Condiciones, por lentitud del bot se desactiva po ahora 2/9/2026
             
@@ -156,7 +156,7 @@ def ValidarAjustarSolped(session,item=1):
             """                   
             set_sap_table_scroll(session, "TC_1211", fila+1) # da scroll una posicion hacia abajo para no perder visual de los objetos en la tabla de SAP
             #print(f"Primera posicion visible : {get_GuiTextField_text(session, f'EBELP[1,0]')}") # Muestra la primera posicion Visible despues del scroll 
-            esperar_sap_listo(session)
+            EsperarSAPListo(session)
 
         # Devuelve las acciones ejecutadas en una lista 
         return acciones
@@ -182,7 +182,7 @@ def AbrirSolped(session, solped, item=2):
     """
     try:
           
-        #esperar_sap_listo(session)
+        #EsperarSAPListo(session)
         # Click Variante de Seleccion y selecciona el campo Solicitudes de pedido en la lista
         timeout = time.time() + 25
         ventana= "Solicitudes de pedido"
@@ -195,7 +195,7 @@ def AbrirSolped(session, solped, item=2):
             # VarianteSeleccion = buscar_objeto_por_id_parcial(session, "/shell[0]")
             # VarianteSeleccion1= buscar_objeto_por_id_parcial(session, "SELECT")
             # VarianteSeleccion.pressContextButton (VarianteSeleccion1.id)
-            # esperar_sap_listo(session)
+            # EsperarSAPListo(session)
             # SolicitudesdePedido = buscar_objeto_por_id_parcial(session, ":REQ_QUERY")
             # VarianteSeleccion.selectContextMenuItem (SolicitudesdePedido.id)
             #session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]").pressContextButton("SELECT")
@@ -203,7 +203,7 @@ def AbrirSolped(session, solped, item=2):
             pyautogui.press("s") # selecciona el campo Solicitudes de pedido en la lista
 
         # ingresa el numero de la solped que va a revisar  #Funciona perfecto
-        esperar_sap_listo(session)
+        EsperarSAPListo(session)
         session.findById("wnd[0]/usr/ctxtSP$00026-LOW").text = solped
         session.findById("wnd[0]/tbar[1]/btn[8]").press()
 
@@ -227,7 +227,7 @@ def AbrirSolped(session, solped, item=2):
         for i in range(primerItem,ultimoItem):   # recordar que en range no incluye el ultimo 
             session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[1]").selectNode(f"          {i}")
 
-        esperar_sap_listo(session)
+        EsperarSAPListo(session)
         # Click en tomar pedido
         #buscar_y_clickear(rf".\img\tomar.png", confidence=0.7, intentos=20, espera=0.5)
         session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]").pressButton ("COPY")

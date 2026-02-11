@@ -1,5 +1,5 @@
 
-#funciones.FuncionesExcel.py
+#Funciones.FuncionesExcel.py
 
 import os
 import csv
@@ -8,7 +8,7 @@ import unicodedata
 import warnings
 import pandas as pd
 
-from config.init_config import in_config
+from Config.InitConfig import inConfig
 from repositories.Excel import ExcelRepo
 
 
@@ -56,7 +56,7 @@ class ExcelService:
 
         # Guardar archivo limpio
         
-        carpeta_temp = in_config("PathTemp")
+        carpeta_temp = inConfig("PathTemp")
         ruta_salida = os.path.join(carpeta_temp, f"{nombre_archivo}limpio.xlsx")
         df_limpio.to_excel(ruta_salida, index=False)
 
@@ -131,7 +131,7 @@ class ExcelService:
             df = df.map(ExcelService.limpiar_texto)
 
             nombre_base = os.path.splitext(os.path.basename(ruta_excel))[0]
-            carpeta_temp = in_config("PathTemp")
+            carpeta_temp = inConfig("PathTemp")
             ruta_csv = os.path.join(carpeta_temp, f"{nombre_base}.csv")
 
             df.to_csv(

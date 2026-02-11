@@ -11,13 +11,13 @@ import re
 import subprocess
 import time
 import os
-from config.settings import RUTAS
-from funciones.GuiShellFunciones import esperar_sap_listo, obtener_numero_oc, ProcesarTabla, SetGuiComboBoxkey, CambiarGrupoCompra
-from funciones.ValidacionME21N import (
+from Config.settings import RUTAS
+from Funciones.GuiShellFunciones import EsperarSAPListo, ObtenerNumeroOC, ProcesarTabla, SetGuiComboBoxkey, CambiarGrupoCompra
+from Funciones.ValidacionME21N import (
 SelectGuiTab, ValidarAjustarSolped,AbrirSolped,MostrarCabecera)
-from funciones.EscribirInforme import WriteInformeOperacion
-from funciones.EscribirLog import WriteLog
-from funciones.GeneralME53N import AbrirTransaccion
+from Funciones.EscribirInforme import EscribirIformeOperacion
+from Funciones.EscribirLog import WriteLog
+from Funciones.GeneralME53N import AbrirTransaccion
 import traceback
 import pyautogui  # Asegúrate de tener pyautogui instaladoi
 
@@ -98,7 +98,7 @@ def EjecutarHU04(session, archivo):
             #print(f"procesando solped: {solped} de items: {item_count}")
             AbrirTransaccion(session, "ME21N")
       
-            esperar_sap_listo(session)
+            EsperarSAPListo(session)
             #navegacion por SAP que permite abrir Solped 
             
             AbrirSolped(session, solped, item_count)
@@ -106,7 +106,7 @@ def EjecutarHU04(session, archivo):
              #se selecciona la clase de docuemnto ZRCR, revisar alcance si es necesario cambiar a otra clase dependiendo de algun criterio
             SetGuiComboBoxkey(session, "TOPLINE-BSART", "ZRCR")
 
-            esperar_sap_listo(session)
+            EsperarSAPListo(session)
             
             #se ingresa a la pestaña  Dat.org. de cabecera, asegurándonos de que esté visible
             pyautogui.hotkey("ctrl","F2")
@@ -114,7 +114,7 @@ def EjecutarHU04(session, archivo):
             # Se cambia el grupo de compra dependiendo de la org de compra, y se guardan acciones
             acciones.extend(CambiarGrupoCompra(session))
             # Seleccionar la pestaña de textos, asegurándonos de que esté visible
-            esperar_sap_listo(session)
+            EsperarSAPListo(session)
             #time.sleep(0.5)
             pyautogui.hotkey("ctrl","F4")
             SelectGuiTab(session, "TABIDT14")
@@ -145,12 +145,12 @@ def EjecutarHU04(session, archivo):
 
 
             # Obtener el numero de la orden de compra generada desde la barra de estado.
-            orden_de_compra = obtener_numero_oc(session)
+            orden_de_compra = ObtenerNumeroOC(session)
 
             # Stev: validar si se debe hacer algo mas con la OC generada
 
             
-            ruta = WriteInformeOperacion(
+            ruta = EscribirIformeOperacion(
                     item_count=item_count,
                     solped=solped,
                     orden_compra= orden_de_compra,

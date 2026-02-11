@@ -8,9 +8,9 @@ from email import encoders
 import os
 from typing import List, Optional
 from pathlib import Path
-from config.settings import CONFIG_EMAIL,RUTAS, SAP_CONFIG
+from Config.settings import CONFIG_EMAIL,RUTAS, SAP_CONFIG
 from dotenv import load_dotenv
-from funciones.EscribirLog import WriteLog
+from Funciones.EscribirLog import WriteLog
 
 
 # # Configuración por defecto (puede ser sobrescrita al instanciar)

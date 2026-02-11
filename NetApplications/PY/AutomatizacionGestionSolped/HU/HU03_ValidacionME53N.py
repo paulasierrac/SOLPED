@@ -15,8 +15,8 @@ import subprocess
 import os
 import time
 import traceback
-from funciones.EscribirLog import WriteLog
-from funciones.GeneralME53N import (
+from Funciones.EscribirLog import WriteLog
+from Funciones.GeneralME53N import (
     AbrirTransaccion,
     ColsultarSolped,
     procesarTablaME5A,
@@ -35,7 +35,7 @@ from funciones.GeneralME53N import (
     convertir_txt_a_excel,
     EnviarNotificacionCorreo,
 )
-from config.settings import RUTAS
+from Config.settings import RUTAS
 
 
 def EjecutarHU03(session, nombre_archivo):

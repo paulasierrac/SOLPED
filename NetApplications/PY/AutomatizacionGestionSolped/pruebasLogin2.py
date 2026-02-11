@@ -6,20 +6,20 @@
 # Propiedad de Colsubsidio
 # Cambios: Ajuste inicial para cumplimiento de estándar
 # ================================
-from HU.HU01_LoginSAP import conectar_sap
+from HU.HU01_LoginSAP import ConectarSAP
 from HU.HU04_GeneracionOC import GenerarOCDesdeSolped
 
 
-# from NetApplications.PY.AutomatizacionGestionSolped.HU.HU03_ValidacionME53N import buscar_SolpedME53N
-from funciones.EscribirLog import WriteLog
+# from HU.HU03_ValidacionME53N import buscar_SolpedME53N
+from Funciones.EscribirLog import WriteLog
 import traceback
-from config.settings import RUTAS, SAP_CONFIG
+from Config.settings import RUTAS, SAP_CONFIG
 
 
 def Main_Pruebas3():
     try:
 
-        session = conectar_sap(
+        session = ConectarSAP(
             SAP_CONFIG["sistema"],
             SAP_CONFIG["mandante"],
             SAP_CONFIG["user"],
