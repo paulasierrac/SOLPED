@@ -14,9 +14,9 @@ import os
 import json
 import random
 
-from Config.InitConfig import initConfig, inConfig
+from Config.InicializarConfig import initConfig, inConfig
 from Funciones.FuncionesExcel import ExcelService
-from repositories.TicketInsumo import TicketInsumoRepo 
+from Repositories.TicketInsumo import TicketInsumoRepo 
 
 
 #from Config.initconfig import initConfig

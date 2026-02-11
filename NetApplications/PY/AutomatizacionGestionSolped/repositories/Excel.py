@@ -1,4 +1,4 @@
-#repositories.Excel.py
+#Repositories.Excel.py
 
 from Config.database import Database
 from Config.settings import DB_CONFIG

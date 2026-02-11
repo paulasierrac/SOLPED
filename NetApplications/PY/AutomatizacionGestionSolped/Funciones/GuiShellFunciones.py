@@ -16,7 +16,7 @@ import time
 import os
 from Funciones.EscribirLog import WriteLog
 from Config.settings import RUTAS
-from Config.InitConfig import inConfig
+from Config.InicializarConfig import inConfig
 import pyautogui
 from pyautogui import ImageNotFoundException
 from Funciones.Login import ObtenerSesionActiva

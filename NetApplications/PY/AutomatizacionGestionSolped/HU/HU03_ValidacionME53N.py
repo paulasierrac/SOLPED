@@ -61,7 +61,7 @@ from Funciones.ValidacionME53N import (
 def EjecutarHU03(session, nombre_archivo):
     try:
         task_name = "HU03_ValidacionME53N"
-        control_hu(task_name=task_name, estado=0)
+        control_hu(task_name, estado=0)
 
         TraerSAPAlFrenteOpcion()
 
@@ -708,11 +708,11 @@ def EjecutarHU03(session, nombre_archivo):
             codigo_correo=3, task_name=task_name, adjuntos=[path_reporte]
         )
 
-        control_hu(task_name=task_name, estado=100)
+        control_hu(task_name, estado=100)
         return True
 
     except Exception as e:
-        control_hu(task_name=task_name, estado=99)
+        control_hu(task_name, estado=99)
         WriteLog(
             mensaje=f"Error en EjecutarHU03: {e}",
             estado="ERROR",

@@ -1,4 +1,4 @@
-from Config.InitConfig import inConfig
+from Config.InicializarConfig import inConfig
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
 from Funciones.FuncionesExcel import ExcelService
 import pandas as pd

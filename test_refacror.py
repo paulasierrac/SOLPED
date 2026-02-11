@@ -38,7 +38,7 @@ RENAME_MAP = {
     "AppendHipervinculoObservaciones": "AgregarHipervinculoObservaciones",
     "obtenerFilaExpSolped": "ObtenerFilaExpSolped",
     "abrir_sap_logon": "AbrirSapLogon",
-    "conectar_sap": "ConectarSap",
+    "ConectarSAP": "ConectarSap",
     "validarLoginDiag": "ValidarLoginDiag",
     "estado_ok": "EstadoOk",
     "generar_envios_y_reporte": "GenerarEnviosYReporte",

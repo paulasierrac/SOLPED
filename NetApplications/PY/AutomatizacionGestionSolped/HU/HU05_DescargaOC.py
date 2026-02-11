@@ -16,7 +16,7 @@ import time
 import traceback
 
 from Config.settings import RUTAS, DB_CONFIG
-from Config.InitConfig import inConfig
+from Config.InicializarConfig import inConfig
 
 from Funciones.GuiShellFunciones import ProcesarTablaMejorada
 from Funciones.EscribirLog import WriteLog

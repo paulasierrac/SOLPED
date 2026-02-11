@@ -11,7 +11,7 @@ class ControlHURepo:
     def actualizar_estado_hu(
         self, 
         hu: int,
-        nombre_hu: str, 
+        iNombreHU: str, 
         estado: int,
         activa: int,
         maquina: str
@@ -38,12 +38,12 @@ class ControlHURepo:
                     query,
                     (
                         hu,
-                        nombre_hu,
+                        iNombreHU,
                         estado,
                         activa,
                         maquina,
                         hu,
-                        nombre_hu,
+                        iNombreHU,
                         estado,
                         activa,
                         maquina

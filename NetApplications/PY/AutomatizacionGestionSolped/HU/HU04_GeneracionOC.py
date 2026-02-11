@@ -22,7 +22,7 @@ import traceback
 import pyautogui  # Asegúrate de tener pyautogui instaladoi
 from Funciones.ControlHU import control_hu
 
-from repositories.Consultas import Querys
+from Repositories.Consultas import Querys
 
 def EjecutarHU04(session, archivo):
 
@@ -32,7 +32,7 @@ def EjecutarHU04(session, archivo):
     generacion de OC desde la transacción ME21N.
     """
     try:
-        control_hu(task_name=task_name, estado=0)
+        control_hu(task_name, estado=0)
         WriteLog(
             mensaje=f"HU04 Inicia para el archivo {archivo}",
             estado="INFO",
@@ -168,11 +168,11 @@ def EjecutarHU04(session, archivo):
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        control_hu(task_name=task_name, estado=100)
+        control_hu(task_name, estado=100)
 
 
     except Exception as e:
-        control_hu(task_name=task_name, estado=99)
+        control_hu(task_name, estado=99)
         WriteLog(
             mensaje=f"ERROR GLOBAL en HU04: {e}",
             estado="ERROR",

@@ -12,15 +12,15 @@ import win32com.client  # pyright: ignore[reportMissingModuleSource]
 import time
 import subprocess
 import os
-from Config.InitConfig import inConfig
+from Config.InicializarConfig import inConfig
 from Config.settings import RUTAS, SAP_CONFIG 
 from Funciones.ValidacionME21N import ventana_abierta
 
 import pyautogui
 
-from Config.init_config import in_config
+from Config.InicializarConfig import inConfig
 from Config.settings import RUTAS, SAP_CONFIG
-from Funciones.ValidacionM21N import ventana_abierta
+from Funciones.ValidacionME21N import ventana_abierta
 from Funciones.ControlHU import control_hu
 
 
@@ -53,11 +53,11 @@ def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
         print(" SAP Logon 750 abierto ")
 
     try:
-        # WriteLog | INFO | INICIA conectar_sap
+        # WriteLog | INFO | INICIA ConectarSAP
         task_name = "HU01_LoginSAP"
-        control_hu(task_name=task_name, estado=0)
+        control_hu(task_name, estado=0)
 
-        abrir_sap = abrir_sap_logon()
+        abrir_sap = AbrirSAPLogon()
         time.sleep(3)
 
         if abrir_sap:
@@ -137,9 +137,9 @@ def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
         return session
 
     except Exception as e:
-        control_hu(task_name=task_name, estado=99)
+        control_hu(task_name, estado=99)
         print(f"ERROR | Error al conectar a SAP: {e}")
-        # WriteLog | ERROR | Error grave conectar_sap
+        # WriteLog | ERROR | Error grave ConectarSAP
         return None
 
 

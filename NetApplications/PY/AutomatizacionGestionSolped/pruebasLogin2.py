@@ -10,7 +10,7 @@ from HU.HU01_LoginSAP import ConectarSAP
 from HU.HU04_GeneracionOC import GenerarOCDesdeSolped
 
 
-# from NetApplications.PY.AutomatizacionGestionSolped.HU.HU03_ValidacionME53N import buscar_SolpedME53N
+# from HU.HU03_ValidacionME53N import buscar_SolpedME53N
 from Funciones.EscribirLog import WriteLog
 import traceback
 from Config.settings import RUTAS, SAP_CONFIG

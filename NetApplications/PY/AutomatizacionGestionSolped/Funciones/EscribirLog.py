@@ -14,7 +14,7 @@ import datetime
 import os
 import getpass
 import socket
-from Config.init_config import in_config
+from Config.InicializarConfig import inConfig
 
 
 def WriteLog(mensaje: str, estado: str, task_name: str, path_log: str):
@@ -74,7 +74,7 @@ def WriteLog(mensaje: str, estado: str, task_name: str, path_log: str):
             f"{fecha_linea} | "
             f"{estado} | "
             f"{mensaje} | "
-            f"{in_config('CodigoRobot')} | "
+            f"{inConfig('CodigoRobot')} | "
             f"{task_name} | "
             "\n"
         )

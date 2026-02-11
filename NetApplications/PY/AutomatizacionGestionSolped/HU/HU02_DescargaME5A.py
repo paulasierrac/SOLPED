@@ -8,6 +8,7 @@
 # ============================================
 from Funciones.DescargarSolpedME5A import DescargarSolpedME5A
 from Funciones.EscribirLog import WriteLog
+from Funciones.ControlHU import control_hu
 import traceback
 from Config.settings import RUTAS
 
@@ -21,7 +22,7 @@ def EjecutarHU02(session):
     """
     try:
         task_name = "HU02_DescargaME5A"
-        control_hu(task_name=task_name, estado=0)
+        control_hu(task_name, estado=0)
         WriteLog(
             mensaje="Inicia HU02",
             estado="INFO",
@@ -32,9 +33,9 @@ def EjecutarHU02(session):
         DescargarSolpedME5A(session, estado)
         estado = "05"
         DescargarSolpedME5A(session, estado)
-        control_hu(task_name=task_name, estado=100)
+        control_hu(task_name, estado=100)
     except Exception as e:
-        control_hu(task_name=task_name, estado=99)
+        control_hu(task_name, estado=99)
         WriteLog(
             mensaje=f"ERROR GLOBAL: {e}",
             estado="ERROR",

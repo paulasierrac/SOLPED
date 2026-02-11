@@ -8,8 +8,8 @@ import unicodedata
 import warnings
 import pandas as pd
 
-from Config.InitConfig import inConfig
-from repositories.Excel import ExcelRepo
+from Config.InicializarConfig import inConfig
+from Repositories.Excel import ExcelRepo
 
 
 class ExcelService:

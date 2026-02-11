@@ -10,27 +10,20 @@
 #   - Manejo de excepciones y log por día
 # ================================
 
-from time import time
-from HU.HU04_GeneracionOC import EjecutarHU04
-from Funciones.GeneralME53N import (
-    EnviarCorreoPersonalizado,
-    NotificarRevisionManualSolped,
-    ConvertirTxtAExcel,
-    NotificarRevisionManualSolped,
-)
 from Funciones.EscribirLog import WriteLog
+from Funciones.EmailSender import EnviarNotificacionCorreo
 
 from Config.settings import RUTAS, SAP_CONFIG
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
-from HU.HU01_LoginSAP import conectar_sap, ObtenerSesionActiva
+from HU.HU01_LoginSAP import ConectarSAP, ObtenerSesionActiva
 from HU.HU02_DescargaME5A import EjecutarHU02
-from HU.HU03_ValidacionME53N import EjecutarHU03
-from Config.init_config import in_config
-from Funciones.ControlHU import control_hu
-from Funciones.GuiShellFunciones import leer_solpeds_desde_archivo
-from Funciones.EmailSender import EnviarNotificacionCorreo
+#from HU.HU03_ValidacionME53N import EjecutarHU03
+from HU.HU04_GeneracionOC import EjecutarHU04
+from HU.HU05_DescargaOC import EjecutarHU05
+
+from Config.InicializarConfig import inConfig
 from Config.settings import RUTAS, SAP_CONFIG
-import traceback
+
 
 
 def Main_GestionSolped():
@@ -42,14 +35,9 @@ def Main_GestionSolped():
         # ================================
 
         # Enviar correo de inicio
-        WriteLog(
-            mensaje="Inicio ejecución Main GestionSolped.",
-            estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
-        )
+        WriteLog(mensaje="Inicio ejecución Main GestionSolped.", estado="INFO", task_name=task_name,  path_log=RUTAS["PathLog"],)
 
-        EnviarNotificacionCorreo(codigo_correo=1, task_name=task_name)
+        #EnviarNotificacionCorreo(codigo_correo=1, task_name=task_name)
 
         # ================================
         # 1. Despliegue de ambiente
@@ -76,14 +64,15 @@ def Main_GestionSolped():
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        # session = conectar_sap(
-        #     in_config("SAP_SISTEMA"),
-        #     in_config("SAP_MANDANTE"),
+        session = ConectarSAP(inConfig("SapSistema"),inConfig("SapMandante") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
+        # session = ConectarSAP(
+        #     inConfig("SAP_SISTEMA"),
+        #     inConfig("SAP_MANDANTE"),
         #     SAP_CONFIG["user"],
         #     SAP_CONFIG["password"],
         # )
 
-        session = ObtenerSesionActiva()
+        #session = ObtenerSesionActiva()
 
         WriteLog(
             mensaje="Finaliza HU01_LoginSAP.",
@@ -102,7 +91,7 @@ def Main_GestionSolped():
             path_log=RUTAS["PathLog"],
         )
         
-        EjecutarHU02(session)
+        #EjecutarHU02(session)
 
         WriteLog(
             mensaje="HU02 finalizada correctamente.",
@@ -119,16 +108,16 @@ def Main_GestionSolped():
             "expSolped03.txt"
         ]  # Dos solped para prueba 1300139393  1300139394
         WriteLog(
-                mensaje=f"Inicia HU03 - Validación ME53N para archivo {archivo}.",
+                mensaje=f"Inicia HU03 - Validación ME53N para archivo.",
                 estado="INFO",
                 task_name=task_name,
                 path_log=RUTAS["PathLog"],
             )
-        for archivo in archivos_validar:
-            EjecutarHU03(session, archivo)
+        #for archivo in archivos_validar:
+            #EjecutarHU03(session, archivo)
 
         WriteLog(
-                mensaje=f"Finaliza HU03 - Validación ME53N para archivo {archivo}.",
+                mensaje=f"Finaliza HU03 - Validación ME53N para archivo.",
                 estado="INFO",
                 task_name=task_name,
                 path_log=RUTAS["PathLog"],
@@ -144,7 +133,7 @@ def Main_GestionSolped():
             path_log=RUTAS["PathLog"],
         )
 
-        # EjecutarHU04(session)
+        EjecutarHU04(session)
 
         WriteLog(
             mensaje="HU04 - Generación OC finalizada correctamente.",
@@ -163,7 +152,7 @@ def Main_GestionSolped():
             path_log=RUTAS["PathLog"],
         )
 
-        # EjecutarHU05(session)
+        EjecutarHU05(session)
 
         WriteLog(
             mensaje="HU05 - Descarga OC finalizada correctamente.",

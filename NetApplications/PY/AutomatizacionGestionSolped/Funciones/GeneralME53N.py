@@ -26,18 +26,7 @@ from Funciones.EmailSender import EmailSender
 from typing import List, Union
 import sys
 from openpyxl import load_workbook
-from Funciones.ValidacionME53N import (
-    DeterminarEstadoFinal,
-    ExtraerDatosTexto,
-    GenerarObservaciones,
-    GenerarReporteValidacion,
-    ProcesarYValidarItem,
-    extraerDatosReporte,
-    AppendHipervinculoObservaciones,
-    obtenerFilaExpSolped,
-    LimpiarNumeroRobusto,
-    ObtenerValorDesdeFila,
-)
+
 
 # Configurar encoding para consola de Windows
 if sys.platform == "win32":

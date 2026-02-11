@@ -5,11 +5,11 @@ import os
 
 from dotenv import load_dotenv
 from pathlib import Path
-from Config.init_config import in_config
+
 
 # Cargar .env
 load_dotenv()
-#from Config.InitConfig import inConfig
+
 
 
 # Ruta base del proyecto

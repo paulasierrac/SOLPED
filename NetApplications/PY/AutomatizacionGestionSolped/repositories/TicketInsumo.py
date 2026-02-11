@@ -1,7 +1,7 @@
 from datetime import datetime
 from Config.database import Database
 from Config.settings import DB_CONFIG
-from Config.InitConfig import inConfig 
+from Config.InicializarConfig import inConfig 
 
 schemadb = DB_CONFIG["schema"]
 
