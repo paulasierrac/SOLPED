@@ -1,4 +1,4 @@
-from config.init_config import in_config
+from Config.init_config import in_config
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
 
 

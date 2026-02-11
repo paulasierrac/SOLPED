@@ -1,6 +1,6 @@
 import pandas as pd
-from funciones.EscribirLog import WriteLog
-from config.settings import RUTAS
+from Funciones.EscribirLog import WriteLog
+from Config.settings import RUTAS
 from datetime import datetime
 from openpyxl.utils import get_column_letter
 import os
@@ -102,7 +102,7 @@ def determinar_estado_reporte(
     return "Aprobado"
 
 
-def construir_fila_reporte_final(
+def ConstruirFilaReporteFinal(
     solped,
     item,
     datos_exp,
@@ -270,7 +270,7 @@ def construir_fila_reporte_final(
 # ======================================================
 # GENERADOR DEL EXCEL FINAL
 # ======================================================
-def generar_reporte_final_excel(filas_reporte):
+def GenerarReporteFinalExcel(filas_reporte):
     """
     Genera el archivo Excel con el reporte final consolidado
 
@@ -284,7 +284,6 @@ def generar_reporte_final_excel(filas_reporte):
         if not filas_reporte:
             print("⚠️ No hay filas para generar el reporte")
             return None
-
 
         # Crear DataFrame
         df = pd.DataFrame(filas_reporte)

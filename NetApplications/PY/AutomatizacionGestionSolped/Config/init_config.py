@@ -1,5 +1,5 @@
-from repositories.parametros import ParametrosRepository
-from config.settings import DB_CONFIG
+from Repositories.parametros import ParametrosRepository
+from Config.settings import DB_CONFIG
 
 schema = DB_CONFIG.get("schema")
 

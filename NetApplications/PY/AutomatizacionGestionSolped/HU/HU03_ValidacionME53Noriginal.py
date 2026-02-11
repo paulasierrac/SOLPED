@@ -15,15 +15,15 @@ import subprocess
 import os
 import time
 import traceback
-from funciones.EscribirLog import WriteLog
-from funciones.GeneralME53N import (
+from Funciones.EscribirLog import WriteLog
+from Funciones.GeneralME53N import (
     AbrirTransaccion,
     ColsultarSolped,
-    procesarTablaME5A,
+    ProcesarTablaME5A,
     ObtenerItemTextME53N,
     ObtenerItemsME53N,
     TablaItemsDataFrame,
-    TraerSAPAlFrente_Opcion,
+    TraerSAPAlFrenteOpcion,
     ActualizarEstado,
     ActualizarEstadoYObservaciones,
     ProcesarYValidarItem,
@@ -32,11 +32,11 @@ from funciones.GeneralME53N import (
     ValidarAttachmentList,
     GenerarReporteAttachments,
     ParsearTablaAttachments,
-    convertir_txt_a_excel,
+    ConvertirTxtAExcel,
     EnviarNotificacionCorreo,
     AppendHipervinculoObservaciones,
 )
-from config.settings import RUTAS
+from Config.settings import RUTAS
 
 
 def EjecutarHU03(session, nombre_archivo):
@@ -59,10 +59,10 @@ def EjecutarHU03(session, nombre_archivo):
         )
 
         # Traer SAP al frente
-        # TraerSAPAlFrente_Opcion()
+        # TraerSAPAlFrenteOpcion()
 
         # Leer el archivo con las SOLPEDs a procesar
-        df_solpeds = procesarTablaME5A(nombre_archivo)
+        df_solpeds = ProcesarTablaME5A(nombre_archivo)
         GuardarTablaME5A(df_solpeds, nombre_archivo)
 
         if df_solpeds.empty:
@@ -796,7 +796,7 @@ def EjecutarHU03(session, nombre_archivo):
         print(f"  Notificaciones fallidas: {contadores['notificaciones_fallidas']}")
 
         # Recargar archivo para mostrar estados finales
-        df_final = procesarTablaME5A(nombre_archivo)
+        df_final = ProcesarTablaME5A(nombre_archivo)
         if not df_final.empty and "Estado" in df_final.columns:
             print("\nDISTRIBUCION FINAL DE ESTADOS:")
             resumen = df_final["Estado"].value_counts()
@@ -827,7 +827,7 @@ def EjecutarHU03(session, nombre_archivo):
 
         # Ruta del archivo a convertir
 
-        convertir_txt_a_excel(nombre_archivo)
+        ConvertirTxtAExcel(nombre_archivo)
         archivo_descargado = rf"{RUTAS['PathInsumos']}/expSolped03.xlsx"
         AppendHipervinculoObservaciones(
             ruta_excel=archivo_descargado, carpeta_reportes=RUTAS["PathReportes"]

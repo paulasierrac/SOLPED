@@ -20,15 +20,15 @@ import time
 import traceback
 import pandas as pd
 from datetime import datetime
-from funciones.EscribirLog import WriteLog
-from funciones.GeneralME53N import (
+from Funciones.EscribirLog import WriteLog
+from Funciones.GeneralME53N import (
     AbrirTransaccion,
     ColsultarSolped,
-    procesarTablaME5A,
+    ProcesarTablaME5A,
     ObtenerItemTextME53N,
     ObtenerItemsME53N,
     TablaItemsDataFrame,
-    TraerSAPAlFrente_Opcion,
+    TraerSAPAlFrenteOpcion,
     ActualizarEstado,
     ActualizarEstadoYObservaciones,
     ProcesarYValidarItem,
@@ -38,18 +38,18 @@ from funciones.GeneralME53N import (
     ParsearTablaAttachments,
     GenerarReporteAttachments,
 )
-from config.settings import RUTAS
+from Config.settings import RUTAS
 
 
 def GenerarReporteConsolidadoFinal(df_resultados, nombre_archivo_salida):
     """
     Genera un archivo de reporte consolidado en formato CSV delimitado por punto y coma (;)
     con todos los campos procesados.
-    
+
     Args:
         df_resultados: DataFrame con todos los datos procesados
         nombre_archivo_salida: Nombre del archivo de salida (sin extensión)
-    
+
     Returns:
         str: Ruta completa del archivo generado
     """
@@ -57,60 +57,97 @@ def GenerarReporteConsolidadoFinal(df_resultados, nombre_archivo_salida):
         # Definir columnas del reporte en el orden solicitado
         columnas_reporte = [
             # Datos de expSolped03.txt
-            "PurchReq", "Item", "ReqDate", "Material", "Created", "ShortText", 
-            "PO", "Quantity", "Plnt", "PGr", "Blank1", "D", "Requisnr", "ProcState",
-            
+            "PurchReq",
+            "Item",
+            "ReqDate",
+            "Material",
+            "Created",
+            "ShortText",
+            "PO",
+            "Quantity",
+            "Plnt",
+            "PGr",
+            "Blank1",
+            "D",
+            "Requisnr",
+            "ProcState",
             # Información de adjuntos
-            "Adjuntos", "Nombre de Adjunto",
-            
+            "Adjuntos",
+            "Nombre de Adjunto",
             # Datos de TablaSolped (ME53N)
-            "Material_ME53N", "Short Text_ME53N", "Quantity_ME53N", "Un", 
-            "Valn Price", "Crcy", "Total Val.", "Deliv.Date", "Fix. Vend.", 
-            "Plant", "PGr_ME53N", "POrg", "Matl Group",
-            
+            "Material_ME53N",
+            "Short Text_ME53N",
+            "Quantity_ME53N",
+            "Un",
+            "Valn Price",
+            "Crcy",
+            "Total Val.",
+            "Deliv.Date",
+            "Fix. Vend.",
+            "Plant",
+            "PGr_ME53N",
+            "POrg",
+            "Matl Group",
             # Datos extraídos del texto del item
-            "Id", "PurchReq_Texto", "Item_Texto", "Razon Social:", "NIT:", 
-            "Correo:", "Concepto:", "Cantidad:", "Valor Unitario:", 
-            "Valor Total:", "Responsable:", "CECO:",
-            
+            "Id",
+            "PurchReq_Texto",
+            "Item_Texto",
+            "Razon Social:",
+            "NIT:",
+            "Correo:",
+            "Concepto:",
+            "Cantidad:",
+            "Valor Unitario:",
+            "Valor Total:",
+            "Responsable:",
+            "CECO:",
             # Resultados de validaciones
-            "CAMPOS OBLIGATORIOS SAP ME53N:", "DATOS EXTRAIDOS Faltantes",
-            "DATOS EXTRAIDOS DEL TEXTO", "DATOS EXTRAIDOS DEL TEXTO faltantes",
-            "CANTIDAD", "VALOR_UNITARIO", "VALOR_TOTAL", "CONCEPTO",
-            "VALIDACIONES", "Estado", "Observaciones"
+            "CAMPOS OBLIGATORIOS SAP ME53N:",
+            "DATOS EXTRAIDOS Faltantes",
+            "DATOS EXTRAIDOS DEL TEXTO",
+            "DATOS EXTRAIDOS DEL TEXTO faltantes",
+            "CANTIDAD",
+            "VALOR_UNITARIO",
+            "VALOR_TOTAL",
+            "CONCEPTO",
+            "VALIDACIONES",
+            "Estado",
+            "Observaciones",
         ]
-        
+
         # Crear DataFrame para el reporte con las columnas correctas
         df_reporte = pd.DataFrame(columns=columnas_reporte)
-        
+
         # Procesar cada fila de resultados
         for idx, row in df_resultados.iterrows():
             fila_reporte = {}
-            
+
             # Copiar campos directamente del DataFrame original
             for col in columnas_reporte:
                 if col in df_resultados.columns:
                     fila_reporte[col] = row.get(col, "")
                 else:
                     fila_reporte[col] = ""
-            
+
             # Agregar fila al reporte
-            df_reporte = pd.concat([df_reporte, pd.DataFrame([fila_reporte])], ignore_index=True)
-        
+            df_reporte = pd.concat(
+                [df_reporte, pd.DataFrame([fila_reporte])], ignore_index=True
+            )
+
         # Generar nombre de archivo con fecha actual
         fecha_actual = datetime.now().strftime("%Y%m%d_%H%M%S")
         nombre_completo = f"reporte_{fecha_actual}.txt"
         ruta_completa = os.path.join(RUTAS["PathReportes"], nombre_completo)
-        
+
         # Guardar archivo delimitado por PUNTO Y COMA (;)
         df_reporte.to_csv(
-            ruta_completa, 
-            sep=';',  # Delimitador punto y coma
-            index=False, 
-            encoding='utf-8-sig',
-            na_rep=''
+            ruta_completa,
+            sep=";",  # Delimitador punto y coma
+            index=False,
+            encoding="utf-8-sig",
+            na_rep="",
         )
-        
+
         print(f"\n{'='*80}")
         WriteLog(
             mensaje=f"Generación de reporte consolidado iniciada",
@@ -118,7 +155,7 @@ def GenerarReporteConsolidadoFinal(df_resultados, nombre_archivo_salida):
             task_name="GenerarReporteConsolidado",
             path_log=RUTAS["PathLog"],
         )
-        
+
         print(f"REPORTE CONSOLIDADO GENERADO EXITOSAMENTE")
         WriteLog(
             mensaje=f"Reporte consolidado generado exitosamente: {nombre_completo}",
@@ -126,7 +163,7 @@ def GenerarReporteConsolidadoFinal(df_resultados, nombre_archivo_salida):
             task_name="GenerarReporteConsolidado",
             path_log=RUTAS["PathLog"],
         )
-        
+
         print(f"📁 Archivo: {nombre_completo}")
         print(f"📂 Ubicación: {ruta_completa}")
         print(f"📊 Total de registros: {len(df_reporte)}")
@@ -137,11 +174,11 @@ def GenerarReporteConsolidadoFinal(df_resultados, nombre_archivo_salida):
             task_name="GenerarReporteConsolidado",
             path_log=RUTAS["PathLog"],
         )
-        
+
         print(f"{'='*80}\n")
-        
+
         return ruta_completa
-        
+
     except Exception as e:
         print(f"Error al generar reporte consolidado: {e}")
         WriteLog(
@@ -164,11 +201,11 @@ def NormalizarNombreColumna(nombre):
         "Val. Price": "Valn Price",
         "Value": "Val.",
     }
-    
+
     for original, normalizado in normalizaciones.items():
         if original in nombre:
             return nombre.replace(original, normalizado)
-    
+
     return nombre
 
 
@@ -179,19 +216,21 @@ def ObtenerValorTabla(df_tabla, columna, valor_default=""):
     # Intentar primero el nombre exacto
     if columna in df_tabla.columns:
         return df_tabla[columna].iloc[0] if len(df_tabla) > 0 else valor_default
-    
+
     # Intentar variaciones comunes
     variaciones = {
         "Total Val.": ["Total Value", "Total Val", "TotalValue"],
         "Valn Price": ["Val. Price", "Value Price", "Val Price"],
         "Short Text": ["ShortText", "Short_Text"],
     }
-    
+
     if columna in variaciones:
         for variacion in variaciones[columna]:
             if variacion in df_tabla.columns:
-                return df_tabla[variacion].iloc[0] if len(df_tabla) > 0 else valor_default
-    
+                return (
+                    df_tabla[variacion].iloc[0] if len(df_tabla) > 0 else valor_default
+                )
+
     return valor_default
 
 
@@ -200,9 +239,9 @@ def EjecutarHU03(session, nombre_archivo):
         task_name = "HU03_ValidacionME53N"
 
         # === Inicio HU03 ===
-        print("="*80)
+        print("=" * 80)
         print("INICIO HU03 - Validación ME53N con generación de reporte consolidado v3")
-        print("="*80)
+        print("=" * 80)
         WriteLog(
             mensaje="Inicio HU03 - Validación ME53N con generación de reporte consolidado v3 (delimitador: ;)",
             estado="INFO",
@@ -211,10 +250,10 @@ def EjecutarHU03(session, nombre_archivo):
         )
 
         # Traer SAP al frente
-        TraerSAPAlFrente_Opcion()
+        TraerSAPAlFrenteOpcion()
 
         # Leer el archivo con las SOLPEDs a procesar
-        df_solpeds = procesarTablaME5A(nombre_archivo)
+        df_solpeds = ProcesarTablaME5A(nombre_archivo)
         GuardarTablaME5A(df_solpeds, nombre_archivo)
 
         if df_solpeds.empty:
@@ -231,7 +270,9 @@ def EjecutarHU03(session, nombre_archivo):
         columnas_requeridas = ["Estado", "Observaciones"]
         for columna in columnas_requeridas:
             if columna not in df_solpeds.columns:
-                print(f"ERROR: Columna requerida '{columna}' no encontrada en el DataFrame")
+                print(
+                    f"ERROR: Columna requerida '{columna}' no encontrada en el DataFrame"
+                )
                 WriteLog(
                     mensaje=f"No se encontró la columna requerida: {columna}",
                     estado="ERROR",
@@ -245,31 +286,66 @@ def EjecutarHU03(session, nombre_archivo):
         # ============================================================
         columnas_reporte = [
             # Datos de expSolped03.txt
-            "PurchReq", "Item", "ReqDate", "Material", "Created", "ShortText", 
-            "PO", "Quantity", "Plnt", "PGr", "Blank1", "D", "Requisnr", "ProcState",
-            
+            "PurchReq",
+            "Item",
+            "ReqDate",
+            "Material",
+            "Created",
+            "ShortText",
+            "PO",
+            "Quantity",
+            "Plnt",
+            "PGr",
+            "Blank1",
+            "D",
+            "Requisnr",
+            "ProcState",
             # Información de adjuntos
-            "Adjuntos", "Nombre de Adjunto",
-            
+            "Adjuntos",
+            "Nombre de Adjunto",
             # Datos de TablaSolped (ME53N)
-            "Material_ME53N", "Short Text_ME53N", "Quantity_ME53N", "Un", 
-            "Valn Price", "Crcy", "Total Val.", "Deliv.Date", "Fix. Vend.", 
-            "Plant", "PGr_ME53N", "POrg", "Matl Group",
-            
+            "Material_ME53N",
+            "Short Text_ME53N",
+            "Quantity_ME53N",
+            "Un",
+            "Valn Price",
+            "Crcy",
+            "Total Val.",
+            "Deliv.Date",
+            "Fix. Vend.",
+            "Plant",
+            "PGr_ME53N",
+            "POrg",
+            "Matl Group",
             # Datos extraídos del texto del item
-            "Id", "PurchReq_Texto", "Item_Texto", "Razon Social:", "NIT:", 
-            "Correo:", "Concepto:", "Cantidad:", "Valor Unitario:", 
-            "Valor Total:", "Responsable:", "CECO:",
-            
+            "Id",
+            "PurchReq_Texto",
+            "Item_Texto",
+            "Razon Social:",
+            "NIT:",
+            "Correo:",
+            "Concepto:",
+            "Cantidad:",
+            "Valor Unitario:",
+            "Valor Total:",
+            "Responsable:",
+            "CECO:",
             # Resultados de validaciones
-            "CAMPOS OBLIGATORIOS SAP ME53N:", "DATOS EXTRAIDOS Faltantes",
-            "DATOS EXTRAIDOS DEL TEXTO", "DATOS EXTRAIDOS DEL TEXTO faltantes",
-            "CANTIDAD", "VALOR_UNITARIO", "VALOR_TOTAL", "CONCEPTO",
-            "VALIDACIONES", "Estado", "Observaciones"
+            "CAMPOS OBLIGATORIOS SAP ME53N:",
+            "DATOS EXTRAIDOS Faltantes",
+            "DATOS EXTRAIDOS DEL TEXTO",
+            "DATOS EXTRAIDOS DEL TEXTO faltantes",
+            "CANTIDAD",
+            "VALOR_UNITARIO",
+            "VALOR_TOTAL",
+            "CONCEPTO",
+            "VALIDACIONES",
+            "Estado",
+            "Observaciones",
         ]
-        
+
         df_reporte_consolidado = pd.DataFrame(columns=columnas_reporte)
-        
+
         # === Limpieza de SOLPEDs válidas ===
         solped_unicos = df_solpeds["PurchReq"].unique().tolist()
 
@@ -414,7 +490,7 @@ def EjecutarHU03(session, nombre_archivo):
                         df_solpeds,
                         nombre_archivo,
                         solped,
-                        nuevo_estado="Error consulta"
+                        nuevo_estado="Error consulta",
                     )
                     contadores["con_errores"] += 1
                     continue
@@ -429,21 +505,23 @@ def EjecutarHU03(session, nombre_archivo):
                     task_name=task_name,
                     path_log=RUTAS["PathLog"],
                 )
-                
-                tiene_attachments, contenido_attachments, observaciones_attachments = ValidarAttachmentList(session, solped)
-                
+
+                tiene_attachments, contenido_attachments, observaciones_attachments = (
+                    ValidarAttachmentList(session, solped)
+                )
+
                 # Parsear attachments para información detallada
                 attachments_lista = []
                 if contenido_attachments:
                     attachments_lista = ParsearTablaAttachments(contenido_attachments)
-                
+
                 cantidad_adjuntos = 0
                 nombres_adjuntos = []
-                
+
                 if tiene_attachments:
                     cantidad_adjuntos = len(attachments_lista)
                     nombres_adjuntos = [att["title"] for att in attachments_lista]
-                    
+
                     print(f"Encontrados {cantidad_adjuntos} adjuntos en SAP")
                     if cantidad_adjuntos <= 5:
                         for i, nombre in enumerate(nombres_adjuntos, 1):
@@ -452,17 +530,17 @@ def EjecutarHU03(session, nombre_archivo):
                         for i, nombre in enumerate(nombres_adjuntos[:3], 1):
                             print(f"   {i}. {nombre[:60]}")
                         print(f"   ... y {cantidad_adjuntos - 3} más")
-                    
+
                     # GUARDAR SOLO EN WRITELOG (NO EN ARCHIVO)
                     WriteLog(
                         mensaje=f"SOLPED {solped}: {cantidad_adjuntos} adjunto(s) encontrado(s) en SAP\n"
-                                f"Nombres: {', '.join(nombres_adjuntos)}\n"
-                                f"Contenido completo:\n{contenido_attachments}",
+                        f"Nombres: {', '.join(nombres_adjuntos)}\n"
+                        f"Contenido completo:\n{contenido_attachments}",
                         estado="INFO",
                         task_name=task_name,
                         path_log=RUTAS["PathLog"],
                     )
-                    
+
                     print(f"SOLPED {solped} tiene attachments - Continuando validación")
                 else:
                     print(f"No se encontraron adjuntos en SAP para SOLPED {solped}")
@@ -472,23 +550,29 @@ def EjecutarHU03(session, nombre_archivo):
                         task_name=task_name,
                         path_log=RUTAS["PathLog"],
                     )
-                    
+
                     # MARCAR SOLPED COMO RECHAZADA POR FALTA DE ADJUNTOS
                     print(f"\nSOLPED {solped} SERÁ RECHAZADA: Sin archivos adjuntos")
-                    print(f" Continuando con validaciones de items para reporte completo...")
-                    
+                    print(
+                        f" Continuando con validaciones de items para reporte completo..."
+                    )
+
                     contadores["rechazadas_sin_attachments"] += 1
                     solped_rechazada_por_attachments = True
                     requiere_notificacion = True
 
                 adjuntos_info = str(cantidad_adjuntos)
-                nombres_adjuntos_str = ", ".join(nombres_adjuntos) if nombres_adjuntos else ""
+                nombres_adjuntos_str = (
+                    ", ".join(nombres_adjuntos) if nombres_adjuntos else ""
+                )
 
                 # === OBTENER ITEMS DE LA SOLPED ===
                 dtItems = ObtenerItemsME53N(session, solped)
 
                 # CORREGIDO: Usar .empty en lugar de not dtItems
-                if dtItems is None or (isinstance(dtItems, pd.DataFrame) and dtItems.empty):
+                if dtItems is None or (
+                    isinstance(dtItems, pd.DataFrame) and dtItems.empty
+                ):
                     print(f"SOLPED {solped} sin items o no se pudieron obtener")
                     WriteLog(
                         mensaje=f"SOLPED {solped} sin items o no se pudieron obtener",
@@ -497,10 +581,7 @@ def EjecutarHU03(session, nombre_archivo):
                         path_log=RUTAS["PathLog"],
                     )
                     ActualizarEstado(
-                        df_solpeds,
-                        nombre_archivo,
-                        solped,
-                        nuevo_estado="Sin items"
+                        df_solpeds, nombre_archivo, solped, nuevo_estado="Sin items"
                     )
                     contadores["sin_items"] += 1
                     continue
@@ -521,9 +602,11 @@ def EjecutarHU03(session, nombre_archivo):
 
                 # === OBTENER TABLA DE DATOS ME53N ===
                 df_tabla_me53n = TablaItemsDataFrame(session, solped)
-                
+
                 if df_tabla_me53n.empty:
-                    print(f"No se pudo obtener la tabla de datos ME53N para SOLPED {solped}")
+                    print(
+                        f"No se pudo obtener la tabla de datos ME53N para SOLPED {solped}"
+                    )
                     WriteLog(
                         mensaje=f"No se pudo obtener tabla ME53N para SOLPED {solped}",
                         estado="WARNING",
@@ -532,7 +615,9 @@ def EjecutarHU03(session, nombre_archivo):
                     )
                 else:
                     # Normalizar nombres de columnas
-                    df_tabla_me53n.columns = [NormalizarNombreColumna(col) for col in df_tabla_me53n.columns]
+                    df_tabla_me53n.columns = [
+                        NormalizarNombreColumna(col) for col in df_tabla_me53n.columns
+                    ]
                     print(f"Tabla ME53N obtenida con {len(df_tabla_me53n)} registros")
                     WriteLog(
                         mensaje=f"Tabla ME53N obtenida para SOLPED {solped}: {len(df_tabla_me53n)} registros",
@@ -560,8 +645,10 @@ def EjecutarHU03(session, nombre_archivo):
                     item_str = str(numero_item).strip()
                     solped_str = str(solped).strip()
                     id_item = f"{solped_str}{item_str}"
-                    
-                    print(f"📌 ID generado: {id_item} (SOLPED: {solped_str} + Item: {item_str})")
+
+                    print(
+                        f"📌 ID generado: {id_item} (SOLPED: {solped_str} + Item: {item_str})"
+                    )
                     WriteLog(
                         mensaje=f"ID generado: {id_item} (SOLPED: {solped_str} + Item: {item_str})",
                         estado="INFO",
@@ -570,9 +657,10 @@ def EjecutarHU03(session, nombre_archivo):
                     )
 
                     # Obtener datos del item desde expSolped03
-                    mask_item = (df_solpeds["PurchReq"].astype(str).str.strip() == solped_str) & \
-                               (df_solpeds["Item"].astype(str).str.strip() == item_str)
-                    
+                    mask_item = (
+                        df_solpeds["PurchReq"].astype(str).str.strip() == solped_str
+                    ) & (df_solpeds["Item"].astype(str).str.strip() == item_str)
+
                     datos_expsolped = {}
                     if mask_item.any():
                         fila_item = df_solpeds[mask_item].iloc[0]
@@ -600,36 +688,88 @@ def EjecutarHU03(session, nombre_archivo):
                     # Obtener datos de la tabla ME53N para este item
                     datos_me53n = {}
                     if not df_tabla_me53n.empty:
-                        mask_tabla = df_tabla_me53n["Item"].astype(str).str.strip() == item_str
+                        mask_tabla = (
+                            df_tabla_me53n["Item"].astype(str).str.strip() == item_str
+                        )
                         if mask_tabla.any():
                             fila_tabla = df_tabla_me53n[mask_tabla].iloc[0]
-                            
+
                             datos_me53n = {
-                                "Material_ME53N": str(ObtenerValorTabla(fila_tabla.to_frame().T, "Material", "")).strip(),
-                                "Short Text_ME53N": str(ObtenerValorTabla(fila_tabla.to_frame().T, "Short Text", "")).strip(),
-                                "Quantity_ME53N": str(ObtenerValorTabla(fila_tabla.to_frame().T, "Quantity", "")).strip(),
-                                "Un": str(ObtenerValorTabla(fila_tabla.to_frame().T, "Un", "")).strip(),
-                                "Valn Price": str(ObtenerValorTabla(fila_tabla.to_frame().T, "Valn Price", "")).strip(),
-                                "Crcy": str(ObtenerValorTabla(fila_tabla.to_frame().T, "Crcy", "")).strip(),
-                                "Total Val.": str(ObtenerValorTabla(fila_tabla.to_frame().T, "Total Val.", "")).strip(),
-                                "Deliv.Date": str(ObtenerValorTabla(fila_tabla.to_frame().T, "Deliv.Date", "")).strip(),
-                                "Fix. Vend.": str(ObtenerValorTabla(fila_tabla.to_frame().T, "Fix. Vend.", "")).strip(),
-                                "Plant": str(ObtenerValorTabla(fila_tabla.to_frame().T, "Plant", "")).strip(),
-                                "PGr_ME53N": str(ObtenerValorTabla(fila_tabla.to_frame().T, "PGr", "")).strip(),
-                                "POrg": str(ObtenerValorTabla(fila_tabla.to_frame().T, "POrg", "")).strip(),
-                                "Matl Group": str(ObtenerValorTabla(fila_tabla.to_frame().T, "Matl Group", "")).strip(),
+                                "Material_ME53N": str(
+                                    ObtenerValorTabla(
+                                        fila_tabla.to_frame().T, "Material", ""
+                                    )
+                                ).strip(),
+                                "Short Text_ME53N": str(
+                                    ObtenerValorTabla(
+                                        fila_tabla.to_frame().T, "Short Text", ""
+                                    )
+                                ).strip(),
+                                "Quantity_ME53N": str(
+                                    ObtenerValorTabla(
+                                        fila_tabla.to_frame().T, "Quantity", ""
+                                    )
+                                ).strip(),
+                                "Un": str(
+                                    ObtenerValorTabla(fila_tabla.to_frame().T, "Un", "")
+                                ).strip(),
+                                "Valn Price": str(
+                                    ObtenerValorTabla(
+                                        fila_tabla.to_frame().T, "Valn Price", ""
+                                    )
+                                ).strip(),
+                                "Crcy": str(
+                                    ObtenerValorTabla(
+                                        fila_tabla.to_frame().T, "Crcy", ""
+                                    )
+                                ).strip(),
+                                "Total Val.": str(
+                                    ObtenerValorTabla(
+                                        fila_tabla.to_frame().T, "Total Val.", ""
+                                    )
+                                ).strip(),
+                                "Deliv.Date": str(
+                                    ObtenerValorTabla(
+                                        fila_tabla.to_frame().T, "Deliv.Date", ""
+                                    )
+                                ).strip(),
+                                "Fix. Vend.": str(
+                                    ObtenerValorTabla(
+                                        fila_tabla.to_frame().T, "Fix. Vend.", ""
+                                    )
+                                ).strip(),
+                                "Plant": str(
+                                    ObtenerValorTabla(
+                                        fila_tabla.to_frame().T, "Plant", ""
+                                    )
+                                ).strip(),
+                                "PGr_ME53N": str(
+                                    ObtenerValorTabla(
+                                        fila_tabla.to_frame().T, "PGr", ""
+                                    )
+                                ).strip(),
+                                "POrg": str(
+                                    ObtenerValorTabla(
+                                        fila_tabla.to_frame().T, "POrg", ""
+                                    )
+                                ).strip(),
+                                "Matl Group": str(
+                                    ObtenerValorTabla(
+                                        fila_tabla.to_frame().T, "Matl Group", ""
+                                    )
+                                ).strip(),
                             }
 
                     # ============================================================
                     # OBTENER Y VALIDAR TEXTO DEL ITEM
                     # ============================================================
                     texto = ObtenerItemTextME53N(session, solped, numero_item)
-                    
+
                     datos_validacion = {}
-                    
+
                     if texto and texto.strip():
                         items_sin_texto += 0
-                        
+
                         # VALIDACION COMPLETA DEL TEXTO
                         resultado = ProcesarYValidarItem(
                             session,
@@ -641,41 +781,65 @@ def EjecutarHU03(session, nombre_archivo):
                             observaciones_attachments,
                             attachments_lista,
                         )
-                        
+
                         # Extraer componentes del resultado (tupla de 5 elementos)
                         datos_texto = resultado[0] if len(resultado) > 0 else {}
                         validaciones = resultado[1] if len(resultado) > 1 else {}
                         reporte = resultado[2] if len(resultado) > 2 else ""
                         estado_final = resultado[3] if len(resultado) > 3 else ""
                         observaciones = resultado[4] if len(resultado) > 4 else ""
-                        
+
                         # Construir datos de validación
                         datos_validacion = {
                             "Id": id_item,
                             "PurchReq_Texto": solped_str,
                             "Item_Texto": item_str,
-                            "Razon Social:": str(datos_texto.get("razon_social", "")).strip(),
+                            "Razon Social:": str(
+                                datos_texto.get("razon_social", "")
+                            ).strip(),
                             "NIT:": str(datos_texto.get("nit", "")).strip(),
                             "Correo:": str(datos_texto.get("correo", "")).strip(),
-                            "Concepto:": str(datos_texto.get("concepto_compra", "")).strip(),
+                            "Concepto:": str(
+                                datos_texto.get("concepto_compra", "")
+                            ).strip(),
                             "Cantidad:": str(datos_texto.get("cantidad", "")).strip(),
-                            "Valor Unitario:": str(datos_texto.get("valor_unitario", "")).strip(),
-                            "Valor Total:": str(datos_texto.get("valor_total", "")).strip(),
-                            "Responsable:": str(datos_texto.get("responsable", "")).strip(),
+                            "Valor Unitario:": str(
+                                datos_texto.get("valor_unitario", "")
+                            ).strip(),
+                            "Valor Total:": str(
+                                datos_texto.get("valor_total", "")
+                            ).strip(),
+                            "Responsable:": str(
+                                datos_texto.get("responsable", "")
+                            ).strip(),
                             "CECO:": str(datos_texto.get("ceco", "")).strip(),
-                            "CAMPOS OBLIGATORIOS SAP ME53N:": str(validaciones.get("campos_obligatorios", "")).strip(),
-                            "DATOS EXTRAIDOS Faltantes": str(validaciones.get("datos_extraidos_faltantes", "")).strip(),
-                            "DATOS EXTRAIDOS DEL TEXTO": str(validaciones.get("datos_extraidos_texto", "")).strip(),
-                            "DATOS EXTRAIDOS DEL TEXTO faltantes": str(validaciones.get("datos_texto_faltantes", "")).strip(),
+                            "CAMPOS OBLIGATORIOS SAP ME53N:": str(
+                                validaciones.get("campos_obligatorios", "")
+                            ).strip(),
+                            "DATOS EXTRAIDOS Faltantes": str(
+                                validaciones.get("datos_extraidos_faltantes", "")
+                            ).strip(),
+                            "DATOS EXTRAIDOS DEL TEXTO": str(
+                                validaciones.get("datos_extraidos_texto", "")
+                            ).strip(),
+                            "DATOS EXTRAIDOS DEL TEXTO faltantes": str(
+                                validaciones.get("datos_texto_faltantes", "")
+                            ).strip(),
                             "CANTIDAD": str(validaciones.get("cantidad", "")).strip(),
-                            "VALOR_UNITARIO": str(validaciones.get("valor_unitario", "")).strip(),
-                            "VALOR_TOTAL": str(validaciones.get("valor_total", "")).strip(),
+                            "VALOR_UNITARIO": str(
+                                validaciones.get("valor_unitario", "")
+                            ).strip(),
+                            "VALOR_TOTAL": str(
+                                validaciones.get("valor_total", "")
+                            ).strip(),
                             "CONCEPTO": str(validaciones.get("concepto", "")).strip(),
-                            "VALIDACIONES": str(validaciones.get("resumen_validaciones", "")).strip(),
+                            "VALIDACIONES": str(
+                                validaciones.get("resumen_validaciones", "")
+                            ).strip(),
                             "Estado": str(estado_final).strip(),
                             "Observaciones": str(observaciones).strip(),
                         }
-                        
+
                         # Verificar si el item requiere revisión
                         if "validado" in estado_final.lower():
                             items_ok += 1
@@ -698,11 +862,15 @@ def EjecutarHU03(session, nombre_archivo):
                                 task_name=task_name,
                                 path_log=RUTAS["PathLog"],
                             )
-                            
+
                             # Extraer correos responsables
                             if datos_texto.get("responsable"):
-                                correos_resp = str(datos_texto.get("responsable", "")).split(",")
-                                correos_responsables.extend([c.strip() for c in correos_resp if c.strip()])
+                                correos_resp = str(
+                                    datos_texto.get("responsable", "")
+                                ).split(",")
+                                correos_responsables.extend(
+                                    [c.strip() for c in correos_resp if c.strip()]
+                                )
                     else:
                         # Item sin texto
                         items_sin_texto += 1
@@ -714,7 +882,7 @@ def EjecutarHU03(session, nombre_archivo):
                             task_name=task_name,
                             path_log=RUTAS["PathLog"],
                         )
-                        
+
                         # Datos mínimos
                         datos_validacion = {
                             "Id": id_item,
@@ -731,10 +899,10 @@ def EjecutarHU03(session, nombre_archivo):
                     datos_completos_item.update(datos_validacion)
 
                     # Agregar al DataFrame de reporte consolidado
-                    df_reporte_consolidado = pd.concat([
-                        df_reporte_consolidado, 
-                        pd.DataFrame([datos_completos_item])
-                    ], ignore_index=True)
+                    df_reporte_consolidado = pd.concat(
+                        [df_reporte_consolidado, pd.DataFrame([datos_completos_item])],
+                        ignore_index=True,
+                    )
 
                     print(f"Item {numero_item} agregado al reporte con Id: {id_item}")
                     WriteLog(
@@ -760,7 +928,7 @@ def EjecutarHU03(session, nombre_archivo):
                     nombre_archivo,
                     solped,
                     nuevo_estado=estado_final,
-                    observaciones=obs_final
+                    observaciones=obs_final,
                 )
 
                 contadores["procesadas_exitosamente"] += 1
@@ -782,10 +950,7 @@ def EjecutarHU03(session, nombre_archivo):
                 )
                 traceback.print_exc()
                 ActualizarEstado(
-                    df_solpeds,
-                    nombre_archivo,
-                    solped,
-                    nuevo_estado="Error"
+                    df_solpeds, nombre_archivo, solped, nuevo_estado="Error"
                 )
                 contadores["con_errores"] += 1
 
@@ -804,12 +969,11 @@ def EjecutarHU03(session, nombre_archivo):
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        
+
         ruta_reporte = GenerarReporteConsolidado(
-            GenerarReporteConsolidado,
-            nombre_archivo
+            GenerarReporteConsolidado, nombre_archivo
         )
-        
+
         if ruta_reporte:
             WriteLog(
                 mensaje=f"Reporte consolidado generado exitosamente: {ruta_reporte}",
@@ -829,20 +993,24 @@ def EjecutarHU03(session, nombre_archivo):
         print(f"\n{'='*80}")
         print("RESUMEN FINAL DE PROCESAMIENTO")
         print(f"{'='*80}")
-        print(f"📊 SOLPEDs procesadas: {contadores['procesadas_exitosamente']}/{contadores['total_solpeds']}")
+        print(
+            f"📊 SOLPEDs procesadas: {contadores['procesadas_exitosamente']}/{contadores['total_solpeds']}"
+        )
         print(f"📋 Items procesados: {contadores['items_procesados']}")
         print(f"Items validados: {contadores['items_validados']}")
         print(f"Items para verificación: {contadores['items_verificar_manual']}")
         print(f"🚫 Items sin texto: {contadores['items_sin_texto']}")
-        print(f"SOLPEDs rechazadas (sin adjuntos): {contadores['rechazadas_sin_attachments']}")
+        print(
+            f"SOLPEDs rechazadas (sin adjuntos): {contadores['rechazadas_sin_attachments']}"
+        )
         if ruta_reporte:
             print(f"📄 Reporte consolidado: {os.path.basename(ruta_reporte)}")
         print(f"{'='*80}\n")
-        
+
         WriteLog(
             mensaje=f"Resumen final - SOLPEDs: {contadores['procesadas_exitosamente']}/{contadores['total_solpeds']}, "
-                    f"Items: {contadores['items_procesados']}, Validados: {contadores['items_validados']}, "
-                    f"Revisar: {contadores['items_verificar_manual']}, Sin texto: {contadores['items_sin_texto']}",
+            f"Items: {contadores['items_procesados']}, Validados: {contadores['items_validados']}, "
+            f"Revisar: {contadores['items_verificar_manual']}, Sin texto: {contadores['items_sin_texto']}",
             estado="INFO",
             task_name=task_name,
             path_log=RUTAS["PathLog"],

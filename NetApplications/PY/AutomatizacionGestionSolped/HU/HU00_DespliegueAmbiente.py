@@ -10,9 +10,9 @@
 import os
 import json
 
-from config.init_config import init_config
+from Config.init_config import init_config
 
-# from config.init_config import init_config
+# from Config.init_config import init_config
 
 
 def EjecutarHU00():

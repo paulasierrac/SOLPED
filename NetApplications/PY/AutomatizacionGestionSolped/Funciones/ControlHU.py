@@ -1,4 +1,4 @@
-from repositories.ControlHU import ControlHURepo
+from Repositories.ControlHU import ControlHURepo
 import socket
 import re
 

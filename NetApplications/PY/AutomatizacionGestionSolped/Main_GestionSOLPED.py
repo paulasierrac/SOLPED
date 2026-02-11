@@ -12,24 +12,24 @@
 
 from time import time
 from HU.HU04_GeneracionOC import EjecutarHU04
-from funciones.GeneralME53N import (
+from Funciones.GeneralME53N import (
     EnviarCorreoPersonalizado,
     NotificarRevisionManualSolped,
-    convertir_txt_a_excel,
+    ConvertirTxtAExcel,
     NotificarRevisionManualSolped,
 )
-from funciones.EscribirLog import WriteLog
+from Funciones.EscribirLog import WriteLog
 
-from config.settings import RUTAS, SAP_CONFIG
+from Config.settings import RUTAS, SAP_CONFIG
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
 from HU.HU01_LoginSAP import conectar_sap, ObtenerSesionActiva
 from HU.HU02_DescargaME5A import EjecutarHU02
 from HU.HU03_ValidacionME53N import EjecutarHU03
-from config.init_config import in_config
+from Config.init_config import in_config
 
-from funciones.GuiShellFunciones import leer_solpeds_desde_archivo
-from funciones.EmailSender import EnviarNotificacionCorreo
-from config.settings import RUTAS, SAP_CONFIG
+from Funciones.GuiShellFunciones import leer_solpeds_desde_archivo
+from Funciones.EmailSender import EnviarNotificacionCorreo
+from Config.settings import RUTAS, SAP_CONFIG
 import traceback
 
 
@@ -122,8 +122,8 @@ def Main_GestionSolped():
                 path_log=RUTAS["PathLog"],
             )
 
-            EjecutarHU03(session, archivo)
-            # convertir_txt_a_excel(archivo)
+            # EjecutarHU03(session, archivo)
+            # ConvertirTxtAExcel(archivo)
 
             WriteLog(
                 mensaje=f"HU03 finalizada correctamente para archivo {archivo}.",
@@ -205,7 +205,7 @@ def Main_GestionSolped():
         # Fin de Main
         # ================================
         # Enviar correo de Finalización
-        EnviarNotificacionCorreo(codigo_correo=17, task_name=task_name, adjuntos=[])
+        EnviarNotificacionCorreo(codigo_correo=2, task_name=task_name, adjuntos=[])
 
         WriteLog(
             mensaje="Main GestionSolped finalizado correctamente.",

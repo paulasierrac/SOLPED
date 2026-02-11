@@ -5,8 +5,8 @@ import unicodedata
 import warnings
 import pandas as pd
 
-from config.init_config import in_config
-from repositories.Excel import ExcelRepo
+from Config.init_config import in_config
+from Repositories.Excel import ExcelRepo
 
 
 class ExcelService:

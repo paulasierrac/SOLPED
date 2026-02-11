@@ -3,24 +3,23 @@ import time
 import getpass
 import subprocess
 import os
-from config.init_config import in_config
-from config.settings import RUTAS, SAP_CONFIG 
-from funciones.ValidacionM21N import ventana_abierta
+from Config.init_config import in_config
+from Config.settings import RUTAS, SAP_CONFIG
+from Funciones.ValidacionM21N import ventana_abierta
 
 import pyautogui
 
 
-
 def abrir_sap_logon():
     """Abre SAP Logon si no está ya abierto."""
-    #SAP_CONFIG = get_sap_config()
+    # SAP_CONFIG = get_sap_config()
     try:
         # Verificar si SAP ya está abierto
         sapgui = win32com.client.GetObject("SAPGUI")
         return True
     except:
         # Si no está abierto, se lanza el ejecutable
-        #"logon_path": get_env_variable("SAP_LOGON_PATH"),
+        # "logon_path": get_env_variable("SAP_LOGON_PATH"),
         subprocess.Popen(in_config("SAP_LOGON_PATH"))
         time.sleep(5)  # Esperar a que abra SAP Logon
         return False
@@ -92,7 +91,7 @@ def conectar_sap(conexion, mandante, usuario, password, idioma="ES"):
                 ruta_imagen=rf".\img\logindiag.png",
                 confidence=0.5,
                 intentos=20,
-                espera=0.5
+                espera=0.5,
             ):
                 print("Ventana loginDiag Copyrigth inesperada superada correctamente")
         except Exception as e:
@@ -125,13 +124,12 @@ def ObtenerSesionActiva():
         return None
 
 
-
 def validarLoginDiag(ruta_imagen, confidence=0.5, intentos=3, espera=0.5):
     """
     Busca una imagen en pantalla y hace Enter cuando la encuentra.
 
     Args:
-    
+
         ruta_imagen (str): Ruta de la imagen a buscar.
         confidence (float): Confianza para el match (requiere OpenCV).
         intentos (int): Número de intentos antes de fallar.
@@ -150,4 +148,3 @@ def validarLoginDiag(ruta_imagen, confidence=0.5, intentos=3, espera=0.5):
 
     print(f" No se encontró la ventana login diag: {ruta_imagen}")
     return False
-

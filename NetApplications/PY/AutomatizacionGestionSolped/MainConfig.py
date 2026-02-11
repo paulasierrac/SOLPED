@@ -1,6 +1,6 @@
-from config.init_config import in_config
+from Config.init_config import in_config
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
-from funciones.FuncionesExcel import ExcelService
+from Funciones.FuncionesExcel import ExcelService
 import pandas as pd
 
 

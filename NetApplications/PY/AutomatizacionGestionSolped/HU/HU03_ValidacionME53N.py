@@ -17,36 +17,46 @@ import getpass
 import subprocess
 import os
 import traceback
-from funciones.EmailSender import EnviarNotificacionCorreo
-from funciones.ReporteFinalME53N import (
-    construir_fila_reporte_final,
-    generar_reporte_final_excel,
+from Funciones.EmailSender import EnviarNotificacionCorreo
+from Funciones.ReporteFinalME53N import (
+    ConstruirFilaReporteFinal,
+    GenerarReporteFinalExcel,
 )
-from funciones.EscribirLog import WriteLog
-from funciones.GeneralME53N import (
+from Funciones.EscribirLog import WriteLog
+from Funciones.GeneralME53N import (
     AbrirTransaccion,
     ColsultarSolped,
-    procesarTablaME5A,
-    ObtenerItemTextME53N,
-    ObtenerItemsME53N,
-    TablaItemsDataFrame,
-    TraerSAPAlFrente_Opcion,
+    TraerSAPAlFrenteOpcion,
     ActualizarEstado,
     ActualizarEstadoYObservaciones,
-    ProcesarYValidarItem,
-    GuardarTablaME5A,
     NotificarRevisionManualSolped,
-    ValidarAttachmentList,
     GenerarReporteAttachments,
-    ParsearTablaAttachments,
-    convertir_txt_a_excel,
+    ConvertirTxtAExcel,
     AppendHipervinculoObservaciones,
-    obtener_fila_expsolped,
-    limpiar_numero_robusto,
-    obtener_valor_desde_fila,
+    obtenerFilaExpSolped,
 )
-from config.settings import RUTAS
-from funciones.FuncionesExcel import ExcelService
+from Funciones.SAPFuncionesME53N import (
+    ProcesarTablaME5A,
+    ObtenerItemTextME53N,
+    ObtenerItemsME53N,
+    GuardarTablaME5A,
+    ValidarAttachmentList,
+)
+
+from Config.settings import RUTAS
+from Funciones.FuncionesExcel import ExcelService
+from Funciones.ValidacionME53N import (
+    DeterminarEstadoFinal,
+    ExtraerDatosTexto,
+    GenerarObservaciones,
+    GenerarReporteValidacion,
+    ProcesarYValidarItem,
+    extraerDatosReporte,
+    AppendHipervinculoObservaciones,
+    obtenerFilaExpSolped,
+    LimpiarNumeroRobusto,
+    ObtenerValorDesdeFila,
+)
 
 
 def EjecutarHU03(session, nombre_archivo):
@@ -55,7 +65,7 @@ def EjecutarHU03(session, nombre_archivo):
         # CONFIGURACIÓN DEL PROCESO
         # ==========================
         task_name = "HU03_ValidacionME53N"
-        TraerSAPAlFrente_Opcion()
+        TraerSAPAlFrenteOpcion()
         # === Inicio HU03 ===
         WriteLog(
             mensaje="Inicio HU03 - Validación ME53N (Versión Corregida)",
@@ -65,7 +75,7 @@ def EjecutarHU03(session, nombre_archivo):
         )
 
         # Leer el archivo con las SOLPEDs a procesar
-        df_solpeds = procesarTablaME5A(nombre_archivo)
+        df_solpeds = ProcesarTablaME5A(nombre_archivo)
         GuardarTablaME5A(df_solpeds, nombre_archivo)
 
         if df_solpeds.empty:
@@ -118,19 +128,54 @@ def EjecutarHU03(session, nombre_archivo):
                     solped_unicos_filtradas.append(solped_str)
             else:
                 print(f"EXCLUIDO: '{solped_str}' (no es una SOLPED valida)")
+                WriteLog(
+                    mensaje=f"EXCLUIDO: '{solped_str}' (no es una SOLPED valida)",
+                    estado="WARNING",
+                    task_name=task_name,
+                    path_log=RUTAS["PathLog"],
+                )
 
         solped_unicos = solped_unicos_filtradas
 
         if not solped_unicos:
             print("ERROR: No se encontraron SOLPEDs validas para procesar")
+            WriteLog(
+                mensaje=f"ERROR: No se encontraron SOLPEDs validas para procesar",
+                estado="WARNING",
+                task_name=task_name,
+                path_log=RUTAS["PathLog"],
+            )
             return False
 
         print(f"Procesando {len(solped_unicos)} SOLPEDs unicas...")
-
+        WriteLog(
+            mensaje=f"Procesando {len(solped_unicos)} SOLPEDs unicas",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
         # Informacion inicial del archivo
         print("RESUMEN INICIAL DEL ARCHIVO:")
+        WriteLog(
+            mensaje=f"RESUMEN INICIAL DEL ARCHIVO:",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
         print(f"   - Total filas: {len(df_solpeds)}")
+        WriteLog(
+            mensaje=f"   - Total filas: {len(df_solpeds)}",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
         print(f"   - SOLPEDs unicas validas: {len(solped_unicos)}")
+        WriteLog(
+            mensaje=f"   - SOLPEDs unicas validas: {len(solped_unicos)}",
+            estado="INFO",
+            task_name=task_name,
+            path_log=RUTAS["PathLog"],
+        )
 
         # Mostrar distribucion inicial de estados
         if "Estado" in df_solpeds.columns:
@@ -391,7 +436,7 @@ def EjecutarHU03(session, nombre_archivo):
                     # ============================================
                     # NUEVO: Obtener datos de expSolped03.txt
                     # ============================================
-                    fila_exp = obtener_fila_expsolped(df_solpeds, solped, numero_item)
+                    fila_exp = obtenerFilaExpSolped(df_solpeds, solped, numero_item)
 
                     if fila_exp:
                         print(f"✅ Datos expSolped encontrados para item {numero_item}")
@@ -614,7 +659,7 @@ def EjecutarHU03(session, nombre_archivo):
                         # ========================================================
                         # CONSTRUIR FILA PARA REPORTE FINAL (UNA SOLA VEZ)
                         # ========================================================
-                        fila_reporte = construir_fila_reporte_final(
+                        fila_reporte = ConstruirFilaReporteFinal(
                             solped=solped,
                             item=numero_item,
                             datos_exp=fila_exp,  # ← CORREGIDO: Datos de expSolped03.txt
@@ -965,7 +1010,7 @@ def EjecutarHU03(session, nombre_archivo):
         print(f"  Total filas en reporte: {len(filas_reporte_final)}")
 
         # Recargar archivo para mostrar estados finales
-        df_final = procesarTablaME5A(nombre_archivo)
+        df_final = ProcesarTablaME5A(nombre_archivo)
         if not df_final.empty and "Estado" in df_final.columns:
             print("\nDISTRIBUCION FINAL DE ESTADOS:")
             resumen = df_final["Estado"].value_counts()
@@ -1008,7 +1053,7 @@ def EjecutarHU03(session, nombre_archivo):
                 path_log=RUTAS["PathLog"],
             )
 
-            path_reporte = generar_reporte_final_excel(filas_reporte_final)
+            path_reporte = GenerarReporteFinalExcel(filas_reporte_final)
 
             if path_reporte:
                 print(f"✅ Reporte final generado correctamente: {path_reporte}")
@@ -1037,15 +1082,13 @@ def EjecutarHU03(session, nombre_archivo):
             )
 
         # Convertir a Excel y agregar hipervínculos
-        convertir_txt_a_excel(nombre_archivo)
+        ConvertirTxtAExcel(nombre_archivo)
         archivo_descargado = rf"{RUTAS['PathInsumos']}/expSolped03.xlsx"
         AppendHipervinculoObservaciones(
             ruta_excel=archivo_descargado, carpeta_reportes=RUTAS["PathReportes"]
         )
         # Sube el Excel a la base de datos
-        ExcelService.ejecutar_bulk_desde_excel(
-            rf"{path_reporte}"
-        )
+        ExcelService.ejecutar_bulk_desde_excel(rf"{path_reporte}")
         # Enviar correo de finalización
         EnviarNotificacionCorreo(
             codigo_correo=10, task_name=task_name, adjuntos=[archivo_descargado]

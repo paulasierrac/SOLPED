@@ -1,6 +1,6 @@
 from datetime import datetime
-from config.database import Database
-from config.settings import DB_CONFIG
+from Config.database import Database
+from Config.settings import DB_CONFIG
 
 schemadb = DB_CONFIG["schema"]
 
