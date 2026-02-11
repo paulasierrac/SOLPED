@@ -25,7 +25,7 @@ from typing import List, Literal, Optional
 from datetime import datetime, timedelta
 import calendar
 
-class SapTextEditor:
+class EditorTextoSAP:
     """
     Wrapper para el editor de textos SAP (GuiShell - SAPLMMTE).
     Permite leer y modificar texto línea por línea de forma segura.
@@ -33,18 +33,18 @@ class SapTextEditor:
     # usando EditorTxt.SetUnprotectedTextPart(0,".")
     """
 
-    def __init__(self, session, editor_id):
+    def __init__(self, sesion, EditorId):
         """
         Args:
             session: sesión activa SAP GUI
-            editor_id (str): ID completo del editor (hasta /shell)
+            EditorId (str): ID completo del editor (hasta /shell)
         """
-        self.session = session
-        self.editor_id = editor_id
+        self.session = sesion
+        self.EditorId = EditorId
         self.shell = self._get_shell()
 
     def _get_shell(self):
-        shell = self.session.findById(self.editor_id)
+        shell = self.session.findById(self.EditorId)
         if shell.Type != "GuiShell":
             raise Exception("El objeto encontrado no es un GuiShell (Text Editor SAP)")
         return shell
@@ -53,45 +53,45 @@ class SapTextEditor:
     # LECTURA
     # ------------------------------------------------------------------
 
-    def get_line(self, index):
+    def TraerLinea(self, index):
         """Obtiene el texto completo de una línea."""
         try:
             return self.shell.GetLineText(index)
         except Exception:
             return None
 
-    def get_all_text(self, max_lines=100):
+    def TraerTodoElTexto(self, MaximoLineas=100):
         """
         Obtiene todo el texto del editor SAP sin saltos de línea finales
         ni líneas vacías generadas por el control.
         """
-        lines = []
+        lineas = []
 
-        for i in range(max_lines):
+        for i in range(MaximoLineas):
             try:
-                line = self.get_line(i)
+                linea = self.TraerLinea(i)
 
-                if line is None:
+                if linea is None:
                     break
 
                 # Limpia caracteres invisibles pero conserva el contenido
-                clean_line = line.rstrip()
-                lines.append(clean_line)
+                limpiarLinea = linea.rstrip()
+                lineas.append(limpiarLinea)
 
             except Exception:
                 break
 
         # Elimina líneas vacías finales
-        while lines and lines[-1] == "":
-            lines.pop()
+        while lineas and lineas[-1] == "":
+            lineas.pop()
 
-        return "\n".join(lines)
+        return "\n".join(lineas)
 
     # ------------------------------------------------------------------
     # ESCRITURA
     # ------------------------------------------------------------------
 
-    def set_editable_line(self, index, new_text):
+    def EstablecerLineaEditable(self, index, new_text):
         """Modifica únicamente la parte editable de una línea."""
         try:
             self.shell.SetUnprotectedTextPart(index, new_text)
@@ -99,7 +99,7 @@ class SapTextEditor:
         except Exception:
             return False
 
-    def replace_in_text(self, texto: str, replacements: dict):
+    def RemplazarTextos(self, texto: str, replacements: dict):
         """
         Reemplaza textos sobre un string completo, evitando líneas vacías iniciales
         y agregando un mensaje final con el total de cambios.
@@ -154,7 +154,7 @@ class SapTextEditor:
         return "\n".join(nuevas_lineas), cambios, CambioExacto
 
 
-# fin class SapTextEditor:
+# fin class EditorTextoSAP:
 # fin utilidades
 
 # ===============================================================================================

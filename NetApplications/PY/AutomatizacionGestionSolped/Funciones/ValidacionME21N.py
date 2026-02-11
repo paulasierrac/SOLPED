@@ -19,7 +19,7 @@ from Config.settings import RUTAS
 import pyautogui
 from pyautogui import ImageNotFoundException
 from Funciones.Login import ObtenerSesionActiva
-from Funciones.GuiShellFunciones import (SapTextEditor,
+from Funciones.GuiShellFunciones import (EditorTextoSAP,
 set_GuiTextField_text,              
 ObtenerTextoCampoGuitextfield,
 buscar_objeto_por_id_parcial,
@@ -86,8 +86,8 @@ def ValidarAjustarSolped(session, item=1):
         
             EsperarSAPListo(session)
             # obtiene el texto del objeto ├─ Leer textos
-            editor = SapTextEditor(session, EDITOR_ID.id)
-            texto = editor.get_all_text()
+            editor = EditorTextoSAP(session, EDITOR_ID.id)
+            texto = editor.TraerTodoElTexto()
 
             # Obtiene la FECHA: en el texto (Precio)
             claves = ["FECHA:"] # str que busca en el texto
@@ -149,7 +149,7 @@ def ValidarAjustarSolped(session, item=1):
 
             # Realiza los reemplazos en el texto segun cuadro 
             reemplazos = {"VENTA SERVICIO": "V1","VENTA PRODUCTO": "V1","GASTO PROPIO SERVICIO": "C2","GASTO PROPIO PRODUCTO": "C2","SAA": "R3","SAA PRODUCTO": "R3"} #"SAA SERVICIO": "R3"
-            nuevo_texto,cambios,cambioEcxacto = editor.replace_in_text(texto, reemplazos)
+            nuevo_texto,cambios,cambioEcxacto = editor.RemplazarTextos(texto, reemplazos)
 
             # Si hay cambios, agrega a la lista de acciones
             if cambios > 0:
@@ -163,7 +163,7 @@ def ValidarAjustarSolped(session, item=1):
                 nodo = f"F0{i}"               
                 textPF = buscar_objeto_por_id_parcial(session, "cntlTEXT_TYPES_0200/shell")
                 textPF.selectedNode = nodo
-                texto = editor.get_all_text()
+                texto = editor.TraerTodoElTexto()
                 if texto :
                     #print("El texto no esta vacío. Procediendo a borrarlo... :"f"F0{i}")
                     editxt=session.findById(EDITOR_ID.id)
