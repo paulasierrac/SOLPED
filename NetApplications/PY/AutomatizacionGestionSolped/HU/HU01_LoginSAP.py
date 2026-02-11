@@ -150,9 +150,8 @@ def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
 # ============================================================
 def ObtenerSesionActiva():
 
+    """Obtiene una sesión SAP ya iniciada (con usuario logueado)."""
     try:
-        # WriteLog | INFO | INICIA ObtenerSesionActiva
-
         sap_gui_auto = win32com.client.GetObject("SAPGUI")
         application = sap_gui_auto.GetScriptingEngine
 
@@ -171,6 +170,8 @@ def ObtenerSesionActiva():
         print(f"ERROR | Error al obtener la sesion activa: {e}")
         # WriteLog | ERROR | Error ObtenerSesionActiva
         return None
+
+
 
 
 # ============================================================
