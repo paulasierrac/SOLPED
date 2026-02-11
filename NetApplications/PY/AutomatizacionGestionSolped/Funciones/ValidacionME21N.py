@@ -69,8 +69,8 @@ def ValidarAjustarSolped(session, item=1):
             CantidadPosicion = ObtenerTextoCampoGuitextfield(session, f"MENGE[6,0]")
             # CantidadPosicion = normalizar_precio_sap(CantidadPosicion)
 
-            FechaPosicion = ObtenerTextoCampoGuitextfield(session, f"EEIND[9,0]")
-            #CantidadPosicion = normalizar_precio_sap(CantidadPosicion)
+            # FechaPosicion = ObtenerTextoCampoGuitextfield(session, f"EEIND[9,0]")
+            # #CantidadPosicion = normalizar_precio_sap(CantidadPosicion)
 
             # Selecbox de la posicion de la solped  ejemplo de guia :  1 [10] 80016676 , LAVADO MANTEL GRANDE 
             PosicionSolped = buscar_objeto_por_id_parcial(session, "cmbDYN_6000-LIST")
@@ -90,9 +90,9 @@ def ValidarAjustarSolped(session, item=1):
             texto = editor.TraerTodoElTexto()
 
             # Obtiene la FECHA: en el texto (Precio)
-            claves = ["FECHA:"] # str que busca en el texto
+            claves = ["FECHA", "FECHA DE EVENTO"] # str que busca en el texto
             FechaTexto = obtener_valor(texto, claves)
-            print(FechaTexto)
+            print(f"Fecha encontrada en el texto: {FechaTexto}")
             #preciotexto = normalizar_precio_sap(preciotexto)
 
             # Obtiene el valor en el texto (Precio)
