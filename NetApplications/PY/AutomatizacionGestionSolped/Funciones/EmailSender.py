@@ -163,7 +163,7 @@ class EmailSender:
             mensaje: Objeto MIMEMultipart
             ruta_archivo: Ruta del archivo a adjuntar
         """
-        nombre_archivo = Path(ruta_archivo).name
+        nombreArchivo = Path(ruta_archivo).name
 
         with open(ruta_archivo, "rb") as archivo:
             parte = MIMEBase("application", "octet-stream")
@@ -171,7 +171,7 @@ class EmailSender:
 
         encoders.encode_base64(parte)
         parte.add_header(
-            "Content-Disposition", f"attachment; filename={nombre_archivo}"
+            "Content-Disposition", f"attachment; filename={nombreArchivo}"
         )
         mensaje.attach(parte)
 

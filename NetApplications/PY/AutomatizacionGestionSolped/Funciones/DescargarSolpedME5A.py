@@ -20,8 +20,8 @@ def DescargarSolpedME5A(session, estado):
         raise ValueError("Sesión SAP no válida.")
 
     # Ruta destino – ejemplo estándar Colsubsidio
-    # ruta_guardar = rf"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
-    ruta_guardar = rf"{RUTAS["PathInsumo"]}\expSolped{estado}.txt"
+    # rutaGuardar = rf"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
+    rutaGuardar = rf"{RUTAS["PathInsumo"]}\expSolped{estado}.txt"
     # ============================
     # Abrir transacción ME5A
     # ============================
@@ -94,11 +94,11 @@ def DescargarSolpedME5A(session, estado):
     # Guardar archivo , revisar rutas relativas
     # ============================
 
-    # ruta_guardar = rf"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
-    ruta_guardar = rf"{RUTAS["PathInsumo"]}\expSolped{estado}.txt"
+    # rutaGuardar = rf"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
+    rutaGuardar = rf"{RUTAS["PathInsumo"]}\expSolped{estado}.txt"
 
-    if os.path.exists(ruta_guardar):
-        os.remove(ruta_guardar)
+    if os.path.exists(rutaGuardar):
+        os.remove(rutaGuardar)
     session.findById("wnd[1]/tbar[0]/btn[0]").press()
     time.sleep(1)
 
@@ -107,7 +107,7 @@ def DescargarSolpedME5A(session, estado):
         rf"{RUTAS["PathInsumo"]}"
     )
 
-    ruta_guardar = rf"{RUTAS["PathInsumo"]}\expSolped{estado}.txt"
+    rutaGuardar = rf"{RUTAS["PathInsumo"]}\expSolped{estado}.txt"
     session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = rf"expSolped{estado}.txt"
     session.findById("wnd[1]/usr/ctxtDY_FILENAME").caretPosition = 10
     session.findById("wnd[1]/tbar[0]/btn[0]").press
@@ -121,5 +121,5 @@ def DescargarSolpedME5A(session, estado):
     time.sleep(1)
     pyautogui.press("f12")
     print(
-        f"Archivo exportado correctamente: {ruta_guardar}"
+        f"Archivo exportado correctamente: {rutaGuardar}"
     )  # luego reemplazar con WriteLog

@@ -1,18 +1,18 @@
 from Config.InicializarConfig import inConfig
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
-from Funciones.FuncionesExcel import ExcelService
+from Funciones.FuncionesExcel import ServicioExcel
 import pandas as pd
 
 def Prueba():
     EjecutarHU00()
-    ruta_excel = r"\\192.168.50.169\RPA_SAMIR_GestionSolped\Temp\OC_Liberadas.xlsx"
+    rutaExcel = r"\\192.168.50.169\RPA_SAMIR_GestionSolped\Temp\OC_Liberadas.xlsx"
 
-    df = pd.read_excel(ruta_excel)
+    df = pd.read_excel(rutaExcel)
     print(df)
 
-    ExcelService.excel_a_csv(ruta_excel, 0)
+    ServicioExcel.excelACSV(rutaExcel, 0)
 
-    ExcelService.ejecutar_bulk_desde_excel(ruta_excel)
+    ServicioExcel.ejecutarBulkDesdeExcel(rutaExcel)
 
 
 

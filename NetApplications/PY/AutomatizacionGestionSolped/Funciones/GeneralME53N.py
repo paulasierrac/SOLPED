@@ -133,11 +133,11 @@ def ConvertirTxtAExcel(archivo):
         print(f"\nDataFrame creado: {len(df)} filas x {len(df.columns)} columnas")
 
         # Generar nombre del archivo Excel
-        ruta_excel = ruta_archivo_txt.rsplit(".", 1)[0] + ".xlsx"
+        rutaExcel = ruta_archivo_txt.rsplit(".", 1)[0] + ".xlsx"
 
         # Guardar a Excel con formato
         print(f"\nGuardando archivo Excel...")
-        with pd.ExcelWriter(ruta_excel, engine="openpyxl") as writer:
+        with pd.ExcelWriter(rutaExcel, engine="openpyxl") as writer:
             df.to_excel(writer, index=False, sheet_name="Datos")
 
             # Ajustar ancho de columnas
@@ -156,8 +156,8 @@ def ConvertirTxtAExcel(archivo):
                 worksheet.column_dimensions[col_letter].width = max_length
 
         print(f"\n[OK] Archivo convertido exitosamente!")
-        print(f"Ubicacion: {ruta_excel}")
-        return ruta_excel
+        print(f"Ubicacion: {rutaExcel}")
+        return rutaExcel
 
     except FileNotFoundError:
         print(f"[ERROR] No se encontro el archivo '{ruta_archivo_txt}'")
@@ -534,7 +534,7 @@ def ColsultarSolped(session, numero_solped):
 
 
 def ActualizarEstadoYObservaciones(
-    df, nombre_archivo, purch_req, item=None, nuevo_estado="", observaciones=""
+    df, nombreArchivo, purch_req, item=None, nuevo_estado="", observaciones=""
 ):
     """Actualiza el estado y observaciones en el DataFrame y guarda el archivo"""
     try:
@@ -559,7 +559,7 @@ def ActualizarEstadoYObservaciones(
             if observaciones:
                 df.loc[mask, "Observaciones"] = observaciones
             # Guardar archivo actualizado
-            GuardarTablaME5A(df, nombre_archivo)
+            GuardarTablaME5A(df, nombreArchivo)
             print(
                 f"EXITO: Actualizado: {purch_req}" + (f" Item {item}" if item else "")
             )
@@ -576,7 +576,7 @@ def ActualizarEstadoYObservaciones(
         return False
 
 
-def ActualizarEstado(df, nombre_archivo, purch_req, item=None, nuevo_estado=""):
+def ActualizarEstado(df, nombreArchivo, purch_req, item=None, nuevo_estado=""):
     """Actualiza el estado en el DataFrame y guarda el archivo"""
     try:
         # Crear mascara para filtrar
@@ -593,7 +593,7 @@ def ActualizarEstado(df, nombre_archivo, purch_req, item=None, nuevo_estado=""):
         if mask.sum() > 0:
             df.loc[mask, "Estado"] = nuevo_estado
             # Guardar archivo actualizado
-            GuardarTablaME5A(df, nombre_archivo)
+            GuardarTablaME5A(df, nombreArchivo)
             return True
         else:
             print(

@@ -424,7 +424,7 @@ def GenerarReporteValidacion(
     # 4. CAMPOS OBLIGATORIOS EXTRAÍDOS DEL TEXTO
     # ===================================================================================
     if "campos_obligatorios" in validaciones:
-        oblig = validaciones["campos_obligatorios"]
+        oblig = validaciones["campos_obligatorios"] 
         reporte += "CAMPOS OBLIGATORIOS (Segun Texto Extraído):\n"
         reporte += f"  Presentes: {oblig['presentes']}/{oblig['total']}\n"
 
@@ -575,12 +575,12 @@ def extraerDatosReporte(fila, df, mapeo):
     return datos
 
 
-def AppendHipervinculoObservaciones(ruta_excel, carpeta_reportes):
+def AppendHipervinculoObservaciones(rutaExcel, carpeta_reportes):
     """
     Recorre todo el Excel y agrega el hipervínculo del reporte correspondiente por SOLPED e ITEM.
     """
 
-    wb = load_workbook(ruta_excel)
+    wb = load_workbook(rutaExcel)
     ws = wb.active
 
     encabezados = [c.value for c in ws[1]]
@@ -616,7 +616,7 @@ def AppendHipervinculoObservaciones(ruta_excel, carpeta_reportes):
         celda_obs.hyperlink = ruta_reporte
         celda_obs.style = "Hyperlink"
 
-    wb.save(ruta_excel)
+    wb.save(rutaExcel)
 
 
 def obtenerFilaExpSolped(df_solpeds, solped, numero_item):

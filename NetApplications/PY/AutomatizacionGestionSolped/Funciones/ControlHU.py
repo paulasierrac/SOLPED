@@ -31,3 +31,4 @@ def control_hu(iNombreHU: str, estado: int):
         print(f"Verdadero HU Actualizada {iHuId}")
     else:
         print(f"Falso HU Actualizada {iHuId}")
+ 

@@ -42,10 +42,10 @@ def EscribirIformeOperacion(
     os.makedirs(path_informes, exist_ok=True)
 
     # === Nombre archivo ===
-    nombre_archivo = (
+    nombreArchivo = (
         f"Informe_{bot_name}_SOLPED_{solped}_OC_{orden_compra}_{fecha_archivo}.txt"
     )
-    ruta_archivo = os.path.join(path_informes, nombre_archivo)
+    ruta_archivo = os.path.join(path_informes, nombreArchivo)
 
     # === Construcción del informe ===
     contenido = []

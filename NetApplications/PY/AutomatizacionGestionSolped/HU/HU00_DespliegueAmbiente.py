@@ -15,7 +15,7 @@ import json
 import random
 
 from Config.InicializarConfig import initConfig, inConfig
-from Funciones.FuncionesExcel import ExcelService
+from Funciones.FuncionesExcel import ServicioExcel
 from Repositories.TicketInsumo import TicketInsumoRepo 
 
 
@@ -69,7 +69,7 @@ def EjecutarHU00():
         #     idTablaticket= random.randint(1, 10)
         #     TicketInsumoRepo.crearPCTicketInsumo( "Inicio cargue de insumo " ) 0
         #     rutaParametros = os.path.join(inConfig("PathInsumo"),"Parametros SAMIR.xlsx")
-        #     ExcelService.ejecutar_bulk_desde_excel(rutaParametros)
+        #     ServicioExcel.ejecutarBulkDesdeExcel(rutaParametros)
         #     TicketInsumoRepo.crearPCTicketInsumo( "Finalizo cargue de insumo " ) 100 
         # except: 
         #     TicketInsumoRepo.crearPCTicketInsumo( error  "Finalizo cargue de insumo " ) 99 

@@ -32,9 +32,9 @@ for col in df.columns:
     print(f"  {estado} {col}")
 
 # Verificar si faltan columnas esperadas
-columnas_faltantes = set(columnas_esperadas) - set(df.columns)
-if columnas_faltantes:
-    print(f"\n⚠️  COLUMNAS FALTANTES: {columnas_faltantes}")
+columnasFaltantes = set(columnas_esperadas) - set(df.columns)
+if columnasFaltantes:
+    print(f"\n⚠️  COLUMNAS FALTANTES: {columnasFaltantes}")
 
 print("\n🔍 ANÁLISIS POR CÓDIGO:")
 

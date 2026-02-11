@@ -62,8 +62,8 @@ def WriteLog(mensaje: str, estado: str, task_name: str, path_log: str):
             ruta_archivo = path_log
         else:
             carpeta_logs = path_log
-            nombre_archivo = f"Log{nombre_maquina}{usuario}{fecha_archivo}.log"
-            ruta_archivo = os.path.join(carpeta_logs, nombre_archivo)
+            nombreArchivo = f"Log{nombre_maquina}{usuario}{fecha_archivo}.log"
+            ruta_archivo = os.path.join(carpeta_logs, nombreArchivo)
 
         os.makedirs(carpeta_logs, exist_ok=True)
 

@@ -24,7 +24,7 @@ from Funciones.GeneralME53N import AbrirTransaccion
 from Funciones.ValidacionME21N import EsperarSAPListo
 
 
-from Funciones.FuncionesExcel import ExcelService
+from Funciones.FuncionesExcel import ServicioExcel
 
 
 def EjecutarHU05(session, ordenes_de_compra: list):
@@ -62,8 +62,8 @@ def EjecutarHU05(session, ordenes_de_compra: list):
         #fecha_hora = ahora.strftime("%d/%m/%Y %H:%M:%S")
         fecha_archivo = ahora.strftime("%Y%m%d_%H%M%S")
         #Guardar el archivo txt en la ruta especificada
-        ruta_guardar = rf"{inConfig("PathTemp")}"
-        session.findById("wnd[1]/usr/ctxtDY_PATH").text = ruta_guardar
+        rutaGuardar = rf"{inConfig("PathTemp")}"
+        session.findById("wnd[1]/usr/ctxtDY_PATH").text = rutaGuardar
         session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = rf"LiberadasOC_{fecha_archivo}.txt"
         session.findById("wnd[1]/usr/ctxtDY_FILENAME").caretPosition = 10
         session.findById("wnd[1]/tbar[0]/btn[0]").press
@@ -101,7 +101,7 @@ def EjecutarHU05(session, ordenes_de_compra: list):
         # Guardar el DataFrame filtrado en un archivo Excel
         df_filtrado.to_excel(rf"{inConfig("PathTemp")}\OC_Liberadas.xlsx", index=False)
         #Sube el Excel a la base de datos
-        ExcelService.ejecutar_bulk_desde_excel(rf"{inConfig("PathTemp")}\OC_Liberadas.xlsx")
+        ServicioExcel.ejecutarBulkDesdeExcel(rf"{inConfig("PathTemp")}\OC_Liberadas.xlsx")
 
         WriteLog(
             mensaje=f"Procesamiento en ME9F completado para la OC: {ordenes_de_compra}",

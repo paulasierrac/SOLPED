@@ -20,18 +20,18 @@ import pyautogui
 from pyautogui import ImageNotFoundException
 from Funciones.Login import ObtenerSesionActiva
 from Funciones.GuiShellFunciones import (EditorTextoSAP,
-set_GuiTextField_text,              
+setGuiTextFieldText,              
 ObtenerTextoCampoGuitextfield,
-buscar_objeto_por_id_parcial,
+buscarObjetoPorIdParcial,
 get_importesCondiciones,
-obtener_valor,
-extraer_concepto,
-obtener_correos,
-normalizar_precio_sap, 
-clasificar_concepto,
+obtenerValor,
+extraerConcepto,
+obtenerCorreos,
+normalizarPrecioSap, 
+clasificarConcepto,
 EsperarSAPListo,
-buscar_y_clickear, set_sap_table_scroll, 
-ventana_abierta,
+buscarYClickear, setSapTableScroll, 
+ventanaAbierta,
 SelectGuiTab,
 MostrarCabecera,
 ObtenerNumeroOC
@@ -62,27 +62,27 @@ def ValidarAjustarSolped(session, item=1):
             # Obtiene el Precio de la posicion
             # PrecioPosicion = ObtenerTextoCampoGuitextfield(session, f"NETPR[10,{fila}]") #Stev: implementar while para scroll, hacer dinamico el f"NETPR[10,{fila}]"
             PrecioPosicion = ObtenerTextoCampoGuitextfield(session, f"NETPR[10,0]")
-            PrecioPosicion = normalizar_precio_sap(PrecioPosicion)
+            PrecioPosicion = normalizarPrecioSap(PrecioPosicion)
 
             # Obtine la Cantidad en la Posicion
             # CantidadPosicion = ObtenerTextoCampoGuitextfield(session, f"MENGE[6,{fila}]") #Stev: implementar while para scroll, hacer dinamico el f"MENGE[6,{fila}]"
             CantidadPosicion = ObtenerTextoCampoGuitextfield(session, f"MENGE[6,0]")
-            # CantidadPosicion = normalizar_precio_sap(CantidadPosicion)
+            # CantidadPosicion = normalizarPrecioSap(CantidadPosicion)
 
             FechaPosicion = ObtenerTextoCampoGuitextfield(session, f"EEIND[9,0]")
-            #CantidadPosicion = normalizar_precio_sap(CantidadPosicion)
+            #CantidadPosicion = normalizarPrecioSap(CantidadPosicion)
 
             # Selecbox de la posicion de la solped  ejemplo de guia :  1 [10] 80016676 , LAVADO MANTEL GRANDE 
-            PosicionSolped = buscar_objeto_por_id_parcial(session, "cmbDYN_6000-LIST")
+            PosicionSolped = buscarObjetoPorIdParcial(session, "cmbDYN_6000-LIST")
             PosicionSolped.key = f"   {fila+1}"
 
             # Navega a la pestaña de textos
             EsperarSAPListo(session)
             SelectGuiTab(session, "TABIDT14")
-            textPF1 = buscar_objeto_por_id_parcial(session, "cntlTEXT_TYPES_0200/shell")
+            textPF1 = buscarObjetoPorIdParcial(session, "cntlTEXT_TYPES_0200/shell")
             textPF1.selectedNode = "F01" # Foco en primer Texto IMPORTANTE
             EsperarSAPListo(session)
-            EDITOR_ID= buscar_objeto_por_id_parcial(session, "cntlTEXT_EDITOR_0201/shellcont/shell")
+            EDITOR_ID= buscarObjetoPorIdParcial(session, "cntlTEXT_EDITOR_0201/shellcont/shell")
         
             EsperarSAPListo(session)
             # obtiene el texto del objeto ├─ Leer textos
@@ -91,24 +91,24 @@ def ValidarAjustarSolped(session, item=1):
 
             # Obtiene la FECHA: en el texto (Precio)
             claves = ["FECHA:"] # str que busca en el texto
-            FechaTexto = obtener_valor(texto, claves)
+            FechaTexto = obtenerValor(texto, claves)
             print(FechaTexto)
-            #preciotexto = normalizar_precio_sap(preciotexto)
+            #preciotexto = normalizarPrecioSap(preciotexto)
 
             # Obtiene el valor en el texto (Precio)
             claves = ["VALOR"]  # str que busca en el texto
-            preciotexto = obtener_valor(texto, claves)
-            preciotexto = normalizar_precio_sap(preciotexto)
+            preciotexto = obtenerValor(texto, claves)
+            preciotexto = normalizarPrecioSap(preciotexto)
 
             # Obtiene la cantidad en el texto
             claves = ["CANTIDAD"]  # str que busca en el texto
-            cantidadtexto = obtener_valor(texto, claves)
+            cantidadtexto = obtenerValor(texto, claves)
 
             # Obtiene impuestos en el texto
             claves = ["IMPUESTO QUE APLICA"]  # str que busca en el texto
-            impuestostexto = obtener_valor(texto, claves)
+            impuestostexto = obtenerValor(texto, claves)
 
-            correosColdubsidio = obtener_correos(
+            correosColdubsidio = obtenerCorreos(
                 texto, "@colsubsidio.com"
             )  # ejemplo de uso de la funcion obtener correos
             acciones.append(
@@ -118,9 +118,9 @@ def ValidarAjustarSolped(session, item=1):
                 f"Impuestos encontrados en el texto de la posicion {fila+1}: {impuestostexto}"
             )
 
-            concepto = extraer_concepto(texto)
+            concepto = extraerConcepto(texto)
             if concepto:
-                tipo = clasificar_concepto(concepto)
+                tipo = clasificarConcepto(concepto)
                 acciones.append(f"{concepto} => {tipo}")
 
             # Comparacion de Valores de Cantidad
@@ -129,7 +129,7 @@ def ValidarAjustarSolped(session, item=1):
                 and cantidadtexto.strip()
                 and CantidadPosicion != cantidadtexto
             ):
-                set_GuiTextField_text(session, f"MENGE[6,0]", cantidadtexto)
+                setGuiTextFieldText(session, f"MENGE[6,0]", cantidadtexto)
                 # print(f"Se mofico posicion :{fila+1}0 Cantidad -> {CantidadPosicion} != {cantidadtexto}")
                 acciones.append(
                     f"Posicion {fila+1}0 => CP: {CantidadPosicion} != CT:{cantidadtexto} ⚠️ Se Actualiza Cantidad"
@@ -141,7 +141,7 @@ def ValidarAjustarSolped(session, item=1):
                 and str(preciotexto).strip()
                 and PrecioPosicion != preciotexto
             ):
-                set_GuiTextField_text(session, f"NETPR[10,0]", preciotexto)
+                setGuiTextFieldText(session, f"NETPR[10,0]", preciotexto)
                 # print(f"Se mofico posicion :{fila+1}0 Precio -> {PrecioPosicion} != {preciotexto}")
                 acciones.append(
                     f"Posicion {fila+1}0 => PP:{PrecioPosicion} != PT:{preciotexto}⚠️ Se Actualiza Precio"
@@ -161,7 +161,7 @@ def ValidarAjustarSolped(session, item=1):
             for i in range(2, 6):  # F02 a F05  2,6   F02 a F03 2,
                 SelectGuiTab(session, "TABIDT14")
                 nodo = f"F0{i}"               
-                textPF = buscar_objeto_por_id_parcial(session, "cntlTEXT_TYPES_0200/shell")
+                textPF = buscarObjetoPorIdParcial(session, "cntlTEXT_TYPES_0200/shell")
                 textPF.selectedNode = nodo
                 texto = editor.TraerTodoElTexto()
                 if texto :
@@ -177,7 +177,7 @@ def ValidarAjustarSolped(session, item=1):
             # if valorImpSaludable:
             #     acciones.append(f"Impuesto Saludable en la posicion {fila+1}0: {valorImpSaludable}")
             """                   
-            set_sap_table_scroll(session, "TC_1211", fila+1) # da scroll una posicion hacia abajo para no perder visual de los objetos en la tabla de SAP
+            setSapTableScroll(session, "TC_1211", fila+1) # da scroll una posicion hacia abajo para no perder visual de los objetos en la tabla de SAP
             #print(f"Primera posicion visible : {ObtenerTextoCampoGuitextfield(session, f'EBELP[1,0]')}") # Muestra la primera posicion Visible despues del scroll 
             EsperarSAPListo(session)
 
@@ -210,17 +210,17 @@ def AbrirSolped(session, solped, item=2):
         # Click Variante de Seleccion y selecciona el campo Solicitudes de pedido en la lista
         timeout = time.time() + 25
         ventana = "Solicitudes de pedido"
-        while not ventana_abierta(session, ventana):
+        while not ventanaAbierta(session, ventana):
             if time.time() > timeout:
                 raise TimeoutError(f"No se abrió la ventana :{ventana}")
             
-            buscar_y_clickear(rf".\img\vSeleccion.png", confidence=0.8, intentos=5, espera=0.5)
+            buscarYClickear(rf".\img\vSeleccion.png", confidence=0.8, intentos=5, espera=0.5)
             #session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]").pressContextButton("SELECT")
-            # VarianteSeleccion = buscar_objeto_por_id_parcial(session, "/shell[0]")
-            # VarianteSeleccion1= buscar_objeto_por_id_parcial(session, "SELECT")
+            # VarianteSeleccion = buscarObjetoPorIdParcial(session, "/shell[0]")
+            # VarianteSeleccion1= buscarObjetoPorIdParcial(session, "SELECT")
             # VarianteSeleccion.pressContextButton (VarianteSeleccion1.id)
             # EsperarSAPListo(session)
-            # SolicitudesdePedido = buscar_objeto_por_id_parcial(session, ":REQ_QUERY")
+            # SolicitudesdePedido = buscarObjetoPorIdParcial(session, ":REQ_QUERY")
             # VarianteSeleccion.selectContextMenuItem (SolicitudesdePedido.id)
             #session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]").pressContextButton("SELECT")
             time.sleep(2)
@@ -234,7 +234,7 @@ def AbrirSolped(session, solped, item=2):
         session.findById("wnd[0]/tbar[1]/btn[8]").press()
 
         # Navegar hasta la sol.pedido en la lista
-        buscar_y_clickear(
+        buscarYClickear(
             rf".\img\sol.pedido.png", confidence=0.8, intentos=20, espera=0.5
         )
         # Despliga los itemns de la solped
@@ -259,7 +259,7 @@ def AbrirSolped(session, solped, item=2):
 
         EsperarSAPListo(session)
         # Click en tomar pedido
-        #buscar_y_clickear(rf".\img\tomar.png", confidence=0.7, intentos=20, espera=0.5)
+        #buscarYClickear(rf".\img\tomar.png", confidence=0.7, intentos=20, espera=0.5)
         session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]").pressButton ("COPY")
         
         #Docstring for MostrarCabecera

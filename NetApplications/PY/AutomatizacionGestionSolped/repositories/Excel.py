@@ -80,14 +80,14 @@ class ExcelRepo:
     # -----------------------------
     # BULK A TEMP + TRANSFERENCIA
     # -----------------------------
-    def ejecutar_bulk_dinamico(self, ruta_txt: str, tabla: str, columnas: list[str]):
+    def ejecutarBulkDinamico(self, rutaTXT: str, tabla: str, columnas: list[str]):
 
         tabla_temp = f"{tabla}_temp"
         columnas_sql = ", ".join(columnas)
 
         bulk_query = f"""
         BULK INSERT {self.schema}.{tabla_temp}
-        FROM '{ruta_txt}'
+        FROM '{rutaTXT}'
         WITH (
             FIRSTROW = 2,
             FIELDTERMINATOR = ';',
@@ -133,7 +133,7 @@ class ExcelRepo:
     # -----------------------------
     # OBTENER SOLO PENDIENTES
     # -----------------------------
-    def obtener_valores(self, tabla: str):
+    def obtenerValores(self, tabla: str):
 
         query = f"""
         SELECT*

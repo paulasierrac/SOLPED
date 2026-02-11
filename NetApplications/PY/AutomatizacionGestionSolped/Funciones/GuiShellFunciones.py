@@ -163,7 +163,7 @@ class EditorTextoSAP:
 # ===============================================================================================
 
 
-def set_sap_table_scroll(session, table_id_part, position):
+def setSapTableScroll(session, table_id_part, position):
     """
     Busca una tabla por su ID técnico y ajusta su scroll vertical.
 
@@ -433,7 +433,7 @@ def ObtenerTextoCampoGuitextfield(session, campo_posicion):
     return txt.Text.strip()
 
 
-def set_GuiTextField_text(session, campo_posicion, valor):
+def setGuiTextFieldText(session, campo_posicion, valor):
     """
     Setea el texto de un GuiTextField dentro de un TableControl SAP
     usando posición lógica (ej: 'NETPR[10,0]' o 'MENGE[6,0]').
@@ -538,7 +538,7 @@ def set_GuiTextField_Ventana1_text(session, campo_posicion, valor):
     txt.CaretPosition = len(txt.Text)
     session.findById("wnd[1]").sendVKey(0)
 
-def ventana_abierta(session, titulo_parcial):
+def ventanaAbierta(session, titulo_parcial):
     """
     Verifica si existe una ventana abierta cuyo título contenga el texto indicado.
 
@@ -617,7 +617,7 @@ def boton_existe(session, id):
         return False
 
 
-def buscar_y_clickear(
+def buscarYClickear(
     ruta_imagen, confidence=0.5, intentos=20, espera=0.5, fail_silently=True, log=True
 ):
     """
@@ -688,7 +688,7 @@ def buscar_y_clickear(
     return False
 
 
-def clasificar_concepto(concepto: str) -> Literal["PRODUCTO", "SERVICIO"]:
+def clasificarConcepto(concepto: str) -> Literal["PRODUCTO", "SERVICIO"]:
     """
     Clasifica un concepto como PRODUCTO o SERVICIO
     usando reglas de negocio.
@@ -722,7 +722,7 @@ def clasificar_concepto(concepto: str) -> Literal["PRODUCTO", "SERVICIO"]:
     return "PRODUCTO"
 
 
-def extraer_concepto(texto: str) -> Optional[str]:
+def extraerConcepto(texto: str) -> Optional[str]:
     """
     Extrae el valor del campo 'POR CONCEPTO DE:'.
     """
@@ -736,7 +736,7 @@ def extraer_concepto(texto: str) -> Optional[str]:
     return None
 
 
-def obtener_correos(texto: str, dominio: Optional[str] = None) -> List[str]:
+def obtenerCorreos(texto: str, dominio: Optional[str] = None) -> List[str]:
     """
     Obtiene correos electrónicos desde un texto.
     - Si se especifica dominio, filtra solo los correos que pertenezcan a ese dominio.
@@ -769,7 +769,7 @@ def obtener_correos(texto: str, dominio: Optional[str] = None) -> List[str]:
     return correos
 
 
-def obtener_valor(texto: str, contiene: List[str]) -> Optional[str]:
+def obtenerValor(texto: str, contiene: List[str]) -> Optional[str]:
     """
     Busca un valor numérico en una línea que contenga
     alguna de las palabras clave especificadas, con o sin símbolo $.
@@ -937,7 +937,7 @@ def CambiarGrupoCompra(session):
     return acciones
 
 
-def normalizar_precio_sap(precio: str) -> int:
+def normalizarPrecioSap(precio: str) -> int:
     """
     Convierte un precio SAP tipo '2.750.000,00' en entero 2750000
     para comparaciones confiables.
@@ -1310,7 +1310,7 @@ def ProcesarTablaMejorada(name, dias=None):
         traceback.print_exc()
         return pd.DataFrame()
 
-def buscar_objeto_por_id_parcial(session, id_parcial):
+def buscarObjetoPorIdParcial(session, id_parcial):
     """
     Busca de forma recursiva un objeto en la sesión de SAP cuyo ID
     contenga la cadena especificada.
@@ -1348,7 +1348,7 @@ def buscar_objeto_por_id_parcial(session, id_parcial):
 def obtener_importe_por_denominacion(session, nombre_buscado="imp.Saludable"):
     # 1. Identificar la tabla y el scrollbar de forma dinámica
     # Usando TC_1211 como ejemplo para la tabla de condiciones
-    tabla = buscar_objeto_por_id_parcial(session, "TC_1211")
+    tabla = buscarObjetoPorIdParcial(session, "TC_1211")
     scrollbar = tabla.verticalScrollbar
 
     encontrado = False
@@ -1412,7 +1412,7 @@ def get_importesCondiciones(session, impuesto_buscado="Imp. Saludable IBUE"):
     SelectGuiTab(session, "TABIDT8")
     bandera = True
     # asegura que empieza en la posición 1 de la tabla de Condiciones
-    set_sap_table_scroll(session, "tblSAPLV69ATCTRL_KONDITIONEN", 1)
+    setSapTableScroll(session, "tblSAPLV69ATCTRL_KONDITIONEN", 1)
 
     while bandera == True:
         try:
@@ -1433,7 +1433,7 @@ def get_importesCondiciones(session, impuesto_buscado="Imp. Saludable IBUE"):
 
         except Exception as e:
             SelectGuiTab(session, "TABIDT8")
-            set_sap_table_scroll(session, "tblSAPLV69ATCTRL_KONDITIONEN", i)
+            setSapTableScroll(session, "tblSAPLV69ATCTRL_KONDITIONEN", i)
             print("Error al obtener los impuestos de las condiciones:", str(e))
             #continue
 

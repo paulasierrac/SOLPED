@@ -43,7 +43,7 @@ from Funciones.SAPFuncionesME53N import (
 )
 
 from Config.settings import RUTAS
-from Funciones.FuncionesExcel import ExcelService
+from Funciones.FuncionesExcel import ServicioExcel
 from Funciones.ValidacionME53N import (
     DeterminarEstadoFinal,
     ExtraerDatosTexto,
@@ -58,7 +58,7 @@ from Funciones.ValidacionME53N import (
 )
 
 
-def EjecutarHU03(session, nombre_archivo):
+def EjecutarHU03(session, nombreArchivo):
     try:
         task_name = "HU03_ValidacionME53N"
         control_hu(task_name, estado=0)
@@ -73,8 +73,8 @@ def EjecutarHU03(session, nombre_archivo):
         )
 
         # Leer el archivo con las SOLPEDs a procesar
-        df_solpeds = ProcesarTablaME5A(nombre_archivo)
-        GuardarTablaME5A(df_solpeds, nombre_archivo)
+        df_solpeds = ProcesarTablaME5A(nombreArchivo)
+        GuardarTablaME5A(df_solpeds, nombreArchivo)
 
         if df_solpeds.empty:
             WriteLog(
@@ -178,7 +178,7 @@ def EjecutarHU03(session, nombre_archivo):
             try:
                 # Marcar SOLPED como "En Proceso"
                 resultado_estado = ActualizarEstado(
-                    df_solpeds, nombre_archivo, solped, nuevo_estado="En Proceso"
+                    df_solpeds, nombreArchivo, solped, nuevo_estado="En Proceso"
                 )
 
                 if not resultado_estado:
@@ -195,7 +195,7 @@ def EjecutarHU03(session, nombre_archivo):
                     )
                     ActualizarEstadoYObservaciones(
                         df_solpeds,
-                        nombre_archivo,
+                        nombreArchivo,
                         solped,
                         nuevo_estado="Error Consulta",
                         observaciones="No se pudo consultar en SAP",
@@ -233,7 +233,7 @@ def EjecutarHU03(session, nombre_archivo):
                 else:
                     ActualizarEstadoYObservaciones(
                         df_solpeds,
-                        nombre_archivo,
+                        nombreArchivo,
                         solped,
                         nuevo_estado="Sin Adjuntos",
                         observaciones="No cuenta con lista de Adjuntos",
@@ -277,7 +277,7 @@ def EjecutarHU03(session, nombre_archivo):
                     contadores["sin_items"] += 1
                     ActualizarEstadoYObservaciones(
                         df_solpeds,
-                        nombre_archivo,
+                        nombreArchivo,
                         solped,
                         nuevo_estado="Sin Items",
                         observaciones="No se encontraron items en SAP",
@@ -330,7 +330,7 @@ def EjecutarHU03(session, nombre_archivo):
 
                     # Marcar item como "Procesando"
                     ActualizarEstado(
-                        df_solpeds, nombre_archivo, solped, numero_item, "Procesando"
+                        df_solpeds, nombreArchivo, solped, numero_item, "Procesando"
                     )
 
                     time.sleep(0.5)
@@ -381,7 +381,7 @@ def EjecutarHU03(session, nombre_archivo):
                         # Actualizar estado y observaciones
                         ActualizarEstadoYObservaciones(
                             df_solpeds,
-                            nombre_archivo,
+                            nombreArchivo,
                             solped,
                             numero_item,
                             estado_final,
@@ -486,7 +486,7 @@ def EjecutarHU03(session, nombre_archivo):
                         )
                         ActualizarEstadoYObservaciones(
                             df_solpeds,
-                            nombre_archivo,
+                            nombreArchivo,
                             solped,
                             numero_item,
                             "Sin Texto",
@@ -528,7 +528,7 @@ def EjecutarHU03(session, nombre_archivo):
 
                 ActualizarEstadoYObservaciones(
                     df_solpeds,
-                    nombre_archivo,
+                    nombreArchivo,
                     solped,
                     nuevo_estado=estado_final_solped,
                     observaciones=observaciones_solped,
@@ -635,7 +635,7 @@ def EjecutarHU03(session, nombre_archivo):
                 observaciones_error = f"Error durante procesamiento: {str(e)[:100]}"
                 ActualizarEstadoYObservaciones(
                     df_solpeds,
-                    nombre_archivo,
+                    nombreArchivo,
                     solped,
                     nuevo_estado="Error",
                     observaciones=observaciones_error,
@@ -694,14 +694,14 @@ def EjecutarHU03(session, nombre_archivo):
             )
 
         # Convertir a Excel y agregar hipervínculos
-        ConvertirTxtAExcel(nombre_archivo)
+        ConvertirTxtAExcel(nombreArchivo)
         archivo_descargado = rf"{RUTAS['PathInsumos']}/expSolped03.xlsx"
         AppendHipervinculoObservaciones(
-            ruta_excel=archivo_descargado, carpeta_reportes=RUTAS["PathReportes"]
+            rutaExcel=archivo_descargado, carpeta_reportes=RUTAS["PathReportes"]
         )
 
         # Sube el Excel a la base de datos
-        ExcelService.ejecutar_bulk_desde_excel(rf"{path_reporte}")
+        ServicioExcel.ejecutarBulkDesdeExcel(rf"{path_reporte}")
 
         # Enviar correo de finalización
         EnviarNotificacionCorreo(

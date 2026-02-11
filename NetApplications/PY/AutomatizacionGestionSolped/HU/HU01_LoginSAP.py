@@ -14,13 +14,13 @@ import subprocess
 import os
 from Config.InicializarConfig import inConfig
 from Config.settings import RUTAS, SAP_CONFIG 
-from Funciones.ValidacionME21N import ventana_abierta
+from Funciones.ValidacionME21N import ventanaAbierta
 
 import pyautogui
 
 from Config.InicializarConfig import inConfig
 from Config.settings import RUTAS, SAP_CONFIG
-from Funciones.ValidacionME21N import ventana_abierta
+from Funciones.ValidacionME21N import ventanaAbierta
 from Funciones.ControlHU import control_hu
 
 
@@ -100,7 +100,7 @@ def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
 
         print("INFO | Credenciales enviadas correctamente")
 
-        if ventana_abierta(session, "Copyrigth"):
+        if ventanaAbierta(session, "Copyrigth"):
             pyautogui.press("enter")
             print("INFO | Ventana Copyrigth cerrada")
 
@@ -115,7 +115,7 @@ def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
         except Exception as e:
             print(f"no se encontro ventana Copyrigth en login {e}")
 
-        if ventana_abierta(session, "Info de licencia en entrada al sistema múltiple"):
+        if ventanaAbierta(session, "Info de licencia en entrada al sistema múltiple"):
             
             print("entro a la funcion click")
             time.sleep(20)  

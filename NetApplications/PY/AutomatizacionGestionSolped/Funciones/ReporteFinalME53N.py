@@ -290,8 +290,8 @@ def GenerarReporteFinalExcel(filas_reporte):
 
         # Generar nombre del archivo con timestamp
         timestamp = datetime.now().strftime("%Y%m%d")
-        nombre_archivo = f"ReporteFinal{timestamp}.xlsx"
-        ruta_completa = os.path.join(RUTAS["PathResultados"], nombre_archivo)
+        nombreArchivo = f"ReporteFinal{timestamp}.xlsx"
+        ruta_completa = os.path.join(RUTAS["PathResultados"], nombreArchivo)
 
         # Asegurar que existe el directorio
         os.makedirs(RUTAS["PathResultados"], exist_ok=True)
@@ -466,13 +466,13 @@ def limpiar_datos_fila(fila):
     return fila_limpia
 
 
-def exportar_a_csv(filas_reporte, nombre_archivo=None):
+def exportar_a_csv(filas_reporte, nombreArchivo=None):
     """
     Exporta el reporte a CSV (adicional al Excel)
 
     Args:
         filas_reporte: Lista de diccionarios con las filas
-        nombre_archivo: Nombre del archivo (opcional)
+        nombreArchivo: Nombre del archivo (opcional)
 
     Returns:
         Ruta del archivo generado o None si hay error
@@ -483,11 +483,11 @@ def exportar_a_csv(filas_reporte, nombre_archivo=None):
 
         df = pd.DataFrame(filas_reporte)
 
-        if nombre_archivo is None:
+        if nombreArchivo is None:
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
-            nombre_archivo = f"Reporte_final_ME53N_{timestamp}.csv"
+            nombreArchivo = f"Reporte_final_ME53N_{timestamp}.csv"
 
-        ruta_completa = os.path.join(RUTAS["PathReportes"], nombre_archivo)
+        ruta_completa = os.path.join(RUTAS["PathReportes"], nombreArchivo)
         df.to_csv(ruta_completa, index=False, encoding="utf-8-sig")
 
         print(f"Reporte CSV generado: {ruta_completa}")
