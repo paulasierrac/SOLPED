@@ -97,13 +97,11 @@ def EjecutarHU04(session, archivo):
             acciones = []
             #print(f"procesando solped: {solped} de items: {item_count}")
             AbrirTransaccion(session, "ME21N")
-      
             EsperarSAPListo(session)
             #navegacion por SAP que permite abrir Solped 
-            
             AbrirSolped(session, solped, item_count)
 
-             #se selecciona la clase de docuemnto ZRCR, revisar alcance si es necesario cambiar a otra clase dependiendo de algun criterio
+            #se selecciona la clase de docuemnto ZRCR, revisar alcance si es necesario cambiar a otra clase dependiendo de algun criterio
             SetGuiComboBoxkey(session, "TOPLINE-BSART", "ZRCR")
 
             EsperarSAPListo(session)
@@ -116,6 +114,7 @@ def EjecutarHU04(session, archivo):
             # Seleccionar la pestaña de textos, asegurándonos de que esté visible
             EsperarSAPListo(session)
             #time.sleep(0.5)
+            # pestaña textos 
             pyautogui.hotkey("ctrl","F4")
             SelectGuiTab(session, "TABIDT14")
             # Valores y textos se validan y ajustan 

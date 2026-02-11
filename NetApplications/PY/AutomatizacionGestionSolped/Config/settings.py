@@ -1,13 +1,14 @@
 # config/settings.py
 
 import os
+
+
 from dotenv import load_dotenv
 from pathlib import Path
-from Config.InitConfig import inConfig
 
 # Cargar .env
 load_dotenv()
-
+#from Config.InitConfig import inConfig
 
 
 # Ruta base del proyecto
@@ -28,7 +29,6 @@ DB_CONFIG = {
     "user": LeerVariableEntorno("USERDB"),
     "password": LeerVariableEntorno("PASSWORDDB"),
     "schema": LeerVariableEntorno("SCHEMA"),
-    
 }
 
 # ========= CONFIG SAP ==========
@@ -47,9 +47,9 @@ CONFIG_EMAIL = {
 
 # ========= RUTAS =========
 RUTAS = {
-    "PathLog":inConfig("PathLog"),
-    "PathLogError":inConfig("PathErrorLog"),   
-    #"PathLogError": LeerVariableEntorno("PATHLOGERROR"),
+    "PathLog": LeerVariableEntorno("PATHLOG"),
+    # "PathLogError":inConfig("PathErrorLog"),   
+    "PathLogError": LeerVariableEntorno("PATHLOGERROR"),
     "PathResultados": LeerVariableEntorno("PATHRESULTADOS"),
     "PathReportes": LeerVariableEntorno("PATHREPORTES"),
     "PathInsumo": LeerVariableEntorno("PATHINSUMO"),

@@ -70,6 +70,9 @@ def ValidarAjustarSolped(session,item=1):
             CantidadPosicion = get_GuiTextField_text(session, f"MENGE[6,0]")
             #CantidadPosicion = normalizar_precio_sap(CantidadPosicion)
 
+            FechaPosicion = get_GuiTextField_text(session, f"EEIND[9,0]")
+            #CantidadPosicion = normalizar_precio_sap(CantidadPosicion)
+
             # Selecbox de la posicion de la solped  ejemplo de guia :  1 [10] 80016676 , LAVADO MANTEL GRANDE 
             PosicionSolped = buscar_objeto_por_id_parcial(session, "cmbDYN_6000-LIST")
             PosicionSolped.key = f"   {fila+1}"
@@ -86,6 +89,12 @@ def ValidarAjustarSolped(session,item=1):
             # obtiene el texto del objeto ├─ Leer textos
             editor = SapTextEditor(session, EDITOR_ID.id)
             texto = editor.get_all_text()
+
+            # Obtiene la FECHA: en el texto (Precio)
+            claves = ["FECHA:"] # str que busca en el texto
+            FechaTexto = obtener_valor(texto, claves)
+            print(FechaTexto)
+            #preciotexto = normalizar_precio_sap(preciotexto)
 
             # Obtiene el valor en el texto (Precio)
             claves = ["VALOR"] # str que busca en el texto
@@ -135,7 +144,7 @@ def ValidarAjustarSolped(session,item=1):
             editext.SetUnprotectedTextPart(0,nuevo_texto)
 
             #Borra los textos de cada editor F02 en adelante
-            for i in range(2, 3):  # F02 a F05  2,6   F02 a F03 2,
+            for i in range(2, 6):  # F02 a F05  2,6   F02 a F03 2,
                 SelectGuiTab(session, "TABIDT14")
                 nodo = f"F0{i}"               
                 textPF = buscar_objeto_por_id_parcial(session, "cntlTEXT_TYPES_0200/shell")

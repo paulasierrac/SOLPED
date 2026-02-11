@@ -31,7 +31,7 @@ def AbrirSAPLogon():
     except:
         # Si no está abierto, se lanza el ejecutable
         #"logon_path": LeerVariableEntorno("SAP_LOGON_PATH"),
-        subprocess.Popen(inConfig("SAP_LOGON_PATH"))
+        subprocess.Popen(inConfig("SapRutaLogon"))
         time.sleep(5)  # Esperar a que abra SAP Logon
         return False
 

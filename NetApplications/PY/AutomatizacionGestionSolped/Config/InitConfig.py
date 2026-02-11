@@ -1,7 +1,7 @@
-from repositories.parametros import ParametrosRepository
-from Config.settings import DB_CONFIG
+from repositories.Parametros import ParametrosRepository
+# from Config.settings import DB_CONFIG
 
-schema = DB_CONFIG.get("schema")
+# schema = DB_CONFIG.get("schema")
 
 _CONFIG_CACHE = None
 
@@ -13,7 +13,7 @@ def initConfig():
     if _CONFIG_CACHE is not None:
         return
 
-    parametros = ParametrosRepository(schema)
+    parametros = ParametrosRepository("GestionSolped")
 
     _CONFIG_CACHE = parametros.cargar_parametros()
 

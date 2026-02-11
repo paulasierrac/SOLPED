@@ -70,7 +70,7 @@ def Main_GestionSolped():
             path_log=RUTAS["PathLog"],
         )
 
-        session = ConectarSAP(inConfig("SAP_SISTEMA"),inConfig("SAP_MANDANTE") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
+        session = ConectarSAP(inConfig("SapSistema"),inConfig("SapMandante") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
 
         time.sleep(3)
      
