@@ -59,9 +59,9 @@ for codigo in codigos:
         destinatario = row.get("toemailparameter")
         print(f"     toemailparameter: ", end="")
         if pd.isna(destinatario):
-            print("❌ VACÍO (NaN)")
+            print("VACÍO (NaN)")
         elif str(destinatario).strip() == "":
-            print("❌ VACÍO (string vacío)")
+            print("VACÍO (string vacío)")
         else:
             print(f"✓ '{destinatario}'")
 

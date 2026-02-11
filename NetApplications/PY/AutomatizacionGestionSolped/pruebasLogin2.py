@@ -11,9 +11,9 @@ from HU.HU04_GeneracionOC import GenerarOCDesdeSolped
 
 
 # from NetApplications.PY.AutomatizacionGestionSolped.HU.HU03_ValidacionME53N import buscar_SolpedME53N
-from funciones.EscribirLog import WriteLog
+from Funciones.EscribirLog import WriteLog
 import traceback
-from config.settings import RUTAS, SAP_CONFIG
+from Config.settings import RUTAS, SAP_CONFIG
 
 
 def Main_Pruebas3():

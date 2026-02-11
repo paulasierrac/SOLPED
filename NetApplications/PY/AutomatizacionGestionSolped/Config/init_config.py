@@ -1,4 +1,7 @@
-from repositories.parametros import ParametrosRepository
+from Repositories.parametros import ParametrosRepository
+from Config.settings import DB_CONFIG
+
+schema = DB_CONFIG.get("schema")
 
 _CONFIG_CACHE = None
 
@@ -10,7 +13,9 @@ def init_config():
     if _CONFIG_CACHE is not None:
         return
 
-    _CONFIG_CACHE = ParametrosRepository.cargar_parametros()
+    parametros = ParametrosRepository(schema)
+
+    _CONFIG_CACHE = parametros.cargar_parametros()
 
 
 def in_config(nombre, default=None):
@@ -19,5 +24,5 @@ def in_config(nombre, default=None):
             "Configuración no inicializada. "
             "Ejecute HU00_DespliegueAmbiente antes de usar in_config()"
         )
-    
+
     return _CONFIG_CACHE.get(nombre, default)
