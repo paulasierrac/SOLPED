@@ -178,7 +178,7 @@ class EmailSender:
     def procesar_excel_y_enviar(
         self,
         archivo_excel: str,
-        codigo_correo: Optional[int] = None,
+        codigoCorreo: Optional[int] = None,
         columna_codigo: str = "codemailparameter",
         columna_destinatario: str = "toemailparameter",
         columna_asunto: str = "asuntoemailparameter",
@@ -194,7 +194,7 @@ class EmailSender:
 
         Args:
             archivo_excel: Ruta al archivo Excel
-            codigo_correo: Código específico para filtrar (ej: 1, 2, 3). Si es None, envía todos
+            codigoCorreo: Código específico para filtrar (ej: 1, 2, 3). Si es None, envía todos
             columna_codigo: Nombre de la columna con el código de correo
             columna_destinatario: Nombre de la columna con el email destino
             columna_asunto: Nombre de la columna con el asunto
@@ -223,13 +223,13 @@ class EmailSender:
         # print(f"🔍 DEBUG: ¿Columna existe?: {columna_destinatario in df.columns}")
 
         # Filtrar por código si se proporciona
-        if codigo_correo is not None:
-            df = df[df[columna_codigo] == codigo_correo]
+        if codigoCorreo is not None:
+            df = df[df[columna_codigo] == codigoCorreo]
             if df.empty:
-                print(f"⚠️  No se encontraron correos con código {codigo_correo}")
+                print(f"⚠️  No se encontraron correos con código {codigoCorreo}")
                 return {"exitosos": 0, "fallidos": 0, "total": 0}
             print(
-                f"📧 Enviando correos con código {codigo_correo} ({len(df)} correo(s))\n"
+                f"📧 Enviando correos con código {codigoCorreo} ({len(df)} correo(s))\n"
             )
 
         exitosos = 0
@@ -376,7 +376,7 @@ if __name__ == "__main__":
     print("\n--- PRUEBA 3: Procesamiento Masivo (Excel) ---")
     resultados = sender.procesar_excel_y_enviar(
         archivo_excel="correos.xlsx",  # Asegúrate de que este archivo exista
-        codigo_correo=1,
+        codigoCorreo=1,
         adjuntos_dinamicos=["reporte.pdf", "log.txt"],
     )
     print(f"Resumen del procesamiento por Excel: {resultados}")
@@ -388,21 +388,21 @@ if __name__ == "__main__":
 
 
 def EnviarNotificacionCorreo(
-    codigo_correo: int, task_name: str = "Notificacion", adjuntos: list = None
+    codigoCorreo: int, taskName: str = "Notificacion", adjuntos: list = None
 ):
     try:
         WriteLog(
-            mensaje=f"Enviando notificación con código {codigo_correo}...",
+            mensaje=f"Enviando notificación con código {codigoCorreo}...",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
 
         sender = EmailSender()
 
         resultados = sender.procesar_excel_y_enviar(
             archivo_excel=RUTAS["ArchivoCorreos"],
-            codigo_correo=codigo_correo,
+            codigoCorreo=codigoCorreo,
             columna_codigo="codemailparameter",
             columna_destinatario="toemailparameter",
             columna_asunto="asuntoemailparameter",
@@ -416,16 +416,16 @@ def EnviarNotificacionCorreo(
             WriteLog(
                 mensaje=f"Notificación enviada correctamente. Exitosos: {resultados['exitosos']}",
                 estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                taskName=taskName,
+                pathLog=RUTAS["PathLog"],
             )
             return True
         else:
             WriteLog(
                 mensaje=f"No se pudo enviar la notificación. Fallidos: {resultados['fallidos']}",
                 estado="WARNING",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                taskName=taskName,
+                pathLog=RUTAS["PathLog"],
             )
             return False
 
@@ -433,8 +433,8 @@ def EnviarNotificacionCorreo(
         WriteLog(
             mensaje=f"Error al enviar notificación: {e}",
             estado="ERROR",
-            task_name=task_name,
-            path_log=RUTAS["PathLogError"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLogError"],
         )
         return False
 
@@ -443,7 +443,7 @@ def EnviarCorreoPersonalizado(
     destinatario: str,
     asunto: str,
     cuerpo: str,
-    task_name: str = "EnvioPersonalizado",
+    taskName: str = "EnvioPersonalizado",
     adjuntos: list = None,
     cc: list = None,
     bcc: list = None,
@@ -455,7 +455,7 @@ def EnviarCorreoPersonalizado(
         destinatario: Email del destinatario (cadena de texto).
         asunto: Asunto del correo (cadena de texto).
         cuerpo: Cuerpo del mensaje (puede ser HTML).
-        task_name: Nombre de la tarea para logs.
+        taskName: Nombre de la tarea para logs.
         adjuntos: Lista de rutas de archivos a adjuntar (opcional).
         cc: Lista de correos en copia (opcional).
         bcc: Lista de correos en copia oculta (opcional).
@@ -467,8 +467,8 @@ def EnviarCorreoPersonalizado(
         WriteLog(
             mensaje=f"Preparando envío personalizado para {destinatario}...",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
 
         # Log de adjuntos
@@ -476,8 +476,8 @@ def EnviarCorreoPersonalizado(
             WriteLog(
                 mensaje=f"Adjuntos a enviar: {', '.join(adjuntos)}",
                 estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                taskName=taskName,
+                pathLog=RUTAS["PathLog"],
             )
 
         # Crear EmailSender con configuración por defecto
@@ -497,16 +497,16 @@ def EnviarCorreoPersonalizado(
             WriteLog(
                 mensaje=f"Correo personalizado enviado exitosamente a {destinatario}.",
                 estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                taskName=taskName,
+                pathLog=RUTAS["PathLog"],
             )
             return True
         else:
             WriteLog(
                 mensaje=f"Fallo al enviar el correo personalizado a {destinatario}.",
                 estado="WARNING",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                taskName=taskName,
+                pathLog=RUTAS["PathLog"],
             )
             return False
 
@@ -515,7 +515,7 @@ def EnviarCorreoPersonalizado(
         WriteLog(
             mensaje=f"Error fatal en el envío personalizado: {e} | {error_stack}",
             estado="ERROR",
-            task_name=task_name,
-            path_log=RUTAS["PathLogError"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLogError"],
         )
         return False

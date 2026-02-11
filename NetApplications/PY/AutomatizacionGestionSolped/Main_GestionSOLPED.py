@@ -28,7 +28,7 @@ from Config.settings import RUTAS, SAP_CONFIG
 
 def Main_GestionSolped():
     try:
-        task_name = "Main_GestionSOLPED"
+        taskName = "Main_GestionSOLPED"
 
         EjecutarHU00()
 
@@ -37,9 +37,9 @@ def Main_GestionSolped():
         # ================================
 
         # Enviar correo de inicio
-        WriteLog(mensaje="Inicio ejecución Main GestionSolped.", estado="INFO", task_name=task_name,  path_log=RUTAS["PathLog"],)
+        WriteLog(mensaje="Inicio ejecución Main GestionSolped.", estado="INFO", taskName=taskName,  pathLog=RUTAS["PathLog"],)
 
-        #EnviarNotificacionCorreo(codigo_correo=1, task_name=task_name)
+        #EnviarNotificacionCorreo(codigoCorreo=1, taskName=taskName)
 
         # ================================
         # 1. Despliegue de ambiente
@@ -47,15 +47,15 @@ def Main_GestionSolped():
         WriteLog(
             mensaje="Inicia HU00_DespliegueAmbiente.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
         
         WriteLog(
             mensaje="Finaliza HU00_DespliegueAmbiente.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
         # ================================
         # 2. Obtener sesión SAP
@@ -63,8 +63,8 @@ def Main_GestionSolped():
         WriteLog(
             mensaje="Inicia HU01_LoginSAP.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
         session = ConectarSAP(inConfig("SapSistema"),inConfig("SapMandante") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
         # session = ConectarSAP(
@@ -79,8 +79,8 @@ def Main_GestionSolped():
         WriteLog(
             mensaje="Finaliza HU01_LoginSAP.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
 
         # ================================
@@ -89,8 +89,8 @@ def Main_GestionSolped():
         WriteLog(
             mensaje="Inicia HU02 - Descarga ME5A.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
         
         #EjecutarHU02(session)
@@ -98,8 +98,8 @@ def Main_GestionSolped():
         WriteLog(
             mensaje="HU02 finalizada correctamente.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
 
         # ================================
@@ -112,8 +112,8 @@ def Main_GestionSolped():
         WriteLog(
                 mensaje=f"Inicia HU03 - Validación ME53N para archivo.",
                 estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                taskName=taskName,
+                pathLog=RUTAS["PathLog"],
             )
         #for archivo in archivos_validar:
             #EjecutarHU03(session, archivo)
@@ -121,8 +121,8 @@ def Main_GestionSolped():
         WriteLog(
                 mensaje=f"Finaliza HU03 - Validación ME53N para archivo.",
                 estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                taskName=taskName,
+                pathLog=RUTAS["PathLog"],
             )
         
         # ================================
@@ -131,8 +131,8 @@ def Main_GestionSolped():
         WriteLog(
             mensaje="Inicia HU04 - Generación OC.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
 
         archivos_validar = ["expSolped03 copy.txt"] 
@@ -142,8 +142,8 @@ def Main_GestionSolped():
         WriteLog(
             mensaje="HU04 - Generación OC finalizada correctamente.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
         
         # ================================
@@ -152,8 +152,8 @@ def Main_GestionSolped():
         WriteLog(
             mensaje="Inicia HU05 - Descarga OC generadas.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
 
         EjecutarHU05(session)
@@ -161,8 +161,8 @@ def Main_GestionSolped():
         WriteLog(
             mensaje="HU05 - Descarga OC finalizada correctamente.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
         
         # ================================
@@ -171,8 +171,8 @@ def Main_GestionSolped():
         WriteLog(
             mensaje="Inicia HU06 - Envío OC por correo.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
 
         # EjecutarHU06(session)
@@ -180,25 +180,25 @@ def Main_GestionSolped():
         WriteLog(
             mensaje="HU06 - Envío OC por correo finalizada correctamente.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
         
-        EnviarNotificacionCorreo(codigo_correo=2, task_name=task_name, adjuntos=[])
+        EnviarNotificacionCorreo(codigoCorreo=2, taskName=taskName, adjuntos=[])
 
         WriteLog(
             mensaje="Main GestionSolped finalizado correctamente.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
 
     except Exception as e:
         WriteLog(
             mensaje=f"Error Global en Main: {e}",
             estado="ERROR",
-            task_name=task_name,
-            path_log=RUTAS["PathLogError"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLogError"],
         )
         raise
 

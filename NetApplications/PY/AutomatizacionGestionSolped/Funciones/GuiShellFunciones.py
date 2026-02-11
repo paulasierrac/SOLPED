@@ -635,7 +635,7 @@ def buscarYClickear(
     Returns:
         bool: True si se encontró e hizo click, False si no.
     """
-    task_name = "HU4_GeneracionOC"
+    taskName = "HU4_GeneracionOC"
 
     for intento in range(1, intentos + 1):
         try:
@@ -648,8 +648,8 @@ def buscarYClickear(
                     WriteLog(
                         mensaje=f"Imagen encontrada y clickeada: {ruta_imagen}",
                         estado="INFO",
-                        task_name=task_name,
-                        path_log=RUTAS["PathLog"],
+                        taskName=taskName,
+                        pathLog=RUTAS["PathLog"],
                     )
                     # print(f"[INFO] Imagen encontrada y clickeada: {ruta_imagen}")
                 return True
@@ -664,8 +664,8 @@ def buscarYClickear(
                 WriteLog(
                     mensaje=f"Error inesperado buscando imagen {ruta_imagen}: {e}",
                     estado="ERROR",
-                    task_name=task_name,
-                    path_log=RUTAS["PathLog"],
+                    taskName=taskName,
+                    pathLog=RUTAS["PathLog"],
                 )
                 # print(f"[ERROR] Error inesperado buscando imagen {ruta_imagen}: {e}")
             if not fail_silently:
@@ -677,8 +677,8 @@ def buscarYClickear(
         WriteLog(
             mensaje=f"Imagen no encontrada tras {intento} intentos: {ruta_imagen}",
             estado="WARNING",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
         # print(f"[WARNING] Imagen no encontrada tras {intento} intentos: {ruta_imagen}")
 
@@ -982,8 +982,8 @@ def ProcesarTabla(name, dias=None):
         WriteLog(
             mensaje=f"Procesar archivo nombre {name}",
             estado="INFO",
-            task_name="ProcesarTablaME5A",
-            path_log=RUTAS["PathLog"],
+            taskName="ProcesarTablaME5A",
+            pathLog=RUTAS["PathLog"],
         )
 
         # path = f".\\AutomatizacionGestionSolped\\Insumo\\{name}"
@@ -1203,8 +1203,8 @@ def ProcesarTabla(name, dias=None):
         WriteLog(
             mensaje=f"Error en ProcesarTablaME5A: {e}",
             estado="ERROR",
-            task_name="ProcesarTablaME5A",
-            path_log=RUTAS["PathLogError"],
+            taskName="ProcesarTablaME5A",
+            pathLog=RUTAS["PathLogError"],
         )
         print(f"ERROR en ProcesarTablaME5A: {e}")
         traceback.print_exc()

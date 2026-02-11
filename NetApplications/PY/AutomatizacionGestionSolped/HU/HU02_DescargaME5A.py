@@ -8,7 +8,7 @@
 # ============================================
 from Funciones.DescargarSolpedME5A import DescargarSolpedME5A
 from Funciones.EscribirLog import WriteLog
-from Funciones.ControlHU import control_hu
+from Funciones.ControlHU import controlHU
 import traceback
 from Config.settings import RUTAS
 
@@ -21,25 +21,25 @@ def EjecutarHU02(session):
     descarga de SOLPED desde la transacción ME5A.
     """
     try:
-        task_name = "HU02_DescargaME5A"
-        control_hu(task_name, estado=0)
+        taskName = "HU02_DescargaME5A"
+        controlHU(taskName, estado=0)
         WriteLog(
             mensaje="Inicia HU02",
             estado="INFO",
-            task_name="HU2_DescargaME5A",
-            path_log=RUTAS["PathLog"],
+            taskName="HU2_DescargaME5A",
+            pathLog=RUTAS["PathLog"],
         )
         estado = "03"
         DescargarSolpedME5A(session, estado)
         estado = "05"
         DescargarSolpedME5A(session, estado)
-        control_hu(task_name, estado=100)
+        controlHU(taskName, estado=100)
     except Exception as e:
-        control_hu(task_name, estado=99)
+        controlHU(taskName, estado=99)
         WriteLog(
             mensaje=f"ERROR GLOBAL: {e}",
             estado="ERROR",
-            task_name="HU2_DescargaME5A",
-            path_log=RUTAS["PathLogError"],
+            taskName="HU2_DescargaME5A",
+            pathLog=RUTAS["PathLogError"],
         )
         raise

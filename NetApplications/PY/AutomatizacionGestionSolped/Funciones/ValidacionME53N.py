@@ -28,19 +28,19 @@ from typing import List, Union
 import sys
 from openpyxl import load_workbook
 
-def DeterminarEstadoFinal(datos_texto: Dict, validaciones: Dict) -> Tuple[str, str]:
+def DeterminarEstadoFinal(datosTexto: Dict, validaciones: Dict) -> Tuple[str, str]:
     """
     Determina el estado final y observaciones basado en validaciones
     AJUSTADO: Maneja textos que solo son descripciones sin datos estructurados
     """
     # Cortar validación temprana para textos sin estructura
-    if datos_texto.get("tipo_texto") == "solo_descripcion":
+    if datosTexto.get("tipo_texto") == "solo_descripcion":
         return "Solo descripcion", "El texto solo contiene una descripción del producto"
 
-    if datos_texto.get("tipo_texto") == "tabla_sap":
+    if datosTexto.get("tipo_texto") == "tabla_sap":
         return "Texto invalido", "El texto contiene una tabla SAP exportada"
 
-    if datos_texto.get("tipo_texto") == "vacio":
+    if datosTexto.get("tipo_texto") == "vacio":
         return "Sin Texto", "El item no tiene texto"
 
     campos_obligatorios_presentes = validaciones.get("campos_obligatorios", {}).get(
@@ -52,7 +52,7 @@ def DeterminarEstadoFinal(datos_texto: Dict, validaciones: Dict) -> Tuple[str, s
     campos_validados = validaciones.get("campos_validados", 0)
 
     # CASO 1: Texto vacio o muy corto
-    concepto = datos_texto.get("concepto_compra", "")
+    concepto = datosTexto.get("concepto_compra", "")
     if not concepto or len(concepto.strip()) < 5:
         return "Sin Texto", "No se encontro texto en el item"
 
@@ -84,12 +84,12 @@ def DeterminarEstadoFinal(datos_texto: Dict, validaciones: Dict) -> Tuple[str, s
         observaciones = "Validacion exitosa - Cumple requisitos minimos"
     elif campos_obligatorios_presentes >= 2:
         estado = "Verificar manualmente"
-        observaciones = GenerarObservaciones(datos_texto, validaciones)
+        observaciones = GenerarObservaciones(datosTexto, validaciones)
         if campos_validados < 2:
             estado = "Datos no coinciden con SAP"
     else:
         estado = "Falta informacion critica"
-        observaciones = GenerarObservaciones(datos_texto, validaciones)
+        observaciones = GenerarObservaciones(datosTexto, validaciones)
 
     # =============================================================
     #  VALIDACIÓN DE CAMPOS OBLIGATORIOS SAP (ME53N)
@@ -273,14 +273,14 @@ def ExtraerDatosTexto(texto: str) -> Dict:
     return datos
 
 
-def GenerarObservaciones(datos_texto: Dict, validaciones: Dict) -> str:
+def GenerarObservaciones(datosTexto: Dict, validaciones: Dict) -> str:
     """Genera observaciones detalladas
     AJUSTADO: Incluye informacion sobre el tipo de texto"""
 
     observaciones = []
 
     # Agregar info sobre tipo de texto
-    tipo_texto = datos_texto.get("tipo_texto", "desconocido")
+    tipo_texto = datosTexto.get("tipo_texto", "desconocido")
     if tipo_texto == "solo_descripcion":
         return "Texto solo contiene descripcion del producto - No incluye datos del proveedor"
     elif tipo_texto == "tabla_sap":
@@ -321,11 +321,11 @@ def GenerarObservaciones(datos_texto: Dict, validaciones: Dict) -> str:
 def GenerarReporteValidacion(
     solped: str,
     item: str,
-    datos_texto: Dict,
+    datosTexto: Dict,
     validaciones: Dict,
-    tiene_attachments: bool = None,
-    obs_attachments: str = "",
-    attachments_lista: list = None,
+    tieneAttachments: bool = None,
+    obsAttachments: str = "",
+    attachmentsLista: list = None,
 ) -> str:
     """Genera un reporte legible de la validacion"""
 
@@ -336,15 +336,15 @@ def GenerarReporteValidacion(
     # ===================================================================================
     # VALIDACIÓN ATTACHMENT LIST DE LA SOLPED:
     # ===================================================================================
-    if tiene_attachments is False:
+    if tieneAttachments is False:
         # NO TIENE ADJUNTOS
         reporte += (
             "ADVERTENCIA: La SOLPED NO tiene archivos adjuntos.\n"
-            f"    Detalle: {obs_attachments}\n"
+            f"    Detalle: {obsAttachments}\n"
             "    La validación del ítem continúa, pero la SOLPED puede ser rechazada.\n\n"
         )
 
-    elif tiene_attachments is True:
+    elif tieneAttachments is True:
         # SÍ TIENE ADJUNTOS → mostrar lista
         reporte += (
             "INFORMACIÓN DE ATTACHMENTS:\n"
@@ -352,22 +352,22 @@ def GenerarReporteValidacion(
         )
 
         # Si existe lista estructurada de attachments
-        if attachments_lista:
+        if attachmentsLista:
             reporte += (
-                f"    Total de archivos: {len(attachments_lista)}\n" f"    Ejemplos:\n"
+                f"    Total de archivos: {len(attachmentsLista)}\n" f"    Ejemplos:\n"
             )
             # Listar hasta 3 para evitar reportes enormes
-            for a in attachments_lista[:3]:
+            for a in attachmentsLista[:3]:
                 reporte += f"      - {a.get('title', '')}\n"
 
-            if len(attachments_lista) > 3:
+            if len(attachmentsLista) > 3:
                 reporte += (
-                    f"      ... ({len(attachments_lista)-3} archivos adicionales)\n"
+                    f"      ... ({len(attachmentsLista)-3} archivos adicionales)\n"
                 )
 
         # Si solo viene texto plano (caso exportación)
-        elif obs_attachments:
-            reporte += f"    Detalle: {obs_attachments}\n"
+        elif obsAttachments:
+            reporte += f"    Detalle: {obsAttachments}\n"
 
         reporte += "\n"
 
@@ -375,13 +375,13 @@ def GenerarReporteValidacion(
     # 1. CAMPOS OBLIGATORIOS SAP ME53N
     # ===================================================================================
     if "campos_me53n" in validaciones:
-        datos_me53n = validaciones["campos_me53n"]
+        datosMe53n = validaciones["campos_me53n"]
         reporte += "CAMPOS OBLIGATORIOS SAP ME53N:\n"
-        reporte += f"  Presentes: {datos_me53n['presentes']}/{datos_me53n['total']}\n"
+        reporte += f"  Presentes: {datosMe53n['presentes']}/{datosMe53n['total']}\n"
 
-        if datos_me53n["faltantes"]:
+        if datosMe53n["faltantes"]:
             reporte += "  Faltantes:\n"
-            for campo in datos_me53n["faltantes"]:
+            for campo in datosMe53n["faltantes"]:
                 reporte += f"    - {campo}\n"
         else:
             reporte += "  ✓ Todos los campos obligatorios ME53N están presentes.\n"
@@ -391,7 +391,7 @@ def GenerarReporteValidacion(
     # ===================================================================================
     # 2. ADVERTENCIA POR TEXTO SIN ESTRUCTURA
     # ===================================================================================
-    if datos_texto.get("tipo_texto") in ["solo_descripcion", "vacio", "tabla_sap"]:
+    if datosTexto.get("tipo_texto") in ["solo_descripcion", "vacio", "tabla_sap"]:
         reporte += (
             "ADVERTENCIA IMPORTANTE:\n"
             "  Este ítem contiene solo descripción o no tiene estructura completa.\n"
@@ -404,21 +404,21 @@ def GenerarReporteValidacion(
     # 3. DATOS EXTRAÍDOS DEL TEXTO
     # ===================================================================================
     reporte += "DATOS EXTRAIDOS DEL TEXTO:\n"
-    reporte += f"  Razon Social: {datos_texto.get('razon_social') or 'No encontrado'}\n"
-    reporte += f"  NIT: {datos_texto.get('nit') or 'No encontrado'}\n"
-    reporte += f"  Correo: {datos_texto.get('correo') or 'No encontrado'}\n"
+    reporte += f"  Razon Social: {datosTexto.get('razon_social') or 'No encontrado'}\n"
+    reporte += f"  NIT: {datosTexto.get('nit') or 'No encontrado'}\n"
+    reporte += f"  Correo: {datosTexto.get('correo') or 'No encontrado'}\n"
     reporte += (
-        f"  Concepto: {datos_texto.get('concepto_compra')[:50] or 'No encontrado'}...\n"
+        f"  Concepto: {datosTexto.get('concepto_compra')[:50] or 'No encontrado'}...\n"
     )
-    reporte += f"  Cantidad: {datos_texto.get('cantidad') or 'No encontrado'}\n"
+    reporte += f"  Cantidad: {datosTexto.get('cantidad') or 'No encontrado'}\n"
     reporte += (
-        f"  Valor Unitario: {datos_texto.get('valor_unitario') or 'No encontrado'}\n"
+        f"  Valor Unitario: {datosTexto.get('valor_unitario') or 'No encontrado'}\n"
     )
-    reporte += f"  Valor Total: {datos_texto.get('valor_total') or 'No encontrado'}\n"
+    reporte += f"  Valor Total: {datosTexto.get('valor_total') or 'No encontrado'}\n"
     reporte += (
-        f"  Responsable: {datos_texto.get('responsable_compra') or 'No encontrado'}\n"
+        f"  Responsable: {datosTexto.get('responsable_compra') or 'No encontrado'}\n"
     )
-    reporte += f"  CECO: {datos_texto.get('ceco') or 'No encontrado'}\n\n"
+    reporte += f"  CECO: {datosTexto.get('ceco') or 'No encontrado'}\n\n"
 
     # ===================================================================================
     # 4. CAMPOS OBLIGATORIOS EXTRAÍDOS DEL TEXTO
@@ -480,23 +480,23 @@ def ProcesarYValidarItem(
     item_num: str,
     texto: str,
     df_items: pd.DataFrame,
-    tiene_attachments: bool = None,
-    obs_attachments: str = "",
-    attachments_lista: list = None,
+    tieneAttachments: bool = None,
+    obsAttachments: str = "",
+    attachmentsLista: list = None,
 ) -> Tuple[Dict, Dict, str, str, str]:
     """
     Procesa un item: extrae datos, valida y genera reporte
-    Returns: (datos_texto, validaciones, reporte, estado_final, observaciones)
+    Returns: (datosTexto, validaciones, reporte, estadoFinal, observaciones)
     """
 
     # 1. Extraer datos del texto
-    datos_texto = ExtraerDatosTexto(texto)
+    datosTexto = ExtraerDatosTexto(texto)
 
     # ======================================================
     # FALLBACK: Texto SAP sin estructura (tabla_sap)
     # Usar valores desde ME53N
     # ======================================================
-    if datos_texto.get("tipo_texto") == "tabla_sap":
+    if datosTexto.get("tipo_texto") == "tabla_sap":
 
         try:
             # Buscar la fila del item en ME53N
@@ -507,23 +507,23 @@ def ProcesarYValidarItem(
             if not fila_item.empty:
                 fila_item = fila_item.iloc[0]
 
-                datos_texto["cantidad"] = datos_texto.get("cantidad") or fila_item.get(
+                datosTexto["cantidad"] = datosTexto.get("cantidad") or fila_item.get(
                     "Cantidad", ""
                 )
 
-                datos_texto["valor_unitario"] = datos_texto.get(
+                datosTexto["valor_unitario"] = datosTexto.get(
                     "valor_unitario"
                 ) or fila_item.get("PrecioVal.", "")
 
-                datos_texto["valor_total"] = datos_texto.get(
+                datosTexto["valor_total"] = datosTexto.get(
                     "valor_total"
                 ) or fila_item.get("Valor tot.", "")
 
-                datos_texto["concepto_compra"] = datos_texto.get(
+                datosTexto["concepto_compra"] = datosTexto.get(
                     "concepto_compra"
                 ) or fila_item.get("Texto breve", "")
 
-                datos_texto["observacion_texto"] = (
+                datosTexto["observacion_texto"] = (
                     "Texto del editor SAP sin estructura. "
                     "Valores tomados directamente desde ME53N."
                 )
@@ -532,14 +532,14 @@ def ProcesarYValidarItem(
             print(f"⚠️ Error aplicando fallback ME53N: {e}")
 
     # 2. Validar contra tabla (pasando el numero de item para busqueda especifica)
-    validaciones = ValidarContraTabla(datos_texto, df_items, item_num)
+    validaciones = ValidarContraTabla(datosTexto, df_items, item_num)
 
     # 3. Determinar estado final y observaciones
-    estado_final, observaciones = DeterminarEstadoFinal(datos_texto, validaciones)
+    estadoFinal, observaciones = DeterminarEstadoFinal(datosTexto, validaciones)
     # Evitar generar reportes completos cuando el texto no tiene estructura
-    if datos_texto.get("tipo_texto") in ["vacio", "solo_descripcion", "tabla_sap"]:
+    if datosTexto.get("tipo_texto") in ["vacio", "solo_descripcion", "tabla_sap"]:
         observaciones = (
-            f"Texto sin estructura completa ({datos_texto.get('tipo_texto')}). "
+            f"Texto sin estructura completa ({datosTexto.get('tipo_texto')}). "
             "Solo contiene descripción."
         )
 
@@ -547,14 +547,14 @@ def ProcesarYValidarItem(
     reporte = GenerarReporteValidacion(
         solped,
         item_num,
-        datos_texto,
+        datosTexto,
         validaciones,
-        tiene_attachments,
-        obs_attachments,
-        attachments_lista,
+        tieneAttachments,
+        obsAttachments,
+        attachmentsLista,
     )
 
-    return datos_texto, validaciones, reporte, estado_final, observaciones
+    return datosTexto, validaciones, reporte, estadoFinal, observaciones
 
 
 def extraerDatosReporte(fila, df, mapeo):
@@ -575,7 +575,7 @@ def extraerDatosReporte(fila, df, mapeo):
     return datos
 
 
-def AppendHipervinculoObservaciones(rutaExcel, carpeta_reportes):
+def AppendHipervinculoObservaciones(rutaExcel, carpetaReportes):
     """
     Recorre todo el Excel y agrega el hipervínculo del reporte correspondiente por SOLPED e ITEM.
     """
@@ -597,7 +597,7 @@ def AppendHipervinculoObservaciones(rutaExcel, carpeta_reportes):
         if not solped or not item:
             continue
 
-        ruta_reporte = os.path.join(carpeta_reportes, f"Reporte_{solped}_{item}.txt")
+        ruta_reporte = os.path.join(carpetaReportes, f"Reporte_{solped}_{item}.txt")
 
         if not os.path.exists(ruta_reporte):
             continue
@@ -619,15 +619,15 @@ def AppendHipervinculoObservaciones(rutaExcel, carpeta_reportes):
     wb.save(rutaExcel)
 
 
-def obtenerFilaExpSolped(df_solpeds, solped, numero_item):
+def obtenerFilaExpSolped(dfSolpeds, solped, numeroItem):
     """
-    Obtiene la fila correspondiente de df_solpeds (expSolped03.txt)
+    Obtiene la fila correspondiente de dfSolpeds (expSolped03.txt)
     para un item específico
 
     Args:
-        df_solpeds: DataFrame con datos de expSolped03.txt
+        dfSolpeds: DataFrame con datos de expSolped03.txt
         solped: Número de SOLPED
-        numero_item: Número del item
+        numeroItem: Número del item
 
     Returns:
         Dict con los datos de expSolped03.txt para ese item
@@ -635,16 +635,16 @@ def obtenerFilaExpSolped(df_solpeds, solped, numero_item):
     try:
         # Buscar la fila que corresponde a esta SOLPED y este item
         mascara = (
-            df_solpeds["PurchReq"].astype(str).str.replace(".", "") == str(solped)
-        ) & (df_solpeds["Item"].astype(str).str.strip() == str(numero_item).strip())
+            dfSolpeds["PurchReq"].astype(str).str.replace(".", "") == str(solped)
+        ) & (dfSolpeds["Item"].astype(str).str.strip() == str(numeroItem).strip())
 
-        filas_encontradas = df_solpeds[mascara]
+        filasEncontradas = dfSolpeds[mascara]
 
-        if not filas_encontradas.empty:
-            return filas_encontradas.iloc[0].to_dict()
+        if not filasEncontradas.empty:
+            return filasEncontradas.iloc[0].to_dict()
         else:
             print(
-                f"⚠️ No se encontró fila en expSolped para SOLPED {solped}, Item {numero_item}"
+                f"⚠️ No se encontró fila en expSolped para SOLPED {solped}, Item {numeroItem}"
             )
             return {}
 

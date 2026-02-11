@@ -171,14 +171,14 @@ def ConvertirTxtAExcel(archivo):
 
 
 def GenerarReporteAttachments(
-    solped: str, tiene_attachments: bool, contenido: str, observaciones: str
+    solped: str, tieneAttachments: bool, contenido: str, observaciones: str
 ) -> str:
     """
     Genera un reporte formateado de la validación de attachments
 
     Args:
         solped: Número de SOLPED
-        tiene_attachments: Si tiene attachments o no
+        tieneAttachments: Si tiene attachments o no
         contenido: Contenido de la tabla exportada
         observaciones: Observaciones de la validación
 
@@ -189,7 +189,7 @@ def GenerarReporteAttachments(
     reporte += f"VALIDACIÓN ATTACHMENT LIST - SOLPED: {solped}\n"
     reporte += f"{'='*80}\n\n"
 
-    reporte += f"Estado: {'CON ADJUNTOS' if tiene_attachments else 'SIN ADJUNTOS'}\n"
+    reporte += f"Estado: {'CON ADJUNTOS' if tieneAttachments else 'SIN ADJUNTOS'}\n"
     reporte += f"Observaciones: {observaciones}\n\n"
 
     attachments = ParsearTablaAttachments(contenido)
@@ -226,9 +226,9 @@ def GenerarReporteAttachments(
 
 def NotificarRevisionManualSolped(
     destinatarios: Union[str, List[str]],
-    numero_solped: Union[int, str],
+    numeroSolped: Union[int, str],
     validaciones: str,
-    task_name: str = "RevisionManualSolped",
+    taskName: str = "RevisionManualSolped",
 ) -> bool:
     """
     Envía una notificación de revisión manual para un SOLPED específico,
@@ -236,23 +236,23 @@ def NotificarRevisionManualSolped(
 
     Args:
         destinatarios: Un email (str) o una lista de emails (List[str]).
-        numero_solped: El número de la solicitud de pedido (SOLPED).
+        numeroSolped: El número de la solicitud de pedido (SOLPED).
         validaciones: Texto que contiene las razones de la validación.
-        task_name: Nombre de la tarea para los logs.
+        taskName: Nombre de la tarea para los logs.
 
     Returns:
         bool: True si el envío fue exitoso, False en caso contrario.
     """
 
     # 1. Preparar el Asunto
-    asunto_template = f"El Solped {numero_solped} Necesita revisión manual"
+    asunto_template = f"El Solped {numeroSolped} Necesita revisión manual"
 
     # 2. Preparar el Cuerpo del Mensaje (Formato HTML)
     cuerpo_template = f"""
         <html>
             <body style="font-family: Arial, sans-serif;">
                 <h2 style="color: #CC0000;">Solicitud de Revisión Manual Requerida</h2>
-                <p>El Solped <strong>{numero_solped}</strong> necesita ser validado por las siguientes razones:</p>
+                <p>El Solped <strong>{numeroSolped}</strong> necesita ser validado por las siguientes razones:</p>
                 
                 <div style="border: 1px solid #ddd; padding: 15px; margin: 15px 0; background-color: #f9f9f9;">
                     <div style="padding: 10px; margin: 10px 0; background-color: #f4f4f4; border-radius: 6px;">
@@ -286,7 +286,7 @@ def NotificarRevisionManualSolped(
         destinatario=destinatario_principal,
         asunto=asunto_template,
         cuerpo=cuerpo_template,
-        task_name=task_name,
+        taskName=taskName,
         cc=cc_list,
         adjuntos=None,  # No se esperan adjuntos para esta notificación
     )
@@ -296,7 +296,7 @@ def EnviarCorreoPersonalizado(
     destinatario: str,
     asunto: str,
     cuerpo: str,
-    task_name: str = "EnvioPersonalizado",
+    taskName: str = "EnvioPersonalizado",
     adjuntos: list = None,
     cc: list = None,
     bcc: list = None,
@@ -308,7 +308,7 @@ def EnviarCorreoPersonalizado(
         destinatario: Email del destinatario (cadena de texto).
         asunto: Asunto del correo (cadena de texto).
         cuerpo: Cuerpo del mensaje (puede ser HTML).
-        task_name: Nombre de la tarea para logs.
+        taskName: Nombre de la tarea para logs.
         adjuntos: Lista de rutas de archivos a adjuntar (opcional).
         cc: Lista de correos en copia (opcional).
         bcc: Lista de correos en copia oculta (opcional).
@@ -320,8 +320,8 @@ def EnviarCorreoPersonalizado(
         WriteLog(
             mensaje=f"Preparando envío personalizado para {destinatario}...",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
 
         # Log de adjuntos
@@ -329,8 +329,8 @@ def EnviarCorreoPersonalizado(
             WriteLog(
                 mensaje=f"Adjuntos a enviar: {', '.join(adjuntos)}",
                 estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                taskName=taskName,
+                pathLog=RUTAS["PathLog"],
             )
 
         # Crear EmailSender con configuración por defecto
@@ -350,16 +350,16 @@ def EnviarCorreoPersonalizado(
             WriteLog(
                 mensaje=f"Correo personalizado enviado exitosamente a {destinatario}.",
                 estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                taskName=taskName,
+                pathLog=RUTAS["PathLog"],
             )
             return True
         else:
             WriteLog(
                 mensaje=f"Fallo al enviar el correo personalizado a {destinatario}.",
                 estado="WARNING",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                taskName=taskName,
+                pathLog=RUTAS["PathLog"],
             )
             return False
 
@@ -368,8 +368,8 @@ def EnviarCorreoPersonalizado(
         WriteLog(
             mensaje=f"Error fatal en el envío personalizado: {e} | {error_stack}",
             estado="ERROR",
-            task_name=task_name,
-            path_log=RUTAS["PathLogError"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLogError"],
         )
         return False
 
@@ -430,8 +430,8 @@ def AbrirTransaccion(session, transaccion):
         WriteLog(
             mensaje=f"Abrir Transaccion {transaccion}",
             estado="INFO",
-            task_name="AbrirTransaccion",
-            path_log=RUTAS["PathLog"],
+            taskName="AbrirTransaccion",
+            pathLog=RUTAS["PathLog"],
         )
 
         # Validar sesion SAP
@@ -440,8 +440,8 @@ def AbrirTransaccion(session, transaccion):
             WriteLog(
                 mensaje="Sesion SAP no disponible",
                 estado="ERROR",
-                task_name="AbrirTransaccion",
-                path_log=RUTAS["PathLog"],
+                taskName="AbrirTransaccion",
+                pathLog=RUTAS["PathLog"],
             )
             raise Exception("Sesion SAP no disponible")
 
@@ -453,8 +453,8 @@ def AbrirTransaccion(session, transaccion):
         WriteLog(
             mensaje=f"Transaccion {transaccion} abierta",
             estado="INFO",
-            task_name="AbrirTransaccion",
-            path_log=RUTAS["PathLog"],
+            taskName="AbrirTransaccion",
+            pathLog=RUTAS["PathLog"],
         )
         print(f"Transaccion {transaccion} abierta")
         return True
@@ -462,24 +462,24 @@ def AbrirTransaccion(session, transaccion):
         WriteLog(
             mensaje=f"Error en AbrirTransaccion: {e}",
             estado="ERROR",
-            task_name="AbrirTransaccion",
-            path_log=RUTAS["PathLogError"],
+            taskName="AbrirTransaccion",
+            pathLog=RUTAS["PathLogError"],
         )
 
         return False
 
 
-def ColsultarSolped(session, numero_solped):
+def ColsultarSolped(session, numeroSolped):
     """session: objeto de SAP GUI
-    numero_solped:  numero de SOLPED a consultar
+    numeroSolped:  numero de SOLPED a consultar
     Realiza la verificacion del SOLPED"""
 
     try:
         WriteLog(
-            mensaje=f"Numero de SOLPED : {numero_solped}",
+            mensaje=f"Numero de SOLPED : {numeroSolped}",
             estado="INFO",
-            task_name="ColsultarSolped",
-            path_log=RUTAS["PathLog"],
+            taskName="ColsultarSolped",
+            pathLog=RUTAS["PathLog"],
         )
 
         # Validar sesion SAP
@@ -488,8 +488,8 @@ def ColsultarSolped(session, numero_solped):
             WriteLog(
                 mensaje="Sesion SAP no disponible",
                 estado="ERROR",
-                task_name="ColsultarSolped",
-                path_log=RUTAS["PathLog"],
+                taskName="ColsultarSolped",
+                pathLog=RUTAS["PathLog"],
             )
             raise Exception("Sesion SAP no disponible")
 
@@ -499,7 +499,7 @@ def ColsultarSolped(session, numero_solped):
         # Escribir numero de solped
         session.findById(
             "wnd[1]/usr/subSUB0:SAPLMEGUI:0003/ctxtMEPO_SELECT-BANFN"
-        ).text = numero_solped
+        ).text = numeroSolped
         # Activar el radiobutton "Purch. Requisition"
         session.findById(
             "wnd[1]/usr/subSUB0:SAPLMEGUI:0003/radMEPO_SELECT-BSTYP_B"
@@ -515,10 +515,10 @@ def ColsultarSolped(session, numero_solped):
         time.sleep(3)
 
         WriteLog(
-            mensaje=f"Solped {numero_solped} consultada exitosamente",
+            mensaje=f"Solped {numeroSolped} consultada exitosamente",
             estado="INFO",
-            task_name="ColsultarSolped",
-            path_log=RUTAS["PathLog"],
+            taskName="ColsultarSolped",
+            pathLog=RUTAS["PathLog"],
         )
 
         return True
@@ -526,15 +526,15 @@ def ColsultarSolped(session, numero_solped):
         WriteLog(
             mensaje=f"Error en ColsultarSolped: {e}",
             estado="ERROR",
-            task_name="ColsultarSolped",
-            path_log=RUTAS["PathLogError"],
+            taskName="ColsultarSolped",
+            pathLog=RUTAS["PathLogError"],
         )
 
         return False
 
 
 def ActualizarEstadoYObservaciones(
-    df, nombreArchivo, purch_req, item=None, nuevo_estado="", observaciones=""
+    df, nombreArchivo, purch_req, item=None, nuevoEstado="", observaciones=""
 ):
     """Actualiza el estado y observaciones en el DataFrame y guarda el archivo"""
     try:
@@ -555,7 +555,7 @@ def ActualizarEstadoYObservaciones(
 
         # Actualizar estado y observaciones
         if mask.sum() > 0:
-            df.loc[mask, "Estado"] = nuevo_estado
+            df.loc[mask, "Estado"] = nuevoEstado
             if observaciones:
                 df.loc[mask, "Observaciones"] = observaciones
             # Guardar archivo actualizado
@@ -576,7 +576,7 @@ def ActualizarEstadoYObservaciones(
         return False
 
 
-def ActualizarEstado(df, nombreArchivo, purch_req, item=None, nuevo_estado=""):
+def ActualizarEstado(df, nombreArchivo, purch_req, item=None, nuevoEstado=""):
     """Actualiza el estado en el DataFrame y guarda el archivo"""
     try:
         # Crear mascara para filtrar
@@ -591,7 +591,7 @@ def ActualizarEstado(df, nombreArchivo, purch_req, item=None, nuevo_estado=""):
 
         # Actualizar estado
         if mask.sum() > 0:
-            df.loc[mask, "Estado"] = nuevo_estado
+            df.loc[mask, "Estado"] = nuevoEstado
             # Guardar archivo actualizado
             GuardarTablaME5A(df, nombreArchivo)
             return True

@@ -8,7 +8,7 @@ def extraer_hu(iNombreHU: str) -> int:
         raise ValueError(f"Nombre de HU invalido: {iNombreHU}")
     return int(match.group(1))
 
-def control_hu(iNombreHU: str, estado: int):
+def controlHU(iNombreHU: str, estado: int):
     
     iHuId = extraer_hu(iNombreHU)
 

@@ -18,10 +18,6 @@ from Config.InicializarConfig import initConfig, inConfig
 from Funciones.FuncionesExcel import ServicioExcel
 from Repositories.TicketInsumo import TicketInsumoRepo 
 
-
-#from Config.initconfig import initConfig
-
-
 def EjecutarHU00():
 
     """
@@ -32,8 +28,8 @@ def EjecutarHU00():
         # ==========================================================
         # 1. Ruta base del proyecto (importante)
         # ==========================================================
-        ruta_base = os.path.dirname(os.path.abspath(__file__))  # ruta de HU00
-        ruta_base = os.path.abspath(os.path.join(ruta_base, ".."))
+        rutaBase = os.path.dirname(os.path.abspath(__file__))  # ruta de HU00
+        rutaBase = os.path.abspath(os.path.join(rutaBase, ".."))
         # Sube un nivel para quedar en /AutomatizacionGestionSolped
 
         # ==========================================================
@@ -50,10 +46,10 @@ def EjecutarHU00():
         ]
 
         for carpeta in carpetas:
-            ruta_completa = os.path.join(ruta_base, carpeta)
+            rutaCompleta = os.path.join(rutaBase, carpeta)
 
-            if not os.path.exists(ruta_completa):
-                os.makedirs(ruta_completa)
+            if not os.path.exists(rutaCompleta):
+                os.makedirs(rutaCompleta)
 
         # ==========================================================
         # 3. Cargar parámetros desde o BD
@@ -74,10 +70,10 @@ def EjecutarHU00():
         # except: 
         #     TicketInsumoRepo.crearPCTicketInsumo( error  "Finalizo cargue de insumo " ) 99 
 
-        ruta_config = os.path.join(ruta_base, "Config.json")
+        rutaConfig = os.path.join(rutaBase, "Config.json")
 
-        if os.path.exists(ruta_config):
-            with open(ruta_config, "r", encoding="utf-8") as f:
+        if os.path.exists(rutaConfig):
+            with open(rutaConfig, "r", encoding="utf-8") as f:
                 config = json.load(f)
         else:
             config = {}
@@ -91,7 +87,7 @@ def EjecutarHU00():
     #     WriteLog(
     #         mensaje=f"Error Global en Main: {e} | {error_stack}",
     #         estado="ERROR",
-    #         task_name=task_name,
-    #         path_log=RUTAS["PathLogError"],
+    #         taskName=taskName,
+    #         pathLog=RUTAS["PathLogError"],
     #     )
     #     raise

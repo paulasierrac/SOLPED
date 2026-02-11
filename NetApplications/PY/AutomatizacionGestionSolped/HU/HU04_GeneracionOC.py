@@ -20,88 +20,88 @@ from Funciones.EscribirLog import WriteLog
 from Funciones.GeneralME53N import AbrirTransaccion
 import traceback
 import pyautogui  # Asegúrate de tener pyautogui instaladoi
-from Funciones.ControlHU import control_hu
+from Funciones.ControlHU import controlHU
 
 from Repositories.Consultas import Querys
 
 def EjecutarHU04(session, archivo):
 
-    task_name = "HU4_GeneracionOC"
+    taskName = "HU4_GeneracionOC"
     """
     Ejecuta la Historia de Usuario 04 encargada de la
     generacion de OC desde la transacción ME21N.
     """
     try:
-        control_hu(task_name, estado=0)
+        controlHU(taskName, estado=0)
         WriteLog(
             mensaje=f"HU04 Inicia para el archivo {archivo}",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
 
         # ============================
         # Limpiar textos Solped
         # ============================
-        # Cambiar Funcion por # df_solpeds = ProcesarTablaME5A(archivo)
-        df_solpeds = ProcesarTabla(archivo)
+        # Cambiar Funcion por # dfSolpeds = ProcesarTablaME5A(archivo)
+        dfSolpeds = ProcesarTabla(archivo)
         """
         #STEV: se trata de llenar el data frame desde la base de datos pero falla 
 
         query = Querys("GestionSolped")
-        df_solpeds = query.fetch_all(tabla="expsolped03")
-        print(df_solpeds)
+        dfSolpeds = query.fetch_all(tabla="expsolped03")
+        print(dfSolpeds)
         """
-        if df_solpeds.empty:
+        if dfSolpeds.empty:
             WriteLog(
                 mensaje=f"No se encontraron Solpeds para procesar en el archivo {archivo}.",
                 estado="WARNING",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                taskName=taskName,
+                pathLog=RUTAS["PathLog"],
             )
             return
 
-        solpeds_unicas = df_solpeds["PurchReq"].unique()
-        print(f"Solpeds a procesar: {solpeds_unicas}")
+        solpedsUnicas = dfSolpeds["PurchReq"].unique()
+        print(f"Solpeds a procesar: {solpedsUnicas}")
         WriteLog(
-            mensaje=f"listado de Solped cargadas : {solpeds_unicas}",
+            mensaje=f"listado de Solped cargadas : {solpedsUnicas}",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
 
         for (
             solped
-        ) in solpeds_unicas:  # Saltar la primera solped si es necesario (Encabezados)
+        ) in solpedsUnicas:  # Saltar la primera solped si es necesario (Encabezados)
             # --- Validación de Solped ---
             if (
                 not solped  # None o vacío
                 or not str(solped).isdigit()  # Debe ser numérica
                 # or len(str(solped)) != 10       # Longitud típica SAP (ej: 1300139274)
-                or solped not in df_solpeds["PurchReq"].values  # Debe existir en el DF
+                or solped not in dfSolpeds["PurchReq"].values  # Debe existir en el DF
             ):
                 WriteLog(
                     mensaje=f"Solped inválida u omitida: {solped}",
                     estado="WARNING",
-                    task_name=task_name,
-                    path_log=RUTAS["PathLog"],
+                    taskName=taskName,
+                    pathLog=RUTAS["PathLog"],
                 )
                 continue  # Saltar a la siguiente solped
             # Contar los items para la solped actual
-            item_count = df_solpeds[df_solpeds["PurchReq"] == solped].shape[0]
+            itemCount = dfSolpeds[dfSolpeds["PurchReq"] == solped].shape[0]
 
             WriteLog(
-                mensaje=f"Procesando Solped: {solped} de items: {item_count} .",
+                mensaje=f"Procesando Solped: {solped} de items: {itemCount} .",
                 estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                taskName=taskName,
+                pathLog=RUTAS["PathLog"],
             )
             acciones = []
-            # print(f"procesando solped: {solped} de items: {item_count}")
+            # print(f"procesando solped: {solped} de items: {itemCount}")
             AbrirTransaccion(session, "ME21N")
             EsperarSAPListo(session)
             #navegacion por SAP que permite abrir Solped 
-            AbrirSolped(session, solped, item_count)
+            AbrirSolped(session, solped, itemCount)
 
             #se selecciona la clase de docuemnto ZRCR, revisar alcance si es necesario cambiar a otra clase dependiendo de algun criterio
             SetGuiComboBoxkey(session, "TOPLINE-BSART", "ZRCR")
@@ -120,7 +120,7 @@ def EjecutarHU04(session, archivo):
             pyautogui.hotkey("ctrl","F4")
             SelectGuiTab(session, "TABIDT14")
             # Valores y textos se validan y ajustan
-            acciones.extend(ValidarAjustarSolped(session, item_count))
+            acciones.extend(ValidarAjustarSolped(session, itemCount))
 
             # *********************************
             # Se debe remplazar con guardar OC
@@ -135,20 +135,20 @@ def EjecutarHU04(session, archivo):
             # *********************************
 
             # Obtener el numero de la orden de compra generada desde la barra de estado.
-            orden_de_compra = ObtenerNumeroOC(session)
+            ordenDeCompra = ObtenerNumeroOC(session)
 
             # Stev: validar si se debe hacer algo mas con la OC generada
 
             
             ruta = EscribirIformeOperacion(
-                    item_count=item_count,
+                    itemCount=itemCount,
                     solped=solped,
-                    orden_compra= orden_de_compra,
+                    ordenCompra= ordenDeCompra,
                     acciones=acciones,
                     estado="EXITOSO",
-                    bot_name="Resock",
-                    task_name=task_name,
-                    path_informes=r".\Salida",
+                    botName="Resock",
+                    taskName=taskName,
+                    pathInformes=r".\Salida",
                     observaciones="Proceso ejecutado sin errores."
             )
 
@@ -156,27 +156,27 @@ def EjecutarHU04(session, archivo):
 
             # Después de procesar todas las solpeds y (presumiblemente) guardar la OC.
             WriteLog(
-                mensaje=f" para la solped : {solped} Se generó la Orden de Compra: {orden_de_compra}",
+                mensaje=f" para la solped : {solped} Se generó la Orden de Compra: {ordenDeCompra}",
                 estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                taskName=taskName,
+                pathLog=RUTAS["PathLog"],
             )
 
         WriteLog(
             mensaje=f"HU04 finalizada correctamente para archivo {archivo}.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
-        control_hu(task_name, estado=100)
+        controlHU(taskName, estado=100)
 
 
     except Exception as e:
-        control_hu(task_name, estado=99)
+        controlHU(taskName, estado=99)
         WriteLog(
             mensaje=f"ERROR GLOBAL en HU04: {e}",
             estado="ERROR",
-            task_name=task_name,
-            path_log=RUTAS["PathLogError"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLogError"],
         )
         raise

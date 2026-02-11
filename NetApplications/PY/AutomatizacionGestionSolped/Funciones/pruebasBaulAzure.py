@@ -82,8 +82,8 @@ def listar_secretos(vault_url):
     # print(usuario)
     # print(password)
 
-    # abrir_sap = AbrirSAPLogon()
-    # if abrir_sap:
+    # abrirSap = AbrirSAPLogon()
+    # if abrirSap:
     #     print(" SAP Logon 750 se encuentra abierto")
     # else:
     #     print(" SAP Logon 750 abierto ")

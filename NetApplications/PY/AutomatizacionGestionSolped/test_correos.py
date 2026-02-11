@@ -126,11 +126,11 @@ print("\n" + "=" * 70)
 
 
 # # Enviar correo de inicio (código 1)
-# # EnviarNotificacionCorreo(codigo_correo=1, task_name=task_name)
-# archivo_descargado = rf"{RUTAS['PathReportes']}/Reporte_1300139268_10.txt"
+# # EnviarNotificacionCorreo(codigoCorreo=1, taskName=taskName)
+# archivoDescargado = rf"{RUTAS['PathReportes']}/Reporte_1300139268_10.txt"
 # # Enviar correo de inicio (código 2 adjunto)
 # EnviarNotificacionCorreo(
-#     codigo_correo=54, task_name=task_name, adjuntos=[archivo_descargado]
+#     codigoCorreo=54, taskName=taskName, adjuntos=[archivoDescargado]
 # )
 
 # exito_personalizado = EnviarCorreoPersonalizado(
@@ -141,7 +141,7 @@ print("\n" + "=" * 70)
 #         "<p>El proceso de sincronización ha fallado en la etapa de validación de datos.</p>"
 #         "<p><strong>Revisar logs en:</strong> \\\\servidor\\logs\\errores.txt</p>"
 #     ),
-#     task_name=task_name,
+#     taskName=taskName,
 #     adjuntos=["C:/Archivos/log_error_20251204.txt"],
 #     cc=["steven.navarro@netapplications.com.co"],
 # )
@@ -151,7 +151,7 @@ print("\n" + "=" * 70)
 # else:
 #     print(f"Fallo al enviar la notificación exito_personalizado.")
 
-# NUMERO_SOLPED = "8000012345"
+# numeroSolped = "8000012345"
 # DESTINOS = ["usuario.revision@empresa.com", "supervisor@empresa.com"]
 # RAZONES_VALIDACION = (
 #     "1. El centro de costo asignado no es válido para el tipo de material.\n"
@@ -159,22 +159,22 @@ print("\n" + "=" * 70)
 # )
 
 # # Llamada a la función
-# exito_notificacion = NotificarRevisionManualSolped(
+# exitoNotificacion = NotificarRevisionManualSolped(
 #     destinatarios=DESTINOS,
-#     numero_solped=NUMERO_SOLPED,
+#     numeroSolped=numeroSolped,
 #     validaciones=RAZONES_VALIDACION,
 # )
 
-# exito_notificacion = NotificarRevisionManualSolped(
+# exitoNotificacion = NotificarRevisionManualSolped(
 #     destinatarios=["usuario.revision@empresa.com", "supervisor@empresa.com"],
-#     numero_solped="8000012345",
+#     numeroSolped="8000012345",
 #     validaciones=(
 #         "1. El centro de costo asignado no es válido para el tipo de material.\n"
 #         "2. La cantidad solicitada supera el límite sin aprobación especial."
 #     ),
 # )
 
-# if exito_notificacion:
-#     print(f"Notificación enviada exitosamente para SOLPED {NUMERO_SOLPED}.")
+# if exitoNotificacion:
+#     print(f"Notificación enviada exitosamente para SOLPED {numeroSolped}.")
 # else:
-#     print(f"Fallo al enviar la notificación para SOLPED {NUMERO_SOLPED}.")
+#     print(f"Fallo al enviar la notificación para SOLPED {numeroSolped}.")

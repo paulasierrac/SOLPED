@@ -5,47 +5,47 @@ import getpass
 
 
 def EscribirIformeOperacion(
-    item_count  :int,
+    itemCount  :int,
     solped: str,
-    orden_compra: str,
+    ordenCompra: str,
     acciones: list,
     estado: str,
-    bot_name: str,
-    task_name: str,
-    path_informes: str,
+    botName: str,
+    taskName: str,
+    pathInformes: str,
     observaciones: str = ""
 ):
     """
     Genera un informe de negocio para envío por correo
 
     solped        : Número de SOLPED
-    orden_compra  : Número de Orden de Compra generada
-    item_count    : Cantidad de posiciones en la SOLPED
+    ordenCompra  : Número de Orden de Compra generada
+    itemCount    : Cantidad de posiciones en la SOLPED
     acciones      : Lista de acciones realizadas (strings)
     estado        : EXITOSO | PARCIAL | ERROR
-    bot_name      : Nombre del Bot RPA (ej. 'Resock')
-    task_name     : HU o proceso (ej. 'HU05_GeneracionOC')
-    path_informes : Carpeta donde se guardará el informe
+    botName      : Nombre del Bot RPA (ej. 'Resock')
+    taskName     : HU o proceso (ej. 'HU05_GeneracionOC')
+    pathInformes : Carpeta donde se guardará el informe
     observaciones : Texto libre opcional
     """
 
     # === Fecha ===
     ahora = datetime.now()
     fecha_hora = ahora.strftime("%d/%m/%Y %H:%M:%S")
-    fecha_archivo = ahora.strftime("%Y%m%d_%H%M%S")
+    fechaArchivo = ahora.strftime("%Y%m%d_%H%M%S")
 
     # === Sistema ===
     nombre_maquina = socket.gethostname()
     usuario = getpass.getuser()
 
     # === Asegurar carpeta ===
-    os.makedirs(path_informes, exist_ok=True)
+    os.makedirs(pathInformes, exist_ok=True)
 
     # === Nombre archivo ===
     nombreArchivo = (
-        f"Informe_{bot_name}_SOLPED_{solped}_OC_{orden_compra}_{fecha_archivo}.txt"
+        f"Informe_{botName}_SOLPED_{solped}_OC_{ordenCompra}_{fechaArchivo}.txt"
     )
-    ruta_archivo = os.path.join(path_informes, nombreArchivo)
+    ruta_archivo = os.path.join(pathInformes, nombreArchivo)
 
     # === Construcción del informe ===
     contenido = []
@@ -55,11 +55,11 @@ def EscribirIformeOperacion(
     contenido.append(f"Fecha ejecución   : {fecha_hora}\n")
     contenido.append(f"Usuario ejecución : {usuario}\n")
     contenido.append(f"Equipo            : {nombre_maquina}\n")
-    contenido.append(f"Bot RPA           : {bot_name}\n")
-    contenido.append(f"Proceso           : {task_name}\n\n")
+    contenido.append(f"Bot RPA           : {botName}\n")
+    contenido.append(f"Proceso           : {taskName}\n\n")
     contenido.append(f"SOLPED            : {solped}\n")
-    contenido.append(f"ORDEN DE COMPRA   : {orden_compra}\n")
-    contenido.append(f"POSICIONES SOLPED : {item_count}\n")
+    contenido.append(f"ORDEN DE COMPRA   : {ordenCompra}\n")
+    contenido.append(f"POSICIONES SOLPED : {itemCount}\n")
     contenido.append(f"Estado final      : {estado}\n\n")
 
     contenido.append("Acciones realizadas:\n")

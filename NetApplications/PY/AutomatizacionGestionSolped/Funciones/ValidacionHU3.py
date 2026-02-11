@@ -29,7 +29,7 @@ import sys
 from openpyxl import load_workbook
 
 def ValidarContraTabla(
-    datos_texto: Dict, df_items: pd.DataFrame, item_num: str = ""
+    datosTexto: Dict, df_items: pd.DataFrame, item_num: str = ""
 ) -> Dict:
     """
     Compara los datos extraidos del texto con la tabla de items SAP ME53N.
@@ -372,13 +372,13 @@ def ValidarContraTabla(
     # ==================================================================
     # VALIDAR CANTIDAD
     # ==================================================================
-    if datos_texto.get("cantidad"):
-        cantidad_txt = LimpiarNumeroRobusto(datos_texto["cantidad"])
+    if datosTexto.get("cantidad"):
+        cantidad_txt = LimpiarNumeroRobusto(datosTexto["cantidad"])
         col = buscar_columna("Quantity")
 
         if col:
             cantidad_tabla = LimpiarNumeroRobusto(fila.get(col))
-            validaciones["cantidad"]["texto"] = datos_texto["cantidad"]
+            validaciones["cantidad"]["texto"] = datosTexto["cantidad"]
             validaciones["cantidad"]["tabla"] = str(cantidad_tabla)
             diff = abs(cantidad_txt - cantidad_tabla)
 
@@ -389,8 +389,8 @@ def ValidarContraTabla(
     # ==================================================================
     # VALIDAR VALOR UNITARIO
     # ==================================================================
-    if datos_texto.get("valor_unitario"):
-        val_txt = LimpiarNumeroRobusto(datos_texto["valor_unitario"])
+    if datosTexto.get("valor_unitario"):
+        val_txt = LimpiarNumeroRobusto(datosTexto["valor_unitario"])
         col = buscar_columna("Valn Price")
 
         if col:
@@ -409,8 +409,8 @@ def ValidarContraTabla(
     # ==================================================================
     # VALIDAR VALOR TOTAL
     # ==================================================================
-    if datos_texto.get("valor_total"):
-        val_txt = LimpiarNumeroRobusto(datos_texto["valor_total"])
+    if datosTexto.get("valor_total"):
+        val_txt = LimpiarNumeroRobusto(datosTexto["valor_total"])
         col = buscar_columna("Total Val.")
 
         if col:
@@ -428,11 +428,11 @@ def ValidarContraTabla(
     # ==================================================================
     # VALIDAR CONCEPTO
     # ==================================================================
-    if datos_texto.get("concepto_compra"):
+    if datosTexto.get("concepto_compra"):
         col = buscar_columna("Short Text")
 
         if col:
-            txt = datos_texto["concepto_compra"].upper()
+            txt = datosTexto["concepto_compra"].upper()
             tabla = str(fila.get(col)).upper()
 
             palabras_txt = set(re.findall(r"\w+", txt))
@@ -453,8 +453,8 @@ def ValidarContraTabla(
     # CAMPOS OBLIGATORIOS TEXTO
     # ============================================================
     oblig = ["nit", "concepto_compra", "cantidad", "valor_total"]
-    presentes = sum(1 for c in oblig if datos_texto.get(c))
-    faltan = [c for c in oblig if not datos_texto.get(c)]
+    presentes = sum(1 for c in oblig if datosTexto.get(c))
+    faltan = [c for c in oblig if not datosTexto.get(c)]
 
     validaciones["campos_obligatorios"] = {
         "presentes": presentes,

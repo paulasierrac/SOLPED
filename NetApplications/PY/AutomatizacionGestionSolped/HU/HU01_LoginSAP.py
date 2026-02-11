@@ -21,19 +21,19 @@ import pyautogui
 from Config.InicializarConfig import inConfig
 from Config.settings import RUTAS, SAP_CONFIG
 from Funciones.ValidacionME21N import ventanaAbierta
-from Funciones.ControlHU import control_hu
+from Funciones.ControlHU import controlHU
 
 
 def AbrirSAPLogon():
     """Abre SAP Logon si no está ya abierto."""
     #SAP_CONFIG = get_sap_config()
     try:
-        # WriteLog | INFO | INICIA abrir_sap_logon
+        # WriteLog | INFO | INICIA abrirSap_logon
 
         win32com.client.GetObject("SAPGUI")
         print("INFO | SAP Logon ya se encuentra abierto")
 
-        # WriteLog | INFO | FINALIZA abrir_sap_logon
+        # WriteLog | INFO | FINALIZA abrirSap_logon
         return True
     except:
         # Si no está abierto, se lanza el ejecutable
@@ -45,31 +45,31 @@ def AbrirSAPLogon():
 
 def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
 
-    abrir_sap = AbrirSAPLogon()
+    abrirSap = AbrirSAPLogon()
     time.sleep(3)
-    if abrir_sap:
+    if abrirSap:
         print(" SAP Logon 750 ya se encuentra abierto")
     else:
         print(" SAP Logon 750 abierto ")
 
     try:
         # WriteLog | INFO | INICIA ConectarSAP
-        task_name = "HU01_LoginSAP"
-        control_hu(task_name, estado=0)
+        taskName = "HU01_LoginSAP"
+        controlHU(taskName, estado=0)
 
-        abrir_sap = AbrirSAPLogon()
+        abrirSap = AbrirSAPLogon()
         time.sleep(3)
 
-        if abrir_sap:
+        if abrirSap:
             print("INFO | SAP Logon ya se encuentra abierto")
         else:
             print("INFO | SAP Logon abierto correctamente")
 
-        sap_gui_auto = win32com.client.GetObject("SAPGUI")
-        if not sap_gui_auto:
+        sapGuiAuto = win32com.client.GetObject("SAPGUI")
+        if not sapGuiAuto:
             raise Exception("No se pudo obtener objeto SAPGUI")
 
-        application = sap_gui_auto.GetScriptingEngine
+        application = sapGuiAuto.GetScriptingEngine
 
         connection = None
         for item in application.Connections:
@@ -137,7 +137,7 @@ def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
         return session
 
     except Exception as e:
-        control_hu(task_name, estado=99)
+        controlHU(taskName, estado=99)
         print(f"ERROR | Error al conectar a SAP: {e}")
         # WriteLog | ERROR | Error grave ConectarSAP
         return None
@@ -152,8 +152,8 @@ def ObtenerSesionActiva():
 
     """Obtiene una sesión SAP ya iniciada (con usuario logueado)."""
     try:
-        sap_gui_auto = win32com.client.GetObject("SAPGUI")
-        application = sap_gui_auto.GetScriptingEngine
+        sapGuiAuto = win32com.client.GetObject("SAPGUI")
+        application = sapGuiAuto.GetScriptingEngine
 
         for conn in application.Connections:
             if conn.Children.Count > 0:

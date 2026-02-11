@@ -27,11 +27,11 @@ from Funciones.ValidacionME21N import EsperarSAPListo
 from Funciones.FuncionesExcel import ServicioExcel
 
 
-def EjecutarHU05(session, ordenes_de_compra: list):
+def EjecutarHU05(session, ordenesDeCompra: list):
     """
     Ejecuta la Historia de Usuario 05: Descarga de OC desde ME9F.
     """
-    task_name = "HU05_DescargaOC"
+    taskName = "HU05_DescargaOC"
 
     try:
 
@@ -43,8 +43,8 @@ def EjecutarHU05(session, ordenes_de_compra: list):
         session.findById("wnd[0]/usr/ctxtLISTU").text = "ALV" # Alcance de la lista
         session.findById("wnd[0]/usr/btn%_S_EBELN_%_APP_%-VALU_PUSH").press() # Presionar Enter
         # Alistar Texto para pegar desde el portapapeles, estándar de Windows \r\n (Carriage Return + Line Feed).
-        texto_para_copiar = '\r\n'.join(ordenes_de_compra)
-        pyperclip.copy(texto_para_copiar)
+        textoParaCopiar = '\r\n'.join(ordenesDeCompra)
+        pyperclip.copy(textoParaCopiar)
         EsperarSAPListo(session)
         #Boton Pegar desde el portapapeles
         session.findById("wnd[1]/tbar[0]/btn[24]").press()
@@ -60,62 +60,62 @@ def EjecutarHU05(session, ordenes_de_compra: list):
         # === Fecha ===
         ahora = datetime.now()
         #fecha_hora = ahora.strftime("%d/%m/%Y %H:%M:%S")
-        fecha_archivo = ahora.strftime("%Y%m%d_%H%M%S")
+        fechaArchivo = ahora.strftime("%Y%m%d_%H%M%S")
         #Guardar el archivo txt en la ruta especificada
         rutaGuardar = rf"{inConfig("PathTemp")}"
         session.findById("wnd[1]/usr/ctxtDY_PATH").text = rutaGuardar
-        session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = rf"LiberadasOC_{fecha_archivo}.txt"
+        session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = rf"LiberadasOC_{fechaArchivo}.txt"
         session.findById("wnd[1]/usr/ctxtDY_FILENAME").caretPosition = 10
         session.findById("wnd[1]/tbar[0]/btn[0]").press
         session.findById("wnd[1]/tbar[0]/btn[11]").press()  # Guardar
 
 
 
-        archivo = rf"LiberadasOC_{fecha_archivo}.txt"
+        archivo = rf"LiberadasOC_{fechaArchivo}.txt"
 
-        df_Ocliberadas = ProcesarTablaMejorada(archivo)
-        #print (df_Ocliberadas)
-        df_Ocliberadas.columns = [col.strip() for col in df_Ocliberadas.columns]
+        dfOcliberadas = ProcesarTablaMejorada(archivo)
+        #print (dfOcliberadas)
+        dfOcliberadas.columns = [col.strip() for col in dfOcliberadas.columns]
 
-        print(df_Ocliberadas)
+        print(dfOcliberadas)
 
         # Definir las columnas deseadas
-        columnas_interes = ["Doc.compr.", "EstadLib"]
+        columnasInteres = ["Doc.compr.", "EstadLib"]
 
         # Crear el nuevo DataFrame validando que las columnas existan
-        if all(col in df_Ocliberadas.columns for col in columnas_interes):
-            df_filtrado = df_Ocliberadas[columnas_interes].copy()
+        if all(col in dfOcliberadas.columns for col in columnasInteres):
+            dfFiltrado = dfOcliberadas[columnasInteres].copy()
             print("Nuevo DataFrame creado exitosamente.")
         else:
             # Caso alternativo: Si las columnas tienen nombres ligeramente distintos
-            print(f"Columnas encontradas en el archivo: {list(df_Ocliberadas.columns)}")
+            print(f"Columnas encontradas en el archivo: {list(dfOcliberadas.columns)}")
             # Intento de búsqueda por coincidencia parcial si falla la exacta
-            col_doc = next((c for c in df_Ocliberadas.columns if "Doc.compr" in c), None)
-            col_est = next((c for c in df_Ocliberadas.columns if "EstadLib" in c), None)
+            colDoc = next((c for c in dfOcliberadas.columns if "Doc.compr" in c), None)
+            colEst = next((c for c in dfOcliberadas.columns if "EstadLib" in c), None)
             
-            if col_doc and col_est:
-                df_filtrado = df_Ocliberadas[[col_doc, col_est]].copy()
-                df_filtrado.columns = ["Doc.compr.", "EstadLib"] # Renombrar para estandarizar
+            if colDoc and colEst:
+                dfFiltrado = dfOcliberadas[[colDoc, colEst]].copy()
+                dfFiltrado.columns = ["Doc.compr.", "EstadLib"] # Renombrar para estandarizar
         
-        print(df_filtrado)
+        print(dfFiltrado)
         # Guardar el DataFrame filtrado en un archivo Excel
-        df_filtrado.to_excel(rf"{inConfig("PathTemp")}\OC_Liberadas.xlsx", index=False)
+        dfFiltrado.to_excel(rf"{inConfig("PathTemp")}\OC_Liberadas.xlsx", index=False)
         #Sube el Excel a la base de datos
         ServicioExcel.ejecutarBulkDesdeExcel(rf"{inConfig("PathTemp")}\OC_Liberadas.xlsx")
 
         WriteLog(
-            mensaje=f"Procesamiento en ME9F completado para la OC: {ordenes_de_compra}",
+            mensaje=f"Procesamiento en ME9F completado para la OC: {ordenesDeCompra}",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLog"],
         )
 
     except Exception as e:
-        error_text = traceback.format_exc()
+        errorText = traceback.format_exc()
         WriteLog(
-            mensaje=f"ERROR GLOBAL en HU05: {e} | {error_text}",
+            mensaje=f"ERROR GLOBAL en HU05: {e} | {errorText}",
             estado="ERROR",
-            task_name=task_name,
-            path_log=RUTAS["PathLogError"],
+            taskName=taskName,
+            pathLog=RUTAS["PathLogError"],
         )
         raise

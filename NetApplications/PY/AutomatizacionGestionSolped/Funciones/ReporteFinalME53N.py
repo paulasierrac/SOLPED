@@ -74,9 +74,9 @@ COLUMNAS_REPORTE_FINAL = [
 
 def determinar_estado_reporte(
     tiene_adjuntos: bool,
-    faltantes_me53n: list,
-    faltantes_texto: list,
-    resultado_validaciones: dict,
+    faltantesMe53n: list,
+    faltantesTexto: list,
+    resultadoValidaciones: dict,
 ):
     """
     Estados permitidos:
@@ -89,12 +89,12 @@ def determinar_estado_reporte(
 
     # 🟡 PENDIENTE
     if (
-        faltantes_me53n
-        or faltantes_texto
-        or not resultado_validaciones.get("cantidad", True)
-        or not resultado_validaciones.get("valor_unitario", True)
-        or not resultado_validaciones.get("valor_total", True)
-        or not resultado_validaciones.get("concepto", True)
+        faltantesMe53n
+        or faltantesTexto
+        or not resultadoValidaciones.get("cantidad", True)
+        or not resultadoValidaciones.get("valor_unitario", True)
+        or not resultadoValidaciones.get("valor_total", True)
+        or not resultadoValidaciones.get("concepto", True)
     ):
         return "Pendiente"
 
@@ -106,10 +106,10 @@ def ConstruirFilaReporteFinal(
     solped,
     item,
     datos_exp,
-    datos_adjuntos,
-    datos_me53n,
-    datos_texto,
-    resultado_validaciones,
+    datosAdjuntos,
+    datosMe53n,
+    datosTexto,
+    resultadoValidaciones,
 ):
     """
     Construye una fila para el reporte final consolidado
@@ -118,10 +118,10 @@ def ConstruirFilaReporteFinal(
         solped: Número de SOLPED
         item: Número de item
         datos_exp: Dict con datos de expSolped03.txt
-        datos_adjuntos: Dict con información de adjuntos
-        datos_me53n: Dict con datos de ME53N (TablaSolped)
-        datos_texto: Dict con datos extraídos del texto del editor
-        resultado_validaciones: Dict con resultados de las validaciones
+        datosAdjuntos: Dict con información de adjuntos
+        datosMe53n: Dict con datos de ME53N (TablaSolped)
+        datosTexto: Dict con datos extraídos del texto del editor
+        resultadoValidaciones: Dict con resultados de las validaciones
 
     Returns:
         Dict con todos los datos para una fila del reporte
@@ -132,49 +132,49 @@ def ConstruirFilaReporteFinal(
     # ========================================================
 
     campos_me53n_obligatorios = {
-        "Material": datos_me53n.get("Material"),
-        "Cantidad": datos_me53n.get("Cantidad"),
-        "Precio valoración": datos_me53n.get("PrecioVal."),
-        "Fecha entrega": datos_me53n.get("Fe.entrega"),
-        "Centro": datos_me53n.get("Centro"),
-        "Grupo de compras": datos_me53n.get("GCp"),
-        "Organización de compras": datos_me53n.get("OrgC"),
-        "Proveedor fijo": datos_me53n.get("ProvFijo"),
+        "Material": datosMe53n.get("Material"),
+        "Cantidad": datosMe53n.get("Cantidad"),
+        "Precio valoración": datosMe53n.get("PrecioVal."),
+        "Fecha entrega": datosMe53n.get("Fe.entrega"),
+        "Centro": datosMe53n.get("Centro"),
+        "Grupo de compras": datosMe53n.get("GCp"),
+        "Organización de compras": datosMe53n.get("OrgC"),
+        "Proveedor fijo": datosMe53n.get("ProvFijo"),
     }
 
-    faltantes_me53n = [
+    faltantesMe53n = [
         campo
         for campo, valor in campos_me53n_obligatorios.items()
         if valor is None or str(valor).strip() == ""
     ]
 
-    faltantes_me53n_texto = ", ".join(faltantes_me53n)
+    faltantesMe53n_texto = ", ".join(faltantesMe53n)
 
     # ========================================================
     # 2. CAMPOS OBLIGATORIOS DEL TEXTO
     # ========================================================
 
     campos_texto_obligatorios = {
-        "nit": datos_texto.get("nit"),
-        "concepto": datos_texto.get("concepto_compra"),
-        "cantidad": datos_texto.get("cantidad"),
-        "valor_total": datos_texto.get("valor_total"),
+        "nit": datosTexto.get("nit"),
+        "concepto": datosTexto.get("concepto_compra"),
+        "cantidad": datosTexto.get("cantidad"),
+        "valor_total": datosTexto.get("valor_total"),
     }
 
-    faltantes_texto = [
+    faltantesTexto = [
         campo
         for campo, valor in campos_texto_obligatorios.items()
         if valor is None or str(valor).strip() == ""
     ]
 
-    faltantes_texto_texto = ", ".join(faltantes_texto)
+    faltantesTexto_texto = ", ".join(faltantesTexto)
 
     # ========================================================
     # 3. NORMALIZAR ADJUNTOS
     # ========================================================
 
-    cant_adj = datos_adjuntos.get("cantidad", 0)
-    nombres_adj = datos_adjuntos.get("nombres", "")
+    cant_adj = datosAdjuntos.get("cantidad", 0)
+    nombres_adj = datosAdjuntos.get("nombres", "")
 
     if cant_adj in [None, ""]:
         cant_adj = 0
@@ -186,11 +186,11 @@ def ConstruirFilaReporteFinal(
     # 4. DETERMINAR ESTADO FINAL
     # ========================================================
 
-    estado_final = determinar_estado_reporte(
+    estadoFinal = determinar_estado_reporte(
         tiene_adjuntos=cant_adj > 0,
-        faltantes_me53n=faltantes_me53n,
-        faltantes_texto=faltantes_texto,
-        resultado_validaciones=resultado_validaciones,
+        faltantesMe53n=faltantesMe53n,
+        faltantesTexto=faltantesTexto,
+        resultadoValidaciones=resultadoValidaciones,
     )
     # ========================================
     # CONSTRUIR FILA DEL REPORTE
@@ -218,50 +218,50 @@ def ConstruirFilaReporteFinal(
         # ========================================
         # DATOS DE ADJUNTOS
         # ========================================
-        "CantAdjuntos": datos_adjuntos.get("cantidad", 0),
-        "Nombre de Adjunto": datos_adjuntos.get("nombres", ""),
+        "CantAdjuntos": datosAdjuntos.get("cantidad", 0),
+        "Nombre de Adjunto": datosAdjuntos.get("nombres", ""),
         # ========================================
         # DATOS DE ME53N (TablaSolped)
         # ========================================
-        "Material_ME53N": datos_me53n.get("Material", ""),
-        "Short Text_ME53N": datos_me53n.get("Texto breve", ""),
-        "Quantity_ME53N": datos_me53n.get("Cantidad", ""),
-        "Un": datos_me53n.get("UM", ""),
-        "Valn Price": datos_me53n.get("PrecioVal.", ""),
-        "Crcy": datos_me53n.get("Mon.", ""),
-        "Total Val.": datos_me53n.get("Valor tot.", ""),
-        "Deliv.Date": datos_me53n.get("Fe.entrega", ""),
-        "Fix. Vend.": datos_me53n.get("ProvFijo", ""),
-        "Plant": datos_me53n.get("Centro", ""),
-        "PGr_ME53N": datos_me53n.get("GCp", ""),
-        "POrg": datos_me53n.get("OrgC", ""),
-        "Matl Group": datos_me53n.get("Gpo.artíc.", ""),
-        "Id": datos_me53n.get("Pos.", ""),
+        "Material_ME53N": datosMe53n.get("Material", ""),
+        "Short Text_ME53N": datosMe53n.get("Texto breve", ""),
+        "Quantity_ME53N": datosMe53n.get("Cantidad", ""),
+        "Un": datosMe53n.get("UM", ""),
+        "Valn Price": datosMe53n.get("PrecioVal.", ""),
+        "Crcy": datosMe53n.get("Mon.", ""),
+        "Total Val.": datosMe53n.get("Valor tot.", ""),
+        "Deliv.Date": datosMe53n.get("Fe.entrega", ""),
+        "Fix. Vend.": datosMe53n.get("ProvFijo", ""),
+        "Plant": datosMe53n.get("Centro", ""),
+        "PGr_ME53N": datosMe53n.get("GCp", ""),
+        "POrg": datosMe53n.get("OrgC", ""),
+        "Matl Group": datosMe53n.get("Gpo.artíc.", ""),
+        "Id": datosMe53n.get("Pos.", ""),
         # ========================================
         # DATOS EXTRAÍDOS DEL TEXTO
         # ========================================
-        "PurchReq_Texto": datos_texto.get("numero_solped", ""),
-        "Item_Texto": datos_texto.get("numero_item", ""),
-        "Razon Social:": datos_texto.get("razon_social", ""),
-        "NIT:": datos_texto.get("nit", ""),
-        "Correo:": datos_texto.get("correo", ""),
-        "Concepto:": datos_texto.get("concepto_compra", ""),
-        "Cantidad:": datos_texto.get("cantidad", ""),
-        "Valor Unitario:": datos_texto.get("valor_unitario", ""),
-        "Valor Total:": datos_texto.get("valor_total", ""),
-        "Responsable:": datos_texto.get("responsable_compra", ""),
-        "CECO:": datos_texto.get("ceco", ""),
+        "PurchReq_Texto": datosTexto.get("numeroSolped", ""),
+        "Item_Texto": datosTexto.get("numeroItem", ""),
+        "Razon Social:": datosTexto.get("razon_social", ""),
+        "NIT:": datosTexto.get("nit", ""),
+        "Correo:": datosTexto.get("correo", ""),
+        "Concepto:": datosTexto.get("concepto_compra", ""),
+        "Cantidad:": datosTexto.get("cantidad", ""),
+        "Valor Unitario:": datosTexto.get("valor_unitario", ""),
+        "Valor Total:": datosTexto.get("valor_total", ""),
+        "Responsable:": datosTexto.get("responsable_compra", ""),
+        "CECO:": datosTexto.get("ceco", ""),
         # ========================================
         # RESULTADOS DE VALIDACIONES
         # ========================================
-        "CAMPOS OBLIGATORIOS FALTANTES ME53N": faltantes_me53n_texto,
-        "DATOS EXTRAIDOS DEL TEXTO FALTANTES": faltantes_texto_texto,
-        "CANTIDAD": resultado_validaciones.get("cantidad", False),
-        "VALOR_UNITARIO": resultado_validaciones.get("valor_unitario", False),
-        "VALOR_TOTAL": resultado_validaciones.get("valor_total", False),
-        "CONCEPTO": resultado_validaciones.get("concepto", False),
-        "Estado": estado_final,
-        "Observaciones": resultado_validaciones.get("observaciones", ""),
+        "CAMPOS OBLIGATORIOS FALTANTES ME53N": faltantesMe53n_texto,
+        "DATOS EXTRAIDOS DEL TEXTO FALTANTES": faltantesTexto_texto,
+        "CANTIDAD": resultadoValidaciones.get("cantidad", False),
+        "VALOR_UNITARIO": resultadoValidaciones.get("valor_unitario", False),
+        "VALOR_TOTAL": resultadoValidaciones.get("valor_total", False),
+        "CONCEPTO": resultadoValidaciones.get("concepto", False),
+        "Estado": estadoFinal,
+        "Observaciones": resultadoValidaciones.get("observaciones", ""),
     }
 
     return fila
@@ -291,13 +291,13 @@ def GenerarReporteFinalExcel(filas_reporte):
         # Generar nombre del archivo con timestamp
         timestamp = datetime.now().strftime("%Y%m%d")
         nombreArchivo = f"ReporteFinal{timestamp}.xlsx"
-        ruta_completa = os.path.join(RUTAS["PathResultados"], nombreArchivo)
+        rutaCompleta = os.path.join(RUTAS["PathResultados"], nombreArchivo)
 
         # Asegurar que existe el directorio
         os.makedirs(RUTAS["PathResultados"], exist_ok=True)
 
         # Guardar Excel con formato
-        with pd.ExcelWriter(ruta_completa, engine="openpyxl") as writer:
+        with pd.ExcelWriter(rutaCompleta, engine="openpyxl") as writer:
             df.to_excel(writer, sheet_name="Validación ME53N", index=False)
 
             # Obtener el worksheet para aplicar formato
@@ -315,8 +315,8 @@ def GenerarReporteFinalExcel(filas_reporte):
             # Congelar primera fila (encabezados)
             worksheet.freeze_panes = "A2"
 
-        print(f"Reporte Excel generado: {ruta_completa}")
-        return ruta_completa
+        print(f"Reporte Excel generado: {rutaCompleta}")
+        return rutaCompleta
 
     except Exception as e:
         print(f"Error generando reporte Excel: {e}")
@@ -344,7 +344,7 @@ def generar_reporte_resumen(filas_reporte):
 
     resumen = {
         "total_items": len(df),
-        "solpeds_unicas": df["PurchReq"].nunique() if "PurchReq" in df.columns else 0,
+        "solpedsUnicas": df["PurchReq"].nunique() if "PurchReq" in df.columns else 0,
         "items_por_estado": (
             df["Estado"].value_counts().to_dict() if "Estado" in df.columns else {}
         ),
@@ -393,7 +393,7 @@ def imprimir_resumen_reporte(filas_reporte):
     print("RESUMEN DEL REPORTE FINAL")
     print(f"{'='*60}")
     print(f"Total items procesados: {resumen['total_items']}")
-    print(f"SOLPEDs únicas: {resumen['solpeds_unicas']}")
+    print(f"SOLPEDs únicas: {resumen['solpedsUnicas']}")
     print(f"\nItems con adjuntos: {resumen['items_con_adjuntos']}")
     print(f"Items sin adjuntos: {resumen['items_sin_adjuntos']}")
 
@@ -487,11 +487,11 @@ def exportar_a_csv(filas_reporte, nombreArchivo=None):
             timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
             nombreArchivo = f"Reporte_final_ME53N_{timestamp}.csv"
 
-        ruta_completa = os.path.join(RUTAS["PathReportes"], nombreArchivo)
-        df.to_csv(ruta_completa, index=False, encoding="utf-8-sig")
+        rutaCompleta = os.path.join(RUTAS["PathReportes"], nombreArchivo)
+        df.to_csv(rutaCompleta, index=False, encoding="utf-8-sig")
 
-        print(f"Reporte CSV generado: {ruta_completa}")
-        return ruta_completa
+        print(f"Reporte CSV generado: {rutaCompleta}")
+        return rutaCompleta
 
     except Exception as e:
         print(f"Error generando CSV: {e}")
