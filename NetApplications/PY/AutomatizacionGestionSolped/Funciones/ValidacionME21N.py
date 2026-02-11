@@ -21,7 +21,7 @@ from pyautogui import ImageNotFoundException
 from Funciones.Login import ObtenerSesionActiva
 from Funciones.GuiShellFunciones import (SapTextEditor,
 set_GuiTextField_text,              
-get_GuiTextField_text,
+ObtenerTextoCampoGuitextfield,
 buscar_objeto_por_id_parcial,
 get_importesCondiciones,
 obtener_valor,
@@ -60,16 +60,16 @@ def ValidarAjustarSolped(session, item=1):
         for fila in range(item):  # cambiar por item
 
             # Obtiene el Precio de la posicion
-            # PrecioPosicion = get_GuiTextField_text(session, f"NETPR[10,{fila}]") #Stev: implementar while para scroll, hacer dinamico el f"NETPR[10,{fila}]"
-            PrecioPosicion = get_GuiTextField_text(session, f"NETPR[10,0]")
+            # PrecioPosicion = ObtenerTextoCampoGuitextfield(session, f"NETPR[10,{fila}]") #Stev: implementar while para scroll, hacer dinamico el f"NETPR[10,{fila}]"
+            PrecioPosicion = ObtenerTextoCampoGuitextfield(session, f"NETPR[10,0]")
             PrecioPosicion = normalizar_precio_sap(PrecioPosicion)
 
             # Obtine la Cantidad en la Posicion
-            # CantidadPosicion = get_GuiTextField_text(session, f"MENGE[6,{fila}]") #Stev: implementar while para scroll, hacer dinamico el f"MENGE[6,{fila}]"
-            CantidadPosicion = get_GuiTextField_text(session, f"MENGE[6,0]")
+            # CantidadPosicion = ObtenerTextoCampoGuitextfield(session, f"MENGE[6,{fila}]") #Stev: implementar while para scroll, hacer dinamico el f"MENGE[6,{fila}]"
+            CantidadPosicion = ObtenerTextoCampoGuitextfield(session, f"MENGE[6,0]")
             # CantidadPosicion = normalizar_precio_sap(CantidadPosicion)
 
-            FechaPosicion = get_GuiTextField_text(session, f"EEIND[9,0]")
+            FechaPosicion = ObtenerTextoCampoGuitextfield(session, f"EEIND[9,0]")
             #CantidadPosicion = normalizar_precio_sap(CantidadPosicion)
 
             # Selecbox de la posicion de la solped  ejemplo de guia :  1 [10] 80016676 , LAVADO MANTEL GRANDE 
@@ -178,7 +178,7 @@ def ValidarAjustarSolped(session, item=1):
             #     acciones.append(f"Impuesto Saludable en la posicion {fila+1}0: {valorImpSaludable}")
             """                   
             set_sap_table_scroll(session, "TC_1211", fila+1) # da scroll una posicion hacia abajo para no perder visual de los objetos en la tabla de SAP
-            #print(f"Primera posicion visible : {get_GuiTextField_text(session, f'EBELP[1,0]')}") # Muestra la primera posicion Visible despues del scroll 
+            #print(f"Primera posicion visible : {ObtenerTextoCampoGuitextfield(session, f'EBELP[1,0]')}") # Muestra la primera posicion Visible despues del scroll 
             EsperarSAPListo(session)
 
         # Devuelve las acciones ejecutadas en una lista 

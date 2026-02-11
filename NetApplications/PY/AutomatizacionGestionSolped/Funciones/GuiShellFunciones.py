@@ -375,10 +375,10 @@ def get_GuiCabeceraTextField_text(session, campo_id):
 
 
 # for fila in range(item):
-#   precio = get_GuiTextField_text(session, f"NETPR[10,{fila}]")
+#   precio = ObtenerTextoCampoGuitextfield(session, f"NETPR[10,{fila}]")
 
 
-def get_GuiTextField_text(session, campo_posicion):
+def ObtenerTextoCampoGuitextfield(session, campo_posicion):
     """
     Obtiene el texto de un GuiTextField dentro de un TableControl SAP
     usando una posición lógica (ej: 'NETPR[10,0]').
@@ -1360,12 +1360,12 @@ def obtener_importe_por_denominacion(session, nombre_buscado="imp.Saludable"):
         for i in range(visible_row_count):
             try:
                 # Obtenemos el texto de la columna Denominación (VTEXT)
-                denominacion = get_GuiTextField_text(session, f"VTEXT[2,{i}]")
+                denominacion = ObtenerTextoCampoGuitextfield(session, f"VTEXT[2,{i}]")
 
                 if nombre_buscado.lower() in denominacion.lower():
                     # Si coincide, capturamos el valor de la columna Importe (KBETR)
                     # Nota: Debes verificar el índice de columna para Importe en tu SAP
-                    importe = get_GuiTextField_text(session, f"KBETR[3,{i}]")
+                    importe = ObtenerTextoCampoGuitextfield(session, f"KBETR[3,{i}]")
                     return importe
             except Exception:
                 # Si falla una fila (ej: fila vacía al final), continuamos
@@ -1417,12 +1417,12 @@ def get_importesCondiciones(session, impuesto_buscado="Imp. Saludable IBUE"):
     while bandera == True:
         try:
             for i in range(20):  # Revisa las condiciones
-                impuestosCondiciones = get_GuiTextField_text(session, f"VTEXT[2,{i}]")
+                impuestosCondiciones = ObtenerTextoCampoGuitextfield(session, f"VTEXT[2,{i}]")
                 print(f"Impuesto en la pestaña de condiciones: {impuestosCondiciones}")
                 if impuestosCondiciones == impuesto_buscado:
                     print("Impuesto encontrado:", impuestosCondiciones)
                     bandera = False
-                    return get_GuiTextField_text(
+                    return ObtenerTextoCampoGuitextfield(
                         session, f"KBETR[3,{i}]"
                     )  # Retorna el importe asociado
 

@@ -30,6 +30,8 @@ def Main_GestionSolped():
     try:
         task_name = "Main_GestionSOLPED"
 
+        EjecutarHU00()
+
         # ================================
         # Inicio de Main
         # ================================
@@ -48,7 +50,7 @@ def Main_GestionSolped():
             task_name=task_name,
             path_log=RUTAS["PathLog"],
         )
-        EjecutarHU00()
+        
         WriteLog(
             mensaje="Finaliza HU00_DespliegueAmbiente.",
             estado="INFO",
@@ -133,7 +135,9 @@ def Main_GestionSolped():
             path_log=RUTAS["PathLog"],
         )
 
-        EjecutarHU04(session)
+        archivos_validar = ["expSolped03 copy.txt"] 
+        for archivo in archivos_validar:
+            EjecutarHU04(session, archivo)
 
         WriteLog(
             mensaje="HU04 - Generación OC finalizada correctamente.",

@@ -108,7 +108,7 @@ def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
             if validarLoginDiag(
                 ruta_imagen=rf".\img\logindiag.png",
                 confidence=0.5,
-                intentos=20,
+                intentos= int (inConfig("ReIntentos")),
                 espera=0.5,
             ):
                 print("INFO | Ventana loginDiag superada correctamente")

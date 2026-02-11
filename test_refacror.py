@@ -7,7 +7,7 @@ RENAME_MAP = {
     "ColsultarSolped": "ConsultarSolped",
     "EnviarCorro_personalizado": "EnviarCorreoPersonalizado",
     "SetGuiComboBoxkey": "EstablecerLlaveGuiComboBox",
-    "get_GuiTextField_text": "ObtenerTextoCampoGui",
+    "ObtenerTextoCampoGuitextfield": "ObtenerTextoCampoGui",
     "set_GuiTextField_text": "EstablecerTextoCampoGui",
     "obtener_valor": "ObtenerValor",
     "buscar_objeto_por_id_parcial": "BuscarObjetoPorIdParcial",

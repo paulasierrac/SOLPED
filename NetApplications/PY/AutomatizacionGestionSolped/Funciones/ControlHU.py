@@ -21,10 +21,13 @@ def control_hu(iNombreHU: str, estado: int):
     
     maquina = socket.gethostname()
 
-    ControlHURepo.actualizar_estado_hu(
-        iHuId=iHuId,
-        iNombreHU=iNombreHU,
-        estado=estado,
-        activa=activa,
-        maquina=maquina
-    )
+    #repo = ControlHURepo(schema="GestionSolped")
+    repo = ControlHURepo(schema=None)
+
+
+    Prueba1 = repo.ActualizarEstadoHU(iHuId=iHuId, iNombreHU=iNombreHU, estado=estado, activa=activa, maquina=maquina)
+
+    if Prueba1:
+        print(f"Verdadero HU Actualizada {iHuId}")
+    else:
+        print(f"Falso HU Actualizada {iHuId}")
