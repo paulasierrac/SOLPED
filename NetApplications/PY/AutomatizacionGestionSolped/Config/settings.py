@@ -62,7 +62,7 @@ RUTAS = {
     "PathLog": in_config("PathLog"),
     "PathLogError": get_env_variable("PATHLOGERROR"),
     "PathResultados": in_config("PathResultado"),
-    "PathReportes": get_env_variable("PATHREPORTES"),
+    "PathReportes": in_config("PathTempReportes"),
     "PathInsumo": get_env_variable("PATHINSUMO"),
     "PathTexto": get_env_variable("PATHTEXTO_SAP"),
     "PathRuta": get_env_variable("PATHRUTA_SAP"),

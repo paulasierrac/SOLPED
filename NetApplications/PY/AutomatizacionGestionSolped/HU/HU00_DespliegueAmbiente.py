@@ -13,7 +13,7 @@
 import os
 import json
 from Funciones.ControlHU import control_hu
-from Config.init_config import in_config,init_config
+from Config.init_config import init_config
 
 
 def EjecutarHU00():
@@ -82,20 +82,6 @@ def EjecutarHU00():
                 config = {}
         else:
             # WriteLog | WARN | No existe config.json
-            config = {}
-
-        rutaParametros = os.path.join(in_config("PathInsumo"),"Parametros SAMIR.xlsx")
-        ExcelService.ejecutar_bulk_desde_excel(rutaParametros)
-
-
-    
-
-        ruta_config = os.path.join(ruta_base, "Config.json")
-
-        if os.path.exists(ruta_config):
-            with open(ruta_config, "r", encoding="utf-8") as f:
-                config = json.load(f)
-        else:
             config = {}
 
         # WriteLog | INFO | FINALIZA HU00
