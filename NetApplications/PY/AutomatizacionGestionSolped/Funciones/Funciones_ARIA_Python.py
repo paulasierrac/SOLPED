@@ -372,10 +372,10 @@ def NotaCredito(Diccionario):
             #print(archivo_destino)
             #registros.to_excel(archivo_destino, index=False, header=False)
             registros=LimpiarCaracteres(registros)
-            registros.to_csv(archivo_destino, index=False, header=False, sep=';', float_format='%.0f', codificacion='latin-1')
-            registros=pd.read_csv(archivo_destino, sep='|', header=None, codificacion='latin-1')
+            registros.to_csv(archivo_destino, index=False, header=False, sep=';', float_format='%.0f', encoding='latin-1')
+            registros=pd.read_csv(archivo_destino, sep='|', header=None, encoding='latin-1')
             registros.loc[0,0]=registros.loc[0,0].rstrip(';')
-            registros.to_csv(archivo_destino, index=False, header=False, sep='|', float_format='%.0f', codificacion='latin-1')
+            registros.to_csv(archivo_destino, index=False, header=False, sep='|', float_format='%.0f', encoding='latin-1')
                 #total2.to_excel(rutaFinal+'NotasCredito'+fechaYM+'.xlsx', index=False)
         
         return ("Archivos separados "+str(num_archivos))
@@ -392,7 +392,7 @@ def GenerarListaPedidos(Diccionario):
         print(rutaCSV)
         print(rutaExcel)
         engine=ConexionDB(Diccionario)
-        df=pd.read_csv(rutaCSV, codificacion='latin-1',sep='\t',skiprows=4)
+        df=pd.read_csv(rutaCSV, encoding='latin-1',sep='\t',skiprows=4)
         df=df.reset_index()
         df=df.iloc[:, [1,5,17,22,24,33,79]]
         df.columns=['Doc.comer.','Denominacion','Solic.','Material','Nombre 1','Valor neto','Factura']

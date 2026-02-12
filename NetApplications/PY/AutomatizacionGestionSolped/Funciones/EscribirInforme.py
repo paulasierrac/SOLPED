@@ -74,7 +74,7 @@ def EscribirIformeOperacion(
     contenido.append("Informe generado automáticamente por RPA.\n")
 
     # === Guardar ===
-    with open(rutaArchivo, "w", codificacion="utf-8") as f:
+    with open(rutaArchivo, "w", encoding="utf-8") as f:
         f.writelines(contenido)
 
     return rutaArchivo

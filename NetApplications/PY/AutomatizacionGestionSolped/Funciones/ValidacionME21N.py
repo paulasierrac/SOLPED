@@ -256,7 +256,14 @@ def AbrirSolped(session, solped, item=2,posiciones = ["20","30","50","60"]):
         ultimoItem = item + 2 # Ultima posicion tomada 
 
         for i in posiciones:   # recordar que en range no incluye el ultimo 
-            #i= (int i)/10
+            print (posiciones)
+            print("Valores a evaluar ")
+            print(i)
+            print (type(i))
+            i = int(int(i) / 10)
+            print("Valores a evaluar ")
+            print(i)
+            print (type(i))
             session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[1]").selectNode(f"          {i}")
 
         EsperarSAPListo(session)

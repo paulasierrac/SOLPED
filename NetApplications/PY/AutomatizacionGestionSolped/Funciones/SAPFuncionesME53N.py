@@ -40,7 +40,7 @@ from Funciones.ValidacionME53N import (
 )
 
 def ObtenerTextoDelPortapapeles():
-    """Obtener texto del portapapeles con manejo correcto de codificacion"""
+    """Obtener texto del portapapeles con manejo correcto de encoding"""
     try:
         # Abrir portapapeles
         win32clipboard.OpenClipboard()
@@ -101,7 +101,7 @@ def ObtenerItemTextME53N(session, numeroSolped, numeroItem):
         pyautogui.hotkey("ctrl", "c")
         time.sleep(0.5)
 
-        # 5) Obtener texto del portapapeles con codificacion correcta
+        # 5) Obtener texto del portapapeles con encoding correcta
         texto_completo = ObtenerTextoDelPortapapeles()
 
         # 6) Limpiar caracteres problematicos si los hay
@@ -112,7 +112,7 @@ def ObtenerItemTextME53N(session, numeroSolped, numeroItem):
         # 7. Guardar texto en archivo de log
         # path = r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\texto_ITEMsap.txt"
         path = rf"{RUTAS["PathInsumos"]}\texto_ITEMsap.txt"
-        with open(path, "a", codificacion="utf-8") as f:
+        with open(path, "a", encoding="utf-8") as f:
             f.write(identificador)
             f.write(texto_limpio + "\n")
             f.write("-" * 80 + "\n")
@@ -156,23 +156,23 @@ def ProcesarTablaME5A(name, dias=None):
 
         # INTENTAR LEER CON DIFERENTES CODIFICACIONES
         lineas = []
-        codificaciones = ["latin-1", "cp1252", "iso-8859-1", "utf-8"]
+        encodinges = ["latin-1", "cp1252", "iso-8859-1", "utf-8"]
 
-        for codificacion in codificaciones:
+        for encoding in encodinges:
             try:
-                with open(path, "r", codificacion=codificacion) as f:
+                with open(path, "r", encoding=encoding) as f:
                     lineas = f.readlines()
-                print(f"EXITO: Archivo leido con codificacion {codificacion}")
+                print(f"EXITO: Archivo leido con encoding {encoding}")
                 break
             except UnicodeDecodeError as e:
-                print(f"ERROR con {codificacion}: {e}")
+                print(f"ERROR con {encoding}: {e}")
                 continue
             except Exception as e:
-                print(f"ERROR con {codificacion}: {e}")
+                print(f"ERROR con {encoding}: {e}")
                 continue
 
         if not lineas:
-            print("ERROR: No se pudo leer el archivo con ninguna codificacion")
+            print("ERROR: No se pudo leer el archivo con ninguna encoding")
             return pd.DataFrame()
 
         # Filtrar solo lineas de datos
@@ -378,7 +378,7 @@ def ProcesarTablaME5A(name, dias=None):
 
 def TablaItemsDataFrame(name) -> pd.DataFrame:
     """name: nombre del archivo a consultar
-    Convierte tabla de items a df con deteccion automatica de codificacion"""
+    Convierte tabla de items a df con deteccion automatica de encoding"""
 
     try:
         WriteLog(
@@ -392,21 +392,21 @@ def TablaItemsDataFrame(name) -> pd.DataFrame:
         path = rf"{RUTAS["PathInsumos"]}\TablasME53N\{name}"
 
         # ========== DETECCION DE CODIFICACION ==========
-        codificacion = DetectarCodificacion(path)
+        encoding = DetectarCodificacion(path)
 
-        # 1. Leer archivo con la codificacion correcta
+        # 1. Leer archivo con la encoding correcta
         try:
-            with open(path, "r", codificacion=codificacion) as f:
+            with open(path, "r", encoding=encoding) as f:
                 texto = f.read()
         except Exception as e:
-            # Si falla, intentar con otras codificaciones comunes
-            print(f"Error con {codificacion}, intentando alternativas...")
+            # Si falla, intentar con otras encodinges comunes
+            print(f"Error con {encoding}, intentando alternativas...")
             for enc in ["latin-1", "cp1252", "iso-8859-1", "utf-8"]:
                 try:
-                    with open(path, "r", codificacion=enc) as f:
+                    with open(path, "r", encoding=enc) as f:
                         texto = f.read()
                     print(f"EXITO con {enc}")
-                    codificacion = enc
+                    encoding = enc
                     break
                 except:
                     continue
@@ -455,7 +455,7 @@ def TablaItemsDataFrame(name) -> pd.DataFrame:
         df = pd.DataFrame(filas, columns=columnas_unicas)
 
         WriteLog(
-            mensaje=f"DataFrame conversion correcta. Codificacion: {codificacion}",
+            mensaje=f"DataFrame conversion correcta. Codificacion: {encoding}",
             estado="INFO",
             nombreTarea="TablaItemsDataFrame",
             rutaRegistro=RUTAS["PathLog"],
@@ -463,7 +463,7 @@ def TablaItemsDataFrame(name) -> pd.DataFrame:
         print(f"EXITO: DataFrame conversion correcta")
         print(f"  - Filas: {df.shape[0]}")
         print(f"  - Columnas: {df.shape[1]}")
-        print(f"  - Codificacion: {codificacion}")
+        print(f"  - Codificacion: {encoding}")
 
         return df
 
@@ -479,19 +479,19 @@ def TablaItemsDataFrame(name) -> pd.DataFrame:
 
 
 def DetectarCodificacion(path):
-    """Detecta automaticamente la codificacion del archivo"""
+    """Detecta automaticamente la encoding del archivo"""
     try:
         with open(path, "rb") as f:
             rawdata = f.read()
 
         resultado = chardet.detect(rawdata)
-        codificacion = resultado["codificacion"]
+        encoding = resultado["encoding"]
         confidence = resultado["confidence"]
 
-        print(f"Codificacion detectada: {codificacion} (confianza: {confidence*100:.1f}%)")
-        return codificacion
+        print(f"Codificacion detectada: {encoding} (confianza: {confidence*100:.1f}%)")
+        return encoding
     except Exception as e:
-        print(f"Error detectando codificacion: {e}")
+        print(f"Error detectando encoding: {e}")
         return "utf-8"
 
 
@@ -628,7 +628,7 @@ def GuardarTablaME5A(df, name):
             filas_txt.append(fila_txt)
 
         # Escribir archivo
-        with open(path, "w", codificacion="utf-8") as f:
+        with open(path, "w", encoding="utf-8") as f:
             f.write(separador + "\n")
             f.write(encabezado + "\n")
             f.write(separador + "\n")
@@ -935,7 +935,7 @@ def ValidarAttachmentList(session, numeroSolped):
         rutaRegistro_archivosAdjuntos = rf"{RUTAS['PathInsumos']}\attachment_lists.txt"
 
         try:
-            with open(rutaRegistro_archivosAdjuntos, "a", codificacion="utf-8") as f:
+            with open(rutaRegistro_archivosAdjuntos, "a", encoding="utf-8") as f:
                 f.write(identificador)
                 f.write(contenido_portapapeles)
                 f.write("\n" + "-" * 80 + "\n")

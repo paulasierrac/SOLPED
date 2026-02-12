@@ -21,11 +21,12 @@ from typing import List, Union
 import sys
 from openpyxl import load_workbook
 from Funciones.SAPFuncionesME53N import GuardarTablaME5A,ParsearTablaAttachments
+import win32clipboard
 
 
-# Configurar codificacion para consola de Windows
+# Configurar encoding para consola de Windows
 if sys.platform == "win32":
-    sys.stdout.reconfigure(codificacion="utf-8")
+    sys.stdout.reconfigure(encoding="utf-8")
 
 
 def EliminarArchivoSiExiste(rutaArchivo):
@@ -64,7 +65,7 @@ def ConvertirTxtAExcel(archivo):
 
         rutaArchivoTxt = rf"{RUTAS["PathInsumos"]}\{archivo}"
         # Leer el archivo
-        with open(rutaArchivoTxt, "r", codificacion="utf-8") as f:
+        with open(rutaArchivoTxt, "r", encoding="utf-8") as f:
             lineas = f.readlines()
 
         # Filtrar líneas que contienen datos (excluir líneas de separadores)
@@ -401,7 +402,7 @@ def convertirValidacionesALista(texto):
 
 
 def ObtenerTextoDelPortapapeles():
-    """Obtener texto del portapapeles con manejo correcto de codificacion"""
+    """Obtener texto del portapapeles con manejo correcto de encoding"""
     try:
         # Abrir portapapeles
         win32clipboard.OpenClipboard()

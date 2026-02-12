@@ -73,7 +73,7 @@ def EjecutarHU00():
         rutaConfig = os.path.join(rutaBase, "Config.json")
 
         if os.path.exists(rutaConfig):
-            with open(rutaConfig, "r", codificacion="utf-8") as f:
+            with open(rutaConfig, "r", encoding="utf-8") as f:
                 config = json.load(f)
         else:
             config = {}

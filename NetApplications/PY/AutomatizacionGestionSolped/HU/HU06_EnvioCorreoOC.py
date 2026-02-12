@@ -56,7 +56,7 @@ def generarEnviosYEeporte(consolidado):
         OUTPUT_DIR, f"Informe_Envios_{datetime.now().strftime('%Y%m%d_%H%M')}.csv"
     )
 
-    with open(reportePath, mode="w", newline="", codificacion="utf-8") as file:
+    with open(reportePath, mode="w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file, delimiter=";")
         writer.writerow(
             ["Proveedor", "Correos Destino", "Ordenes de Compra", "Estado Envío"]

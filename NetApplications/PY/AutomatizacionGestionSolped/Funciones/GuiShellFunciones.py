@@ -815,7 +815,7 @@ def leer_solpeds_desde_archivo(rutaArchivo):
     """
     resultados = {}
 
-    with open(rutaArchivo, "r", codificacion="utf-8", errors="ignore") as f:
+    with open(rutaArchivo, "r", encoding="utf-8", errors="ignore") as f:
         for linea in f:
             # Todas las líneas útiles empiezan con '|'
             if not linea.strip().startswith("|"):
@@ -991,23 +991,23 @@ def ProcesarTabla(name, dias=None):
 
         # INTENTAR LEER CON DIFERENTES CODIFICACIONES
         lineas = []
-        codificaciones = ["latin-1", "cp1252", "iso-8859-1", "utf-8"]
+        encodinges = ["latin-1", "cp1252", "iso-8859-1", "utf-8"]
 
-        for codificacion in codificaciones:
+        for encoding in encodinges:
             try:
-                with open(path, "r", codificacion=codificacion) as f:
+                with open(path, "r", encoding=encoding) as f:
                     lineas = f.readlines()
-                # print(f"EXITO: Archivo leido con codificacion {codificacion}")
+                # print(f"EXITO: Archivo leido con encoding {encoding}")
                 break
             except UnicodeDecodeError as e:
-                print(f"ERROR con {codificacion}: {e}")
+                print(f"ERROR con {encoding}: {e}")
                 continue
             except Exception as e:
-                print(f"ERROR con {codificacion}: {e}")
+                print(f"ERROR con {encoding}: {e}")
                 continue
 
         if not lineas:
-            print("ERROR: No se pudo leer el archivo con ninguna codificacion")
+            print("ERROR: No se pudo leer el archivo con ninguna encoding")
             return pd.DataFrame()
 
         # Filtrar solo lineas de datos
@@ -1217,7 +1217,7 @@ def ProcesarTablaMejorada(name, dias=None):
         lineas_puras = []
         for cod in ["latin-1", "utf-8", "cp1252"]:
             try:
-                with open(path, "r", codificacion=cod) as f:
+                with open(path, "r", encoding=cod) as f:
                     lineas_puras = [l.strip() for l in f.readlines()]
                 break
             except: continue

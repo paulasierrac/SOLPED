@@ -102,7 +102,7 @@ def EjecutarHU04(session, archivo):
             AbrirTransaccion(session, "ME21N",)
             EsperarSAPListo(session)
             #navegacion por SAP que permite abrir Solped 
-            posiciones = {"20","30","50","60"}
+            posiciones = ["10","40","50","60"]
             AbrirSolped(session, solped, itemCount, posiciones)
 
             #se selecciona la clase de docuemnto ZRCR, revisar alcance si es necesario cambiar a otra clase dependiendo de algun criterio

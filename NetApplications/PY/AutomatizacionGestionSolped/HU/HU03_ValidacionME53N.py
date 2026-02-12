@@ -226,7 +226,7 @@ def EjecutarHU03(session, nombreArchivo):
                         f"{RUTAS['PathReportes']}\\Attachments_{solped}.txt"
                     )
                     try:
-                        with open(pathReporteAttach, "w", codificacion="utf-8") as f:
+                        with open(pathReporteAttach, "w", encoding="utf-8") as f:
                             f.write(reporteAttachments)
                     except Exception as e:
                         pass
@@ -373,7 +373,7 @@ def EjecutarHU03(session, nombreArchivo):
                         # Guardar reporte detallado
                         pathReporte = f"{RUTAS['PathReportes']}\\Reporte_{solped}_{numeroItem}.txt"
                         try:
-                            with open(pathReporte, "w", codificacion="utf-8") as f:
+                            with open(pathReporte, "w", encoding="utf-8") as f:
                                 f.write(reporte)
                         except Exception as e:
                             pass

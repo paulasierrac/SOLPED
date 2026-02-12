@@ -82,7 +82,7 @@ def WriteLog(mensaje: str, estado: str, nombreTarea: str, rutaRegistro: str):
         # ==========================================================
         # 6. Escritura
         # ==========================================================
-        with open(rutaArchivo, "a", codificacion="utf-8") as f:
+        with open(rutaArchivo, "a", encoding="utf-8") as f:
             f.write(linea)
 
     except Exception as e:
