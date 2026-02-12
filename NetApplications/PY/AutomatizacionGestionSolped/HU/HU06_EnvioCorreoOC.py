@@ -56,7 +56,7 @@ def generarEnviosYEeporte(consolidado):
         OUTPUT_DIR, f"Informe_Envios_{datetime.now().strftime('%Y%m%d_%H%M')}.csv"
     )
 
-    with open(reportePath, mode="w", newline="", encoding="utf-8") as file:
+    with open(reportePath, mode="w", newline="", codificacion="utf-8") as file:
         writer = csv.writer(file, delimiter=";")
         writer.writerow(
             ["Proveedor", "Correos Destino", "Ordenes de Compra", "Estado Envío"]
@@ -90,7 +90,7 @@ def generarEnviosYEeporte(consolidado):
 
                 EnviarNotificacionCorreo(
                     codigoCorreo=1,
-                    taskName="Prueba - Notificacion",
+                    nombreTarea="Prueba - Notificacion",
                     adjuntos=adjuntosFinales,
                 )
 
@@ -211,7 +211,7 @@ def obtenerTipoProveedor(textoPdf, dictTipos):
 
 def EjecutarHU06():
 
-    taskName = "HU06_EnvioCorreoOC"
+    nombreTarea = "HU06_EnvioCorreoOC"
     # Diccionario para agrupar: { "Nombre Proveedor": { "correos": [], "ocs": [], "archivos": [] } }
     consolidadoProveedores = {}
 
@@ -237,8 +237,8 @@ def EjecutarHU06():
     WriteLog(
         mensaje="Inicio ejecución Envio Correo de OC.",
         estado="INFO",
-        taskName=taskName,
-        pathLog=RUTAS["PathLog"],
+        nombreTarea=nombreTarea,
+        rutaRegistro=RUTAS["PathLog"],
     )
 
     # Asegurar que los directorios existen
@@ -292,7 +292,7 @@ def EjecutarHU06():
     WriteLog(
         mensaje="Fin ejecución Envio Correo de OC.",
         estado="INFO",
-        taskName=taskName,
-        pathLog=RUTAS["PathLog"],
+        nombreTarea=nombreTarea,
+        rutaRegistro=RUTAS["PathLog"],
     )
     log("Fin proceso RPA")

@@ -58,7 +58,7 @@ RENAME_MAP = {
 
 def replace_in_file(file_path):
     try:
-        with open(file_path, 'r', encoding='utf-8') as f:
+        with open(file_path, 'r', codificacion='utf-8') as f:
             content = f.read()
         
         original_content = content
@@ -73,7 +73,7 @@ def replace_in_file(file_path):
             
         if content != original_content:
             print(f"Modifying: {file_path}")
-            with open(file_path, 'w', encoding='utf-8') as f:
+            with open(file_path, 'w', codificacion='utf-8') as f:
                 f.write(content)
             return True
         return False

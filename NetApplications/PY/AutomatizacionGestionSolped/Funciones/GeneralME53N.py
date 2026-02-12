@@ -26,23 +26,24 @@ from Funciones.EmailSender import EmailSender
 from typing import List, Union
 import sys
 from openpyxl import load_workbook
+from Funciones.SAPFuncionesME53N import GuardarTablaME5A,ParsearTablaAttachments
 
 
-# Configurar encoding para consola de Windows
+# Configurar codificacion para consola de Windows
 if sys.platform == "win32":
-    sys.stdout.reconfigure(encoding="utf-8")
+    sys.stdout.reconfigure(codificacion="utf-8")
 
 
-def EliminarArchivoSiExiste(ruta_archivo):
+def EliminarArchivoSiExiste(rutaArchivo):
     try:
-        if os.path.exists(ruta_archivo):
-            WriteLog(f"Eliminando archivo: {ruta_archivo}", "INFO")
-            os.remove(ruta_archivo)
-            WriteLog(f"Archivo eliminado correctamente: {ruta_archivo}", "INFO")
+        if os.path.exists(rutaArchivo):
+            WriteLog(f"Eliminando archivo: {rutaArchivo}", "INFO")
+            os.remove(rutaArchivo)
+            WriteLog(f"Archivo eliminado correctamente: {rutaArchivo}", "INFO")
         else:
-            WriteLog(f"No existe archivo para eliminar: {ruta_archivo}", "INFO")
+            WriteLog(f"No existe archivo para eliminar: {rutaArchivo}", "INFO")
     except Exception as e:
-        WriteLog(f"Error al eliminar archivo {ruta_archivo} | Error: {str(e)}", "ERROR")
+        WriteLog(f"Error al eliminar archivo {rutaArchivo} | Error: {str(e)}", "ERROR")
 
 
 def ConvertirTxtAExcel(archivo):
@@ -51,7 +52,7 @@ def ConvertirTxtAExcel(archivo):
 
     Parámetros:
     -----------
-    ruta_archivo_txt : str
+    rutaArchivoTxt : str
         Ruta completa del archivo TXT a convertir
 
     Retorna:
@@ -67,52 +68,52 @@ def ConvertirTxtAExcel(archivo):
     try:
         print(f"Leyendo archivo: {archivo}")
 
-        ruta_archivo_txt = rf"{RUTAS["PathInsumos"]}\{archivo}"
+        rutaArchivoTxt = rf"{RUTAS["PathInsumos"]}\{archivo}"
         # Leer el archivo
-        with open(ruta_archivo_txt, "r", encoding="utf-8") as f:
+        with open(rutaArchivoTxt, "r", codificacion="utf-8") as f:
             lineas = f.readlines()
 
         # Filtrar líneas que contienen datos (excluir líneas de separadores)
-        lineas_validas = []
+        lineasValidas = []
         for linea in lineas:
-            linea_limpia = linea.strip()
+            lineaLimpia = linea.strip()
             # Verificar que tenga pipes y no sea solo guiones
             if (
-                "|" in linea_limpia
-                and not linea_limpia.replace("-", "").replace("|", "").strip() == ""
+                "|" in lineaLimpia
+                and not lineaLimpia.replace("-", "").replace("|", "").strip() == ""
             ):
-                lineas_validas.append(linea_limpia)
+                lineasValidas.append(lineaLimpia)
 
-        if len(lineas_validas) < 2:
+        if len(lineasValidas) < 2:
             raise ValueError("El archivo no contiene suficientes datos")
 
-        print(f"Lineas validas encontradas: {len(lineas_validas)}")
+        print(f"Lineas validas encontradas: {len(lineasValidas)}")
 
         # Procesar encabezados (primera línea válida)
         # NO filtrar campos vacíos, mantener todas las posiciones
-        encabezados_raw = lineas_validas[0].split("|")
+        encabezadosFila = lineasValidas[0].split("|")
         # Eliminar solo el primer y último elemento si están vacíos (bordes del pipe)
-        if encabezados_raw and encabezados_raw[0].strip() == "":
-            encabezados_raw = encabezados_raw[1:]
-        if encabezados_raw and encabezados_raw[-1].strip() == "":
-            encabezados_raw = encabezados_raw[:-1]
-        encabezados = [campo.strip() for campo in encabezados_raw]
+        if encabezadosFila and encabezadosFila[0].strip() == "":
+            encabezadosFila = encabezadosFila[1:]
+        if encabezadosFila and encabezadosFila[-1].strip() == "":
+            encabezadosFila = encabezadosFila[:-1]
+        encabezados = [campo.strip() for campo in encabezadosFila]
 
         print(f"\nColumnas encontradas: {len(encabezados)}")
         for i, col in enumerate(encabezados, 1):
             print(f"  {i}. {col}")
 
         # Procesar datos (resto de líneas)
-        datos_procesados = []
-        for i, linea in enumerate(lineas_validas[1:], start=2):
-            campos_raw = linea.split("|")
+        datosProcesados = []
+        for i, linea in enumerate(lineasValidas[1:], start=2):
+            camposFila = linea.split("|")
             # Eliminar solo el primer y último elemento si están vacíos (bordes del pipe)
-            if campos_raw and campos_raw[0].strip() == "":
-                campos_raw = campos_raw[1:]
-            if campos_raw and campos_raw[-1].strip() == "":
-                campos_raw = campos_raw[:-1]
+            if camposFila and camposFila[0].strip() == "":
+                camposFila = camposFila[1:]
+            if camposFila and camposFila[-1].strip() == "":
+                camposFila = camposFila[:-1]
             # Mantener TODAS las posiciones, incluso las vacías
-            campos = [campo.strip() for campo in campos_raw]
+            campos = [campo.strip() for campo in camposFila]
 
             # Asegurar que tenga el mismo número de columnas
             if len(campos) != len(encabezados):
@@ -125,15 +126,15 @@ def ConvertirTxtAExcel(archivo):
                 else:
                     campos = campos[: len(encabezados)]
 
-            datos_procesados.append(campos)
+            datosProcesados.append(campos)
 
         # Crear DataFrame
-        df = pd.DataFrame(datos_procesados, columns=encabezados)
+        df = pd.DataFrame(datosProcesados, columns=encabezados)
 
         print(f"\nDataFrame creado: {len(df)} filas x {len(df.columns)} columnas")
 
         # Generar nombre del archivo Excel
-        rutaExcel = ruta_archivo_txt.rsplit(".", 1)[0] + ".xlsx"
+        rutaExcel = rutaArchivoTxt.rsplit(".", 1)[0] + ".xlsx"
 
         # Guardar a Excel con formato
         print(f"\nGuardando archivo Excel...")
@@ -144,8 +145,8 @@ def ConvertirTxtAExcel(archivo):
             worksheet = writer.sheets["Datos"]
             for idx, col in enumerate(df.columns):
                 # Calcular ancho máximo
-                max_length = max(df[col].astype(str).apply(len).max(), len(col)) + 2
-                max_length = min(max_length, 60)
+                longitudMax = max(df[col].astype(str).apply(len).max(), len(col)) + 2
+                longitudMax = min(longitudMax, 60)
 
                 # Calcular letra de columna
                 if idx < 26:
@@ -153,14 +154,14 @@ def ConvertirTxtAExcel(archivo):
                 else:
                     col_letter = chr(64 + idx // 26) + chr(65 + idx % 26)
 
-                worksheet.column_dimensions[col_letter].width = max_length
+                worksheet.column_dimensions[col_letter].width = longitudMax
 
         print(f"\n[OK] Archivo convertido exitosamente!")
         print(f"Ubicacion: {rutaExcel}")
         return rutaExcel
 
     except FileNotFoundError:
-        print(f"[ERROR] No se encontro el archivo '{ruta_archivo_txt}'")
+        print(f"[ERROR] No se encontro el archivo '{rutaArchivoTxt}'")
         raise
     except Exception as e:
         print(f"[ERROR] Error al convertir el archivo: {str(e)}")
@@ -174,11 +175,11 @@ def GenerarReporteAttachments(
     solped: str, tieneAttachments: bool, contenido: str, observaciones: str
 ) -> str:
     """
-    Genera un reporte formateado de la validación de attachments
+    Genera un reporte formateado de la validación de archivosAdjuntos
 
     Args:
         solped: Número de SOLPED
-        tieneAttachments: Si tiene attachments o no
+        tieneAttachments: Si tiene archivosAdjuntos o no
         contenido: Contenido de la tabla exportada
         observaciones: Observaciones de la validación
 
@@ -192,16 +193,16 @@ def GenerarReporteAttachments(
     reporte += f"Estado: {'CON ADJUNTOS' if tieneAttachments else 'SIN ADJUNTOS'}\n"
     reporte += f"Observaciones: {observaciones}\n\n"
 
-    attachments = ParsearTablaAttachments(contenido)
+    archivosAdjuntos = ParsearTablaAttachments(contenido)
 
-    if attachments:
-        # Parsear tabla de attachments
+    if archivosAdjuntos:
+        # Parsear tabla de archivosAdjuntos
 
-        if attachments:
-            reporte += f"ARCHIVOS ADJUNTOS ENCONTRADOS ({len(attachments)}):\n"
+        if archivosAdjuntos:
+            reporte += f"ARCHIVOS ADJUNTOS ENCONTRADOS ({len(archivosAdjuntos)}):\n"
             reporte += f"{'-'*80}\n"
 
-            for i, attach in enumerate(attachments, 1):
+            for i, attach in enumerate(archivosAdjuntos, 1):
                 reporte += f"\n{i}. Archivo: {attach['title']}\n"
                 reporte += f"   Creado por: {attach['creator']}\n"
                 reporte += f"   Fecha: {attach['date']}\n"
@@ -228,7 +229,7 @@ def NotificarRevisionManualSolped(
     destinatarios: Union[str, List[str]],
     numeroSolped: Union[int, str],
     validaciones: str,
-    taskName: str = "RevisionManualSolped",
+    nombreTarea: str = "RevisionManualSolped",
 ) -> bool:
     """
     Envía una notificación de revisión manual para un SOLPED específico,
@@ -238,17 +239,17 @@ def NotificarRevisionManualSolped(
         destinatarios: Un email (str) o una lista de emails (List[str]).
         numeroSolped: El número de la solicitud de pedido (SOLPED).
         validaciones: Texto que contiene las razones de la validación.
-        taskName: Nombre de la tarea para los logs.
+        nombreTarea: Nombre de la tarea para los logs.
 
     Returns:
         bool: True si el envío fue exitoso, False en caso contrario.
     """
 
     # 1. Preparar el Asunto
-    asunto_template = f"El Solped {numeroSolped} Necesita revisión manual"
+    asuntoTemplate = f"El Solped {numeroSolped} Necesita revisión manual"
 
     # 2. Preparar el Cuerpo del Mensaje (Formato HTML)
-    cuerpo_template = f"""
+    cuerpoTemplate = f"""
         <html>
             <body style="font-family: Arial, sans-serif;">
                 <h2 style="color: #CC0000;">Solicitud de Revisión Manual Requerida</h2>
@@ -256,7 +257,7 @@ def NotificarRevisionManualSolped(
                 
                 <div style="border: 1px solid #ddd; padding: 15px; margin: 15px 0; background-color: #f9f9f9;">
                     <div style="padding: 10px; margin: 10px 0; background-color: #f4f4f4; border-radius: 6px;">
-                        {convertir_validaciones_a_lista(validaciones)}
+                        {convertirValidacionesALista(validaciones)}
                     </div>
                 </div>
 
@@ -269,13 +270,13 @@ def NotificarRevisionManualSolped(
 
     # Asegurar que destinatarios sea una lista si viene como string
     if isinstance(destinatarios, str):
-        destinatario_principal = destinatarios
-        cc_list = None
+        destinatarioPrincipal = destinatarios
+        ccList = None
     else:
         # Usamos el primer elemento como destinatario principal y el resto como CC (o podrías ajustar esta lógica)
         if destinatarios:
-            destinatario_principal = destinatarios[0]
-            cc_list = destinatarios[1:] if len(destinatarios) > 1 else None
+            destinatarioPrincipal = destinatarios[0]
+            ccList = destinatarios[1:] if len(destinatarios) > 1 else None
         else:
             # Manejar el caso de lista vacía si fuera necesario
             print("Error: La lista de destinatarios está vacía.")
@@ -283,11 +284,11 @@ def NotificarRevisionManualSolped(
 
     # 3. Llamar a la función de envío personalizada
     return EnviarCorreoPersonalizado(
-        destinatario=destinatario_principal,
-        asunto=asunto_template,
-        cuerpo=cuerpo_template,
-        taskName=taskName,
-        cc=cc_list,
+        destinatario=destinatarioPrincipal,
+        asunto=asuntoTemplate,
+        cuerpo=cuerpoTemplate,
+        nombreTarea=nombreTarea,
+        cc=ccList,
         adjuntos=None,  # No se esperan adjuntos para esta notificación
     )
 
@@ -296,7 +297,7 @@ def EnviarCorreoPersonalizado(
     destinatario: str,
     asunto: str,
     cuerpo: str,
-    taskName: str = "EnvioPersonalizado",
+    nombreTarea: str = "EnvioPersonalizado",
     adjuntos: list = None,
     cc: list = None,
     bcc: list = None,
@@ -308,7 +309,7 @@ def EnviarCorreoPersonalizado(
         destinatario: Email del destinatario (cadena de texto).
         asunto: Asunto del correo (cadena de texto).
         cuerpo: Cuerpo del mensaje (puede ser HTML).
-        taskName: Nombre de la tarea para logs.
+        nombreTarea: Nombre de la tarea para logs.
         adjuntos: Lista de rutas de archivos a adjuntar (opcional).
         cc: Lista de correos en copia (opcional).
         bcc: Lista de correos en copia oculta (opcional).
@@ -320,8 +321,8 @@ def EnviarCorreoPersonalizado(
         WriteLog(
             mensaje=f"Preparando envío personalizado para {destinatario}...",
             estado="INFO",
-            taskName=taskName,
-            pathLog=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         # Log de adjuntos
@@ -329,8 +330,8 @@ def EnviarCorreoPersonalizado(
             WriteLog(
                 mensaje=f"Adjuntos a enviar: {', '.join(adjuntos)}",
                 estado="INFO",
-                taskName=taskName,
-                pathLog=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
             )
 
         # Crear EmailSender con configuración por defecto
@@ -350,16 +351,16 @@ def EnviarCorreoPersonalizado(
             WriteLog(
                 mensaje=f"Correo personalizado enviado exitosamente a {destinatario}.",
                 estado="INFO",
-                taskName=taskName,
-                pathLog=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
             )
             return True
         else:
             WriteLog(
                 mensaje=f"Fallo al enviar el correo personalizado a {destinatario}.",
                 estado="WARNING",
-                taskName=taskName,
-                pathLog=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
             )
             return False
 
@@ -368,8 +369,8 @@ def EnviarCorreoPersonalizado(
         WriteLog(
             mensaje=f"Error fatal en el envío personalizado: {e} | {error_stack}",
             estado="ERROR",
-            taskName=taskName,
-            pathLog=RUTAS["PathLogError"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLogError"],
         )
         return False
 
@@ -384,25 +385,25 @@ def TraerSAPAlFrenteOpcion():
         print(f"Error en Opcion 4: {e}")
 
 
-def convertir_validaciones_a_lista(texto):
+def convertirValidacionesALista(texto):
     """
     Convierte el bloque de texto de validaciones en una lista HTML <ul><li>.
     Cada item debe comenzar con '📋 ITEM' u otro marcador detectable.
     """
     lineas = [l.strip() for l in texto.split("\n") if l.strip()]
 
-    lista_html = "<ul style='font-size:14px; line-height:1.5;'>"
+    listaHtml = "<ul style='font-size:14px; line-height:1.5;'>"
 
     for linea in lineas:
         # Detectar inicio de item
         if linea.startswith("-ITEM"):
-            lista_html += f"<li><strong>{linea}</strong></li>"
+            listaHtml += f"<li><strong>{linea}</strong></li>"
         else:
-            lista_html += f"<li>{linea}</li>"
+            listaHtml += f"<li>{linea}</li>"
 
-    lista_html += "</ul>"
+    listaHtml += "</ul>"
 
-    return lista_html
+    return listaHtml
 
 
 def ObtenerTextoDelPortapapeles():
@@ -430,8 +431,8 @@ def AbrirTransaccion(session, transaccion):
         WriteLog(
             mensaje=f"Abrir Transaccion {transaccion}",
             estado="INFO",
-            taskName="AbrirTransaccion",
-            pathLog=RUTAS["PathLog"],
+            nombreTarea="AbrirTransaccion",
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         # Validar sesion SAP
@@ -440,8 +441,8 @@ def AbrirTransaccion(session, transaccion):
             WriteLog(
                 mensaje="Sesion SAP no disponible",
                 estado="ERROR",
-                taskName="AbrirTransaccion",
-                pathLog=RUTAS["PathLog"],
+                nombreTarea="AbrirTransaccion",
+                rutaRegistro=RUTAS["PathLog"],
             )
             raise Exception("Sesion SAP no disponible")
 
@@ -453,8 +454,8 @@ def AbrirTransaccion(session, transaccion):
         WriteLog(
             mensaje=f"Transaccion {transaccion} abierta",
             estado="INFO",
-            taskName="AbrirTransaccion",
-            pathLog=RUTAS["PathLog"],
+            nombreTarea="AbrirTransaccion",
+            rutaRegistro=RUTAS["PathLog"],
         )
         print(f"Transaccion {transaccion} abierta")
         return True
@@ -462,8 +463,8 @@ def AbrirTransaccion(session, transaccion):
         WriteLog(
             mensaje=f"Error en AbrirTransaccion: {e}",
             estado="ERROR",
-            taskName="AbrirTransaccion",
-            pathLog=RUTAS["PathLogError"],
+            nombreTarea="AbrirTransaccion",
+            rutaRegistro=RUTAS["PathLogError"],
         )
 
         return False
@@ -478,8 +479,8 @@ def ColsultarSolped(session, numeroSolped):
         WriteLog(
             mensaje=f"Numero de SOLPED : {numeroSolped}",
             estado="INFO",
-            taskName="ColsultarSolped",
-            pathLog=RUTAS["PathLog"],
+            nombreTarea="ColsultarSolped",
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         # Validar sesion SAP
@@ -488,8 +489,8 @@ def ColsultarSolped(session, numeroSolped):
             WriteLog(
                 mensaje="Sesion SAP no disponible",
                 estado="ERROR",
-                taskName="ColsultarSolped",
-                pathLog=RUTAS["PathLog"],
+                nombreTarea="ColsultarSolped",
+                rutaRegistro=RUTAS["PathLog"],
             )
             raise Exception("Sesion SAP no disponible")
 
@@ -517,8 +518,8 @@ def ColsultarSolped(session, numeroSolped):
         WriteLog(
             mensaje=f"Solped {numeroSolped} consultada exitosamente",
             estado="INFO",
-            taskName="ColsultarSolped",
-            pathLog=RUTAS["PathLog"],
+            nombreTarea="ColsultarSolped",
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         return True
@@ -526,15 +527,15 @@ def ColsultarSolped(session, numeroSolped):
         WriteLog(
             mensaje=f"Error en ColsultarSolped: {e}",
             estado="ERROR",
-            taskName="ColsultarSolped",
-            pathLog=RUTAS["PathLogError"],
+            nombreTarea="ColsultarSolped",
+            rutaRegistro=RUTAS["PathLogError"],
         )
 
         return False
 
 
 def ActualizarEstadoYObservaciones(
-    df, nombreArchivo, purch_req, item=None, nuevoEstado="", observaciones=""
+    df, nombreArchivo, purchReq, item=None, nuevoEstado="", observaciones=""
 ):
     """Actualiza el estado y observaciones en el DataFrame y guarda el archivo"""
     try:
@@ -546,27 +547,27 @@ def ActualizarEstadoYObservaciones(
         # Crear mascara para filtrar
         if item is not None:
             # Actualizar item especifico
-            mask = (df["PurchReq"] == str(purch_req)) & (
+            mascara = (df["PurchReq"] == str(purchReq)) & (
                 df["Item"] == str(item).strip()
             )
         else:
             # Actualizar toda la SOLPED
-            mask = df["PurchReq"] == str(purch_req)
+            mascara = df["PurchReq"] == str(purchReq)
 
         # Actualizar estado y observaciones
-        if mask.sum() > 0:
-            df.loc[mask, "Estado"] = nuevoEstado
+        if mascara.sum() > 0:
+            df.loc[mascara, "Estado"] = nuevoEstado
             if observaciones:
-                df.loc[mask, "Observaciones"] = observaciones
+                df.loc[mascara, "Observaciones"] = observaciones
             # Guardar archivo actualizado
             GuardarTablaME5A(df, nombreArchivo)
             print(
-                f"EXITO: Actualizado: {purch_req}" + (f" Item {item}" if item else "")
+                f"EXITO: Actualizado: {purchReq}" + (f" Item {item}" if item else "")
             )
             return True
         else:
             print(
-                f"No se encontro PurchReq {purch_req}"
+                f"No se encontro PurchReq {purchReq}"
                 + (f", Item {item}" if item else "")
             )
             return False
@@ -576,28 +577,28 @@ def ActualizarEstadoYObservaciones(
         return False
 
 
-def ActualizarEstado(df, nombreArchivo, purch_req, item=None, nuevoEstado=""):
+def ActualizarEstado(df, nombreArchivo, purchReq, item=None, nuevoEstado=""):
     """Actualiza el estado en el DataFrame y guarda el archivo"""
     try:
         # Crear mascara para filtrar
         if item is not None:
             # Actualizar item especifico
-            mask = (df["PurchReq"] == str(purch_req)) & (
+            mascara = (df["PurchReq"] == str(purchReq)) & (
                 df["Item"] == str(item).strip()
             )
         else:
             # Actualizar toda la SOLPED
-            mask = df["PurchReq"] == str(purch_req)
+            mascara = df["PurchReq"] == str(purchReq)
 
         # Actualizar estado
-        if mask.sum() > 0:
-            df.loc[mask, "Estado"] = nuevoEstado
+        if mascara.sum() > 0:
+            df.loc[mascara, "Estado"] = nuevoEstado
             # Guardar archivo actualizado
             GuardarTablaME5A(df, nombreArchivo)
             return True
         else:
             print(
-                f"No se encontro PurchReq {purch_req}"
+                f"No se encontro PurchReq {purchReq}"
                 + (f", Item {item}" if item else "")
             )
             return False

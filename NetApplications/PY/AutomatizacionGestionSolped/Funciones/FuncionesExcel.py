@@ -138,7 +138,7 @@ class ServicioExcel:
                 rutaCSV,
                 sep=";",
                 index=False,
-                encoding="utf-8-sig"
+                codificacion="utf-8-sig"
             )
             return rutaCSV, ordenColumnas
         except Exception as e:
@@ -153,8 +153,8 @@ class ServicioExcel:
 
         txt_path = os.path.splitext(csv_path)[0] + ".txt"
 
-        with open(csv_path, "r", encoding="latin1", newline="") as csv_file, \
-             open(txt_path, "w", encoding="utf-8", newline="\n") as txt_file:
+        with open(csv_path, "r", codificacion="latin1", newline="") as csv_file, \
+             open(txt_path, "w", codificacion="utf-8", newline="\n") as txt_file:
 
             reader = csv.reader(csv_file)
 

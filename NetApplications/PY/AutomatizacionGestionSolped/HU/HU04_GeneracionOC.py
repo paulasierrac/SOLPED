@@ -20,24 +20,24 @@ from Funciones.EscribirLog import WriteLog
 from Funciones.GeneralME53N import AbrirTransaccion
 import traceback
 import pyautogui  # Asegúrate de tener pyautogui instaladoi
-from Funciones.ControlHU import controlHU
+from Funciones.ControlHU import ControlHU
 
 from Repositories.Consultas import Querys
 
 def EjecutarHU04(session, archivo):
 
-    taskName = "HU4_GeneracionOC"
+    nombreTarea = "HU4_GeneracionOC"
     """
     Ejecuta la Historia de Usuario 04 encargada de la
     generacion de OC desde la transacción ME21N.
     """
     try:
-        controlHU(taskName, estado=0)
+        ControlHU(nombreTarea, estado=0)
         WriteLog(
             mensaje=f"HU04 Inicia para el archivo {archivo}",
             estado="INFO",
-            taskName=taskName,
-            pathLog=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         # ============================
@@ -56,8 +56,8 @@ def EjecutarHU04(session, archivo):
             WriteLog(
                 mensaje=f"No se encontraron Solpeds para procesar en el archivo {archivo}.",
                 estado="WARNING",
-                taskName=taskName,
-                pathLog=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
             )
             return
 
@@ -66,8 +66,8 @@ def EjecutarHU04(session, archivo):
         WriteLog(
             mensaje=f"listado de Solped cargadas : {solpedsUnicas}",
             estado="INFO",
-            taskName=taskName,
-            pathLog=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         for (
@@ -83,8 +83,8 @@ def EjecutarHU04(session, archivo):
                 WriteLog(
                     mensaje=f"Solped inválida u omitida: {solped}",
                     estado="WARNING",
-                    taskName=taskName,
-                    pathLog=RUTAS["PathLog"],
+                    nombreTarea=nombreTarea,
+                    rutaRegistro=RUTAS["PathLog"],
                 )
                 continue  # Saltar a la siguiente solped
             # Contar los items para la solped actual
@@ -93,8 +93,8 @@ def EjecutarHU04(session, archivo):
             WriteLog(
                 mensaje=f"Procesando Solped: {solped} de items: {itemCount} .",
                 estado="INFO",
-                taskName=taskName,
-                pathLog=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
             )
             acciones = []
             # print(f"procesando solped: {solped} de items: {itemCount}")
@@ -147,7 +147,7 @@ def EjecutarHU04(session, archivo):
                     acciones=acciones,
                     estado="EXITOSO",
                     botName="Resock",
-                    taskName=taskName,
+                    nombreTarea=nombreTarea,
                     pathInformes=r".\Salida",
                     observaciones="Proceso ejecutado sin errores."
             )
@@ -158,25 +158,25 @@ def EjecutarHU04(session, archivo):
             WriteLog(
                 mensaje=f" para la solped : {solped} Se generó la Orden de Compra: {ordenDeCompra}",
                 estado="INFO",
-                taskName=taskName,
-                pathLog=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
             )
 
         WriteLog(
             mensaje=f"HU04 finalizada correctamente para archivo {archivo}.",
             estado="INFO",
-            taskName=taskName,
-            pathLog=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLog"],
         )
-        controlHU(taskName, estado=100)
+        ControlHU(nombreTarea, estado=100)
 
 
     except Exception as e:
-        controlHU(taskName, estado=99)
+        ControlHU(nombreTarea, estado=99)
         WriteLog(
             mensaje=f"ERROR GLOBAL en HU04: {e}",
             estado="ERROR",
-            taskName=taskName,
-            pathLog=RUTAS["PathLogError"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLogError"],
         )
         raise

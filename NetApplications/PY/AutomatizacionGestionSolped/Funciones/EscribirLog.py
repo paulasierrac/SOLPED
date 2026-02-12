@@ -17,12 +17,12 @@ import socket
 from Config.InicializarConfig import inConfig
 
 
-def WriteLog(mensaje: str, estado: str, taskName: str, pathLog: str):
+def WriteLog(mensaje: str, estado: str, nombreTarea: str, rutaRegistro: str):
     """
     mensaje  : Texto del log
     estado   : INFO, DEBUG, WARN, ERROR
-    taskName: Nombre de HU o Main
-    pathLog : Ruta de carpeta Logs o archivo .log
+    nombreTarea: Nombre de HU o Main
+    rutaRegistro : Ruta de carpeta Logs o archivo .log
     """
 
     try:
@@ -32,8 +32,8 @@ def WriteLog(mensaje: str, estado: str, taskName: str, pathLog: str):
         if not mensaje:
             mensaje = "Mensaje vacío"
 
-        if not taskName:
-            taskName = "TaskNoDefinida"
+        if not nombreTarea:
+            nombreTarea = "TaskNoDefinida"
 
         estado = estado.upper()
         if estado not in ["INFO", "DEBUG", "WARN", "ERROR"]:
@@ -55,15 +55,15 @@ def WriteLog(mensaje: str, estado: str, taskName: str, pathLog: str):
         # ==========================================================
         # 4. Determinar ruta final
         # ==========================================================
-        base, extension = os.path.splitext(pathLog)
+        base, extension = os.path.splitext(rutaRegistro)
 
         if extension:
-            carpeta_logs = os.path.dirname(pathLog)
-            ruta_archivo = pathLog
+            carpeta_logs = os.path.dirname(rutaRegistro)
+            rutaArchivo = rutaRegistro
         else:
-            carpeta_logs = pathLog
+            carpeta_logs = rutaRegistro
             nombreArchivo = f"Log{nombre_maquina}{usuario}{fechaArchivo}.log"
-            ruta_archivo = os.path.join(carpeta_logs, nombreArchivo)
+            rutaArchivo = os.path.join(carpeta_logs, nombreArchivo)
 
         os.makedirs(carpeta_logs, exist_ok=True)
 
@@ -75,14 +75,14 @@ def WriteLog(mensaje: str, estado: str, taskName: str, pathLog: str):
             f"{estado} | "
             f"{mensaje} | "
             f"{inConfig('CodigoRobot')} | "
-            f"{taskName} | "
+            f"{nombreTarea} | "
             "\n"
         )
 
         # ==========================================================
         # 6. Escritura
         # ==========================================================
-        with open(ruta_archivo, "a", encoding="utf-8") as f:
+        with open(rutaArchivo, "a", codificacion="utf-8") as f:
             f.write(linea)
 
     except Exception as e:

@@ -306,9 +306,9 @@ def GenerarReporteFinalExcel(filas_reporte):
             # Ajustar ancho de columnas
             for idx, col in enumerate(df.columns, 1):
                 # Calcular ancho basado en el contenido
-                max_length = max(df[col].astype(str).apply(len).max(), len(str(col)))
+                longitudMax = max(df[col].astype(str).apply(len).max(), len(str(col)))
                 # Limitar el ancho máximo
-                adjusted_width = min(max_length + 2, 50)
+                adjusted_width = min(longitudMax + 2, 50)
                 col_letter = get_column_letter(idx)
                 worksheet.column_dimensions[col_letter].width = adjusted_width
 
@@ -488,7 +488,7 @@ def exportar_a_csv(filas_reporte, nombreArchivo=None):
             nombreArchivo = f"Reporte_final_ME53N_{timestamp}.csv"
 
         rutaCompleta = os.path.join(RUTAS["PathReportes"], nombreArchivo)
-        df.to_csv(rutaCompleta, index=False, encoding="utf-8-sig")
+        df.to_csv(rutaCompleta, index=False, codificacion="utf-8-sig")
 
         print(f"Reporte CSV generado: {rutaCompleta}")
         return rutaCompleta

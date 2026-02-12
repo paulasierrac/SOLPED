@@ -13,7 +13,7 @@ def txt_a_pdf_tabla(path_txt: str, path_pdf: str):
 
     try:
         # Leer el archivo TXT
-        with open(path_txt, "r", encoding="utf-8") as f:
+        with open(path_txt, "r", codificacion="utf-8") as f:
             lineas = [linea.strip() for linea in f.readlines() if linea.strip()]
 
         # Convertir las líneas separadas por | en filas de tabla

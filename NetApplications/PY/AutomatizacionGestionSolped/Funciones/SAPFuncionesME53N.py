@@ -51,8 +51,8 @@ def ObtenerItemTextME53N(session, numeroSolped, numeroItem):
         WriteLog(
             mensaje=f"ObtenerItemTextME53N {numeroSolped} Item {numeroItem}",
             estado="INFO",
-            taskName="ObtenerItemTextME53N",
-            pathLog=RUTAS["PathLog"],
+            nombreTarea="ObtenerItemTextME53N",
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         # Validar sesion SAP
@@ -60,8 +60,8 @@ def ObtenerItemTextME53N(session, numeroSolped, numeroItem):
             WriteLog(
                 mensaje="Sesion SAP no disponible",
                 estado="ERROR",
-                taskName="ObtenerItemTextME53N",
-                pathLog=RUTAS["PathLog"],
+                nombreTarea="ObtenerItemTextME53N",
+                rutaRegistro=RUTAS["PathLog"],
             )
             raise Exception("Sesion SAP no disponible")
 
@@ -99,7 +99,7 @@ def ObtenerItemTextME53N(session, numeroSolped, numeroItem):
         # 7. Guardar texto en archivo de log
         # path = r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\texto_ITEMsap.txt"
         path = rf"{RUTAS["PathInsumos"]}\texto_ITEMsap.txt"
-        with open(path, "a", encoding="utf-8") as f:
+        with open(path, "a", codificacion="utf-8") as f:
             f.write(identificador)
             f.write(texto_limpio + "\n")
             f.write("-" * 80 + "\n")
@@ -118,8 +118,8 @@ def ObtenerItemTextME53N(session, numeroSolped, numeroItem):
         WriteLog(
             mensaje=f"Error en ObtenerItemTextME53N: {e}",
             estado="ERROR",
-            taskName="ObtenerItemTextME53N",
-            pathLog=RUTAS["PathLogError"],
+            nombreTarea="ObtenerItemTextME53N",
+            rutaRegistro=RUTAS["PathLogError"],
         )
         return ""
 
@@ -134,8 +134,8 @@ def ProcesarTablaME5A(name, dias=None):
         WriteLog(
             mensaje=f"Procesar archivo nombre {name}",
             estado="INFO",
-            taskName="ProcesarTablaME5A",
-            pathLog=RUTAS["PathLog"],
+            nombreTarea="ProcesarTablaME5A",
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         # path = f".\\AutomatizacionGestionSolped\\Insumo\\{name}"
@@ -147,7 +147,7 @@ def ProcesarTablaME5A(name, dias=None):
 
         for codificacion in codificaciones:
             try:
-                with open(path, "r", encoding=codificacion) as f:
+                with open(path, "r", codificacion=codificacion) as f:
                     lineas = f.readlines()
                 print(f"EXITO: Archivo leido con codificacion {codificacion}")
                 break
@@ -355,8 +355,8 @@ def ProcesarTablaME5A(name, dias=None):
         WriteLog(
             mensaje=f"Error en ProcesarTablaME5A: {e}",
             estado="ERROR",
-            taskName="ProcesarTablaME5A",
-            pathLog=RUTAS["PathLogError"],
+            nombreTarea="ProcesarTablaME5A",
+            rutaRegistro=RUTAS["PathLogError"],
         )
         print(f"ERROR en ProcesarTablaME5A: {e}")
         traceback.print_exc()
@@ -371,29 +371,29 @@ def TablaItemsDataFrame(name) -> pd.DataFrame:
         WriteLog(
             mensaje=f"Nombre de archivo {name}",
             estado="INFO",
-            taskName="TablaItemsDataFrame",
-            pathLog=RUTAS["PathLog"],
+            nombreTarea="TablaItemsDataFrame",
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         # path = rf"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\TablasME53N\{name}"
         path = rf"{RUTAS["PathInsumos"]}\TablasME53N\{name}"
 
         # ========== DETECCION DE CODIFICACION ==========
-        encoding = DetectarCodificacion(path)
+        codificacion = DetectarCodificacion(path)
 
         # 1. Leer archivo con la codificacion correcta
         try:
-            with open(path, "r", encoding=encoding) as f:
+            with open(path, "r", codificacion=codificacion) as f:
                 texto = f.read()
         except Exception as e:
             # Si falla, intentar con otras codificaciones comunes
-            print(f"Error con {encoding}, intentando alternativas...")
+            print(f"Error con {codificacion}, intentando alternativas...")
             for enc in ["latin-1", "cp1252", "iso-8859-1", "utf-8"]:
                 try:
-                    with open(path, "r", encoding=enc) as f:
+                    with open(path, "r", codificacion=enc) as f:
                         texto = f.read()
                     print(f"EXITO con {enc}")
-                    encoding = enc
+                    codificacion = enc
                     break
                 except:
                     continue
@@ -442,15 +442,15 @@ def TablaItemsDataFrame(name) -> pd.DataFrame:
         df = pd.DataFrame(filas, columns=columnas_unicas)
 
         WriteLog(
-            mensaje=f"DataFrame conversion correcta. Codificacion: {encoding}",
+            mensaje=f"DataFrame conversion correcta. Codificacion: {codificacion}",
             estado="INFO",
-            taskName="TablaItemsDataFrame",
-            pathLog=RUTAS["PathLog"],
+            nombreTarea="TablaItemsDataFrame",
+            rutaRegistro=RUTAS["PathLog"],
         )
         print(f"EXITO: DataFrame conversion correcta")
         print(f"  - Filas: {df.shape[0]}")
         print(f"  - Columnas: {df.shape[1]}")
-        print(f"  - Codificacion: {encoding}")
+        print(f"  - Codificacion: {codificacion}")
 
         return df
 
@@ -458,8 +458,8 @@ def TablaItemsDataFrame(name) -> pd.DataFrame:
         WriteLog(
             mensaje=f"Error en TablaItemsDataFrame: {e}",
             estado="ERROR",
-            taskName="TablaItemsDataFrame",
-            pathLog=RUTAS["PathLogError"],
+            nombreTarea="TablaItemsDataFrame",
+            rutaRegistro=RUTAS["PathLogError"],
         )
         print(f"ERROR: {e}")
         return pd.DataFrame()
@@ -472,11 +472,11 @@ def DetectarCodificacion(path):
             rawdata = f.read()
 
         resultado = chardet.detect(rawdata)
-        encoding = resultado["encoding"]
+        codificacion = resultado["codificacion"]
         confidence = resultado["confidence"]
 
-        print(f"Codificacion detectada: {encoding} (confianza: {confidence*100:.1f}%)")
-        return encoding
+        print(f"Codificacion detectada: {codificacion} (confianza: {confidence*100:.1f}%)")
+        return codificacion
     except Exception as e:
         print(f"Error detectando codificacion: {e}")
         return "utf-8"
@@ -491,8 +491,8 @@ def ObtenerItemsME53N(session, numeroSolped):
         WriteLog(
             mensaje=f"Solped {numeroSolped} a obtener items",
             estado="INFO",
-            taskName="ObtenerItemsME53N",
-            pathLog=RUTAS["PathLog"],
+            nombreTarea="ObtenerItemsME53N",
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         # Validar sesion SAP
@@ -500,8 +500,8 @@ def ObtenerItemsME53N(session, numeroSolped):
             WriteLog(
                 mensaje="Sesion SAP no disponible",
                 estado="ERROR",
-                taskName="ObtenerItemsME53N",
-                pathLog=RUTAS["PathLog"],
+                nombreTarea="ObtenerItemsME53N",
+                rutaRegistro=RUTAS["PathLog"],
             )
             raise Exception("Sesion SAP no disponible")
 
@@ -552,8 +552,8 @@ def ObtenerItemsME53N(session, numeroSolped):
         WriteLog(
             mensaje=f"Solped {numeroSolped} convertido a DF con exito",
             estado="INFO",
-            taskName="ObtenerItemsME53N",
-            pathLog=RUTAS["PathLog"],
+            nombreTarea="ObtenerItemsME53N",
+            rutaRegistro=RUTAS["PathLog"],
         )
         print(f"EXITO: Solped {numeroSolped} convertido a DF con exito")
 
@@ -563,8 +563,8 @@ def ObtenerItemsME53N(session, numeroSolped):
         WriteLog(
             mensaje=f"Error en ObtenerItemsME53N: {e}",
             estado="ERROR",
-            taskName="ObtenerItemsME53N",
-            pathLog=RUTAS["PathLogError"],
+            nombreTarea="ObtenerItemsME53N",
+            rutaRegistro=RUTAS["PathLogError"],
         )
         print(f"ERROR en ObtenerItemsME53N: {e}")
         return pd.DataFrame()
@@ -615,7 +615,7 @@ def GuardarTablaME5A(df, name):
             filas_txt.append(fila_txt)
 
         # Escribir archivo
-        with open(path, "w", encoding="utf-8") as f:
+        with open(path, "w", codificacion="utf-8") as f:
             f.write(separador + "\n")
             f.write(encabezado + "\n")
             f.write(separador + "\n")
@@ -625,8 +625,8 @@ def GuardarTablaME5A(df, name):
         WriteLog(
             mensaje=f"Archivo {name} actualizado con exito - {len(df)} filas",
             estado="INFO",
-            taskName="GuardarTablaME5A",
-            pathLog=RUTAS["PathLog"],
+            nombreTarea="GuardarTablaME5A",
+            rutaRegistro=RUTAS["PathLog"],
         )
         print(f"EXITO: Archivo guardado: {len(df)} filas, {len(df.columns)} columnas")
         return True
@@ -635,8 +635,8 @@ def GuardarTablaME5A(df, name):
         WriteLog(
             mensaje=f"Error al guardar {name}: {e}",
             estado="ERROR",
-            taskName="GuardarTablaME5A",
-            pathLog=RUTAS["PathLogError"],
+            nombreTarea="GuardarTablaME5A",
+            rutaRegistro=RUTAS["PathLogError"],
         )
         print(f"ERROR al guardar archivo: {e}")
         return False
@@ -644,7 +644,7 @@ def GuardarTablaME5A(df, name):
 
 def ParsearTablaAttachments(contenido: str) -> list:
     """
-    Parsea la tabla de attachments exportada de SAP y extrae información estructurada
+    Parsea la tabla de archivosAdjuntos exportada de SAP y extrae información estructurada
 
     Formato esperado:
     AttachmentFor1300139391
@@ -661,7 +661,7 @@ def ParsearTablaAttachments(contenido: str) -> list:
     Returns:
         list: Lista de diccionarios con {title, creator, date}
     """
-    attachments = []
+    archivosAdjuntos = []
 
     try:
         lineas = contenido.strip().split("\n")
@@ -678,12 +678,12 @@ def ParsearTablaAttachments(contenido: str) -> list:
 
         if header_idx == -1:
             WriteLog(
-                mensaje="No se encontró encabezado en tabla de attachments",
+                mensaje="No se encontró encabezado en tabla de archivosAdjuntos",
                 estado="WARNING",
-                taskName="ParsearTablaAttachments",
-                pathLog=RUTAS["PathLog"],
+                nombreTarea="ParsearTablaAttachments",
+                rutaRegistro=RUTAS["PathLog"],
             )
-            return attachments
+            return archivosAdjuntos
 
         # Procesar filas de datos (después del encabezado y línea de guiones)
         for linea in lineas[
@@ -723,18 +723,18 @@ def ParsearTablaAttachments(contenido: str) -> list:
                 if not title or not creator or not date:
                     continue
 
-                attachments.append({"title": title, "creator": creator, "date": date})
+                archivosAdjuntos.append({"title": title, "creator": creator, "date": date})
 
     except Exception as e:
         WriteLog(
-            mensaje=f"Error parseando tabla de attachments: {e}",
+            mensaje=f"Error parseando tabla de archivosAdjuntos: {e}",
             estado="ERROR",
-            taskName="ParsearTablaAttachments",
-            pathLog=RUTAS["PathLogError"],
+            nombreTarea="ParsearTablaAttachments",
+            rutaRegistro=RUTAS["PathLogError"],
         )
         traceback.print_exc()
 
-    return attachments
+    return archivosAdjuntos
 
 
 def ValidarAttachmentList(session, numeroSolped):
@@ -752,8 +752,8 @@ def ValidarAttachmentList(session, numeroSolped):
         WriteLog(
             mensaje=f"Validando Attachment List para SOLPED {numeroSolped}",
             estado="INFO",
-            taskName="ValidarAttachmentList",
-            pathLog=RUTAS["PathLog"],
+            nombreTarea="ValidarAttachmentList",
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         # 1. Presionar botón de GOS Toolbox
@@ -764,8 +764,8 @@ def ValidarAttachmentList(session, numeroSolped):
             WriteLog(
                 mensaje=f"Error al abrir GOS Toolbox: {e}",
                 estado="WARNING",
-                taskName="ValidarAttachmentList",
-                pathLog=RUTAS["PathLog"],
+                nombreTarea="ValidarAttachmentList",
+                rutaRegistro=RUTAS["PathLog"],
             )
             return False, "", "No se pudo abrir el menú de servicios GOS"
 
@@ -775,10 +775,10 @@ def ValidarAttachmentList(session, numeroSolped):
             time.sleep(1)
         except Exception as e:
             WriteLog(
-                mensaje=f"No hay attachments disponibles: {e}",
+                mensaje=f"No hay archivosAdjuntos disponibles: {e}",
                 estado="WARNING",
-                taskName="ValidarAttachmentList",
-                pathLog=RUTAS["PathLog"],
+                nombreTarea="ValidarAttachmentList",
+                rutaRegistro=RUTAS["PathLog"],
             )
             # Cerrar menú GOS si quedó abierto
             try:
@@ -789,8 +789,8 @@ def ValidarAttachmentList(session, numeroSolped):
 
         # 3. Verificar si se abrió la ventana "Service: Attachment list"
         try:
-            # Intentar acceder al objeto de la tabla de attachments
-            tabla_attachments = session.findById(
+            # Intentar acceder al objeto de la tabla de archivosAdjuntos
+            tabla_archivosAdjuntos = session.findById(
                 "wnd[1]/usr/cntlCONTAINER_0100/shellcont/shell"
             )
             time.sleep(0.5)
@@ -798,8 +798,8 @@ def ValidarAttachmentList(session, numeroSolped):
             WriteLog(
                 mensaje=f"Ventana de Attachment List no encontrada: {e}",
                 estado="WARNING",
-                taskName="ValidarAttachmentList",
-                pathLog=RUTAS["PathLog"],
+                nombreTarea="ValidarAttachmentList",
+                rutaRegistro=RUTAS["PathLog"],
             )
             # Cerrar menú GOS
             try:
@@ -811,11 +811,11 @@ def ValidarAttachmentList(session, numeroSolped):
         # 4. Exportar contenido de la tabla al portapapeles
         try:
             # Abrir menú de exportación
-            tabla_attachments.pressToolbarContextButton("&MB_EXPORT")
+            tabla_archivosAdjuntos.pressToolbarContextButton("&MB_EXPORT")
             time.sleep(0.5)
 
             # Seleccionar "Hoja de cálculo" (opción PC)
-            tabla_attachments.selectContextMenuItem("&PC")
+            tabla_archivosAdjuntos.selectContextMenuItem("&PC")
             time.sleep(0.5)
 
             # Seleccionar formato "Spreadsheet" (radio button)
@@ -835,8 +835,8 @@ def ValidarAttachmentList(session, numeroSolped):
             WriteLog(
                 mensaje=f"Error al exportar Attachment List: {e}",
                 estado="WARNING",
-                taskName="ValidarAttachmentList",
-                pathLog=RUTAS["PathLog"],
+                nombreTarea="ValidarAttachmentList",
+                rutaRegistro=RUTAS["PathLog"],
             )
             # Intentar cerrar ventanas abiertas
             try:
@@ -857,10 +857,10 @@ def ValidarAttachmentList(session, numeroSolped):
 
         if not contenido_portapapeles or not contenido_portapapeles.strip():
             WriteLog(
-                mensaje=f"Portapapeles vacío después de exportar attachments",
+                mensaje=f"Portapapeles vacío después de exportar archivosAdjuntos",
                 estado="WARNING",
-                taskName="ValidarAttachmentList",
-                pathLog=RUTAS["PathLog"],
+                nombreTarea="ValidarAttachmentList",
+                rutaRegistro=RUTAS["PathLog"],
             )
             # Cerrar ventanas
             try:
@@ -873,7 +873,7 @@ def ValidarAttachmentList(session, numeroSolped):
                 session.findById("wnd[0]/shellcont[1]").close()  # Cerrar menú GOS
             except:
                 pass
-            return False, "", "No se pudo copiar contenido de attachments"
+            return False, "", "No se pudo copiar contenido de archivosAdjuntos"
 
         # 6. Cerrar ventana de Attachment List (botón 12 = Cerrar)
         try:
@@ -881,10 +881,10 @@ def ValidarAttachmentList(session, numeroSolped):
             time.sleep(0.3)
         except Exception as e:
             WriteLog(
-                mensaje=f"Advertencia al cerrar ventana de attachments: {e}",
+                mensaje=f"Advertencia al cerrar ventana de archivosAdjuntos: {e}",
                 estado="WARNING",
-                taskName="ValidarAttachmentList",
-                pathLog=RUTAS["PathLog"],
+                nombreTarea="ValidarAttachmentList",
+                rutaRegistro=RUTAS["PathLog"],
             )
 
         # 7. Cerrar menú GOS Toolbox (shellcont[1])
@@ -895,21 +895,21 @@ def ValidarAttachmentList(session, numeroSolped):
             WriteLog(
                 mensaje=f"Advertencia al cerrar menú GOS: {e}",
                 estado="WARNING",
-                taskName="ValidarAttachmentList",
-                pathLog=RUTAS["PathLog"],
+                nombreTarea="ValidarAttachmentList",
+                rutaRegistro=RUTAS["PathLog"],
             )
 
         # 8. Analizar contenido obtenido
         lineas = contenido_portapapeles.strip().split("\n")
-        lineas_validas = [
+        lineasValidas = [
             l.strip() for l in lineas if l.strip() and not l.strip().startswith("-")
         ]
 
-        # Parsear attachments estructurados
-        attachments_parseados = ParsearTablaAttachments(contenido_portapapeles)
-        num_attachments = len(attachments_parseados)
+        # Parsear archivosAdjuntos estructurados
+        archivosAdjuntos_parseados = ParsearTablaAttachments(contenido_portapapeles)
+        num_archivosAdjuntos = len(archivosAdjuntos_parseados)
 
-        if num_attachments == 0:
+        if num_archivosAdjuntos == 0:
             # Aún así cerrar todo antes de retornar
             return (
                 False,
@@ -919,36 +919,36 @@ def ValidarAttachmentList(session, numeroSolped):
 
         # 9. Guardar contenido en archivo de log
         identificador = f"\n===== SOLPED: {numeroSolped} - Attachment List - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} =====\n"
-        pathLog_attachments = rf"{RUTAS['PathInsumos']}\attachment_lists.txt"
+        rutaRegistro_archivosAdjuntos = rf"{RUTAS['PathInsumos']}\attachment_lists.txt"
 
         try:
-            with open(pathLog_attachments, "a", encoding="utf-8") as f:
+            with open(rutaRegistro_archivosAdjuntos, "a", codificacion="utf-8") as f:
                 f.write(identificador)
                 f.write(contenido_portapapeles)
                 f.write("\n" + "-" * 80 + "\n")
         except Exception as e:
             WriteLog(
-                mensaje=f"Advertencia: No se pudo guardar log de attachments: {e}",
+                mensaje=f"Advertencia: No se pudo guardar log de archivosAdjuntos: {e}",
                 estado="WARNING",
-                taskName="ValidarAttachmentList",
-                pathLog=RUTAS["PathLog"],
+                nombreTarea="ValidarAttachmentList",
+                rutaRegistro=RUTAS["PathLog"],
             )
 
         WriteLog(
-            mensaje=f"SOLPED {numeroSolped}: {num_attachments} attachment(s) encontrado(s)",
+            mensaje=f"SOLPED {numeroSolped}: {num_archivosAdjuntos} attachment(s) encontrado(s)",
             estado="INFO",
-            taskName="ValidarAttachmentList",
-            pathLog=RUTAS["PathLog"],
+            nombreTarea="ValidarAttachmentList",
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         # Construir observación detallada con nombres de archivos
-        observaciones_exito = f"{num_attachments} archivo(s) adjunto(s)"
+        observaciones_exito = f"{num_archivosAdjuntos} archivo(s) adjunto(s)"
 
-        if num_attachments <= 3:
+        if num_archivosAdjuntos <= 3:
             # Mostrar nombres si son pocos archivos
-            nombres = [a["title"][:40] for a in attachments_parseados[:3]]
+            nombres = [a["title"][:40] for a in archivosAdjuntos_parseados[:3]]
             observaciones_exito += f": {', '.join(nombres)}"
-            if any(len(a["title"]) > 40 for a in attachments_parseados[:3]):
+            if any(len(a["title"]) > 40 for a in archivosAdjuntos_parseados[:3]):
                 observaciones_exito += "..."
 
         return True, contenido_portapapeles, observaciones_exito
@@ -958,8 +958,8 @@ def ValidarAttachmentList(session, numeroSolped):
         WriteLog(
             mensaje=f"Error inesperado en ValidarAttachmentList: {e}\n{error_trace}",
             estado="ERROR",
-            taskName="ValidarAttachmentList",
-            pathLog=RUTAS["PathLogError"],
+            nombreTarea="ValidarAttachmentList",
+            rutaRegistro=RUTAS["PathLogError"],
         )
         # Intentar cerrar cualquier ventana abierta
         try:
@@ -970,4 +970,4 @@ def ValidarAttachmentList(session, numeroSolped):
             session.findById("wnd[0]/shellcont[1]").close()
         except:
             pass
-        return False, "", f"Error al validar attachments: {str(e)[:100]}"
+        return False, "", f"Error al validar archivosAdjuntos: {str(e)[:100]}"

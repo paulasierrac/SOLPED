@@ -14,7 +14,7 @@
 # =========================================
 import time
 import traceback
-from Funciones.ControlHU import controlHU
+from Funciones.ControlHU import ControlHU
 from Funciones.EmailSender import EnviarNotificacionCorreo
 from Funciones.ReporteFinalME53N import (
     ConstruirFilaReporteFinal,
@@ -60,16 +60,16 @@ from Funciones.ValidacionME53N import (
 
 def EjecutarHU03(session, nombreArchivo):
     try:
-        taskName = "HU03_ValidacionME53N"
-        controlHU(taskName, estado=0)
+        nombreTarea = "HU03_ValidacionME53N"
+        ControlHU(nombreTarea, estado=0)
 
         TraerSAPAlFrenteOpcion()
 
         WriteLog(
             mensaje="Inicio HU03 - Validación ME53N",
             estado="INFO",
-            taskName=taskName,
-            pathLog=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         # Leer el archivo con las SOLPEDs a procesar
@@ -80,8 +80,8 @@ def EjecutarHU03(session, nombreArchivo):
             WriteLog(
                 mensaje="El archivo expSolped03.txt está vacío o no se pudo cargar",
                 estado="ERROR",
-                taskName=taskName,
-                pathLog=RUTAS["PathLogError"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLogError"],
             )
             return False
 
@@ -92,8 +92,8 @@ def EjecutarHU03(session, nombreArchivo):
                 WriteLog(
                     mensaje=f"Columna requerida '{columna}' no encontrada",
                     estado="ERROR",
-                    taskName=taskName,
-                    pathLog=RUTAS["PathLogError"],
+                    nombreTarea=nombreTarea,
+                    rutaRegistro=RUTAS["PathLogError"],
                 )
                 return False
 
@@ -124,16 +124,16 @@ def EjecutarHU03(session, nombreArchivo):
             WriteLog(
                 mensaje="No se encontraron SOLPEDs válidas para procesar",
                 estado="WARNING",
-                taskName=taskName,
-                pathLog=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
             )
             return False
 
         WriteLog(
             mensaje=f"Procesando {len(solpedUnicos)} SOLPEDs - Total filas: {len(dfSolpeds)}",
             estado="INFO",
-            taskName=taskName,
-            pathLog=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         # Abrir transaccion ME53N en SAP
@@ -151,7 +151,7 @@ def EjecutarHU03(session, nombreArchivo):
             "items_verificar_manual": 0,
             "notificaciones_enviadas": 0,
             "notificaciones_fallidas": 0,
-            "rechazadas_sin_attachments": 0,
+            "rechazadas_sin_archivosAdjuntos": 0,
         }
 
         # Modo desarrollo
@@ -162,8 +162,8 @@ def EjecutarHU03(session, nombreArchivo):
             WriteLog(
                 mensaje=f"MODO DESARROLLO: Correos redirigidos a {EMAIL_DESARROLLO}",
                 estado="WARNING",
-                taskName=taskName,
-                pathLog=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
             )
 
         solpedsConProblemas = []
@@ -190,8 +190,8 @@ def EjecutarHU03(session, nombreArchivo):
                     WriteLog(
                         mensaje=f"No se pudo consultar SOLPED {solped} en SAP",
                         estado="ERROR",
-                        taskName=taskName,
-                        pathLog=RUTAS["PathLogError"],
+                        nombreTarea=nombreTarea,
+                        rutaRegistro=RUTAS["PathLogError"],
                     )
                     ActualizarEstadoYObservaciones(
                         dfSolpeds,
@@ -210,7 +210,7 @@ def EjecutarHU03(session, nombreArchivo):
                     ValidarAttachmentList(session, solped)
                 )
 
-                attachmentsLista = (
+                archivosAdjuntosLista = (
                     ParsearTablaAttachments(contenidoAttachments)
                     if contenidoAttachments
                     else []
@@ -220,13 +220,13 @@ def EjecutarHU03(session, nombreArchivo):
                     solped, tieneAttachments, contenidoAttachments, obsAttachments
                 )
 
-                # Guardar reporte de attachments SOLO si tiene adjuntos
-                if attachmentsLista:
+                # Guardar reporte de archivosAdjuntos SOLO si tiene adjuntos
+                if archivosAdjuntosLista:
                     pathReporteAttach = (
                         f"{RUTAS['PathReportes']}\\Attachments_{solped}.txt"
                     )
                     try:
-                        with open(pathReporteAttach, "w", encoding="utf-8") as f:
+                        with open(pathReporteAttach, "w", codificacion="utf-8") as f:
                             f.write(reporteAttachments)
                     except Exception as e:
                         pass
@@ -242,8 +242,8 @@ def EjecutarHU03(session, nombreArchivo):
                 # MARCAR SI NO TIENE ATTACHMENTS
                 solpedRechazadaPorAttachments = False
 
-                if not attachmentsLista:
-                    contadores["rechazadas_sin_attachments"] += 1
+                if not archivosAdjuntosLista:
+                    contadores["rechazadas_sin_archivosAdjuntos"] += 1
                     solpedRechazadaPorAttachments = True
                     requiereNotificacion = True
 
@@ -255,18 +255,18 @@ def EjecutarHU03(session, nombreArchivo):
                     )
                 else:
                     infoAttachments = (
-                        f"\n📎 ATTACHMENT LIST ({len(attachmentsLista)} archivo(s))\n"
+                        f"\n📎 ATTACHMENT LIST ({len(archivosAdjuntosLista)} archivo(s))\n"
                     )
                     infoAttachments += f"   {obsAttachments}\n"
 
-                    if attachmentsLista:
+                    if archivosAdjuntosLista:
                         infoAttachments += f"\n   Archivos adjuntos:\n"
-                        for i, attach in enumerate(attachmentsLista[:5], 1):
+                        for i, attach in enumerate(archivosAdjuntosLista[:5], 1):
                             infoAttachments += f"   {i}. {attach['title'][:50]}\n"
                             infoAttachments += f"      Creado por: {attach['creator']} - {attach['date']}\n"
 
-                        if len(attachmentsLista) > 5:
-                            infoAttachments += f"   ... y {len(attachmentsLista) - 5} archivo(s) más\n"
+                        if len(archivosAdjuntosLista) > 5:
+                            infoAttachments += f"   ... y {len(archivosAdjuntosLista) - 5} archivo(s) más\n"
 
                     resumenValidaciones.append(infoAttachments)
 
@@ -357,7 +357,7 @@ def EjecutarHU03(session, nombreArchivo):
                             dtItems,
                             tieneAttachments,
                             obsAttachments,
-                            attachmentsLista,
+                            archivosAdjuntosLista,
                         )
 
                         # CAPTURAR CORREOS DE COLSUBSIDIO
@@ -373,7 +373,7 @@ def EjecutarHU03(session, nombreArchivo):
                         # Guardar reporte detallado
                         pathReporte = f"{RUTAS['PathReportes']}\\Reporte_{solped}_{numeroItem}.txt"
                         try:
-                            with open(pathReporte, "w", encoding="utf-8") as f:
+                            with open(pathReporte, "w", codificacion="utf-8") as f:
                                 f.write(reporte)
                         except Exception as e:
                             pass
@@ -402,9 +402,9 @@ def EjecutarHU03(session, nombreArchivo):
                             item=numeroItem,
                             datos_exp=filaExp,
                             datosAdjuntos={
-                                "cantidad": len(attachmentsLista),
+                                "cantidad": len(archivosAdjuntosLista),
                                 "nombres": ", ".join(
-                                    [a["title"] for a in attachmentsLista]
+                                    [a["title"] for a in archivosAdjuntosLista]
                                 ),
                             },
                             datosMe53n=filaMe53n,
@@ -566,7 +566,7 @@ def EjecutarHU03(session, nombreArchivo):
                             destinatarios=correosUnicos,
                             numeroSolped=solped,
                             validaciones=textoValidaciones,
-                            taskName=taskName,
+                            nombreTarea=nombreTarea,
                         )
 
                         if exitoNotificacion:
@@ -578,9 +578,9 @@ def EjecutarHU03(session, nombreArchivo):
                                     "estado": estadoFinalSolped,
                                     "tieneAttachments": tieneAttachments,
                                     "obsAttachments": obsAttachments,
-                                    "attachments_detalle": (
-                                        attachmentsLista[:10]
-                                        if attachmentsLista
+                                    "archivosAdjuntos_detalle": (
+                                        archivosAdjuntosLista[:10]
+                                        if archivosAdjuntosLista
                                         else []
                                     ),
                                     "items_total": itemsProcesadosEnSolped,
@@ -604,16 +604,16 @@ def EjecutarHU03(session, nombreArchivo):
                         WriteLog(
                             mensaje=f"Error al enviar notificación para SOLPED {solped}: {e_notif}",
                             estado="WARNING",
-                            taskName=taskName,
-                            pathLog=RUTAS["PathLog"],
+                            nombreTarea=nombreTarea,
+                            rutaRegistro=RUTAS["PathLog"],
                         )
 
                 elif requiereNotificacion and not correosResponsables:
                     WriteLog(
                         mensaje=f"SOLPED {solped}: Requiere revisión pero sin correo de responsable",
                         estado="WARNING",
-                        taskName=taskName,
-                        pathLog=RUTAS["PathLog"],
+                        nombreTarea=nombreTarea,
+                        rutaRegistro=RUTAS["PathLog"],
                     )
 
                     solpedsConProblemas.append(
@@ -643,8 +643,8 @@ def EjecutarHU03(session, nombreArchivo):
                 WriteLog(
                     mensaje=f"Error procesando SOLPED {solped}: {e}",
                     estado="ERROR",
-                    taskName=taskName,
-                    pathLog=RUTAS["PathLogError"],
+                    nombreTarea=nombreTarea,
+                    rutaRegistro=RUTAS["PathLogError"],
                 )
                 continue
 
@@ -653,11 +653,11 @@ def EjecutarHU03(session, nombreArchivo):
             mensaje=f"PROCESO COMPLETADO - SOLPEDs: {contadores['procesadas_exitosamente']}/{contadores['total_solpeds']}, "
             f"Items validados: {contadores['items_validados']}/{contadores['items_procesados']}, "
             f"Notificaciones: {contadores['notificaciones_enviadas']}, "
-            f"Rechazadas sin attachments: {contadores['rechazadas_sin_attachments']}, "
+            f"Rechazadas sin archivosAdjuntos: {contadores['rechazadas_sin_archivosAdjuntos']}, "
             f"Filas reporte: {len(filasReporteFinal)}",
             estado="INFO",
-            taskName=taskName,
-            pathLog=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         # GENERAR ARCHIVO FINAL
@@ -665,8 +665,8 @@ def EjecutarHU03(session, nombreArchivo):
             WriteLog(
                 mensaje="Generando reporte final consolidado ME53N",
                 estado="INFO",
-                taskName=taskName,
-                pathLog=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
             )
 
             pathReporte = GenerarReporteFinalExcel(filasReporteFinal)
@@ -675,22 +675,22 @@ def EjecutarHU03(session, nombreArchivo):
                 WriteLog(
                     mensaje=f"Reporte final generado: {pathReporte}",
                     estado="OK",
-                    taskName=taskName,
-                    pathLog=RUTAS["PathLog"],
+                    nombreTarea=nombreTarea,
+                    rutaRegistro=RUTAS["PathLog"],
                 )
             else:
                 WriteLog(
                     mensaje="No se pudo generar el reporte final",
                     estado="WARNING",
-                    taskName=taskName,
-                    pathLog=RUTAS["PathLog"],
+                    nombreTarea=nombreTarea,
+                    rutaRegistro=RUTAS["PathLog"],
                 )
         else:
             WriteLog(
                 mensaje="No hay filas para generar el reporte final",
                 estado="WARNING",
-                taskName=taskName,
-                pathLog=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
             )
 
         # Convertir a Excel y agregar hipervínculos
@@ -705,19 +705,19 @@ def EjecutarHU03(session, nombreArchivo):
 
         # Enviar correo de finalización
         EnviarNotificacionCorreo(
-            codigoCorreo=3, taskName=taskName, adjuntos=[pathReporte]
+            codigoCorreo=3, nombreTarea=nombreTarea, adjuntos=[pathReporte]
         )
 
-        controlHU(taskName, estado=100)
+        ControlHU(nombreTarea, estado=100)
         return True
 
     except Exception as e:
-        controlHU(taskName, estado=99)
+        ControlHU(nombreTarea, estado=99)
         WriteLog(
             mensaje=f"Error en EjecutarHU03: {e}",
             estado="ERROR",
-            taskName=taskName,
-            pathLog=RUTAS["PathLogError"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLogError"],
         )
         traceback.print_exc()
         return False

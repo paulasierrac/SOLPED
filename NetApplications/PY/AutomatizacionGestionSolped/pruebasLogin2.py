@@ -39,8 +39,8 @@ def Main_Pruebas3():
         WriteLog(
             mensaje=f"ERROR GLOBAL: {e} | {errorText}",
             estado="ERROR",
-            taskName="Main_GestionSOLPED",
-            pathLog=RUTAS["PathLogError"],
+            nombreTarea="Main_GestionSOLPED",
+            rutaRegistro=RUTAS["PathLogError"],
         )
         raise
 

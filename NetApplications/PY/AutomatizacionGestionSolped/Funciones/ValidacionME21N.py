@@ -30,7 +30,7 @@ obtenerCorreos,
 normalizarPrecioSap, 
 clasificarConcepto,
 EsperarSAPListo,
-buscarYClickear, setSapTableScroll, 
+BuscarYClickear, setSapTableScroll, 
 ventanaAbierta,
 SelectGuiTab,
 MostrarCabecera,
@@ -82,11 +82,11 @@ def ValidarAjustarSolped(session, item=1):
             textPF1 = buscarObjetoPorIdParcial(session, "cntlTEXT_TYPES_0200/shell")
             textPF1.selectedNode = "F01" # Foco en primer Texto IMPORTANTE
             EsperarSAPListo(session)
-            EDITOR_ID= buscarObjetoPorIdParcial(session, "cntlTEXT_EDITOR_0201/shellcont/shell")
+            editorId= buscarObjetoPorIdParcial(session, "cntlTEXT_EDITOR_0201/shellcont/shell")
         
             EsperarSAPListo(session)
             # obtiene el texto del objeto ├─ Leer textos
-            editor = EditorTextoSAP(session, EDITOR_ID.id)
+            editor = EditorTextoSAP(session, editorId.id)
             texto = editor.TraerTodoElTexto()
 
             # Obtiene la FECHA: en el texto (Precio)
@@ -166,7 +166,7 @@ def ValidarAjustarSolped(session, item=1):
                 texto = editor.TraerTodoElTexto()
                 if texto :
                     #print("El texto no esta vacío. Procediendo a borrarlo... :"f"F0{i}")
-                    editxt=session.findById(EDITOR_ID.id)
+                    editxt=session.findById(editorId.id)
                     editxt.SetUnprotectedTextPart(0,".")
 
             EsperarSAPListo(session)
@@ -214,7 +214,7 @@ def AbrirSolped(session, solped, item=2):
             if time.time() > timeout:
                 raise TimeoutError(f"No se abrió la ventana :{ventana}")
             
-            buscarYClickear(rf".\img\vSeleccion.png", confidence=0.8, intentos=5, espera=0.5)
+            BuscarYClickear(rf".\img\vSeleccion.png", confidence=0.8, intentos=5, espera=0.5)
             #session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]").pressContextButton("SELECT")
             # VarianteSeleccion = buscarObjetoPorIdParcial(session, "/shell[0]")
             # VarianteSeleccion1= buscarObjetoPorIdParcial(session, "SELECT")
@@ -234,7 +234,7 @@ def AbrirSolped(session, solped, item=2):
         session.findById("wnd[0]/tbar[1]/btn[8]").press()
 
         # Navegar hasta la sol.pedido en la lista
-        buscarYClickear(
+        BuscarYClickear(
             rf".\img\sol.pedido.png", confidence=0.8, intentos=20, espera=0.5
         )
         # Despliga los itemns de la solped
@@ -259,7 +259,7 @@ def AbrirSolped(session, solped, item=2):
 
         EsperarSAPListo(session)
         # Click en tomar pedido
-        #buscarYClickear(rf".\img\tomar.png", confidence=0.7, intentos=20, espera=0.5)
+        #BuscarYClickear(rf".\img\tomar.png", confidence=0.7, intentos=20, espera=0.5)
         session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]").pressButton ("COPY")
         
         #Docstring for MostrarCabecera

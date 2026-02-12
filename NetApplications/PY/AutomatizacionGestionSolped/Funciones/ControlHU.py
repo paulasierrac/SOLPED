@@ -2,15 +2,15 @@ from Repositories.ControlHU import ControlHURepo
 import socket
 import re
 
-def extraer_hu(iNombreHU: str) -> int:
+def ExtraerHU(iNombreHU: str) -> int:
     match = re.match(r'HU(\d+)', iNombreHU.upper())
     if not match:
         raise ValueError(f"Nombre de HU invalido: {iNombreHU}")
     return int(match.group(1))
 
-def controlHU(iNombreHU: str, estado: int):
+def ControlHU(iNombreHU: str, estado: int):
     
-    iHuId = extraer_hu(iNombreHU)
+    iHuId = ExtraerHU(iNombreHU)
 
     if estado == 0:
         activa = 1

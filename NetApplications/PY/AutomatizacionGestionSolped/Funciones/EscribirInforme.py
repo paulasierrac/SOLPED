@@ -11,7 +11,7 @@ def EscribirIformeOperacion(
     acciones: list,
     estado: str,
     botName: str,
-    taskName: str,
+    nombreTarea: str,
     pathInformes: str,
     observaciones: str = ""
 ):
@@ -24,7 +24,7 @@ def EscribirIformeOperacion(
     acciones      : Lista de acciones realizadas (strings)
     estado        : EXITOSO | PARCIAL | ERROR
     botName      : Nombre del Bot RPA (ej. 'Resock')
-    taskName     : HU o proceso (ej. 'HU05_GeneracionOC')
+    nombreTarea     : HU o proceso (ej. 'HU05_GeneracionOC')
     pathInformes : Carpeta donde se guardará el informe
     observaciones : Texto libre opcional
     """
@@ -45,7 +45,7 @@ def EscribirIformeOperacion(
     nombreArchivo = (
         f"Informe_{botName}_SOLPED_{solped}_OC_{ordenCompra}_{fechaArchivo}.txt"
     )
-    ruta_archivo = os.path.join(pathInformes, nombreArchivo)
+    rutaArchivo = os.path.join(pathInformes, nombreArchivo)
 
     # === Construcción del informe ===
     contenido = []
@@ -56,7 +56,7 @@ def EscribirIformeOperacion(
     contenido.append(f"Usuario ejecución : {usuario}\n")
     contenido.append(f"Equipo            : {nombre_maquina}\n")
     contenido.append(f"Bot RPA           : {botName}\n")
-    contenido.append(f"Proceso           : {taskName}\n\n")
+    contenido.append(f"Proceso           : {nombreTarea}\n\n")
     contenido.append(f"SOLPED            : {solped}\n")
     contenido.append(f"ORDEN DE COMPRA   : {ordenCompra}\n")
     contenido.append(f"POSICIONES SOLPED : {itemCount}\n")
@@ -74,7 +74,7 @@ def EscribirIformeOperacion(
     contenido.append("Informe generado automáticamente por RPA.\n")
 
     # === Guardar ===
-    with open(ruta_archivo, "w", encoding="utf-8") as f:
+    with open(rutaArchivo, "w", codificacion="utf-8") as f:
         f.writelines(contenido)
 
-    return ruta_archivo
+    return rutaArchivo

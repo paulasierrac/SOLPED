@@ -617,7 +617,7 @@ def boton_existe(session, id):
         return False
 
 
-def buscarYClickear(
+def BuscarYClickear(
     ruta_imagen, confidence=0.5, intentos=20, espera=0.5, fail_silently=True, log=True
 ):
     """
@@ -635,7 +635,7 @@ def buscarYClickear(
     Returns:
         bool: True si se encontró e hizo click, False si no.
     """
-    taskName = "HU4_GeneracionOC"
+    nombreTarea = "HU4_GeneracionOC"
 
     for intento in range(1, intentos + 1):
         try:
@@ -648,8 +648,8 @@ def buscarYClickear(
                     WriteLog(
                         mensaje=f"Imagen encontrada y clickeada: {ruta_imagen}",
                         estado="INFO",
-                        taskName=taskName,
-                        pathLog=RUTAS["PathLog"],
+                        nombreTarea=nombreTarea,
+                        rutaRegistro=RUTAS["PathLog"],
                     )
                     # print(f"[INFO] Imagen encontrada y clickeada: {ruta_imagen}")
                 return True
@@ -664,8 +664,8 @@ def buscarYClickear(
                 WriteLog(
                     mensaje=f"Error inesperado buscando imagen {ruta_imagen}: {e}",
                     estado="ERROR",
-                    taskName=taskName,
-                    pathLog=RUTAS["PathLog"],
+                    nombreTarea=nombreTarea,
+                    rutaRegistro=RUTAS["PathLog"],
                 )
                 # print(f"[ERROR] Error inesperado buscando imagen {ruta_imagen}: {e}")
             if not fail_silently:
@@ -677,8 +677,8 @@ def buscarYClickear(
         WriteLog(
             mensaje=f"Imagen no encontrada tras {intento} intentos: {ruta_imagen}",
             estado="WARNING",
-            taskName=taskName,
-            pathLog=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLog"],
         )
         # print(f"[WARNING] Imagen no encontrada tras {intento} intentos: {ruta_imagen}")
 
@@ -800,13 +800,13 @@ def obtenerValor(texto: str, contiene: List[str]) -> Optional[str]:
     return None
 
 
-def leer_solpeds_desde_archivo(ruta_archivo):
+def leer_solpeds_desde_archivo(rutaArchivo):
     """
     Lee un archivo de texto plano con formato de tabla (| separado) y extrae
     información de Solicitudes de Pedido (SOLPEDs), agrupando por número de SOLPED.
 
     Args:
-        ruta_archivo (str): La ruta completa al archivo de texto a leer.
+        rutaArchivo (str): La ruta completa al archivo de texto a leer.
 
     Returns:
         dict: Un diccionario donde cada clave es un número de SOLPED y el valor
@@ -815,7 +815,7 @@ def leer_solpeds_desde_archivo(ruta_archivo):
     """
     resultados = {}
 
-    with open(ruta_archivo, "r", encoding="utf-8", errors="ignore") as f:
+    with open(rutaArchivo, "r", codificacion="utf-8", errors="ignore") as f:
         for linea in f:
             # Todas las líneas útiles empiezan con '|'
             if not linea.strip().startswith("|"):
@@ -828,22 +828,22 @@ def leer_solpeds_desde_archivo(ruta_archivo):
                 continue
 
             try:
-                purch_req = partes[1]  # PurchReq
+                purchReq = partes[1]  # PurchReq
                 estado = partes[15]  # Estado
             except IndexError:
                 continue  # Si alguna fila viene corrupta
 
             # Evitar encabezados
-            if purch_req.lower().startswith("purch"):
+            if purchReq.lower().startswith("purch"):
                 continue
 
             # Inicializar
-            if purch_req not in resultados:
-                resultados[purch_req] = {"items": 0, "estados": set()}
+            if purchReq not in resultados:
+                resultados[purchReq] = {"items": 0, "estados": set()}
 
             # Sumar item
-            resultados[purch_req]["items"] += 1
-            resultados[purch_req]["estados"].add(estado)
+            resultados[purchReq]["items"] += 1
+            resultados[purchReq]["estados"].add(estado)
 
     return resultados
 
@@ -982,8 +982,8 @@ def ProcesarTabla(name, dias=None):
         WriteLog(
             mensaje=f"Procesar archivo nombre {name}",
             estado="INFO",
-            taskName="ProcesarTablaME5A",
-            pathLog=RUTAS["PathLog"],
+            nombreTarea="ProcesarTablaME5A",
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         # path = f".\\AutomatizacionGestionSolped\\Insumo\\{name}"
@@ -995,7 +995,7 @@ def ProcesarTabla(name, dias=None):
 
         for codificacion in codificaciones:
             try:
-                with open(path, "r", encoding=codificacion) as f:
+                with open(path, "r", codificacion=codificacion) as f:
                     lineas = f.readlines()
                 # print(f"EXITO: Archivo leido con codificacion {codificacion}")
                 break
@@ -1203,8 +1203,8 @@ def ProcesarTabla(name, dias=None):
         WriteLog(
             mensaje=f"Error en ProcesarTablaME5A: {e}",
             estado="ERROR",
-            taskName="ProcesarTablaME5A",
-            pathLog=RUTAS["PathLogError"],
+            nombreTarea="ProcesarTablaME5A",
+            rutaRegistro=RUTAS["PathLogError"],
         )
         print(f"ERROR en ProcesarTablaME5A: {e}")
         traceback.print_exc()
@@ -1217,7 +1217,7 @@ def ProcesarTablaMejorada(name, dias=None):
         lineas_puras = []
         for cod in ["latin-1", "utf-8", "cp1252"]:
             try:
-                with open(path, "r", encoding=cod) as f:
+                with open(path, "r", codificacion=cod) as f:
                     lineas_puras = [l.strip() for l in f.readlines()]
                 break
             except: continue
@@ -1384,12 +1384,12 @@ def obtener_importe_por_denominacion(session, nombre_buscado="imp.Saludable"):
 
 
 def ObtenerColumnasdf(
-    ruta_archivo: str,
+    rutaArchivo: str,
 ):
     """
     Pruebas obtener columnas de un archivo txt
     """
-    df = pd.read_csv(ruta_archivo, dtype=str, sep="|")
+    df = pd.read_csv(rutaArchivo, dtype=str, sep="|")
     columnas = df.columns.tolist()
     return columnas
 

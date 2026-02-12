@@ -325,7 +325,7 @@ def GenerarReporteValidacion(
     validaciones: Dict,
     tieneAttachments: bool = None,
     obsAttachments: str = "",
-    attachmentsLista: list = None,
+    archivosAdjuntosLista: list = None,
 ) -> str:
     """Genera un reporte legible de la validacion"""
 
@@ -351,18 +351,18 @@ def GenerarReporteValidacion(
             "    La SOLPED cuenta con archivos adjuntos.\n"
         )
 
-        # Si existe lista estructurada de attachments
-        if attachmentsLista:
+        # Si existe lista estructurada de archivosAdjuntos
+        if archivosAdjuntosLista:
             reporte += (
-                f"    Total de archivos: {len(attachmentsLista)}\n" f"    Ejemplos:\n"
+                f"    Total de archivos: {len(archivosAdjuntosLista)}\n" f"    Ejemplos:\n"
             )
             # Listar hasta 3 para evitar reportes enormes
-            for a in attachmentsLista[:3]:
+            for a in archivosAdjuntosLista[:3]:
                 reporte += f"      - {a.get('title', '')}\n"
 
-            if len(attachmentsLista) > 3:
+            if len(archivosAdjuntosLista) > 3:
                 reporte += (
-                    f"      ... ({len(attachmentsLista)-3} archivos adicionales)\n"
+                    f"      ... ({len(archivosAdjuntosLista)-3} archivos adicionales)\n"
                 )
 
         # Si solo viene texto plano (caso exportación)
@@ -482,7 +482,7 @@ def ProcesarYValidarItem(
     df_items: pd.DataFrame,
     tieneAttachments: bool = None,
     obsAttachments: str = "",
-    attachmentsLista: list = None,
+    archivosAdjuntosLista: list = None,
 ) -> Tuple[Dict, Dict, str, str, str]:
     """
     Procesa un item: extrae datos, valida y genera reporte
@@ -551,7 +551,7 @@ def ProcesarYValidarItem(
         validaciones,
         tieneAttachments,
         obsAttachments,
-        attachmentsLista,
+        archivosAdjuntosLista,
     )
 
     return datosTexto, validaciones, reporte, estadoFinal, observaciones

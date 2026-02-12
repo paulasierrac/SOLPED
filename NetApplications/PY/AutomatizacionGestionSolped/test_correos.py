@@ -126,11 +126,11 @@ print("\n" + "=" * 70)
 
 
 # # Enviar correo de inicio (código 1)
-# # EnviarNotificacionCorreo(codigoCorreo=1, taskName=taskName)
+# # EnviarNotificacionCorreo(codigoCorreo=1, nombreTarea=nombreTarea)
 # archivoDescargado = rf"{RUTAS['PathReportes']}/Reporte_1300139268_10.txt"
 # # Enviar correo de inicio (código 2 adjunto)
 # EnviarNotificacionCorreo(
-#     codigoCorreo=54, taskName=taskName, adjuntos=[archivoDescargado]
+#     codigoCorreo=54, nombreTarea=nombreTarea, adjuntos=[archivoDescargado]
 # )
 
 # exito_personalizado = EnviarCorreoPersonalizado(
@@ -141,7 +141,7 @@ print("\n" + "=" * 70)
 #         "<p>El proceso de sincronización ha fallado en la etapa de validación de datos.</p>"
 #         "<p><strong>Revisar logs en:</strong> \\\\servidor\\logs\\errores.txt</p>"
 #     ),
-#     taskName=taskName,
+#     nombreTarea=nombreTarea,
 #     adjuntos=["C:/Archivos/log_error_20251204.txt"],
 #     cc=["steven.navarro@netapplications.com.co"],
 # )

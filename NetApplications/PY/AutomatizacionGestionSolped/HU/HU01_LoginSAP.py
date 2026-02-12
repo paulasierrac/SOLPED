@@ -21,7 +21,7 @@ import pyautogui
 from Config.InicializarConfig import inConfig
 from Config.settings import RUTAS, SAP_CONFIG
 from Funciones.ValidacionME21N import ventanaAbierta
-from Funciones.ControlHU import controlHU
+from Funciones.ControlHU import ControlHU
 
 
 def AbrirSAPLogon():
@@ -54,8 +54,8 @@ def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
 
     try:
         # WriteLog | INFO | INICIA ConectarSAP
-        taskName = "HU01_LoginSAP"
-        controlHU(taskName, estado=0)
+        nombreTarea = "HU01_LoginSAP"
+        ControlHU(nombreTarea, estado=0)
 
         abrirSap = AbrirSAPLogon()
         time.sleep(3)
@@ -137,7 +137,7 @@ def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
         return session
 
     except Exception as e:
-        controlHU(taskName, estado=99)
+        ControlHU(nombreTarea, estado=99)
         print(f"ERROR | Error al conectar a SAP: {e}")
         # WriteLog | ERROR | Error grave ConectarSAP
         return None

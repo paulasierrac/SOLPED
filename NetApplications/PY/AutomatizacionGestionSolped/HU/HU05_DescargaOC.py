@@ -31,7 +31,7 @@ def EjecutarHU05(session, ordenesDeCompra: list):
     """
     Ejecuta la Historia de Usuario 05: Descarga de OC desde ME9F.
     """
-    taskName = "HU05_DescargaOC"
+    nombreTarea = "HU05_DescargaOC"
 
     try:
 
@@ -106,8 +106,8 @@ def EjecutarHU05(session, ordenesDeCompra: list):
         WriteLog(
             mensaje=f"Procesamiento en ME9F completado para la OC: {ordenesDeCompra}",
             estado="INFO",
-            taskName=taskName,
-            pathLog=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLog"],
         )
 
     except Exception as e:
@@ -115,7 +115,7 @@ def EjecutarHU05(session, ordenesDeCompra: list):
         WriteLog(
             mensaje=f"ERROR GLOBAL en HU05: {e} | {errorText}",
             estado="ERROR",
-            taskName=taskName,
-            pathLog=RUTAS["PathLogError"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLogError"],
         )
         raise

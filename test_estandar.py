@@ -1,9 +1,9 @@
 import ast
 import os
 
-def obtener_funciones(ruta_archivo):
+def obtener_funciones(rutaArchivo):
     try:
-        with open(ruta_archivo, "r", encoding="utf-8") as f:
+        with open(rutaArchivo, "r", codificacion="utf-8") as f:
             tree = ast.parse(f.read())
         
         # Extrae solo las definiciones de funciones (def)
@@ -43,7 +43,7 @@ if __name__ == "__main__":
     # Redirigir stdout a un archivo
     import sys
     original_stdout = sys.stdout
-    with open("function_list.txt", "w", encoding="utf-8") as f:
+    with open("function_list.txt", "w", codificacion="utf-8") as f:
         sys.stdout = f
         analizar_carpetas(carpetas_objetivo)
         sys.stdout = original_stdout

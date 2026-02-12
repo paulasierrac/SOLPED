@@ -155,17 +155,17 @@ class EmailSender:
             adjuntos=adjuntos,
         )
 
-    def _adjuntar_archivo(self, mensaje: MIMEMultipart, ruta_archivo: str):
+    def _adjuntar_archivo(self, mensaje: MIMEMultipart, rutaArchivo: str):
         """
         Adjunta un archivo al mensaje
 
         Args:
             mensaje: Objeto MIMEMultipart
-            ruta_archivo: Ruta del archivo a adjuntar
+            rutaArchivo: Ruta del archivo a adjuntar
         """
-        nombreArchivo = Path(ruta_archivo).name
+        nombreArchivo = Path(rutaArchivo).name
 
-        with open(ruta_archivo, "rb") as archivo:
+        with open(rutaArchivo, "rb") as archivo:
             parte = MIMEBase("application", "octet-stream")
             parte.set_payload(archivo.read())
 
@@ -388,14 +388,14 @@ if __name__ == "__main__":
 
 
 def EnviarNotificacionCorreo(
-    codigoCorreo: int, taskName: str = "Notificacion", adjuntos: list = None
+    codigoCorreo: int, nombreTarea: str = "Notificacion", adjuntos: list = None
 ):
     try:
         WriteLog(
             mensaje=f"Enviando notificación con código {codigoCorreo}...",
             estado="INFO",
-            taskName=taskName,
-            pathLog=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         sender = EmailSender()
@@ -416,16 +416,16 @@ def EnviarNotificacionCorreo(
             WriteLog(
                 mensaje=f"Notificación enviada correctamente. Exitosos: {resultados['exitosos']}",
                 estado="INFO",
-                taskName=taskName,
-                pathLog=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
             )
             return True
         else:
             WriteLog(
                 mensaje=f"No se pudo enviar la notificación. Fallidos: {resultados['fallidos']}",
                 estado="WARNING",
-                taskName=taskName,
-                pathLog=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
             )
             return False
 
@@ -433,8 +433,8 @@ def EnviarNotificacionCorreo(
         WriteLog(
             mensaje=f"Error al enviar notificación: {e}",
             estado="ERROR",
-            taskName=taskName,
-            pathLog=RUTAS["PathLogError"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLogError"],
         )
         return False
 
@@ -443,7 +443,7 @@ def EnviarCorreoPersonalizado(
     destinatario: str,
     asunto: str,
     cuerpo: str,
-    taskName: str = "EnvioPersonalizado",
+    nombreTarea: str = "EnvioPersonalizado",
     adjuntos: list = None,
     cc: list = None,
     bcc: list = None,
@@ -455,7 +455,7 @@ def EnviarCorreoPersonalizado(
         destinatario: Email del destinatario (cadena de texto).
         asunto: Asunto del correo (cadena de texto).
         cuerpo: Cuerpo del mensaje (puede ser HTML).
-        taskName: Nombre de la tarea para logs.
+        nombreTarea: Nombre de la tarea para logs.
         adjuntos: Lista de rutas de archivos a adjuntar (opcional).
         cc: Lista de correos en copia (opcional).
         bcc: Lista de correos en copia oculta (opcional).
@@ -467,8 +467,8 @@ def EnviarCorreoPersonalizado(
         WriteLog(
             mensaje=f"Preparando envío personalizado para {destinatario}...",
             estado="INFO",
-            taskName=taskName,
-            pathLog=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLog"],
         )
 
         # Log de adjuntos
@@ -476,8 +476,8 @@ def EnviarCorreoPersonalizado(
             WriteLog(
                 mensaje=f"Adjuntos a enviar: {', '.join(adjuntos)}",
                 estado="INFO",
-                taskName=taskName,
-                pathLog=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
             )
 
         # Crear EmailSender con configuración por defecto
@@ -497,16 +497,16 @@ def EnviarCorreoPersonalizado(
             WriteLog(
                 mensaje=f"Correo personalizado enviado exitosamente a {destinatario}.",
                 estado="INFO",
-                taskName=taskName,
-                pathLog=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
             )
             return True
         else:
             WriteLog(
                 mensaje=f"Fallo al enviar el correo personalizado a {destinatario}.",
                 estado="WARNING",
-                taskName=taskName,
-                pathLog=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
             )
             return False
 
@@ -515,7 +515,7 @@ def EnviarCorreoPersonalizado(
         WriteLog(
             mensaje=f"Error fatal en el envío personalizado: {e} | {error_stack}",
             estado="ERROR",
-            taskName=taskName,
-            pathLog=RUTAS["PathLogError"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLogError"],
         )
         return False
