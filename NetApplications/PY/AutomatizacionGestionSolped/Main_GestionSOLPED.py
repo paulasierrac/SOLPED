@@ -16,7 +16,7 @@ from Funciones.EmailSender import EnviarNotificacionCorreo
 from Config.settings import RUTAS, SAP_CONFIG
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
 from HU.HU01_LoginSAP import ConectarSAP, ObtenerSesionActiva
-from HU.HU02_DescargaME5A import EjecutarHU02
+#from HU.HU02_DescargaME5A import EjecutarHU02
 #from HU.HU03_ValidacionME53N import EjecutarHU03
 from HU.HU04_GeneracionOC import EjecutarHU04
 from HU.HU05_DescargaOC import EjecutarHU05

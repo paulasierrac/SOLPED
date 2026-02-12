@@ -61,14 +61,14 @@ def EjecutarHU00():
         # ==========================================================
 
 
-        # try : 
-        #     idTablaticket= random.randint(1, 10)
-        #     TicketInsumoRepo.crearPCTicketInsumo( "Inicio cargue de insumo " ) 0
-        #     rutaParametros = os.path.join(inConfig("PathInsumo"),"Parametros SAMIR.xlsx")
-        #     ServicioExcel.ejecutarBulkDesdeExcel(rutaParametros)
-        #     TicketInsumoRepo.crearPCTicketInsumo( "Finalizo cargue de insumo " ) 100 
-        # except: 
-        #     TicketInsumoRepo.crearPCTicketInsumo( error  "Finalizo cargue de insumo " ) 99 
+        try : 
+                 
+            TicketInsumoRepo.crearPCTicketInsumo( estado=0, observaciones= "Cargue de insumo")
+            rutaParametros = os.path.join(inConfig("PathInsumo"),"Parametros SAMIR.xlsx")
+            ServicioExcel.ejecutarBulkDesdeExcel(rutaParametros)
+            TicketInsumoRepo.crearPCTicketInsumo( estado=100, observaciones= "Cargue de insumo")
+        except: 
+            TicketInsumoRepo.crearPCTicketInsumo( error= 99, observaciones="Carge de insumo " )
 
         rutaConfig = os.path.join(rutaBase, "Config.json")
 

@@ -11,7 +11,6 @@ import win32com.client
 import time
 import os
 from Funciones.EscribirLog import WriteLog
-from Funciones.GeneralME53N import ObtenerTextoDelPortapapeles
 from Config.settings import RUTAS
 import pandas as pd
 import datetime
@@ -27,6 +26,7 @@ from Funciones.EmailSender import EmailSender
 from typing import List, Union
 import sys
 from openpyxl import load_workbook
+
 
 def DeterminarEstadoFinal(datosTexto: Dict, validaciones: Dict) -> Tuple[str, str]:
     """

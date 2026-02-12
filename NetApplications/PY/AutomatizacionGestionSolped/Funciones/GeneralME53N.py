@@ -7,20 +7,14 @@
 # Cambios: Correcciones en ObtenerItemTextME53N y campos concepto_compra
 # ============================================
 import traceback
-import win32com.client
 import time
 import os
 from Funciones.EscribirLog import WriteLog
 from Config.settings import RUTAS
 import pandas as pd
-import datetime
-import re
-import win32clipboard
 import pyautogui
-import chardet
 from datetime import datetime
 from typing import Dict, List, Tuple
-import smtplib
 import os
 from Funciones.EmailSender import EmailSender
 from typing import List, Union
@@ -423,9 +417,12 @@ def ObtenerTextoDelPortapapeles():
 
 
 def AbrirTransaccion(session, transaccion):
-    """session: objeto de SAP GUI
+    """
+    session: objeto de SAP GUI
     transaccion: transaccion a buscar
-    Realiza la busqueda de la transaccion requerida"""
+    Realiza la busqueda de la transaccion requerida
+    
+    """
 
     try:
         WriteLog(

@@ -11,7 +11,6 @@ import win32com.client
 import time
 import os
 from Funciones.EscribirLog import WriteLog
-from Funciones.GeneralME53N import ObtenerTextoDelPortapapeles
 from Config.settings import RUTAS
 import pandas as pd
 import datetime
@@ -537,4 +536,3 @@ def NormalizarFecha(fecha: str) -> str:
         except:
             continue
     return fecha.strip()
-

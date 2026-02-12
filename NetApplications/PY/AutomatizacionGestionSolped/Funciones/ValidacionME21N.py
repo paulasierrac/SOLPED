@@ -90,7 +90,7 @@ def ValidarAjustarSolped(session, item=1):
             texto = editor.TraerTodoElTexto()
 
             # Obtiene la FECHA: en el texto (Precio)
-            claves = ["FECHA:"] # str que busca en el texto
+            claves = ["FECHA:","FECHA DE EVENTO:"] # str que busca en el texto
             FechaTexto = obtenerValor(texto, claves)
             print(f"Fecha encontrada en el Texto {FechaTexto}")
             #preciotexto = normalizarPrecioSap(preciotexto)
@@ -190,7 +190,7 @@ def ValidarAjustarSolped(session, item=1):
         raise
 
 
-def AbrirSolped(session, solped, item=2):
+def AbrirSolped(session, solped, item=2,posiciones = ["20","30","50","60"]):
     """
     Navega en la GUI de SAP para tomar una Solicitud de Pedido (SOLPED) específica
     y prepararla para la creación de una Orden de Compra.
@@ -254,7 +254,9 @@ def AbrirSolped(session, solped, item=2):
         """
         primerItem = 2 #desde donde se toman las pociciones TODO: que se pase por parametro, segun cliente con posiciones 
         ultimoItem = item + 2 # Ultima posicion tomada 
-        for i in range(primerItem,ultimoItem):   # recordar que en range no incluye el ultimo 
+
+        for i in posiciones:   # recordar que en range no incluye el ultimo 
+            #i= (int i)/10
             session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[1]").selectNode(f"          {i}")
 
         EsperarSAPListo(session)

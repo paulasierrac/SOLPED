@@ -1,7 +1,14 @@
 from datetime import datetime
+import random
+import platform
+import socket
 from Config.database import Database
 from Config.settings import DB_CONFIG
 from Config.InicializarConfig import inConfig 
+
+
+
+
 
 schemadb = DB_CONFIG["schema"]
 
@@ -70,26 +77,40 @@ class TicketInsumoRepo:
                 )
             )
     
-    def crearPCTicketInsumo():
+    def crearPCTicketInsumo(estado=98, observaciones:str = ""):
         """
          EXEC [GestionSolped].[GestionarTicketInsumo]
             @ID             = 1,
             @Estado         = 100,
             @Maquina        = 'CGRPA042',
             @Observaciones  = 'Prueba Error cargue lectura de insumo plantilla';
+
+            Estado = 100 / finalizado
+            Estado = 99 / Error 
+            Estado = 0 / inicio
         """
 
-        #schemadb = DB_CONFIG["schema"]
+        idTablaticket= random.randint(1, 1000) # Id Ramdom
+        PCTicketInsumo = inConfig("PCTicketInsumo") # [GestionSolped].[GestionarTicketInsumo]
+        maquina = socket.gethostname() # Nombre de la máquina (hostname)
 
-        PCTicketInsumo = inConfig("PCTicketInsumo")
+        if estado == 0:
+            estadoObsevacion ="Inicio: "
+        elif estado == 100:
+            estadoObsevacion ="Finalizado: "
+        elif estado == 99:
+            estadoObsevacion ="Error: "
+        else:
+            estadoObsevacion =": "
+           
 
         query = f"""
             EXEC {PCTicketInsumo}
-                @ID             = 1,
-                @Estado         = 100,
-                @Maquina        = 'CGRPA042',
-                @Observaciones  = 'Steven Error cargue lectura de insumo plantilla';
-        """
+                @ID             = {idTablaticket},
+                @Estado         = {estado},
+                @Maquina        = '{maquina}',
+                @Observaciones  = '{estadoObsevacion} {observaciones}';
+               """
         with Database.get_connection() as conn:
             cursor = conn.cursor()
             cursor.execute(

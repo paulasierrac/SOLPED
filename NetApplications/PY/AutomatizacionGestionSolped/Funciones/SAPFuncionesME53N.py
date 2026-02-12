@@ -11,7 +11,6 @@ import win32com.client
 import time
 import os
 from Funciones.EscribirLog import WriteLog
-from Funciones.GeneralME53N import ObtenerTextoDelPortapapeles
 from Config.settings import RUTAS
 import pandas as pd
 import datetime
@@ -40,6 +39,20 @@ from Funciones.ValidacionME53N import (
     ObtenerValorDesdeFila,
 )
 
+def ObtenerTextoDelPortapapeles():
+    """Obtener texto del portapapeles con manejo correcto de codificacion"""
+    try:
+        # Abrir portapapeles
+        win32clipboard.OpenClipboard()
+        try:
+            # Obtener texto con CF_UNICODETEXT (maneja mejor caracteres especiales)
+            texto = win32clipboard.GetClipboardData(win32clipboard.CF_UNICODETEXT)
+            return texto if texto else ""
+        finally:
+            win32clipboard.CloseClipboard()
+    except Exception as e:
+        print(f"Error al leer portapapeles: {e}")
+        return ""
 
 def ObtenerItemTextME53N(session, numeroSolped, numeroItem):
     """session: objeto de SAP GUI

@@ -97,11 +97,13 @@ def EjecutarHU04(session, archivo):
                 rutaRegistro=RUTAS["PathLog"],
             )
             acciones = []
+            
             # print(f"procesando solped: {solped} de items: {itemCount}")
-            AbrirTransaccion(session, "ME21N")
+            AbrirTransaccion(session, "ME21N",)
             EsperarSAPListo(session)
             #navegacion por SAP que permite abrir Solped 
-            AbrirSolped(session, solped, itemCount)
+            posiciones = {"20","30","50","60"}
+            AbrirSolped(session, solped, itemCount, posiciones)
 
             #se selecciona la clase de docuemnto ZRCR, revisar alcance si es necesario cambiar a otra clase dependiendo de algun criterio
             SetGuiComboBoxkey(session, "TOPLINE-BSART", "ZRCR")
