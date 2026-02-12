@@ -30,8 +30,6 @@ from Funciones.GeneralME53N import (
     NotificarRevisionManualSolped,
     GenerarReporteAttachments,
     ConvertirTxtAExcel,
-    AppendHipervinculoObservaciones,
-    obtenerFilaExpSolped,
 )
 from Funciones.SAPFuncionesME53N import (
     ProcesarTablaME5A,

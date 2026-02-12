@@ -2707,3 +2707,107 @@ ENTREGA EN EL CLUB BELLAVISTA
 
 GASTO PROPIO
 --------------------------------------------------------------------------------
+
+=====Solped: 1300139397 Item: 10 Registro: 2026-02-12 15:49:12 =====
+POR FAVOR GENERAR ORDEN DE COMPRA A: WINDOBIS SAS.
+NIT: 901067142
+Email: winbodis.yur@gmail.com
+
+POR CONCEPTO DE: Estuche de plumones doble punta pincel para actividades recreativas Bloc 20 de julio.
+FECHA DE EVENTO: diciembre 26 de 2025
+SERVICIO POR FACTURA
+CANTIDAD UNITARIA:                    1
+CANTIDAD TOTAL:                       1
+VALOR UNIDAD:                $   27.000
+VALOR TOTAL:                 $   27.000
+IVA (19%):                   $    5.130
+VALOR MÁS IVA:               $   32.130
+
+
+CECO: 302040026
+COORDINADOR: LAURA MELISSA CAICEDO ESPINOSA
+PROMOTOR: VANESSA RUIZ
+CORREO COORDINADOR Y/O PROMOTOR: laura.caicedo@colsubidio.com
+ELABORA: JDDM
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139274 Item: 10 Registro: 2026-02-12 15:49:32 =====
+GENERAR ORDEN DE COMPRA A: D BARON LOGISTICA Y EVENTOS S.A.S
+NIT: 900562347
+Correo: info@dbaroneventos.com
+
+POR CONCEPTO DE      :SONIDO PROFESIONAL STAKING
+EMPRESA              : RAMA JUDICIAL
+FECHA DEL EVENTO:      25 DE MAYO DE 2024
+
+*SE  ADJUNTA COTIZACION*
+
+CANTIDAD:                        1
+VALOR UNITARIO:             $ 2.207.427
+VALOR TOTAL:                $ 2.207.427
+VALOR + IVA:                $ 2.626.838
+
+
+CECO:302040023
+COORDINADOR: LAURA ALVAREZ
+PROMOTOR: SMTM
+ELABORO: LAURA ALVAREZ
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139173 Item: 10 Registro: 2026-02-12 15:49:52 =====
+Prueba de programa
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139103 Item: 10 Registro: 2026-02-12 15:50:12 =====
+13° seminario Internacional Presencial en seguridad en medios de pago
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139104 Item: 10 Registro: 2026-02-12 15:50:32 =====
+13° seminario Internacional Presencial en seguridad en medios de pago
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139099 Item: 10 Registro: 2026-02-12 15:50:52 =====
+13° seminario Internacional Presencial en seguridad en medios de pago
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139102 Item: 10 Registro: 2026-02-12 15:51:12 =====
+13° seminario Internacional Presencial en seguridad en medios de pago
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139090 Item: 10 Registro: 2026-02-12 15:51:32 =====
+Prueba de programa
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139093 Item: 10 Registro: 2026-02-12 15:51:51 =====
+13° seminario Internacional Presencial en seguridad en medios de pago
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139089 Item: 10 Registro: 2026-02-12 15:52:11 =====
+13° seminario Internacional Presencial en seguridad en medios de pago
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139086 Item: 10 Registro: 2026-02-12 15:52:32 =====
+Prueba de programa
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139073 Item: 20 Registro: 2026-02-12 15:52:52 =====
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139074 Item: 10 Registro: 2026-02-12 15:53:11 =====
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139076 Item: 10 Registro: 2026-02-12 15:53:32 =====
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300138923 Item: 10 Registro: 2026-02-12 15:53:52 =====
+Tortilla Bimbo,carne Zenú, Lechuga, tomate, queso, salsas
+frico: tomate, mayonesa ,mostaza y piña
+Tortilla Bimbo,carne Zenú, Lechuga, tomate, queso, salsas
+frico: tomate, mayonesa ,mostaza y piña
+Tortilla Bimbo,carne Zenú, Lechuga, tomate, queso, salsas
+frico: tomate, mayonesa ,mostaza y piña
+--------------------------------------------------------------------------------

@@ -12,12 +12,13 @@
 
 from Funciones.EscribirLog import WriteLog
 from Funciones.EmailSender import EnviarNotificacionCorreo
+#from Funciones.GeneralME53N import AppendHipervinculoObservaciones
 
 from Config.settings import RUTAS, SAP_CONFIG
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
 from HU.HU01_LoginSAP import ConectarSAP, ObtenerSesionActiva
-#from HU.HU02_DescargaME5A import EjecutarHU02
-#from HU.HU03_ValidacionME53N import EjecutarHU03
+from HU.HU02_DescargaME5A import EjecutarHU02
+from HU.HU03_ValidacionME53N import EjecutarHU03
 from HU.HU04_GeneracionOC import EjecutarHU04
 from HU.HU05_DescargaOC import EjecutarHU05
 
@@ -67,15 +68,9 @@ def Main_GestionSolped():
             nombreTarea=nombreTarea,
             rutaRegistro=RUTAS["PathLog"],
         )
-        session = ConectarSAP(inConfig("SapSistema"),inConfig("SapMandante") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
-        # session = ConectarSAP(
-        #     inConfig("SAP_SISTEMA"),
-        #     inConfig("SAP_MANDANTE"),
-        #     SAP_CONFIG["user"],
-        #     SAP_CONFIG["password"],
-        # )
+        #session = ConectarSAP(inConfig("SapSistema"),inConfig("SapMandante") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
 
-        #session = ObtenerSesionActiva()
+        session = ObtenerSesionActiva()
 
         WriteLog(
             mensaje="Finaliza HU01_LoginSAP.",
@@ -116,8 +111,8 @@ def Main_GestionSolped():
                 nombreTarea=nombreTarea,
                 rutaRegistro=RUTAS["PathLog"],
             )
-        #for archivo in archivos_validar:
-            #EjecutarHU03(session, archivo)
+        for archivo in archivos_validar:
+            EjecutarHU03(session, archivo)
 
         WriteLog(
                 mensaje=f"Finaliza HU03 - Validación ME53N para archivo.",
@@ -136,9 +131,9 @@ def Main_GestionSolped():
             rutaRegistro=RUTAS["PathLog"],
         )
 
-        archivos_validar = ["expSolped03 copy.txt"] 
-        for archivo in archivos_validar:
-            EjecutarHU04(session, archivo)
+        # archivos_validar = ["expSolped03 copy.txt"] 
+        # for archivo in archivos_validar:
+        #     EjecutarHU04(session, archivo)
 
         WriteLog(
             mensaje="HU04 - Generación OC finalizada correctamente.",
@@ -157,7 +152,7 @@ def Main_GestionSolped():
             rutaRegistro=RUTAS["PathLog"],
         )
 
-        EjecutarHU05(session)
+        #EjecutarHU05(session)
 
         WriteLog(
             mensaje="HU05 - Descarga OC finalizada correctamente.",

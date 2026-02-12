@@ -92,7 +92,7 @@ def ValidarAjustarSolped(session, item=1):
             # Obtiene la FECHA: en el texto (Precio)
             claves = ["FECHA:","FECHA DE EVENTO:"] # str que busca en el texto
             FechaTexto = obtenerValor(texto, claves)
-            print(f"Fecha encontrada en el Texto {FechaTexto}")
+            print(f"Fecha encontrada en el Texto en la posicion {fila+1}: {FechaTexto}")
             #preciotexto = normalizarPrecioSap(preciotexto)
 
             # Obtiene el valor en el texto (Precio)
@@ -257,10 +257,11 @@ def AbrirSolped(session, solped, item=2,posiciones = ["20","30","50","60"]):
 
         for i in posiciones:   # recordar que en range no incluye el ultimo 
             print (posiciones)
+            print (type(posiciones))
             print("Valores a evaluar ")
             print(i)
             print (type(i))
-            i = int(int(i) / 10)
+            i = int(int(i) / 10) + 1
             print("Valores a evaluar ")
             print(i)
             print (type(i))
