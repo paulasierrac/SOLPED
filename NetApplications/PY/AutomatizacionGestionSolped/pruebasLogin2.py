@@ -35,12 +35,12 @@ def Main_Pruebas3():
         # GenerarOCDesdeSolped(session, "1300177338", 13)
 
     except Exception as e:
-        error_text = traceback.format_exc()
+        errorText = traceback.format_exc()
         WriteLog(
-            mensaje=f"ERROR GLOBAL: {e} | {error_text}",
+            mensaje=f"ERROR GLOBAL: {e} | {errorText}",
             estado="ERROR",
-            task_name="Main_GestionSOLPED",
-            path_log=RUTAS["PathLogError"],
+            nombreTarea="Main_GestionSOLPED",
+            rutaRegistro=RUTAS["PathLogError"],
         )
         raise
 

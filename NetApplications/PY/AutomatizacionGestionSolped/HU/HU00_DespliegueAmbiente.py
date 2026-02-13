@@ -2,22 +2,21 @@
 # GestionSOLPED – HU00: DespliegueAmbiente
 # Autor: Paula Sierra - NetApplications
 # Descripcion: Carga parámetros, valida carpetas y prepara entorno
-# Ultima modificacion: 30/11/2025
+# Ultima modificacion: 11/02/2026
 # Propiedad de Colsubsidio
-# Cambios: Ajuste ruta base dinámica + estándar Colsubsidio
+# Cambios:
+# - Se agrega manejo de errores
+# - Se agrega trazabilidad
+# - Se validan rutas
 # ================================
 
 import os
 import json
 import random
 
-from Config.InitConfig import initConfig, inConfig
-from Funciones.FuncionesExcel import ExcelService
-from repositories.TicketInsumo import TicketInsumoRepo 
-
-
-#from Config.initconfig import initConfig
-
+from Config.InicializarConfig import initConfig, inConfig
+from Funciones.FuncionesExcel import ServicioExcel
+from Repositories.TicketInsumo import TicketInsumoRepo 
 
 def EjecutarHU00():
 
@@ -25,12 +24,13 @@ def EjecutarHU00():
     Prepara el entorno: valida carpetas, carga parámetros y estructura inicial.
     """
     try : 
-            
+        
+        #Probando GIT 
         # ==========================================================
         # 1. Ruta base del proyecto (importante)
         # ==========================================================
-        ruta_base = os.path.dirname(os.path.abspath(__file__))  # ruta de HU00
-        ruta_base = os.path.abspath(os.path.join(ruta_base, ".."))
+        rutaBase = os.path.dirname(os.path.abspath(__file__))  # ruta de HU00
+        rutaBase = os.path.abspath(os.path.join(rutaBase, ".."))
         # Sube un nivel para quedar en /AutomatizacionGestionSolped
 
         # ==========================================================
@@ -47,10 +47,10 @@ def EjecutarHU00():
         ]
 
         for carpeta in carpetas:
-            ruta_completa = os.path.join(ruta_base, carpeta)
+            rutaCompleta = os.path.join(rutaBase, carpeta)
 
-            if not os.path.exists(ruta_completa):
-                os.makedirs(ruta_completa)
+            if not os.path.exists(rutaCompleta):
+                os.makedirs(rutaCompleta)
 
         # ==========================================================
         # 3. Cargar parámetros desde o BD
@@ -62,25 +62,19 @@ def EjecutarHU00():
         # ==========================================================
 
 
-        # try : 
-        #     idTablaticket= random.randint(1, 10)
-        #     TicketInsumoRepo.crearPCTicketInsumo( "Inicio cargue de insumo " ) 0
-        #     rutaParametros = os.path.join(inConfig("PathInsumo"),"Parametros SAMIR.xlsx")
-        #     ExcelService.ejecutar_bulk_desde_excel(rutaParametros)
-        #     TicketInsumoRepo.crearPCTicketInsumo( "Finalizo cargue de insumo " ) 100 
-        # except: 
-        #     TicketInsumoRepo.crearPCTicketInsumo( error  "Finalizo cargue de insumo " ) 99 
+        try : 
+                 
+            TicketInsumoRepo.crearPCTicketInsumo( estado=0, observaciones= "Cargue de insumo")
+            rutaParametros = os.path.join(inConfig("PathInsumo"),"Parametros SAMIR.xlsx")
+            ServicioExcel.ejecutarBulkDesdeExcel(rutaParametros)
+            TicketInsumoRepo.crearPCTicketInsumo( estado=100, observaciones= "Cargue de insumo")
+        except: 
+            TicketInsumoRepo.crearPCTicketInsumo( error= 99, observaciones="Carge de insumo " )
 
+        rutaConfig = os.path.join(rutaBase, "Config.json")
 
-
-
-
-    
-
-        ruta_config = os.path.join(ruta_base, "Config.json")
-
-        if os.path.exists(ruta_config):
-            with open(ruta_config, "r", encoding="utf-8") as f:
+        if os.path.exists(rutaConfig):
+            with open(rutaConfig, "r", encoding="utf-8") as f:
                 config = json.load(f)
         else:
             config = {}
@@ -88,13 +82,13 @@ def EjecutarHU00():
         return config
 
     except Exception as e:
-         print("Error")
+         print("Error en despliege ")
 
          
     #     WriteLog(
     #         mensaje=f"Error Global en Main: {e} | {error_stack}",
     #         estado="ERROR",
-    #         task_name=task_name,
-    #         path_log=RUTAS["PathLogError"],
+    #         nombreTarea=nombreTarea,
+    #         rutaRegistro=RUTAS["PathLogError"],
     #     )
     #     raise

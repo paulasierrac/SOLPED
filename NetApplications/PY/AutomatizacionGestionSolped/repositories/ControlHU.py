@@ -4,18 +4,37 @@ from Config.settings import DB_CONFIG
 schemadb = DB_CONFIG["schema"]
 
 class ControlHURepo:
+
+    """
+    Repositorio encargado de la gestión y persistencia de los estados de las 
+    Historias de Usuario (HU) en la base de datos de control.
+
+    Esta clase permite centralizar el seguimiento de la ejecución del bot,
+    asegurando que cada HU tenga un registro de su estado actual y la máquina 
+    donde se está procesando.
+
+    Attributes:
+        schema (str): Esquema de la base de datos donde reside la tabla ControlHU.
+    """
     
     def __init__(self, schema: str):
         self.schema = schema or schemadb
-        
-    def actualizar_estado_hu(
+
+    def ActualizarEstadoHU(
         self, 
-        hu: int,
-        nombre_hu: str, 
+        iHuId: int,
+        iNombreHU: str, 
         estado: int,
         activa: int,
         maquina: str
     ) -> bool:
+        """
+        Inicializa el repositorio con un esquema específico.
+
+        Args:
+            schema (str): Nombre del esquema (ej. 'GestionSolped'). 
+                          Si es None, se utiliza el valor por defecto schemadb.
+        """
         query = f"""
         MERGE {self.schema}.ControlHU AS target
         USING (SELECT ? AS HU) AS source
@@ -28,7 +47,7 @@ class ControlHURepo:
                 Maquina = ?
         WHEN NOT MATCHED THEN
             INSERT (HU, NombreHU, Estado, Activa, Maquina) 
-            VALUES (?, ?, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?);
         """
         
         with Database.get_connection() as conn:
@@ -37,13 +56,13 @@ class ControlHURepo:
                 cursor.execute(
                     query,
                     (
-                        hu,
-                        nombre_hu,
+                        iHuId,
+                        iNombreHU,
                         estado,
                         activa,
                         maquina,
-                        hu,
-                        nombre_hu,
+                        iHuId,
+                        iNombreHU,
                         estado,
                         activa,
                         maquina

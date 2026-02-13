@@ -1,9 +1,9 @@
 import ast
 import os
 
-def obtener_funciones(ruta_archivo):
+def obtener_funciones(rutaArchivo):
     try:
-        with open(ruta_archivo, "r", encoding="utf-8") as f:
+        with open(rutaArchivo, "r", encoding="utf-8") as f:
             tree = ast.parse(f.read())
         
         # Extrae solo las definiciones de funciones (def)

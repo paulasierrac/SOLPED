@@ -7,37 +7,48 @@
 # Cambios: Correcciones en ObtenerItemTextME53N y campos concepto_compra
 # ============================================
 import traceback
-import win32com.client
 import time
 import os
 from Funciones.EscribirLog import WriteLog
 from Config.settings import RUTAS
+from Config.InicializarConfig import inConfig
 import pandas as pd
-import datetime
-import re
-import win32clipboard
 import pyautogui
-import chardet
 from datetime import datetime
 from typing import Dict, List, Tuple
-import smtplib
 import os
 from Funciones.EmailSender import EmailSender
 from typing import List, Union
 import sys
+from openpyxl import load_workbook
+from Funciones.SAPFuncionesME53N import GuardarTablaME5A,ParsearTablaAttachments
+import win32clipboard
+
 
 # Configurar encoding para consola de Windows
 if sys.platform == "win32":
     sys.stdout.reconfigure(encoding="utf-8")
 
 
-def convertir_txt_a_excel(archivo):
+def EliminarArchivoSiExiste(rutaArchivo):
+    try:
+        if os.path.exists(rutaArchivo):
+            WriteLog(f"Eliminando archivo: {rutaArchivo}", "INFO")
+            os.remove(rutaArchivo)
+            WriteLog(f"Archivo eliminado correctamente: {rutaArchivo}", "INFO")
+        else:
+            WriteLog(f"No existe archivo para eliminar: {rutaArchivo}", "INFO")
+    except Exception as e:
+        WriteLog(f"Error al eliminar archivo {rutaArchivo} | Error: {str(e)}", "ERROR")
+
+
+def ConvertirTxtAExcel(archivo):
     """
     Convierte un archivo TXT delimitado por pipes (|) a Excel.
 
     Parámetros:
     -----------
-    ruta_archivo_txt : str
+    rutaArchivoTxt : str
         Ruta completa del archivo TXT a convertir
 
     Retorna:
@@ -46,59 +57,59 @@ def convertir_txt_a_excel(archivo):
 
     Ejemplo:
     --------
-    >>> convertir_txt_a_excel('datos.txt')
+    >>> ConvertirTxtAExcel('datos.txt')
     'datos.xlsx'
     """
 
     try:
         print(f"Leyendo archivo: {archivo}")
 
-        ruta_archivo_txt = rf"{RUTAS["PathInsumos"]}\{archivo}"
+        rutaArchivoTxt = rf"{RUTAS["PathInsumos"]}\{archivo}"
         # Leer el archivo
-        with open(ruta_archivo_txt, "r", encoding="utf-8") as f:
+        with open(rutaArchivoTxt, "r", encoding="utf-8") as f:
             lineas = f.readlines()
 
         # Filtrar líneas que contienen datos (excluir líneas de separadores)
-        lineas_validas = []
+        lineasValidas = []
         for linea in lineas:
-            linea_limpia = linea.strip()
+            lineaLimpia = linea.strip()
             # Verificar que tenga pipes y no sea solo guiones
             if (
-                "|" in linea_limpia
-                and not linea_limpia.replace("-", "").replace("|", "").strip() == ""
+                "|" in lineaLimpia
+                and not lineaLimpia.replace("-", "").replace("|", "").strip() == ""
             ):
-                lineas_validas.append(linea_limpia)
+                lineasValidas.append(lineaLimpia)
 
-        if len(lineas_validas) < 2:
+        if len(lineasValidas) < 2:
             raise ValueError("El archivo no contiene suficientes datos")
 
-        print(f"Lineas validas encontradas: {len(lineas_validas)}")
+        print(f"Lineas validas encontradas: {len(lineasValidas)}")
 
         # Procesar encabezados (primera línea válida)
         # NO filtrar campos vacíos, mantener todas las posiciones
-        encabezados_raw = lineas_validas[0].split("|")
+        encabezadosFila = lineasValidas[0].split("|")
         # Eliminar solo el primer y último elemento si están vacíos (bordes del pipe)
-        if encabezados_raw and encabezados_raw[0].strip() == "":
-            encabezados_raw = encabezados_raw[1:]
-        if encabezados_raw and encabezados_raw[-1].strip() == "":
-            encabezados_raw = encabezados_raw[:-1]
-        encabezados = [campo.strip() for campo in encabezados_raw]
+        if encabezadosFila and encabezadosFila[0].strip() == "":
+            encabezadosFila = encabezadosFila[1:]
+        if encabezadosFila and encabezadosFila[-1].strip() == "":
+            encabezadosFila = encabezadosFila[:-1]
+        encabezados = [campo.strip() for campo in encabezadosFila]
 
         print(f"\nColumnas encontradas: {len(encabezados)}")
         for i, col in enumerate(encabezados, 1):
             print(f"  {i}. {col}")
 
         # Procesar datos (resto de líneas)
-        datos_procesados = []
-        for i, linea in enumerate(lineas_validas[1:], start=2):
-            campos_raw = linea.split("|")
+        datosProcesados = []
+        for i, linea in enumerate(lineasValidas[1:], start=2):
+            camposFila = linea.split("|")
             # Eliminar solo el primer y último elemento si están vacíos (bordes del pipe)
-            if campos_raw and campos_raw[0].strip() == "":
-                campos_raw = campos_raw[1:]
-            if campos_raw and campos_raw[-1].strip() == "":
-                campos_raw = campos_raw[:-1]
+            if camposFila and camposFila[0].strip() == "":
+                camposFila = camposFila[1:]
+            if camposFila and camposFila[-1].strip() == "":
+                camposFila = camposFila[:-1]
             # Mantener TODAS las posiciones, incluso las vacías
-            campos = [campo.strip() for campo in campos_raw]
+            campos = [campo.strip() for campo in camposFila]
 
             # Asegurar que tenga el mismo número de columnas
             if len(campos) != len(encabezados):
@@ -111,27 +122,27 @@ def convertir_txt_a_excel(archivo):
                 else:
                     campos = campos[: len(encabezados)]
 
-            datos_procesados.append(campos)
+            datosProcesados.append(campos)
 
         # Crear DataFrame
-        df = pd.DataFrame(datos_procesados, columns=encabezados)
+        df = pd.DataFrame(datosProcesados, columns=encabezados)
 
         print(f"\nDataFrame creado: {len(df)} filas x {len(df.columns)} columnas")
 
         # Generar nombre del archivo Excel
-        ruta_excel = ruta_archivo_txt.rsplit(".", 1)[0] + ".xlsx"
+        rutaExcel = rutaArchivoTxt.rsplit(".", 1)[0] + ".xlsx"
 
         # Guardar a Excel con formato
         print(f"\nGuardando archivo Excel...")
-        with pd.ExcelWriter(ruta_excel, engine="openpyxl") as writer:
+        with pd.ExcelWriter(rutaExcel, engine="openpyxl") as writer:
             df.to_excel(writer, index=False, sheet_name="Datos")
 
             # Ajustar ancho de columnas
             worksheet = writer.sheets["Datos"]
             for idx, col in enumerate(df.columns):
                 # Calcular ancho máximo
-                max_length = max(df[col].astype(str).apply(len).max(), len(col)) + 2
-                max_length = min(max_length, 60)
+                longitudMax = max(df[col].astype(str).apply(len).max(), len(col)) + 2
+                longitudMax = min(longitudMax, 60)
 
                 # Calcular letra de columna
                 if idx < 26:
@@ -139,14 +150,14 @@ def convertir_txt_a_excel(archivo):
                 else:
                     col_letter = chr(64 + idx // 26) + chr(65 + idx % 26)
 
-                worksheet.column_dimensions[col_letter].width = max_length
+                worksheet.column_dimensions[col_letter].width = longitudMax
 
         print(f"\n[OK] Archivo convertido exitosamente!")
-        print(f"Ubicacion: {ruta_excel}")
-        return ruta_excel
+        print(f"Ubicacion: {rutaExcel}")
+        return rutaExcel
 
     except FileNotFoundError:
-        print(f"[ERROR] No se encontro el archivo '{ruta_archivo_txt}'")
+        print(f"[ERROR] No se encontro el archivo '{rutaArchivoTxt}'")
         raise
     except Exception as e:
         print(f"[ERROR] Error al convertir el archivo: {str(e)}")
@@ -156,347 +167,15 @@ def convertir_txt_a_excel(archivo):
         raise
 
 
-def ValidarAttachmentList(session, numero_solped):
-    """
-    Valida si la SOLPED tiene Attachment List y extrae la información
-
-    Args:
-        session: Objeto de SAP GUI
-        numero_solped: Número de SOLPED a validar
-
-    Returns:
-        tuple: (tiene_attachments: bool, contenido_tabla: str, observaciones: str)
-    """
-    try:
-        WriteLog(
-            mensaje=f"Validando Attachment List para SOLPED {numero_solped}",
-            estado="INFO",
-            task_name="ValidarAttachmentList",
-            path_log=RUTAS["PathLog"],
-        )
-
-        # 1. Presionar botón de GOS Toolbox
-        try:
-            session.findById("wnd[0]/titl/shellcont/shell").pressButton("%GOS_TOOLBOX")
-            time.sleep(0.5)
-        except Exception as e:
-            WriteLog(
-                mensaje=f"Error al abrir GOS Toolbox: {e}",
-                estado="WARNING",
-                task_name="ValidarAttachmentList",
-                path_log=RUTAS["PathLog"],
-            )
-            return False, "", "No se pudo abrir el menú de servicios GOS"
-
-        # 2. Presionar botón VIEW_ATTA (View Attachments)
-        try:
-            session.findById("wnd[0]/shellcont[1]/shell").pressButton("VIEW_ATTA")
-            time.sleep(1)
-        except Exception as e:
-            WriteLog(
-                mensaje=f"No hay attachments disponibles: {e}",
-                estado="WARNING",
-                task_name="ValidarAttachmentList",
-                path_log=RUTAS["PathLog"],
-            )
-            # Cerrar menú GOS si quedó abierto
-            try:
-                session.findById("wnd[0]/shellcont[1]").close()
-            except:
-                pass
-            return False, "", "No se encontró lista de adjuntos (Attachment List vacía)"
-
-        # 3. Verificar si se abrió la ventana "Service: Attachment list"
-        try:
-            # Intentar acceder al objeto de la tabla de attachments
-            tabla_attachments = session.findById(
-                "wnd[1]/usr/cntlCONTAINER_0100/shellcont/shell"
-            )
-            time.sleep(0.5)
-        except Exception as e:
-            WriteLog(
-                mensaje=f"Ventana de Attachment List no encontrada: {e}",
-                estado="WARNING",
-                task_name="ValidarAttachmentList",
-                path_log=RUTAS["PathLog"],
-            )
-            # Cerrar menú GOS
-            try:
-                session.findById("wnd[0]/shellcont[1]").close()
-            except:
-                pass
-            return False, "", "Ventana de adjuntos no disponible"
-
-        # 4. Exportar contenido de la tabla al portapapeles
-        try:
-            # Abrir menú de exportación
-            tabla_attachments.pressToolbarContextButton("&MB_EXPORT")
-            time.sleep(0.5)
-
-            # Seleccionar "Hoja de cálculo" (opción PC)
-            tabla_attachments.selectContextMenuItem("&PC")
-            time.sleep(0.5)
-
-            # Seleccionar formato "Spreadsheet" (radio button)
-            session.findById(
-                "wnd[1]/usr/subSUBSCREEN_STEPLOOP:SAPLSPO5:0150/sub:SAPLSPO5:0150/radSPOPLI-SELFLAG[4,0]"
-            ).select()
-            session.findById(
-                "wnd[1]/usr/subSUBSCREEN_STEPLOOP:SAPLSPO5:0150/sub:SAPLSPO5:0150/radSPOPLI-SELFLAG[4,0]"
-            ).setFocus()
-            time.sleep(0.3)
-
-            # Confirmar exportación (botón OK)
-            session.findById("wnd[1]/tbar[0]/btn[0]").press()
-            time.sleep(1)
-
-        except Exception as e:
-            WriteLog(
-                mensaje=f"Error al exportar Attachment List: {e}",
-                estado="WARNING",
-                task_name="ValidarAttachmentList",
-                path_log=RUTAS["PathLog"],
-            )
-            # Intentar cerrar ventanas abiertas
-            try:
-                session.findById(
-                    "wnd[1]/tbar[0]/btn[12]"
-                ).press()  # Cancelar ventana exportación
-            except:
-                pass
-            try:
-                session.findById("wnd[0]/shellcont[1]").close()  # Cerrar menú GOS
-            except:
-                pass
-            return False, "", "Error al exportar lista de adjuntos"
-
-        # 5. Obtener contenido del portapapeles
-        time.sleep(0.5)
-        contenido_portapapeles = ObtenerTextoDelPortapapeles()
-
-        if not contenido_portapapeles or not contenido_portapapeles.strip():
-            WriteLog(
-                mensaje=f"Portapapeles vacío después de exportar attachments",
-                estado="WARNING",
-                task_name="ValidarAttachmentList",
-                path_log=RUTAS["PathLog"],
-            )
-            # Cerrar ventanas
-            try:
-                session.findById(
-                    "wnd[1]/tbar[0]/btn[12]"
-                ).press()  # Cerrar ventana de Attachment List
-            except:
-                pass
-            try:
-                session.findById("wnd[0]/shellcont[1]").close()  # Cerrar menú GOS
-            except:
-                pass
-            return False, "", "No se pudo copiar contenido de attachments"
-
-        # 6. Cerrar ventana de Attachment List (botón 12 = Cerrar)
-        try:
-            session.findById("wnd[1]/tbar[0]/btn[12]").press()
-            time.sleep(0.3)
-        except Exception as e:
-            WriteLog(
-                mensaje=f"Advertencia al cerrar ventana de attachments: {e}",
-                estado="WARNING",
-                task_name="ValidarAttachmentList",
-                path_log=RUTAS["PathLog"],
-            )
-
-        # 7. Cerrar menú GOS Toolbox (shellcont[1])
-        try:
-            session.findById("wnd[0]/shellcont[1]").close()
-            time.sleep(0.3)
-        except Exception as e:
-            WriteLog(
-                mensaje=f"Advertencia al cerrar menú GOS: {e}",
-                estado="WARNING",
-                task_name="ValidarAttachmentList",
-                path_log=RUTAS["PathLog"],
-            )
-
-        # 8. Analizar contenido obtenido
-        lineas = contenido_portapapeles.strip().split("\n")
-        lineas_validas = [
-            l.strip() for l in lineas if l.strip() and not l.strip().startswith("-")
-        ]
-
-        # Parsear attachments estructurados
-        attachments_parseados = ParsearTablaAttachments(contenido_portapapeles)
-        num_attachments = len(attachments_parseados)
-
-        if num_attachments == 0:
-            # Aún así cerrar todo antes de retornar
-            return (
-                False,
-                contenido_portapapeles,
-                "Lista de adjuntos vacía (sin archivos)",
-            )
-
-        # 9. Guardar contenido en archivo de log
-        identificador = f"\n===== SOLPED: {numero_solped} - Attachment List - {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} =====\n"
-        path_log_attachments = rf"{RUTAS['PathInsumos']}\attachment_lists.txt"
-
-        try:
-            with open(path_log_attachments, "a", encoding="utf-8") as f:
-                f.write(identificador)
-                f.write(contenido_portapapeles)
-                f.write("\n" + "-" * 80 + "\n")
-        except Exception as e:
-            WriteLog(
-                mensaje=f"Advertencia: No se pudo guardar log de attachments: {e}",
-                estado="WARNING",
-                task_name="ValidarAttachmentList",
-                path_log=RUTAS["PathLog"],
-            )
-
-        WriteLog(
-            mensaje=f"SOLPED {numero_solped}: {num_attachments} attachment(s) encontrado(s)",
-            estado="INFO",
-            task_name="ValidarAttachmentList",
-            path_log=RUTAS["PathLog"],
-        )
-
-        # Construir observación detallada con nombres de archivos
-        observaciones_exito = f"✅ {num_attachments} archivo(s) adjunto(s)"
-
-        if num_attachments <= 3:
-            # Mostrar nombres si son pocos archivos
-            nombres = [a["title"][:40] for a in attachments_parseados[:3]]
-            observaciones_exito += f": {', '.join(nombres)}"
-            if any(len(a["title"]) > 40 for a in attachments_parseados[:3]):
-                observaciones_exito += "..."
-
-        return True, contenido_portapapeles, observaciones_exito
-
-    except Exception as e:
-        error_trace = traceback.format_exc()
-        WriteLog(
-            mensaje=f"Error inesperado en ValidarAttachmentList: {e}\n{error_trace}",
-            estado="ERROR",
-            task_name="ValidarAttachmentList",
-            path_log=RUTAS["PathLogError"],
-        )
-        # Intentar cerrar cualquier ventana abierta
-        try:
-            session.findById("wnd[1]/tbar[0]/btn[12]").press()
-        except:
-            pass
-        try:
-            session.findById("wnd[0]/shellcont[1]").close()
-        except:
-            pass
-        return False, "", f"Error al validar attachments: {str(e)[:100]}"
-
-
-def ParsearTablaAttachments(contenido: str) -> list:
-    """
-    Parsea la tabla de attachments exportada de SAP y extrae información estructurada
-
-    Formato esperado:
-    AttachmentFor1300139391
-    -----------------------------------------------------------------------------------
-    |Icon|Title                                             |Creator Name  |Created On|
-    -----------------------------------------------------------------------------------
-    |    |COTIZACIONPEÑALISAQUIMICOSPARAPISCINASJUNIO2024_20|OSCAR VILLABON|09.12.2025|
-    |    |COTIZACIONPEÑALISAQUIMICOSPARAPISCINASJUNIO2024_20|OSCAR VILLABON|09.12.2025|
-    -----------------------------------------------------------------------------------
-
-    Args:
-        contenido: Texto de la tabla exportada
-
-    Returns:
-        list: Lista de diccionarios con {title, creator, date}
-    """
-    attachments = []
-
-    try:
-        lineas = contenido.strip().split("\n")
-
-        # Buscar línea de encabezado (contiene "Title", "Creator", "Created")
-        header_idx = -1
-        for i, linea in enumerate(lineas):
-            if (
-                "|" in linea
-                and "Title" in linea
-                and ("Creator" in linea or "Created" in linea)
-            ):
-                header_idx = i
-                break
-
-        if header_idx == -1:
-            WriteLog(
-                mensaje="No se encontró encabezado en tabla de attachments",
-                estado="WARNING",
-                task_name="ParsearTablaAttachments",
-                path_log=RUTAS["PathLog"],
-            )
-            return attachments
-
-        # Procesar filas de datos (después del encabezado y línea de guiones)
-        for linea in lineas[
-            header_idx + 2 :
-        ]:  # +2 para saltar encabezado y línea de guiones
-            # Ignorar líneas vacías o separadores
-            if not linea.strip() or linea.strip().startswith("-"):
-                continue
-
-            # Debe contener pipes
-            if "|" not in linea:
-                continue
-
-            # Dividir por pipes y limpiar espacios
-            partes = [p.strip() for p in linea.split("|")]
-
-            # Filtrar partes vacías del inicio y final (| al inicio y final de cada línea)
-            # Formato típico: |    |COTIZACION...|OSCAR VILLABON|09.12.2025|
-            # Esto da: ['', '', 'COTIZACION...', 'OSCAR VILLABON', '09.12.2025', '']
-            partes_validas = [p for p in partes if p]
-
-            # Debe tener exactamente 3 columnas de datos: Title, Creator Name, Created On
-            # (Icon está vacío, así que solo contamos las que tienen datos)
-            if len(partes_validas) >= 3:
-                # Última estructura válida: [Title, Creator, Date]
-                title = partes_validas[0]
-                creator = partes_validas[1]
-                date = partes_validas[2]
-
-                # Validar que no sea una línea de encabezado repetida
-                if title.lower() in ["title", "título", "icon"]:
-                    continue
-                if creator.lower() in ["creator", "creador", "creator name"]:
-                    continue
-
-                # Validar que tenga contenido real
-                if not title or not creator or not date:
-                    continue
-
-                attachments.append({"title": title, "creator": creator, "date": date})
-
-    except Exception as e:
-        WriteLog(
-            mensaje=f"Error parseando tabla de attachments: {e}",
-            estado="ERROR",
-            task_name="ParsearTablaAttachments",
-            path_log=RUTAS["PathLogError"],
-        )
-        traceback.print_exc()
-
-    return attachments
-
-
 def GenerarReporteAttachments(
-    solped: str, tiene_attachments: bool, contenido: str, observaciones: str
+    solped: str, tieneAttachments: bool, contenido: str, observaciones: str
 ) -> str:
     """
-    Genera un reporte formateado de la validación de attachments
+    Genera un reporte formateado de la validación de archivosAdjuntos
 
     Args:
         solped: Número de SOLPED
-        tiene_attachments: Si tiene attachments o no
+        tieneAttachments: Si tiene archivosAdjuntos o no
         contenido: Contenido de la tabla exportada
         observaciones: Observaciones de la validación
 
@@ -507,20 +186,19 @@ def GenerarReporteAttachments(
     reporte += f"VALIDACIÓN ATTACHMENT LIST - SOLPED: {solped}\n"
     reporte += f"{'='*80}\n\n"
 
-    reporte += (
-        f"Estado: {'✅ CON ADJUNTOS' if tiene_attachments else '❌ SIN ADJUNTOS'}\n"
-    )
+    reporte += f"Estado: {'CON ADJUNTOS' if tieneAttachments else 'SIN ADJUNTOS'}\n"
     reporte += f"Observaciones: {observaciones}\n\n"
 
-    if tiene_attachments and contenido:
-        # Parsear tabla de attachments
-        attachments = ParsearTablaAttachments(contenido)
+    archivosAdjuntos = ParsearTablaAttachments(contenido)
 
-        if attachments:
-            reporte += f"ARCHIVOS ADJUNTOS ENCONTRADOS ({len(attachments)}):\n"
+    if archivosAdjuntos:
+        # Parsear tabla de archivosAdjuntos
+
+        if archivosAdjuntos:
+            reporte += f"ARCHIVOS ADJUNTOS ENCONTRADOS ({len(archivosAdjuntos)}):\n"
             reporte += f"{'-'*80}\n"
 
-            for i, attach in enumerate(attachments, 1):
+            for i, attach in enumerate(archivosAdjuntos, 1):
                 reporte += f"\n{i}. Archivo: {attach['title']}\n"
                 reporte += f"   Creado por: {attach['creator']}\n"
                 reporte += f"   Fecha: {attach['date']}\n"
@@ -545,9 +223,9 @@ def GenerarReporteAttachments(
 
 def NotificarRevisionManualSolped(
     destinatarios: Union[str, List[str]],
-    numero_solped: Union[int, str],
+    numeroSolped: Union[int, str],
     validaciones: str,
-    task_name: str = "RevisionManualSolped",
+    nombreTarea: str = "RevisionManualSolped",
 ) -> bool:
     """
     Envía una notificación de revisión manual para un SOLPED específico,
@@ -555,27 +233,27 @@ def NotificarRevisionManualSolped(
 
     Args:
         destinatarios: Un email (str) o una lista de emails (List[str]).
-        numero_solped: El número de la solicitud de pedido (SOLPED).
+        numeroSolped: El número de la solicitud de pedido (SOLPED).
         validaciones: Texto que contiene las razones de la validación.
-        task_name: Nombre de la tarea para los logs.
+        nombreTarea: Nombre de la tarea para los logs.
 
     Returns:
         bool: True si el envío fue exitoso, False en caso contrario.
     """
 
     # 1. Preparar el Asunto
-    asunto_template = f"El Solped {numero_solped} Necesita revisión manual"
+    asuntoTemplate = f"El Solped {numeroSolped} Necesita revisión manual"
 
     # 2. Preparar el Cuerpo del Mensaje (Formato HTML)
-    cuerpo_template = f"""
+    cuerpoTemplate = f"""
         <html>
             <body style="font-family: Arial, sans-serif;">
                 <h2 style="color: #CC0000;">Solicitud de Revisión Manual Requerida</h2>
-                <p>El Solped <strong>{numero_solped}</strong> necesita ser validado por las siguientes razones:</p>
+                <p>El Solped <strong>{numeroSolped}</strong> necesita ser validado por las siguientes razones:</p>
                 
                 <div style="border: 1px solid #ddd; padding: 15px; margin: 15px 0; background-color: #f9f9f9;">
                     <div style="padding: 10px; margin: 10px 0; background-color: #f4f4f4; border-radius: 6px;">
-                        {convertir_validaciones_a_lista(validaciones)}
+                        {convertirValidacionesALista(validaciones)}
                     </div>
                 </div>
 
@@ -588,13 +266,13 @@ def NotificarRevisionManualSolped(
 
     # Asegurar que destinatarios sea una lista si viene como string
     if isinstance(destinatarios, str):
-        destinatario_principal = destinatarios
-        cc_list = None
+        destinatarioPrincipal = destinatarios
+        ccList = None
     else:
         # Usamos el primer elemento como destinatario principal y el resto como CC (o podrías ajustar esta lógica)
         if destinatarios:
-            destinatario_principal = destinatarios[0]
-            cc_list = destinatarios[1:] if len(destinatarios) > 1 else None
+            destinatarioPrincipal = destinatarios[0]
+            ccList = destinatarios[1:] if len(destinatarios) > 1 else None
         else:
             # Manejar el caso de lista vacía si fuera necesario
             print("Error: La lista de destinatarios está vacía.")
@@ -602,99 +280,20 @@ def NotificarRevisionManualSolped(
 
     # 3. Llamar a la función de envío personalizada
     return EnviarCorreoPersonalizado(
-        destinatario=destinatario_principal,
-        asunto=asunto_template,
-        cuerpo=cuerpo_template,
-        task_name=task_name,
-        cc=cc_list,
+        destinatario=destinatarioPrincipal,
+        asunto=asuntoTemplate,
+        cuerpo=cuerpoTemplate,
+        nombreTarea=nombreTarea,
+        cc=ccList,
         adjuntos=None,  # No se esperan adjuntos para esta notificación
     )
-
-
-def EnviarNotificacionCorreo(
-    codigo_correo: int, task_name: str = "Notificacion", adjuntos: list = None
-):
-    """
-    Envía notificaciones por correo según el código especificado
-
-    Args:
-        codigo_correo: Código del correo a enviar (1=Inicio, 2=Éxito, 3=Error, etc.)
-        task_name: Nombre de la tarea para logs
-        adjuntos: Lista de rutas de archivos a adjuntar (opcional)
-
-    Returns:
-        bool: True si se envió correctamente, False en caso contrario
-    """
-    try:
-        WriteLog(
-            mensaje=f"Enviando notificación con código {codigo_correo}...",
-            estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
-        )
-
-        # Log de adjuntos si existen
-        if adjuntos:
-            WriteLog(
-                mensaje=f"Adjuntos a enviar: {', '.join(adjuntos)}",
-                estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
-            )
-
-        # Crear EmailSender con configuración por defecto
-        sender = EmailSender()
-
-        # Enviar correo según código con adjuntos
-        resultados = sender.procesar_excel_y_enviar(
-            archivo_excel=RUTAS.get(
-                "ArchivoCorreos",
-                # r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\EnvioCorreos.xlsx",
-                rf"{RUTAS["ArchivoCorreos"]}",
-            ),
-            codigo_correo=codigo_correo,
-            columna_codigo="codemailparameter",
-            columna_destinatario="toemailparameter",  # Nombre correcto
-            columna_asunto="asuntoemailparameter",  # Nombre correcto
-            columna_cuerpo="bodyemailparameter",  # Nombre correcto
-            columna_cc="ccemailparameter",  # Nombre correcto
-            columna_bcc="bccemailparameter",  # Nombre correcto
-            adjuntos_dinamicos=adjuntos,
-        )
-
-        if resultados["exitosos"] > 0:
-            WriteLog(
-                mensaje=f"Notificación enviada correctamente. Exitosos: {resultados['exitosos']}",
-                estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
-            )
-            return True
-        else:
-            WriteLog(
-                mensaje=f"No se pudo enviar la notificación. Fallidos: {resultados['fallidos']}",
-                estado="WARNING",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
-            )
-            return False
-
-    except Exception as e:
-        error_stack = traceback.format_exc()
-        WriteLog(
-            mensaje=f"Error al enviar notificación: {e} | {error_stack}",
-            estado="ERROR",
-            task_name=task_name,
-            path_log=RUTAS["PathLogError"],
-        )
-        return False
 
 
 def EnviarCorreoPersonalizado(
     destinatario: str,
     asunto: str,
     cuerpo: str,
-    task_name: str = "EnvioPersonalizado",
+    nombreTarea: str = "EnvioPersonalizado",
     adjuntos: list = None,
     cc: list = None,
     bcc: list = None,
@@ -706,7 +305,7 @@ def EnviarCorreoPersonalizado(
         destinatario: Email del destinatario (cadena de texto).
         asunto: Asunto del correo (cadena de texto).
         cuerpo: Cuerpo del mensaje (puede ser HTML).
-        task_name: Nombre de la tarea para logs.
+        nombreTarea: Nombre de la tarea para logs.
         adjuntos: Lista de rutas de archivos a adjuntar (opcional).
         cc: Lista de correos en copia (opcional).
         bcc: Lista de correos en copia oculta (opcional).
@@ -718,8 +317,8 @@ def EnviarCorreoPersonalizado(
         WriteLog(
             mensaje=f"Preparando envío personalizado para {destinatario}...",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # Log de adjuntos
@@ -727,8 +326,8 @@ def EnviarCorreoPersonalizado(
             WriteLog(
                 mensaje=f"Adjuntos a enviar: {', '.join(adjuntos)}",
                 estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=inConfig("PathLog"),
             )
 
         # Crear EmailSender con configuración por defecto
@@ -748,16 +347,16 @@ def EnviarCorreoPersonalizado(
             WriteLog(
                 mensaje=f"Correo personalizado enviado exitosamente a {destinatario}.",
                 estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=inConfig("PathLog"),
             )
             return True
         else:
             WriteLog(
                 mensaje=f"Fallo al enviar el correo personalizado a {destinatario}.",
                 estado="WARNING",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=inConfig("PathLog"),
             )
             return False
 
@@ -766,13 +365,13 @@ def EnviarCorreoPersonalizado(
         WriteLog(
             mensaje=f"Error fatal en el envío personalizado: {e} | {error_stack}",
             estado="ERROR",
-            task_name=task_name,
-            path_log=RUTAS["PathLogError"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLogError"],
         )
         return False
 
 
-def TraerSAPAlFrente_Opcion():
+def TraerSAPAlFrenteOpcion():
     """Usar Alt+Tab para traer SAP al frente"""
     try:
         pyautogui.hotkey("alt", "tab")
@@ -782,29 +381,29 @@ def TraerSAPAlFrente_Opcion():
         print(f"Error en Opcion 4: {e}")
 
 
-def convertir_validaciones_a_lista(texto):
+def convertirValidacionesALista(texto):
     """
     Convierte el bloque de texto de validaciones en una lista HTML <ul><li>.
     Cada item debe comenzar con '📋 ITEM' u otro marcador detectable.
     """
     lineas = [l.strip() for l in texto.split("\n") if l.strip()]
 
-    lista_html = "<ul style='font-size:14px; line-height:1.5;'>"
+    listaHtml = "<ul style='font-size:14px; line-height:1.5;'>"
 
     for linea in lineas:
         # Detectar inicio de item
         if linea.startswith("-ITEM"):
-            lista_html += f"<li><strong>{linea}</strong></li>"
+            listaHtml += f"<li><strong>{linea}</strong></li>"
         else:
-            lista_html += f"<li>{linea}</li>"
+            listaHtml += f"<li>{linea}</li>"
 
-    lista_html += "</ul>"
+    listaHtml += "</ul>"
 
-    return lista_html
+    return listaHtml
 
 
 def ObtenerTextoDelPortapapeles():
-    """Obtener texto del portapapeles con manejo correcto de codificacion"""
+    """Obtener texto del portapapeles con manejo correcto de encoding"""
     try:
         # Abrir portapapeles
         win32clipboard.OpenClipboard()
@@ -819,402 +418,20 @@ def ObtenerTextoDelPortapapeles():
         return ""
 
 
-def procesarTablaME5A(name, dias=15):
-    """name: nombre del txt a utilizar
-    return data frame
-    Procesa txt estructura ME5A y devuelve un df con manejo de columnas dinamico.
-    dias: int|None -> número de días a mantener (si None, no aplica filtro por fecha)"""
-
-    try:
-        WriteLog(
-            mensaje=f"Procesar archivo nombre {name}",
-            estado="INFO",
-            task_name="procesarTablaME5A",
-            path_log=RUTAS["PathLog"],
-        )
-
-        # path = f".\\AutomatizacionGestionSolped\\Insumo\\{name}"
-        path = rf"{RUTAS["PathInsumos"]}\{name}"
-
-        # INTENTAR LEER CON DIFERENTES CODIFICACIONES
-        lineas = []
-        codificaciones = ["latin-1", "cp1252", "iso-8859-1", "utf-8"]
-
-        for codificacion in codificaciones:
-            try:
-                with open(path, "r", encoding=codificacion) as f:
-                    lineas = f.readlines()
-                print(f"EXITO: Archivo leido con codificacion {codificacion}")
-                break
-            except UnicodeDecodeError as e:
-                print(f"ERROR con {codificacion}: {e}")
-                continue
-            except Exception as e:
-                print(f"ERROR con {codificacion}: {e}")
-                continue
-
-        if not lineas:
-            print("ERROR: No se pudo leer el archivo con ninguna codificacion")
-            return pd.DataFrame()
-
-        # Filtrar solo lineas de datos
-        filas = [l for l in lineas if l.startswith("|") and not l.startswith("|---")]
-
-        # DETECTAR ESTRUCTURA DE COLUMNAS DINAMICAMENTE
-        if not filas:
-            print("No se encontraron filas de datos en el archivo")
-            return pd.DataFrame()
-
-        # Analizar la primera fila para determinar estructura
-        primera_fila = filas[0].strip().split("|")[1:-1]  # Quitar | inicial y final
-        primera_fila = [p.strip() for p in primera_fila]
-
-        num_columnas = len(primera_fila)
-        print(f"Estructura detectada: {num_columnas} columnas")
-        print(f"   Encabezados: {primera_fila}")
-
-        # DEFINIR COLUMNAS BASE SEGUN ESTRUCTURA
-        if num_columnas == 14:
-            # Estructura original (sin Estado ni Observaciones)
-            columnas_base = [
-                "PurchReq",
-                "Item",
-                "ReqDate",
-                "Material",
-                "Created",
-                "ShortText",
-                "PO",
-                "Quantity",
-                "Plnt",
-                "PGr",
-                "Blank1",
-                "D",
-                "Requisnr",
-                "ProcState",
-            ]
-            columnas_extra = ["Estado", "Observaciones"]
-
-        elif num_columnas == 15:
-            # Verificar si la columna 15 es "Estado" o "Observaciones"
-            ultima_columna = primera_fila[-1].lower()
-            if "estado" in ultima_columna:
-                # Estructura con Estado pero sin Observaciones
-                columnas_base = [
-                    "PurchReq",
-                    "Item",
-                    "ReqDate",
-                    "Material",
-                    "Created",
-                    "ShortText",
-                    "PO",
-                    "Quantity",
-                    "Plnt",
-                    "PGr",
-                    "Blank1",
-                    "D",
-                    "Requisnr",
-                    "ProcState",
-                    "Estado",
-                ]
-                columnas_extra = ["Observaciones"]
-            else:
-                # Estructura con Observaciones pero sin Estado
-                columnas_base = [
-                    "PurchReq",
-                    "Item",
-                    "ReqDate",
-                    "Material",
-                    "Created",
-                    "ShortText",
-                    "PO",
-                    "Quantity",
-                    "Plnt",
-                    "PGr",
-                    "Blank1",
-                    "D",
-                    "Requisnr",
-                    "ProcState",
-                    "Observaciones",
-                ]
-                columnas_extra = ["Estado"]
-
-        elif num_columnas == 16:
-            # Estructura completa con Estado y Observaciones
-            columnas_base = [
-                "PurchReq",
-                "Item",
-                "ReqDate",
-                "Material",
-                "Created",
-                "ShortText",
-                "PO",
-                "Quantity",
-                "Plnt",
-                "PGr",
-                "Blank1",
-                "D",
-                "Requisnr",
-                "ProcState",
-                "Estado",
-                "Observaciones",
-            ]
-            columnas_extra = []
-        else:
-            print(f"ERROR: Estructura no soportada: {num_columnas} columnas")
-            return pd.DataFrame()
-
-        # PROCESAR TODAS LAS FILAS
-        filas_proc = []
-        for i, fila in enumerate(filas):
-            partes = fila.strip().split("|")[1:-1]
-            partes = [p.strip() for p in partes]
-
-            # Validar que tenga el numero correcto de columnas
-            if len(partes) == num_columnas:
-                filas_proc.append(partes)
-            elif len(partes) == num_columnas + 1 and partes[-1] == "":
-                # Caso: columna extra vacia al final
-                filas_proc.append(partes[:num_columnas])
-                if i < 3:  # Solo log primeras filas
-                    print(f"   ADVERTENCIA Fila {i+1}: Columna extra vacia removida")
-            else:
-                print(
-                    f"   ERROR Fila {i+1} ignorada: {len(partes)} columnas vs {num_columnas} esperadas"
-                )
-                if i == 0:  # Solo mostrar detalle para primera fila
-                    print(f"      Contenido: {partes}")
-                continue
-
-        # CREAR DATAFRAME
-        df = pd.DataFrame(filas_proc, columns=columnas_base)
-
-        # AGREGAR COLUMNAS FALTANTES
-        for col_extra in columnas_extra:
-            if col_extra not in df.columns:
-                df[col_extra] = ""
-                print(f"EXITO: Columna '{col_extra}' agregada al DataFrame")
-
-        # FILTRAR: Si la primera fila es encabezado, eliminarla
-        primera_fila_es_encabezado = any(
-            col in df.iloc[0].values if not df.empty else False
-            for col in [
-                "Purch.Req.",
-                "Item",
-                "Req.Date",
-                "Short Text",
-                "PurchReq",
-                "Estado",
-                "Observaciones",
-            ]
-        )
-
-        if not df.empty and primera_fila_es_encabezado:
-            df = df.iloc[1:].reset_index(drop=True)
-            print("EXITO: Fila de encabezado removida")
-
-        print(f"EXITO: Archivo procesado: {len(df)} filas de datos")
-        print(f"   - Columnas: {list(df.columns)}")
-
-        if not df.empty:
-            print(f"   - SOLPEDs: {df['PurchReq'].nunique()}")
-            if "Estado" in df.columns:
-                print(f"   - Estados unicos: {df['Estado'].value_counts().to_dict()}")
-
-        # Normalizar formato fecha
-        df["ReqDate_fmt"] = pd.to_datetime(
-            df["ReqDate"], errors="coerce", dayfirst=True
-        )
-
-        df["ReqDate_fmt"] = pd.to_datetime(
-            df["ReqDate"], errors="coerce", dayfirst=True
-        )
-
-        if dias is not None:
-            hoy = pd.Timestamp.today().normalize()
-            limite = hoy - pd.Timedelta(days=int(dias))
-            filas_antes = len(df)
-            df = df[df["ReqDate_fmt"] >= limite].reset_index(drop=True)
-            filas_despues = len(df)
-            print(
-                f"EXITO: Filtrado por ReqDate últimos {dias} días -> {filas_despues}/{filas_antes}"
-            )
-        else:
-            print("INFO: No se aplicó filtro por ReqDate (dias=None)")
-
-        # opcional: eliminar columna auxiliar
-        df.drop(columns=["ReqDate_fmt"], inplace=True)
-
-        return df
-
-    except Exception as e:
-        WriteLog(
-            mensaje=f"Error en procesarTablaME5A: {e}",
-            estado="ERROR",
-            task_name="procesarTablaME5A",
-            path_log=RUTAS["PathLogError"],
-        )
-        print(f"ERROR en procesarTablaME5A: {e}")
-        traceback.print_exc()
-        return pd.DataFrame()
-
-
-def GuardarTablaME5A(df, name):
-    """Guarda el DataFrame de vuelta al TXT con formato de tabla"""
-    try:
-        # path = f"C:\\Users\\CGRPA009\\Documents\\SOLPED-main\\SOLPED\\NetApplications\\PY\\AutomatizacionGestionSolped\\Insumo\\{name}"
-        path = rf"{RUTAS["PathInsumos"]}\{name}"
-
-        # ASEGURAR QUE TIENE LAS COLUMNAS NECESARIAS
-        columnas_requeridas = ["Estado", "Observaciones"]
-        for col in columnas_requeridas:
-            if col not in df.columns:
-                df[col] = ""
-                print(f"ADVERTENCIA: Columna '{col}' agregada para guardado")
-
-        # Calcular anchos de columna basados en contenido
-        anchos = {}
-        for col in df.columns:
-            max_contenido = df[col].astype(str).str.len().max() if not df.empty else 0
-            anchos[col] = max(len(col), max_contenido) + 2
-
-        # Crear linea separadora
-        separador = "-" * (sum(anchos.values()) + len(df.columns) + 1)
-
-        # Crear encabezado
-        encabezado_partes = [str(col).ljust(anchos[col]) for col in df.columns]
-        encabezado = "|" + "|".join(encabezado_partes) + "|"
-
-        # Crear filas
-        filas_txt = []
-        for _, fila in df.iterrows():
-            partes = []
-            for col in df.columns:
-                valor = str(fila[col])
-                # Alinear a la derecha numeros, izquierda texto
-                if (
-                    col in ["Item", "Quantity"]
-                    or valor.replace(".", "").replace("-", "").isdigit()
-                ):
-                    texto_valor = valor.rjust(anchos[col])
-                else:
-                    texto_valor = valor.ljust(anchos[col])
-                partes.append(texto_valor)
-            fila_txt = "|" + "|".join(partes) + "|"
-            filas_txt.append(fila_txt)
-
-        # Escribir archivo
-        with open(path, "w", encoding="utf-8") as f:
-            f.write(separador + "\n")
-            f.write(encabezado + "\n")
-            f.write(separador + "\n")
-            for fila in filas_txt:
-                f.write(fila + "\n")
-
-        WriteLog(
-            mensaje=f"Archivo {name} actualizado con exito - {len(df)} filas",
-            estado="INFO",
-            task_name="GuardarTablaME5A",
-            path_log=RUTAS["PathLog"],
-        )
-        print(f"EXITO: Archivo guardado: {len(df)} filas, {len(df.columns)} columnas")
-        return True
-
-    except Exception as e:
-        WriteLog(
-            mensaje=f"Error al guardar {name}: {e}",
-            estado="ERROR",
-            task_name="GuardarTablaME5A",
-            path_log=RUTAS["PathLogError"],
-        )
-        print(f"ERROR al guardar archivo: {e}")
-        return False
-
-
-def ActualizarEstadoYObservaciones(
-    df, nombre_archivo, purch_req, item=None, nuevo_estado="", observaciones=""
-):
-    """Actualiza el estado y observaciones en el DataFrame y guarda el archivo"""
-    try:
-        # ASEGURAR QUE EXISTE LA COLUMNA OBSERVACIONES
-        if "Observaciones" not in df.columns:
-            df["Observaciones"] = ""
-            print("ADVERTENCIA: Columna 'Observaciones' creada en el DataFrame")
-
-        # Crear mascara para filtrar
-        if item is not None:
-            # Actualizar item especifico
-            mask = (df["PurchReq"] == str(purch_req)) & (
-                df["Item"] == str(item).strip()
-            )
-        else:
-            # Actualizar toda la SOLPED
-            mask = df["PurchReq"] == str(purch_req)
-
-        # Actualizar estado y observaciones
-        if mask.sum() > 0:
-            df.loc[mask, "Estado"] = nuevo_estado
-            if observaciones:
-                df.loc[mask, "Observaciones"] = observaciones
-            # Guardar archivo actualizado
-            GuardarTablaME5A(df, nombre_archivo)
-            print(
-                f"EXITO: Actualizado: {purch_req}" + (f" Item {item}" if item else "")
-            )
-            return True
-        else:
-            print(
-                f"No se encontro PurchReq {purch_req}"
-                + (f", Item {item}" if item else "")
-            )
-            return False
-
-    except Exception as e:
-        print(f"Error al actualizar estado y observaciones: {e}")
-        return False
-
-
-def ActualizarEstado(df, nombre_archivo, purch_req, item=None, nuevo_estado=""):
-    """Actualiza el estado en el DataFrame y guarda el archivo"""
-    try:
-        # Crear mascara para filtrar
-        if item is not None:
-            # Actualizar item especifico
-            mask = (df["PurchReq"] == str(purch_req)) & (
-                df["Item"] == str(item).strip()
-            )
-        else:
-            # Actualizar toda la SOLPED
-            mask = df["PurchReq"] == str(purch_req)
-
-        # Actualizar estado
-        if mask.sum() > 0:
-            df.loc[mask, "Estado"] = nuevo_estado
-            # Guardar archivo actualizado
-            GuardarTablaME5A(df, nombre_archivo)
-            return True
-        else:
-            print(
-                f"No se encontro PurchReq {purch_req}"
-                + (f", Item {item}" if item else "")
-            )
-            return False
-
-    except Exception as e:
-        print(f"Error al actualizar estado: {e}")
-        return False
-
-
 def AbrirTransaccion(session, transaccion):
-    """session: objeto de SAP GUI
+    """
+    session: objeto de SAP GUI
     transaccion: transaccion a buscar
-    Realiza la busqueda de la transaccion requerida"""
+    Realiza la busqueda de la transaccion requerida
+    
+    """
 
     try:
         WriteLog(
             mensaje=f"Abrir Transaccion {transaccion}",
             estado="INFO",
-            task_name="AbrirTransaccion",
-            path_log=RUTAS["PathLog"],
+            nombreTarea="AbrirTransaccion",
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # Validar sesion SAP
@@ -1223,8 +440,8 @@ def AbrirTransaccion(session, transaccion):
             WriteLog(
                 mensaje="Sesion SAP no disponible",
                 estado="ERROR",
-                task_name="AbrirTransaccion",
-                path_log=RUTAS["PathLog"],
+                nombreTarea="AbrirTransaccion",
+                rutaRegistro=inConfig("PathLog"),
             )
             raise Exception("Sesion SAP no disponible")
 
@@ -1236,8 +453,8 @@ def AbrirTransaccion(session, transaccion):
         WriteLog(
             mensaje=f"Transaccion {transaccion} abierta",
             estado="INFO",
-            task_name="AbrirTransaccion",
-            path_log=RUTAS["PathLog"],
+            nombreTarea="AbrirTransaccion",
+            rutaRegistro=inConfig("PathLog"),
         )
         print(f"Transaccion {transaccion} abierta")
         return True
@@ -1245,24 +462,24 @@ def AbrirTransaccion(session, transaccion):
         WriteLog(
             mensaje=f"Error en AbrirTransaccion: {e}",
             estado="ERROR",
-            task_name="AbrirTransaccion",
-            path_log=RUTAS["PathLogError"],
+            nombreTarea="AbrirTransaccion",
+            rutaRegistro=RUTAS["PathLogError"],
         )
 
         return False
 
 
-def ColsultarSolped(session, numero_solped):
+def ColsultarSolped(session, numeroSolped):
     """session: objeto de SAP GUI
-    numero_solped:  numero de SOLPED a consultar
+    numeroSolped:  numero de SOLPED a consultar
     Realiza la verificacion del SOLPED"""
 
     try:
         WriteLog(
-            mensaje=f"Numero de SOLPED : {numero_solped}",
+            mensaje=f"Numero de SOLPED : {numeroSolped}",
             estado="INFO",
-            task_name="ColsultarSolped",
-            path_log=RUTAS["PathLog"],
+            nombreTarea="ColsultarSolped",
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # Validar sesion SAP
@@ -1271,8 +488,8 @@ def ColsultarSolped(session, numero_solped):
             WriteLog(
                 mensaje="Sesion SAP no disponible",
                 estado="ERROR",
-                task_name="ColsultarSolped",
-                path_log=RUTAS["PathLog"],
+                nombreTarea="ColsultarSolped",
+                rutaRegistro=inConfig("PathLog"),
             )
             raise Exception("Sesion SAP no disponible")
 
@@ -1282,7 +499,7 @@ def ColsultarSolped(session, numero_solped):
         # Escribir numero de solped
         session.findById(
             "wnd[1]/usr/subSUB0:SAPLMEGUI:0003/ctxtMEPO_SELECT-BANFN"
-        ).text = numero_solped
+        ).text = numeroSolped
         # Activar el radiobutton "Purch. Requisition"
         session.findById(
             "wnd[1]/usr/subSUB0:SAPLMEGUI:0003/radMEPO_SELECT-BSTYP_B"
@@ -1298,10 +515,10 @@ def ColsultarSolped(session, numero_solped):
         time.sleep(3)
 
         WriteLog(
-            mensaje=f"Solped {numero_solped} consultada exitosamente",
+            mensaje=f"Solped {numeroSolped} consultada exitosamente",
             estado="INFO",
-            task_name="ColsultarSolped",
-            path_log=RUTAS["PathLog"],
+            nombreTarea="ColsultarSolped",
+            rutaRegistro=inConfig("PathLog"),
         )
 
         return True
@@ -1309,301 +526,93 @@ def ColsultarSolped(session, numero_solped):
         WriteLog(
             mensaje=f"Error en ColsultarSolped: {e}",
             estado="ERROR",
-            task_name="ColsultarSolped",
-            path_log=RUTAS["PathLogError"],
+            nombreTarea="ColsultarSolped",
+            rutaRegistro=RUTAS["PathLogError"],
         )
 
         return False
 
 
-def DetectarCodificacion(path):
-    """Detecta automaticamente la codificacion del archivo"""
+def ActualizarEstadoYObservaciones(
+    df, nombreArchivo, purchReq, item=None, nuevoEstado="", observaciones=""
+):
+    """Actualiza el estado y observaciones en el DataFrame y guarda el archivo"""
     try:
-        with open(path, "rb") as f:
-            rawdata = f.read()
+        # ASEGURAR QUE EXISTE LA COLUMNA OBSERVACIONES
+        if "Observaciones" not in df.columns:
+            df["Observaciones"] = ""
+            print("ADVERTENCIA: Columna 'Observaciones' creada en el DataFrame")
 
-        resultado = chardet.detect(rawdata)
-        encoding = resultado["encoding"]
-        confidence = resultado["confidence"]
-
-        print(f"Codificacion detectada: {encoding} (confianza: {confidence*100:.1f}%)")
-        return encoding
-    except Exception as e:
-        print(f"Error detectando codificacion: {e}")
-        return "utf-8"
-
-
-def TablaItemsDataFrame(name) -> pd.DataFrame:
-    """name: nombre del archivo a consultar
-    Convierte tabla de items a df con deteccion automatica de codificacion"""
-
-    try:
-        WriteLog(
-            mensaje=f"Nombre de archivo {name}",
-            estado="INFO",
-            task_name="TablaItemsDataFrame",
-            path_log=RUTAS["PathLog"],
-        )
-
-        # path = rf"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\TablasME53N\{name}"
-        path = rf"{RUTAS["PathInsumos"]}\TablasME53N\{name}"
-
-        # ========== DETECCION DE CODIFICACION ==========
-        encoding = DetectarCodificacion(path)
-
-        # 1. Leer archivo con la codificacion correcta
-        try:
-            with open(path, "r", encoding=encoding) as f:
-                texto = f.read()
-        except Exception as e:
-            # Si falla, intentar con otras codificaciones comunes
-            print(f"Error con {encoding}, intentando alternativas...")
-            for enc in ["latin-1", "cp1252", "iso-8859-1", "utf-8"]:
-                try:
-                    with open(path, "r", encoding=enc) as f:
-                        texto = f.read()
-                    print(f"EXITO con {enc}")
-                    encoding = enc
-                    break
-                except:
-                    continue
-
-        # 2. Separar por lineas
-        lineas = texto.splitlines()
-
-        # 3. Filtrar lineas que forman parte de la tabla
-        tabla = [
-            l
-            for l in lineas
-            if l.strip().startswith("|") and l.strip().endswith("|") and "---" not in l
-        ]
-
-        if not tabla:
-            raise ValueError("No se encontro ninguna tabla SAP dentro del archivo.")
-
-        # 4. Eliminar lineas de guiones largos (separadores)
-        tabla = [
-            l for l in tabla if not re.match(r"^-{5,}", l.replace("|", "").strip())
-        ]
-
-        # 5. Extraer encabezado
-        encabezado_raw = tabla[0]
-        columnas = [c.strip() for c in encabezado_raw.split("|")[1:-1]]
-
-        # ========== SOLUCIONAR COLUMNAS DUPLICADAS ==========
-        columnas_unicas = []
-        contador = {}
-        for col in columnas:
-            if col in contador:
-                contador[col] += 1
-                columnas_unicas.append(f"{col}_{contador[col]}")
-            else:
-                contador[col] = 0
-                columnas_unicas.append(col)
-
-        # 6. Procesar filas de datos
-        filas = []
-        for fila in tabla[1:]:
-            partes = [c.strip() for c in fila.split("|")[1:-1]]
-            if len(partes) == len(columnas_unicas):  # validar integridad
-                filas.append(partes)
-
-        # 7. Convertir a DataFrame
-        df = pd.DataFrame(filas, columns=columnas_unicas)
-
-        WriteLog(
-            mensaje=f"DataFrame conversion correcta. Codificacion: {encoding}",
-            estado="INFO",
-            task_name="TablaItemsDataFrame",
-            path_log=RUTAS["PathLog"],
-        )
-        print(f"EXITO: DataFrame conversion correcta")
-        print(f"  - Filas: {df.shape[0]}")
-        print(f"  - Columnas: {df.shape[1]}")
-        print(f"  - Codificacion: {encoding}")
-
-        return df
-
-    except Exception as e:
-        WriteLog(
-            mensaje=f"Error en TablaItemsDataFrame: {e}",
-            estado="ERROR",
-            task_name="TablaItemsDataFrame",
-            path_log=RUTAS["PathLogError"],
-        )
-        print(f"ERROR: {e}")
-        return pd.DataFrame()
-
-
-def ObtenerItemsME53N(session, numero_solped):
-    """session: objeto de SAP GUI
-    numero_solped: numero de solicitud
-    Obtiene los items de SOLPED y los pasa a un df"""
-
-    try:
-        WriteLog(
-            mensaje=f"Solped {numero_solped} a obtener items",
-            estado="INFO",
-            task_name="ObtenerItemsME53N",
-            path_log=RUTAS["PathLog"],
-        )
-
-        # Validar sesion SAP
-        if session is None:
-            WriteLog(
-                mensaje="Sesion SAP no disponible",
-                estado="ERROR",
-                task_name="ObtenerItemsME53N",
-                path_log=RUTAS["PathLog"],
+        # Crear mascara para filtrar
+        if item is not None:
+            # Actualizar item especifico
+            mascara = (df["PurchReq"] == str(purchReq)) & (
+                df["Item"] == str(item).strip()
             )
-            raise Exception("Sesion SAP no disponible")
+        else:
+            # Actualizar toda la SOLPED
+            mascara = df["PurchReq"] == str(purchReq)
 
-        # ========== EXPORTAR TABLA ==========
-        grid = session.findById(
-            "wnd[0]/usr/subSUB0:SAPLMEGUI:0015/"
-            "subSUB2:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/"
-            "subSUB1:SAPLMEGUI:3212/cntlGRIDCONTROL/shellcont/shell"
-        )
-        grid.setFocus()
-        time.sleep(0.5)
-
-        # 1. Abrir menu contexto "Exportar"
-        grid.pressToolbarContextButton("&MB_EXPORT")
-        time.sleep(0.5)
-
-        # 2. Seleccionar "Exportar → Hoja de calculo (PC)"
-        grid.selectContextMenuItem("&PC")
-        time.sleep(0.3)
-
-        # 3. Confirmar ventana de exportar
-        session.findById("wnd[1]/tbar[0]/btn[0]").press()
-        time.sleep(0.3)
-
-        # 4. Escribir ruta de guardado
-        session.findById("wnd[1]/usr/ctxtDY_PATH").text = (
-            # r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\TablasME53N"
-            rf"{RUTAS["PathInsumos"]}\TablasME53N"
-        )
-        time.sleep(0.2)
-
-        # 5. Nombre del archivo
-        session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = (
-            f"TablaSolped{numero_solped}.txt"
-        )
-        time.sleep(0.2)
-
-        # 6. Guardar
-        session.findById("wnd[1]/tbar[0]/btn[0]").press()
-        time.sleep(1)  # Esperar a que se guarde
-
-        # ========== CONVERTIR A DATAFRAME ==========
-        df = TablaItemsDataFrame(f"TablaSolped{numero_solped}.txt")
-
-        if df is None or df.empty:
-            raise Exception("DataFrame vacio despues de conversion")
-
-        WriteLog(
-            mensaje=f"Solped {numero_solped} convertido a DF con exito",
-            estado="INFO",
-            task_name="ObtenerItemsME53N",
-            path_log=RUTAS["PathLog"],
-        )
-        print(f"EXITO: Solped {numero_solped} convertido a DF con exito")
-
-        return df
-
-    except Exception as e:
-        WriteLog(
-            mensaje=f"Error en ObtenerItemsME53N: {e}",
-            estado="ERROR",
-            task_name="ObtenerItemsME53N",
-            path_log=RUTAS["PathLogError"],
-        )
-        print(f"ERROR en ObtenerItemsME53N: {e}")
-        return pd.DataFrame()
-
-
-def ObtenerItemTextME53N(session, numero_solped, numero_item):
-    """session: objeto de SAP GUI
-    numero_solped: numero de SOLPED
-    numero_item: numero del item actual
-    Realiza la extraccion del texto del editor SAP"""
-
-    try:
-        WriteLog(
-            mensaje=f"ObtenerItemTextME53N {numero_solped} Item {numero_item}",
-            estado="INFO",
-            task_name="ObtenerItemTextME53N",
-            path_log=RUTAS["PathLog"],
-        )
-
-        # Validar sesion SAP
-        if session is None:
-            WriteLog(
-                mensaje="Sesion SAP no disponible",
-                estado="ERROR",
-                task_name="ObtenerItemTextME53N",
-                path_log=RUTAS["PathLog"],
+        # Actualizar estado y observaciones
+        if mascara.sum() > 0:
+            df.loc[mascara, "Estado"] = nuevoEstado
+            if observaciones:
+                df.loc[mascara, "Observaciones"] = observaciones
+            # Guardar archivo actualizado
+            GuardarTablaME5A(df, nombreArchivo)
+            print(
+                f"EXITO: Actualizado: {purchReq}" + (f" Item {item}" if item else "")
             )
-            raise Exception("Sesion SAP no disponible")
-
-        # ---------------- Capturar Texto----------------
-        # 1) Obtener el objeto del editor
-        editor = session.findById(
-            "wnd[0]/usr/subSUB0:SAPLMEGUI:0015/"
-            "subSUB3:SAPLMEVIEWS:1100/subSUB2:SAPLMEVIEWS:1200/"
-            "subSUB1:SAPLMEGUI:1301/subSUB2:SAPLMEGUI:3303/"
-            "tabsREQ_ITEM_DETAIL/tabpTABREQDT13/ssubTABSTRIPCONTROL1SUB:SAPLMEGUI:1329/"
-            "subTEXTS:SAPLMMTE:0200/subEDITOR:SAPLMMTE:0201/"
-            "cntlTEXT_EDITOR_0201/shellcont/shell"
-        )
-
-        # 2) Asegurar que el editor tiene el foco
-        editor.SetFocus()
-        time.sleep(0.5)
-
-        # 3) Seleccionar TODO el texto
-        pyautogui.hotkey("ctrl", "a")
-        time.sleep(0.3)
-
-        # 4) Copiar al portapapeles
-        pyautogui.hotkey("ctrl", "c")
-        time.sleep(0.5)
-
-        # 5) Obtener texto del portapapeles con codificacion correcta
-        texto_completo = ObtenerTextoDelPortapapeles()
-
-        # 6) Limpiar caracteres problematicos si los hay
-        texto_limpio = texto_completo.encode("utf-8", errors="replace").decode("utf-8")
-
-        identificador = f"\n=====Solped: {numero_solped} Item: {numero_item} Registro: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')} =====\n"
-
-        # 7. Guardar texto en archivo de log
-        # path = r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\texto_ITEMsap.txt"
-        path = rf"{RUTAS["PathInsumos"]}\texto_ITEMsap.txt"
-        with open(path, "a", encoding="utf-8") as f:
-            f.write(identificador)
-            f.write(texto_limpio + "\n")
-            f.write("-" * 80 + "\n")
-
-        # 8. Navegar al siguiente item
-        session.findById(
-            "wnd[0]/usr/subSUB0:SAPLMEGUI:0015/subSUB3:SAPLMEVIEWS:1100/"
-            "subSUB2:SAPLMEVIEWS:1200/subSUB1:SAPLMEGUI:1301/subSUB1:SAPLMEGUI:6000/"
-            "btn%#AUTOTEXT002"
-        ).press()
-        time.sleep(0.5)
-
-        return texto_limpio
+            return True
+        else:
+            print(
+                f"No se encontro PurchReq {purchReq}"
+                + (f", Item {item}" if item else "")
+            )
+            return False
 
     except Exception as e:
-        WriteLog(
-            mensaje=f"Error en ObtenerItemTextME53N: {e}",
-            estado="ERROR",
-            task_name="ObtenerItemTextME53N",
-            path_log=RUTAS["PathLogError"],
-        )
-        return ""
+        print(f"Error al actualizar estado y observaciones: {e}")
+        return False
+
+
+def ActualizarEstado(df, nombreArchivo, purchReq, item=None, nuevoEstado=""):
+    """Actualiza el estado en el DataFrame y guarda el archivo"""
+    try:
+        # Crear mascara para filtrar
+        if item is not None:
+            # Actualizar item especifico
+            mascara = (df["PurchReq"] == str(purchReq)) & (
+                df["Item"] == str(item).strip()
+            )
+        else:
+            # Actualizar toda la SOLPED
+            mascara = df["PurchReq"] == str(purchReq)
+
+        # Actualizar estado
+        if mascara.sum() > 0:
+            df.loc[mascara, "Estado"] = nuevoEstado
+            # Guardar archivo actualizado
+            GuardarTablaME5A(df, nombreArchivo)
+            return True
+        else:
+            print(
+                f"No se encontro PurchReq {purchReq}"
+                + (f", Item {item}" if item else "")
+            )
+            return False
+
+    except Exception as e:
+        print(f"Error al actualizar estado: {e}")
+        return False
+
+
+def obtenerValorTabla(fila, posibles_nombres, default=0):
+    """Intenta múltiples nombres de columna"""
+    for nombre in posibles_nombres:
+        if nombre in fila and fila[nombre] not in [None, "", " "]:
+            return fila[nombre]
+    return default
 
 
 def FormatoMoneda(valor):
@@ -1615,1324 +624,41 @@ def FormatoMoneda(valor):
         return str(valor)
 
 
-# def ValidarContraTabla(
-#     datos_texto: Dict, df_items: pd.DataFrame, item_num: str = ""
-# ) -> Dict:
-#     """Compara los datos extraidos del texto con la tabla de items SAP"""
-#     validaciones = {
-#         "cantidad": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
-#         "valor_unitario": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
-#         "valor_total": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
-#         # "fecha_entrega": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
-#         "concepto": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
-#         "campos_obligatorios": {"presentes": 0, "total": 0, "faltantes": []},
-#         "resumen": "",
-#         "campos_validados": 0,
-#         "total_campos": 0,
-#     }
-
-#     if df_items.empty:
-#         validaciones["resumen"] = "Tabla vacia - No se puede validar"
-#         return validaciones
-
-#     # Buscar el item especifico en el DataFrame
-#     item_df = df_items
-#     if item_num and "Item" in df_items.columns:
-#         item_df = df_items[
-#             df_items["Item"].astype(str).str.strip() == str(item_num).strip()
-#         ]
-#         if item_df.empty:
-#             item_df = df_items.iloc[[0]]  # usar primera fila si no encuentra
-
-#     if item_df.empty:
-#         validaciones["resumen"] = "Item no encontrado en tabla - No se puede validar"
-#         return validaciones
-
-#     # ------------------------------------------------------------------
-#     # VALIDACIÓN DE CAMPOS OBLIGATORIOS DE LA TABLA SAP ME53N (con alias)
-#     # ------------------------------------------------------------------
-
-#     # Diccionario: nombre estándar → lista de nombres equivalentes que puede traer SAP
-#     alias_campos = {
-#         "Material": ["Material"],
-#         "Short Text": ["Short Text"],
-#         "Quantity": ["Quantity"],
-#         "Un": ["Un"],
-#         "Valn Price": ["Val. Price"],
-#         "Crcy": ["Crcy"],
-#         # ESTE CAMPO CAMBIA POR IDIOMA / CONFIGURACIÓN SAP
-#         "Total Val.": ["Total Val.", "Total Value"],
-#         "Deliv.Date": ["Deliv.Date"],
-#         "Fix. Vend.": ["Fix. Vend."],
-#         "Plant": ["Plant"],
-#         "PGr": ["PGr"],
-#         "POrg": ["POrg"],
-#         "Matl Group": ["Matl Group"],
-#     }
-
-#     faltantes_me53n = []
-#     fila = item_df.iloc[0]  # se toma la primera fila del item
-
-#     for campo_estandar, posibles_nombres in alias_campos.items():
-
-#         # Buscar si alguna columna coincide con los alias permitidos
-#         columna_encontrada = None
-#         for alias in posibles_nombres:
-#             if alias in item_df.columns:
-#                 columna_encontrada = alias
-#                 break
-
-#         # Si ninguna columna existe → campo faltante
-#         if columna_encontrada is None:
-#             faltantes_me53n.append(campo_estandar)
-#             continue
-
-#         # Validar contenido vacío o nulo
-#         val = fila.get(columna_encontrada, "")
-#         if val is None or str(val).strip() in ["", "nan", "None"]:
-#             faltantes_me53n.append(campo_estandar)
-
-#     # Construcción del resultado de validaciones
-#     validaciones["campos_me53n"] = {
-#         "presentes": len(alias_campos) - len(faltantes_me53n),
-#         "total": len(alias_campos),
-#         "faltantes": faltantes_me53n,
-#     }
-
-#     # --- VALIDAR CANTIDAD ---
-#     if datos_texto["cantidad"]:
-#         cantidad_texto = LimpiarNumero(datos_texto["cantidad"])
-#         if "Quantity" in item_df.columns:
-#             # CORREGIDO: Asegurar que obtenemos un valor escalar
-#             cantidad_tabla_val = item_df["Quantity"].iloc[0]
-#             cantidad_tabla = LimpiarNumero(str(cantidad_tabla_val))
-#             validaciones["cantidad"]["texto"] = datos_texto["cantidad"]
-#             validaciones["cantidad"]["tabla"] = str(cantidad_tabla)
-#             validaciones["cantidad"]["match"] = (
-#                 abs(cantidad_texto - cantidad_tabla) < 0.01
-#             )
-#             if not validaciones["cantidad"]["match"]:
-#                 validaciones["cantidad"][
-#                     "diferencia"
-#                 ] = f"Difiere en {abs(cantidad_texto - cantidad_tabla):.2f}"
-
-#     # --- VALIDAR VALOR UNITARIO ---
-#     if datos_texto["valor_unitario"]:
-#         valor_texto = LimpiarNumero(datos_texto["valor_unitario"])
-#         if "Valn Price" in item_df.columns:
-#             valor_tabla = LimpiarNumero(str(item_df["Valn Price"].iloc[0]))
-#             # validaciones["valor_unitario"]["texto"] = datos_texto["valor_unitario"]
-#             # validaciones["valor_unitario"]["tabla"] = str(valor_tabla)
-
-#             validaciones["valor_unitario"]["texto"] = FormatoMoneda(
-#                 datos_texto["valor_unitario"]
-#             )
-#             validaciones["valor_unitario"]["tabla"] = FormatoMoneda(valor_tabla)
-
-#             # Tolerancia del 1%
-#             if valor_tabla > 0:
-#                 diferencia_relativa = abs(valor_texto - valor_tabla) / valor_tabla
-#                 validaciones["valor_unitario"]["match"] = diferencia_relativa < 0.01
-#             else:
-#                 validaciones["valor_unitario"]["match"] = valor_texto == valor_tabla
-
-#             if not validaciones["valor_unitario"]["match"]:
-#                 diferencia = abs(valor_texto - valor_tabla)
-#                 validaciones["valor_unitario"][
-#                     "diferencia"
-#                 ] = f"Difiere en {FormatoMoneda(diferencia)}"
-#                 # validaciones["valor_unitario"][
-#                 #     "diferencia"
-#                 # ] = f"Difiere en ${diferencia:,.2f}"
-
-#     # --- VALIDAR VALOR TOTAL ---
-#     if datos_texto["valor_total"]:
-#         valor_texto = LimpiarNumero(datos_texto["valor_total"])
-
-#         # ACEPTAR AMBOS CAMPOS DE SAP
-#         columna_total = None
-#         if "Total Value" in item_df.columns:
-#             columna_total = "Total Value"
-#         elif "Total Val." in item_df.columns:
-#             columna_total = "Total Val."
-
-#         if columna_total:
-#             valor_tabla = LimpiarNumero(str(item_df[columna_total].iloc[0]))
-
-#             # validaciones["valor_total"]["texto"] = datos_texto["valor_total"]
-#             # validaciones["valor_total"]["tabla"] = str(valor_tabla)
-
-#             validaciones["valor_total"]["texto"] = FormatoMoneda(
-#                 datos_texto["valor_total"]
-#             )
-#             validaciones["valor_total"]["tabla"] = FormatoMoneda(valor_tabla)
-
-#             # Tolerancia del 1%
-#             if valor_tabla > 0:
-#                 diferencia_relativa = abs(valor_texto - valor_tabla) / valor_tabla
-#                 validaciones["valor_total"]["match"] = diferencia_relativa < 0.01
-#             else:
-#                 validaciones["valor_total"]["match"] = valor_texto == valor_tabla
-
-#             if not validaciones["valor_total"]["match"]:
-#                 diferencia = abs(valor_texto - valor_tabla)
-#                 validaciones["valor_total"][
-#                     "diferencia"
-#                 ] = f"Difiere en {FormatoMoneda(diferencia)}"
-
-#                 # validaciones["valor_total"][
-#                 #     "diferencia"
-#                 # ] = f"Difiere en ${diferencia:,.2f}"
-#         else:
-#             # Si no existe ninguna columna válida
-#             validaciones["valor_total"]["tabla"] = "Campo no encontrado en SAP"
-#             validaciones["valor_total"]["match"] = False
-
-#     # # --- VALIDAR FECHA DE ENTREGA ---
-#     # if datos_texto["fecha_prestacion"] and "Deliv.Date" in item_df.columns:
-#     #     fecha_texto = datos_texto["fecha_prestacion"]
-#     #     fecha_tabla = str(item_df["Deliv.Date"].iloc[0]) if not item_df.empty else ""
-#     #     validaciones["fecha_entrega"]["texto"] = fecha_texto
-#     #     validaciones["fecha_entrega"]["tabla"] = fecha_tabla
-#     #     validaciones["fecha_entrega"]["match"] = NormalizarFecha(
-#     #         fecha_texto
-#     #     ) == NormalizarFecha(fecha_tabla)
-#     #     if not validaciones["fecha_entrega"]["match"]:
-#     #         validaciones["fecha_entrega"]["diferencia"] = "Fechas no coinciden"
-
-#     # --- VALIDAR CONCEPTO ---
-#     if datos_texto["concepto_compra"] and "Short Text" in item_df.columns:
-#         concepto_texto = datos_texto["concepto_compra"].upper()
-#         concepto_tabla_val = item_df["Short Text"].iloc[0] if not item_df.empty else ""
-#         concepto_tabla = str(concepto_tabla_val).upper()
-
-#         validaciones["concepto"]["texto"] = datos_texto["concepto_compra"][:50] + (
-#             "..." if len(datos_texto["concepto_compra"]) > 50 else ""
-#         )
-#         validaciones["concepto"]["tabla"] = concepto_tabla[:50] + (
-#             "..." if len(concepto_tabla) > 50 else ""
-#         )
-
-#         # Verificar coincidencia de palabras clave
-#         palabras_texto = set(re.findall(r"\w+", concepto_texto))
-#         palabras_tabla = set(re.findall(r"\w+", concepto_tabla))
-#         coincidencias = len(palabras_texto & palabras_tabla)
-
-#         # CORREGIDO: Mejorar logica de validacion de palabras
-#         if palabras_texto and palabras_tabla:
-#             palabras_minimas = max(
-#                 2, min(len(palabras_texto), len(palabras_tabla)) // 3
-#             )
-#             validaciones["concepto"]["match"] = coincidencias >= palabras_minimas
-#         else:
-#             validaciones["concepto"]["match"] = False
-
-#         if not validaciones["concepto"]["match"]:
-#             validaciones["concepto"][
-#                 "diferencia"
-#             ] = f"Solo {coincidencias} palabras coinciden (minimo: {palabras_minimas if 'palabras_minimas' in locals() else 2})"
-
-#     # --- VALIDAR CAMPOS OBLIGATORIOS ---
-#     campos_obligatorios = {
-#         "nit": "NIT",
-#         "concepto_compra": "Concepto de Compra",
-#         "cantidad": "Cantidad",
-#         "valor_total": "Valor Total",
-#     }
-
-#     campos_presentes = 0
-#     campos_faltantes = []
-
-#     for campo, nombre in campos_obligatorios.items():
-#         if datos_texto.get(campo) and str(datos_texto[campo]).strip():
-#             campos_presentes += 1
-#         else:
-#             campos_faltantes.append(nombre)
-
-#     validaciones["campos_obligatorios"]["presentes"] = campos_presentes
-#     validaciones["campos_obligatorios"]["total"] = len(campos_obligatorios)
-#     validaciones["campos_obligatorios"]["faltantes"] = campos_faltantes
-
-#     # --- CALCULAR RESUMEN ---
-#     campos_para_validar = [
-#         "cantidad",
-#         "valor_unitario",
-#         "valor_total",
-#         # "fecha_entrega",
-#         "concepto",
-#     ]
-#     campos_validados = sum(
-#         [1 for campo in campos_para_validar if validaciones[campo]["match"]]
-#     )
-
-#     validaciones["campos_validados"] = campos_validados
-#     validaciones["total_campos"] = len(campos_para_validar)
-
-#     validaciones["resumen"] = (
-#         f"{campos_validados}/{len(campos_para_validar)} campos coinciden, "
-#         f"{campos_presentes}/{len(campos_obligatorios)} campos obligatorios presentes"
-#     )
-
-#     return validaciones
-
-
-def ValidarContraTabla(
-    datos_texto: Dict, df_items: pd.DataFrame, item_num: str = ""
-) -> Dict:
+def limpiar_numero(valor):
     """
-    Compara los datos extraidos del texto con la tabla de items SAP ME53N.
-    Maneja variaciones de nombres de columnas según idioma/configuración SAP.
+    Limpia y convierte un valor a número
+    Maneja valores None, vacíos, y no numéricos
     """
-    validaciones = {
-        "cantidad": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
-        "valor_unitario": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
-        "valor_total": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
-        "concepto": {"match": False, "texto": "", "tabla": "", "diferencia": ""},
-        "campos_obligatorios": {"presentes": 0, "total": 0, "faltantes": []},
-        "resumen": "",
-        "campos_validados": 0,
-        "total_campos": 0,
-    }
-
-    if df_items.empty:
-        validaciones["resumen"] = "Tabla vacia - No se puede validar"
-        return validaciones
-
-    # Buscar el item especifico en el DataFrame
-    item_df = df_items
-    if item_num and "Item" in df_items.columns:
-        item_df = df_items[
-            df_items["Item"].astype(str).str.strip() == str(item_num).strip()
-        ]
-        if item_df.empty:
-            item_df = df_items.iloc[[0]]
-
-    if item_df.empty:
-        validaciones["resumen"] = "Item no encontrado en tabla - No se puede validar"
-        return validaciones
-
-    # ==================================================================
-    # MAPEO DE CAMPOS SAP ME53N
-    # Basado en nombres reales de la transacción según idioma
-    # ==================================================================
-
-    alias_campos = {
-        # MATERIAL (Campo técnico: MATNR)
-        "Material": [
-            # Español
-            "Material",
-            "Número de material",
-            "Nº material",
-            "Mat.",
-            # Inglés
-            "Material",
-            "Material Number",
-            "Material No",
-            "Mat. No.",
-            # Portugués
-            "Material",
-            "Número do material",
-            "Nº do material",
-            # Otros
-            "Código",
-            "Code",
-            "Item Code",
-        ],
-        # TEXTO BREVE (Campo técnico: TXZ01)
-        "Short Text": [
-            # Español
-            "Texto breve",
-            "Descripción",
-            "Desc.",
-            "Denominación",
-            # Inglés
-            "Short Text",
-            "Short text",
-            "Description",
-            "Item Text",
-            "Text",
-            # Portugués
-            "Texto breve",
-            "Descrição",
-            "Texto resumido",
-        ],
-        # CANTIDAD (Campo técnico: MENGE)
-        "Quantity": [
-            # Español
-            "Cantidad",
-            "Cant.",
-            "Ctd.",
-            "Cantidad pedido",
-            # Inglés
-            "Quantity",
-            "Qty",
-            "Order Quantity",
-            "PO Quantity",
-            # Portugués
-            "Quantidade",
-            "Qtd",
-            "Qtde",
-            "Quantidade pedido",
-        ],
-        # UNIDAD DE MEDIDA (Campo técnico: MEINS)
-        "Un": [
-            # Español
-            "Un",
-            "UM",
-            "Unidad",
-            "UMed",
-            "Unidad medida",
-            # Inglés
-            "Un",
-            "Unit",
-            "UoM",
-            "Unit of Measure",
-            "U.M.",
-            # Portugués
-            "Un",
-            "Unidade",
-            "UM",
-            "Unidade de medida",
-        ],
-        # PRECIO VALORACIÓN (Campo técnico: BPREIS / NETPR)
-        "Valn Price": [
-            # Español
-            "Precio valoración",
-            "Precio val.",
-            "Val. Price",
-            "Precio unit.",
-            "Precio unitario",
-            "Pr.unit.",
-            "Precio",
-            # Inglés
-            "Valn Price",
-            "Valuation Price",
-            "Unit Price",
-            "Price",
-            "Net Price",
-            # Portugués
-            "Preço valorização",
-            "Preço unit.",
-            "Preço unitário",
-        ],
-        # MONEDA (Campo técnico: WAERS)
-        "Crcy": [
-            # Español
-            "Moneda",
-            "Mon.",
-            "Divisa",
-            "Crcy",
-            # Inglés
-            "Crcy",
-            "Currency",
-            "Curr",
-            "Ccy",
-            # Portugués
-            "Moeda",
-            "Crcy",
-        ],
-        # VALOR TOTAL (Campo técnico: NETWR)
-        "Total Val.": [
-            # Español
-            "Valor total",
-            "Total",
-            "Importe",
-            "Imp.total",
-            "Total Val.",
-            "Valor neto",
-            "Importe neto",
-            # Inglés
-            "Total Val.",
-            "Total Value",
-            "Net Value",
-            "Total",
-            "Amount",
-            "Net Price",
-            "Total Amount",
-            "Total Price",
-            # Portugués
-            "Valor total",
-            "Total",
-            "Valor líquido",
-        ],
-        # FECHA DE ENTREGA (Campo técnico: EINDT)
-        "Deliv.Date": [
-            # Español
-            "Fecha entrega",
-            "Fech.entr.",
-            "Fecha de entrega",
-            "Deliv.Date",
-            "Fecha",
-            "F.entrega",
-            # Inglés
-            "Deliv.Date",
-            "Delivery Date",
-            "Del. Date",
-            "Delivery",
-            "Date",
-            # Portugués
-            "Data entrega",
-            "Data de entrega",
-            "Dt.entrega",
-        ],
-        # PROVEEDOR FIJO (Campo técnico: LIFNR)
-        "Fix. Vend.": [
-            # Español
-            "Proveedor fijo",
-            "Prov.fijo",
-            "Proveedor",
-            "Fix. Vend.",
-            # Inglés
-            "Fix. Vend.",
-            "Fixed Vendor",
-            "Vendor",
-            "Supplier",
-            "Fixed Supplier",
-            # Portugués
-            "Fornecedor fixo",
-            "Fornecedor",
-            "Forn.fixo",
-        ],
-        # CENTRO (Campo técnico: WERKS)
-        "Plant": [
-            # Español
-            "Centro",
-            "Planta",
-            "Cen.",
-            "Plant",
-            # Inglés
-            "Plant",
-            "Center",
-            "Plnt",
-            # Portugués
-            "Centro",
-            "Planta",
-        ],
-        # GRUPO DE COMPRAS (Campo técnico: EKGRP)
-        "PGr": [
-            # Español
-            "Grupo compras",
-            "Gr.compras",
-            "GC",
-            "PGr",
-            # Inglés
-            "PGr",
-            "Purchasing Group",
-            "Purch. Group",
-            "Pur. Group",
-            # Portugués
-            "Grupo compras",
-            "Gr.compras",
-        ],
-        # ORGANIZACIÓN DE COMPRAS (Campo técnico: EKORG)
-        "POrg": [
-            # Español
-            "Org.compras",
-            "Organización compras",
-            "Org. compras",
-            "POrg",
-            # Inglés
-            "POrg",
-            "Purchasing Organization",
-            "Purch. Org",
-            "Pur. Org",
-            # Portugués
-            "Org.compras",
-            "Organização compras",
-        ],
-        # GRUPO DE ARTÍCULOS (Campo técnico: MATKL)
-        "Matl Group": [
-            # Español
-            "Grupo artículos",
-            "Gr.artículos",
-            "Grupo material",
-            "Matl Group",
-            # Inglés
-            "Matl Group",
-            "Material Group",
-            "Mat. Group",
-            "Item Group",
-            # Portugués
-            "Grupo mercadorias",
-            "Gr.mercadorias",
-            "Grupo material",
-        ],
-    }
-
-    # ==================================================================
-    # FUNCIÓN DE BÚSQUEDA MEJORADA
-    # ==================================================================
-    def buscar_columna(campo_estandar: str) -> str:
-        """
-        Busca la columna real en item_df que coincida con algún alias.
-        Prioriza coincidencias exactas, luego parciales.
-        """
-        posibles_nombres = alias_campos.get(campo_estandar, [])
-        columnas_disponibles = [str(col).strip() for col in item_df.columns]
-
-        # PASO 1: Búsqueda exacta (case-insensitive)
-        for alias in posibles_nombres:
-            alias_lower = alias.lower().strip()
-            for col in columnas_disponibles:
-                if col.lower() == alias_lower:
-                    return col
-
-        # PASO 2: Búsqueda parcial (contiene)
-        for alias in posibles_nombres:
-            alias_lower = alias.lower().strip()
-            for col in columnas_disponibles:
-                col_lower = col.lower()
-                # Verificar si el alias está contenido en la columna o viceversa
-                if alias_lower in col_lower or col_lower in alias_lower:
-                    # Evitar falsos positivos con palabras muy cortas
-                    if len(alias_lower) >= 3:
-                        return col
-
-        return None
-
-    # ==================================================================
-    # VALIDACIÓN DE CAMPOS OBLIGATORIOS ME53N
-    # ==================================================================
-
-    faltantes_me53n = []
-    fila = item_df.iloc[0]
-
-    for campo_estandar in alias_campos.keys():
-        columna_encontrada = buscar_columna(campo_estandar)
-
-        if columna_encontrada is None:
-            faltantes_me53n.append(campo_estandar)
-            continue
-
-        val = fila.get(columna_encontrada, "")
-        if val is None or str(val).strip() in ["", "nan", "None", "NaN"]:
-            faltantes_me53n.append(campo_estandar)
-
-    validaciones["campos_me53n"] = {
-        "presentes": len(alias_campos) - len(faltantes_me53n),
-        "total": len(alias_campos),
-        "faltantes": faltantes_me53n,
-    }
-
-    # ==================================================================
-    # VALIDAR CANTIDAD
-    # ==================================================================
-    if datos_texto.get("cantidad"):
-        cantidad_texto = LimpiarNumero(datos_texto["cantidad"])
-        col_quantity = buscar_columna("Quantity")
-
-        if col_quantity and col_quantity in item_df.columns:
-            try:
-                cantidad_tabla_val = item_df[col_quantity].iloc[0]
-                cantidad_tabla = LimpiarNumero(str(cantidad_tabla_val))
-                validaciones["cantidad"]["texto"] = datos_texto["cantidad"]
-                validaciones["cantidad"]["tabla"] = str(cantidad_tabla)
-                validaciones["cantidad"]["match"] = (
-                    abs(cantidad_texto - cantidad_tabla) < 0.01
-                )
-                if not validaciones["cantidad"]["match"]:
-                    validaciones["cantidad"][
-                        "diferencia"
-                    ] = f"Difiere en {abs(cantidad_texto - cantidad_tabla):.2f}"
-            except Exception as e:
-                validaciones["cantidad"]["tabla"] = f"Error al leer: {str(e)}"
-
-    # ==================================================================
-    # VALIDAR VALOR UNITARIO
-    # ==================================================================
-    if datos_texto.get("valor_unitario"):
-        valor_texto = LimpiarNumero(datos_texto["valor_unitario"])
-        col_price = buscar_columna("Valn Price")
-
-        if col_price and col_price in item_df.columns:
-            try:
-                valor_tabla = LimpiarNumero(str(item_df[col_price].iloc[0]))
-
-                validaciones["valor_unitario"]["texto"] = FormatoMoneda(
-                    datos_texto["valor_unitario"]
-                )
-                validaciones["valor_unitario"]["tabla"] = FormatoMoneda(valor_tabla)
-
-                if valor_tabla > 0:
-                    diferencia_relativa = abs(valor_texto - valor_tabla) / valor_tabla
-                    validaciones["valor_unitario"]["match"] = diferencia_relativa < 0.01
-                else:
-                    validaciones["valor_unitario"]["match"] = valor_texto == valor_tabla
-
-                if not validaciones["valor_unitario"]["match"]:
-                    diferencia = abs(valor_texto - valor_tabla)
-                    validaciones["valor_unitario"][
-                        "diferencia"
-                    ] = f"Difiere en {FormatoMoneda(diferencia)}"
-            except Exception as e:
-                validaciones["valor_unitario"]["tabla"] = f"Error al leer: {str(e)}"
-
-    # ==================================================================
-    # VALIDAR VALOR TOTAL
-    # ==================================================================
-    if datos_texto.get("valor_total"):
-        valor_texto = LimpiarNumero(datos_texto["valor_total"])
-        col_total = buscar_columna("Total Val.")
-
-        if col_total and col_total in item_df.columns:
-            try:
-                valor_tabla = LimpiarNumero(str(item_df[col_total].iloc[0]))
-
-                validaciones["valor_total"]["texto"] = FormatoMoneda(
-                    datos_texto["valor_total"]
-                )
-                validaciones["valor_total"]["tabla"] = FormatoMoneda(valor_tabla)
-
-                if valor_tabla > 0:
-                    diferencia_relativa = abs(valor_texto - valor_tabla) / valor_tabla
-                    validaciones["valor_total"]["match"] = diferencia_relativa < 0.01
-                else:
-                    validaciones["valor_total"]["match"] = valor_texto == valor_tabla
-
-                if not validaciones["valor_total"]["match"]:
-                    diferencia = abs(valor_texto - valor_tabla)
-                    validaciones["valor_total"][
-                        "diferencia"
-                    ] = f"Difiere en {FormatoMoneda(diferencia)}"
-            except Exception as e:
-                validaciones["valor_total"]["tabla"] = f"Error al leer: {str(e)}"
-        else:
-            validaciones["valor_total"]["tabla"] = "Campo no encontrado en SAP"
-            validaciones["valor_total"]["match"] = False
-
-    # ==================================================================
-    # VALIDAR CONCEPTO
-    # ==================================================================
-    if datos_texto.get("concepto_compra"):
-        col_text = buscar_columna("Short Text")
-
-        if col_text and col_text in item_df.columns:
-            try:
-                concepto_texto = datos_texto["concepto_compra"].upper()
-                concepto_tabla_val = item_df[col_text].iloc[0]
-                concepto_tabla = str(concepto_tabla_val).upper()
-
-                validaciones["concepto"]["texto"] = datos_texto["concepto_compra"][
-                    :50
-                ] + ("..." if len(datos_texto["concepto_compra"]) > 50 else "")
-                validaciones["concepto"]["tabla"] = concepto_tabla[:50] + (
-                    "..." if len(concepto_tabla) > 50 else ""
-                )
-
-                palabras_texto = set(re.findall(r"\w+", concepto_texto))
-                palabras_tabla = set(re.findall(r"\w+", concepto_tabla))
-                coincidencias = len(palabras_texto & palabras_tabla)
-
-                if palabras_texto and palabras_tabla:
-                    palabras_minimas = max(
-                        2, min(len(palabras_texto), len(palabras_tabla)) // 3
-                    )
-                    validaciones["concepto"]["match"] = (
-                        coincidencias >= palabras_minimas
-                    )
-                else:
-                    validaciones["concepto"]["match"] = False
-
-                if not validaciones["concepto"]["match"]:
-                    validaciones["concepto"]["diferencia"] = (
-                        f"Solo {coincidencias} palabras coinciden "
-                        f"(minimo: {palabras_minimas if palabras_texto and palabras_tabla else 2})"
-                    )
-            except Exception as e:
-                validaciones["concepto"]["tabla"] = f"Error al leer: {str(e)}"
-
-    # ==================================================================
-    # VALIDAR CAMPOS OBLIGATORIOS
-    # ==================================================================
-    campos_obligatorios = {
-        "nit": "NIT",
-        "concepto_compra": "Concepto de Compra",
-        "cantidad": "Cantidad",
-        "valor_total": "Valor Total",
-    }
-
-    campos_presentes = 0
-    campos_faltantes = []
-
-    for campo, nombre in campos_obligatorios.items():
-        if datos_texto.get(campo) and str(datos_texto[campo]).strip():
-            campos_presentes += 1
-        else:
-            campos_faltantes.append(nombre)
-
-    validaciones["campos_obligatorios"]["presentes"] = campos_presentes
-    validaciones["campos_obligatorios"]["total"] = len(campos_obligatorios)
-    validaciones["campos_obligatorios"]["faltantes"] = campos_faltantes
-
-    # ==================================================================
-    # CALCULAR RESUMEN
-    # ==================================================================
-    campos_para_validar = [
-        "cantidad",
-        "valor_unitario",
-        "valor_total",
-        "concepto",
-    ]
-    campos_validados = sum(
-        [1 for campo in campos_para_validar if validaciones[campo]["match"]]
-    )
-
-    validaciones["campos_validados"] = campos_validados
-    validaciones["total_campos"] = len(campos_para_validar)
-
-    validaciones["resumen"] = (
-        f"{campos_validados}/{len(campos_para_validar)} campos coinciden, "
-        f"{campos_presentes}/{len(campos_obligatorios)} campos obligatorios presentes"
-    )
-
-    return validaciones
-
-
-def LimpiarNumero(valor: str) -> float:
-    """Convierte string con formato monetario a numero con mejor manejo de errores"""
-    if not valor or valor == "N/A" or str(valor).strip() == "":
+    if valor is None or valor == "":
         return 0.0
 
+    # Convertir a string
+    valor_str = str(valor).strip()
+
+    # Si es vacío después de strip
+    if not valor_str:
+        return 0.0
+
+    # ============================================
+    # NUEVO: Validar que es numérico
+    # ============================================
+    # Si contiene solo letras (como 'K', 'D'), retornar 0
+    if valor_str.isalpha():
+        return 0.0
+
+    # Si es muy corto y no es numérico, retornar 0
+    if len(valor_str) <= 2 and not any(c.isdigit() for c in valor_str):
+        return 0.0
+    # ============================================
+
     try:
-        # Convertir a string y limpiar
-        valor_str = str(valor).strip()
-
-        # Eliminar simbolos monetarios y espacios
-        valor_limpio = valor_str.replace("$", "").replace(" ", "").strip()
-
-        # Detectar separador decimal
-        # Si tiene tanto punto como coma, el ultimo es el decimal
-        if "." in valor_limpio and "," in valor_limpio:
-            if valor_limpio.rindex(".") > valor_limpio.rindex(","):
-                # Punto es decimal (formato US: 1,000.50)
-                valor_limpio = valor_limpio.replace(",", "")
-            else:
-                # Coma es decimal (formato EU: 1.000,50)
-                valor_limpio = valor_limpio.replace(".", "").replace(",", ".")
-        elif "," in valor_limpio:
-            # Solo comas - podria ser miles o decimal
-            if valor_limpio.count(",") == 1 and len(valor_limpio.split(",")[1]) == 2:
-                # Es decimal (formato: 1000,50)
-                valor_limpio = valor_limpio.replace(",", ".")
-            else:
-                # Es separador de miles (formato: 1,000 o 1,000,000)
-                valor_limpio = valor_limpio.replace(",", "")
-        elif "." in valor_limpio:
-            # Solo puntos - podria ser miles o decimal
-            if valor_limpio.count(".") == 1 and len(valor_limpio.split(".")[1]) == 2:
-                # Es decimal (formato: 1000.50)
-                pass  # Ya esta en formato correcto
-            else:
-                # Es separador de miles (formato: 1.000 o 1.000.000)
-                valor_limpio = valor_limpio.replace(".", "")
+        # Remover símbolos de moneda y separadores
+        valor_limpio = valor_str.replace("$", "").replace("COP", "").replace("USD", "")
+        valor_limpio = valor_limpio.replace(".", "").replace(",", ".")
+        valor_limpio = valor_limpio.strip()
 
         # Convertir a float
         return float(valor_limpio)
-
-    except Exception as e:
+    except (ValueError, AttributeError) as e:
         print(f"ERROR limpiando numero '{valor}': {e}")
         return 0.0
-
-
-def NormalizarFecha(fecha: str) -> str:
-    """Normaliza formato de fecha para comparacion"""
-    if not fecha:
-        return ""
-    # Intentar parsear y normalizar
-    for formato in ["%d/%m/%Y", "%d-%m-%Y", "%Y-%m-%d", "%d.%m.%Y"]:
-        try:
-            dt = datetime.strptime(fecha.strip(), formato)
-            return dt.strftime("%Y-%m-%d")
-        except:
-            continue
-    return fecha.strip()
-
-
-def DeterminarEstadoFinal(datos_texto: Dict, validaciones: Dict) -> Tuple[str, str]:
-    """
-    Determina el estado final y observaciones basado en validaciones
-    AJUSTADO: Maneja textos que solo son descripciones sin datos estructurados
-    """
-    # Cortar validación temprana para textos sin estructura
-    if datos_texto.get("tipo_texto") == "solo_descripcion":
-        return "Solo descripcion", "El texto solo contiene una descripción del producto"
-
-    if datos_texto.get("tipo_texto") == "tabla_sap":
-        return "Texto invalido", "El texto contiene una tabla SAP exportada"
-
-    if datos_texto.get("tipo_texto") == "vacio":
-        return "Sin Texto", "El item no tiene texto"
-
-    campos_obligatorios_presentes = validaciones.get("campos_obligatorios", {}).get(
-        "presentes", 0
-    )
-    total_campos_obligatorios = validaciones.get("campos_obligatorios", {}).get(
-        "total", 4
-    )
-    campos_validados = validaciones.get("campos_validados", 0)
-
-    # CASO 1: Texto vacio o muy corto
-    concepto = datos_texto.get("concepto_compra", "")
-    if not concepto or len(concepto.strip()) < 5:
-        return "Sin Texto", "No se encontro texto en el item"
-
-    # CASO 2: Texto es solo tabla de SAP (detectar por pipes y guiones)
-    if concepto.count("|") > 10 and concepto.count("-") > 50:
-        return (
-            "Texto invalido",
-            "El texto es una tabla de SAP exportada, no contiene informacion del proveedor",
-        )
-
-    # CASO 3: Texto es solo descripcion del producto (sin datos del proveedor)
-    # Si NO tiene ningun campo obligatorio Y el texto es corto (menos de 200 chars)
-    if campos_obligatorios_presentes == 0 and len(concepto) < 200:
-        return (
-            "Solo descripcion",
-            f"Texto solo contiene descripcion del producto: {concepto[:50]}...",
-        )
-
-    # CASO 4: Texto tiene algunos datos pero incompletos
-    if campos_obligatorios_presentes == 0 and len(concepto) >= 200:
-        return (
-            "Verificar manualmente",
-            "Texto extenso pero sin campos estructurados (NIT, valores, etc)",
-        )
-
-    # CASO 5: Validacion normal - tiene campos estructurados
-    if campos_obligatorios_presentes >= 3 and campos_validados >= 3:
-        estado = "Registro validado para orden de compra"
-        observaciones = "Validacion exitosa - Cumple requisitos minimos"
-    elif campos_obligatorios_presentes >= 2:
-        estado = "Verificar manualmente"
-        observaciones = GenerarObservaciones(datos_texto, validaciones)
-        if campos_validados < 2:
-            estado = "Datos no coinciden con SAP"
-    else:
-        estado = "Falta informacion critica"
-        observaciones = GenerarObservaciones(datos_texto, validaciones)
-
-    # =============================================================
-    #  VALIDACIÓN DE CAMPOS OBLIGATORIOS SAP (ME53N)
-    #  SI FALTAN → ESTADO = "Verificar manualmente"
-    # =============================================================
-    campos_me = validaciones.get("campos_me53n", {})
-
-    if campos_me and campos_me.get("faltantes"):
-        faltantes = campos_me["faltantes"]
-
-        # agregar a observaciones
-        if observaciones:
-            observaciones += " | "
-
-        observaciones += f"Faltan campos SAP: {', '.join(faltantes)}"
-
-        # cambiar estado final
-        return "Verificar manualmente", observaciones
-
-    return estado, observaciones
-
-
-def ExtraerDatosTexto(texto: str) -> Dict:
-    """Extrae campos estructurados del texto capturado
-    AJUSTADO: Se agregan nuevos patrones manteniendo la lógica existente."""
-
-    datos = {
-        "razon_social": "",
-        "nit": "",
-        "correo": "",
-        "empresa": "",
-        "concepto_compra": "",
-        "fecha_prestacion": "",
-        "valor_unitario": "",
-        "valor_total": "",
-        "cantidad": "",
-        "subtotal": "",
-        "iva_impo": "",
-        "total": "",
-        "responsable_compra": "",
-        "ceco": "",
-        "telefono": "",
-        "direccion_entrega": "",
-        "tipo_texto": "desconocido",
-    }
-
-    if not texto or not texto.strip():
-        datos["tipo_texto"] = "vacio"
-        return datos
-
-    texto_limpio = texto.strip()
-    texto_upper = texto_limpio.upper()
-    lineas = [linea.strip() for linea in texto_limpio.split("\n") if linea.strip()]
-
-    # ------------------------------------------------------------
-    # CLASIFICACIÓN DEL TEXTO (MANTENIDA TAL CUAL)
-    # ------------------------------------------------------------
-
-    if texto.count("|") > 10 and texto.count("-") > 50:
-        datos["tipo_texto"] = "tabla_sap"
-        datos["concepto_compra"] = "TABLA SAP EXPORTADA"
-        return datos
-
-    if len(texto_limpio) < 200 and not any(
-        kw in texto_upper
-        for kw in ["NIT", "RAZON SOCIAL", "VALOR", "CANTIDAD:", "PROVEEDOR"]
-    ):
-        datos["tipo_texto"] = "solo_descripcion"
-        datos["concepto_compra"] = texto_limpio
-        return datos
-
-    if any(
-        kw in texto_upper
-        for kw in ["NIT", "RAZON SOCIAL", "PROVEEDOR:", "VALOR TOTAL", "CANTIDAD:"]
-    ):
-        datos["tipo_texto"] = "estructurado"
-    else:
-        datos["tipo_texto"] = "texto_simple"
-
-    # ------------------------------------------------------------
-    # EXTRACCIÓN DE CAMPOS (NUEVOS + EXISTENTES)
-    # ------------------------------------------------------------
-
-    # --- RAZON SOCIAL (NUEVO + mantiene lo que tenías) ---
-    m = re.search(r"GENERAR ORDEN DE COMPRA A[:\s]*(.+?)\s*NIT", texto_upper)
-    if m:
-        datos["razon_social"] = m.group(1).strip()
-
-    # fallback TUYO (línea con RAZON SOCIAL o PROVEEDOR)
-    if not datos["razon_social"]:
-        for linea in lineas:
-            linea_upper = linea.upper()
-            if any(kw in linea_upper for kw in ["RAZON SOCIAL", "PROVEEDOR"]):
-                if ":" in linea:
-                    datos["razon_social"] = linea.split(":", 1)[1].strip()
-                    break
-
-    # --- NIT (MANTENIDO + más flexible) ---
-    patrones_nit = [r"NIT[\s:]*([0-9.\-]+)", r"IDENTIFICACION[\s:]*([0-9.\-]+)"]
-    for patron in patrones_nit:
-        m = re.search(patron, texto_upper)
-        if m:
-            datos["nit"] = m.group(1).strip()
-            break
-
-    # --- CORREOS (MEJORA) ---
-    correos = re.findall(r"[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}", texto)
-
-    # Correo del proveedor (NO colsubsidio)
-    correos_proveedor = [c for c in correos if "colsubsidio.com" not in c.lower()]
-    if correos_proveedor:
-        datos["correo"] = correos_proveedor[0].strip()
-
-    # Correos responsables (@colsubsidio.com)
-    correos_resp = [c.lower() for c in correos if "colsubsidio.com" in c.lower()]
-    if correos_resp:
-        datos["responsable_compra"] = ", ".join(correos_resp)
-
-    # --- CONCEPTO (NUEVO + tu fallback) ---
-    m = re.search(
-        r"POR CONCEPTO DE[:\s]*(.+?)\s*(EMPRESA|FECHA|HORA|DIRECCION|CANTIDAD|MES|HTH)",
-        texto_upper,
-    )
-    if m:
-        datos["concepto_compra"] = m.group(1).strip()
-
-    # fallback TUYO
-    if not datos["concepto_compra"] and lineas:
-        datos["concepto_compra"] = lineas[0][:200]
-
-    # --- CANTIDAD (MANTENIDO) ---
-    m = re.search(r"CANTIDAD[\s:]*([0-9.,]+)", texto_upper)
-    if m:
-        datos["cantidad"] = m.group(1).strip()
-
-    # --- VALORES (MANTENIDO) ---
-    patron_valor = r"[\$]?\s*([0-9]{1,3}(?:[.,][0-9]{3})*(?:[.,][0-9]{2})?)"
-
-    # valor unitario
-    for linea in lineas:
-        if any(
-            kw in linea.upper()
-            for kw in [
-                "VALOR UNITARIO",
-                "VALOR UNIDAD",
-                "VR UNITARIO",
-                "PRECIO UNITARIO",
-            ]
-        ):
-            m = re.search(patron_valor, linea)
-            if m:
-                datos["valor_unitario"] = m.group(1).strip()
-                break
-
-    # --- IVA (MEJORADO) ---
-    m = re.search(r"IVA[\s:]*" + patron_valor, texto_upper)
-    if m:
-        datos["iva_impo"] = m.group(1).strip()
-
-    # valor total / subtotal (lógica según IVA)
-    if datos["iva_impo"]:  # Si hay IVA, buscar valor SIN IVA
-        for linea in lineas:
-            if any(kw in linea.upper() for kw in ["VALOR SIN IVA", "SUBTOTAL"]):
-                m = re.search(patron_valor, linea)
-                if m:
-                    datos["valor_total"] = m.group(1).strip()
-                    break
-    else:  # Si NO hay IVA, tomar VALOR TOTAL normal
-        for linea in lineas:
-            if any(kw in linea.upper() for kw in ["VALOR TOTAL", "SUBTOTAL"]):
-                m = re.search(patron_valor, linea)
-                if m:
-                    datos["valor_total"] = m.group(1).strip()
-                    break
-
-    # --- CECO (NUEVO) ---
-    m = re.search(r"CECO[:\s]*([0-9]+)", texto_upper)
-    if m:
-        datos["ceco"] = m.group(1).strip()
-
-    return datos
-
-
-def GenerarObservaciones(datos_texto: Dict, validaciones: Dict) -> str:
-    """Genera observaciones detalladas
-    AJUSTADO: Incluye informacion sobre el tipo de texto"""
-
-    observaciones = []
-
-    # Agregar info sobre tipo de texto
-    tipo_texto = datos_texto.get("tipo_texto", "desconocido")
-    if tipo_texto == "solo_descripcion":
-        return "Texto solo contiene descripcion del producto - No incluye datos del proveedor"
-    elif tipo_texto == "tabla_sap":
-        return "Error: Texto es una tabla de SAP, no informacion del proveedor"
-    elif tipo_texto == "vacio":
-        return "Item sin texto"
-    elif tipo_texto == "texto_simple":
-        observaciones.append("Texto no estructurado")
-
-    # Campos obligatorios faltantes
-    if "campos_obligatorios" in validaciones:
-        campos_faltantes = validaciones["campos_obligatorios"].get("faltantes", [])
-        if campos_faltantes:
-            observaciones.append(f"Faltan: {', '.join(campos_faltantes)}")
-
-    # Validaciones fallidas
-    campos_validacion = {
-        "cantidad": "Cantidad",
-        "valor_unitario": "Valor unitario",
-        "valor_total": "Valor total",
-    }
-
-    for campo, nombre in campos_validacion.items():
-        if campo in validaciones and isinstance(validaciones[campo], dict):
-            if validaciones[campo].get("texto") and not validaciones[campo].get(
-                "match", False
-            ):
-                diferencia = validaciones[campo].get("diferencia", "")
-                if diferencia:
-                    observaciones.append(f"{nombre} {diferencia}")
-
-    if not observaciones:
-        return "Texto sin campos requeridos para validacion"
-
-    return " | ".join(observaciones[:5])
-
-
-def GenerarReporteValidacion(
-    solped: str,
-    item: str,
-    datos_texto: Dict,
-    validaciones: Dict,
-    tiene_attachments: bool = None,
-    obs_attachments: str = "",
-    attachments_lista: list = None,
-) -> str:
-    """Genera un reporte legible de la validacion"""
-
-    reporte = f"\n{'='*80}\n"
-    reporte += f"REPORTE DE VALIDACION - SOLPED: {solped}, ITEM: {item}\n"
-    reporte += f"{'='*80}\n\n"
-
-    # ===================================================================================
-    # VALIDACIÓN ATTACHMENT LIST DE LA SOLPED:
-    # ===================================================================================
-    if tiene_attachments is False:
-        # NO TIENE ADJUNTOS
-        reporte += (
-            "ADVERTENCIA: La SOLPED NO tiene archivos adjuntos.\n"
-            f"    Detalle: {obs_attachments}\n"
-            "    La validación del ítem continúa, pero la SOLPED puede ser rechazada.\n\n"
-        )
-
-    elif tiene_attachments is True:
-        # SÍ TIENE ADJUNTOS → mostrar lista
-        reporte += (
-            "INFORMACIÓN DE ATTACHMENTS:\n"
-            "    La SOLPED cuenta con archivos adjuntos.\n"
-        )
-
-        # Si existe lista estructurada de attachments
-        if attachments_lista:
-            reporte += (
-                f"    Total de archivos: {len(attachments_lista)}\n" f"    Ejemplos:\n"
-            )
-            # Listar hasta 3 para evitar reportes enormes
-            for a in attachments_lista[:3]:
-                reporte += f"      - {a.get('title', '')}\n"
-
-            if len(attachments_lista) > 3:
-                reporte += (
-                    f"      ... ({len(attachments_lista)-3} archivos adicionales)\n"
-                )
-
-        # Si solo viene texto plano (caso exportación)
-        elif obs_attachments:
-            reporte += f"    Detalle: {obs_attachments}\n"
-
-        reporte += "\n"
-
-    # ===================================================================================
-    # 1. CAMPOS OBLIGATORIOS SAP ME53N
-    # ===================================================================================
-    if "campos_me53n" in validaciones:
-        datos_me53n = validaciones["campos_me53n"]
-        reporte += "CAMPOS OBLIGATORIOS SAP ME53N:\n"
-        reporte += f"  Presentes: {datos_me53n['presentes']}/{datos_me53n['total']}\n"
-
-        if datos_me53n["faltantes"]:
-            reporte += "  Faltantes:\n"
-            for campo in datos_me53n["faltantes"]:
-                reporte += f"    - {campo}\n"
-        else:
-            reporte += "  ✓ Todos los campos obligatorios ME53N están presentes.\n"
-
-        reporte += "\n"
-
-    # ===================================================================================
-    # 2. ADVERTENCIA POR TEXTO SIN ESTRUCTURA
-    # ===================================================================================
-    if datos_texto.get("tipo_texto") in ["solo_descripcion", "vacio", "tabla_sap"]:
-        reporte += (
-            "ADVERTENCIA IMPORTANTE:\n"
-            "  Este ítem contiene solo descripción o no tiene estructura completa.\n"
-            "  → No fue posible extraer todos los campos estructurados.\n"
-            "  → Validar manualmente la información.\n"
-            "  → Revisar cantidad, valor unitario, valor total y NIT directamente en SAP.\n\n"
-        )
-
-    # ===================================================================================
-    # 3. DATOS EXTRAÍDOS DEL TEXTO
-    # ===================================================================================
-    reporte += "DATOS EXTRAIDOS DEL TEXTO:\n"
-    reporte += f"  Razon Social: {datos_texto.get('razon_social') or 'No encontrado'}\n"
-    reporte += f"  NIT: {datos_texto.get('nit') or 'No encontrado'}\n"
-    reporte += f"  Correo: {datos_texto.get('correo') or 'No encontrado'}\n"
-    reporte += (
-        f"  Concepto: {datos_texto.get('concepto_compra')[:50] or 'No encontrado'}...\n"
-    )
-    reporte += f"  Cantidad: {datos_texto.get('cantidad') or 'No encontrado'}\n"
-    reporte += (
-        f"  Valor Unitario: {datos_texto.get('valor_unitario') or 'No encontrado'}\n"
-    )
-    reporte += f"  Valor Total: {datos_texto.get('valor_total') or 'No encontrado'}\n"
-    reporte += (
-        f"  Responsable: {datos_texto.get('responsable_compra') or 'No encontrado'}\n"
-    )
-    reporte += f"  CECO: {datos_texto.get('ceco') or 'No encontrado'}\n\n"
-
-    # ===================================================================================
-    # 4. CAMPOS OBLIGATORIOS EXTRAÍDOS DEL TEXTO
-    # ===================================================================================
-    if "campos_obligatorios" in validaciones:
-        oblig = validaciones["campos_obligatorios"]
-        reporte += "CAMPOS OBLIGATORIOS (Segun Texto Extraído):\n"
-        reporte += f"  Presentes: {oblig['presentes']}/{oblig['total']}\n"
-
-        if oblig["faltantes"]:
-            reporte += "  Faltantes:\n"
-            for campo in oblig["faltantes"]:
-                reporte += f"    - {campo}\n"
-        else:
-            reporte += "  ✓ Todos los campos obligatorios del texto están presentes.\n"
-
-        reporte += "\n"
-
-    # ===================================================================================
-    # 5. VALIDACIONES DETALLADAS
-    # ===================================================================================
-    reporte += "VALIDACIONES:\n"
-
-    for campo, validacion in validaciones.items():
-
-        if campo in ["resumen", "campos_obligatorios", "campos_me53n"]:
-            continue  # ya fueron procesados
-
-        if not isinstance(validacion, dict):
-            continue
-
-        if "match" not in validacion:
-            continue
-
-        estado = "EXITO" if validacion["match"] else "ERROR"
-        reporte += f"  {estado} {campo.upper()}:\n"
-
-        if validacion.get("texto"):
-            reporte += f"      Texto: {validacion['texto']}\n"
-
-        if validacion.get("tabla"):
-            reporte += f"      Tabla: {validacion['tabla']}\n"
-
-        if validacion.get("diferencia"):
-            reporte += f"      {validacion['diferencia']}\n"
-
-    # ===================================================================================
-    # 6. RESUMEN FINAL
-    # ===================================================================================
-    reporte += f"\n{validaciones['resumen']}\n"
-    reporte += f"{'='*80}\n"
-
-    return reporte
-
-
-def ProcesarYValidarItem(
-    session,
-    solped: str,
-    item_num: str,
-    texto: str,
-    df_items: pd.DataFrame,
-    tiene_attachments: bool = None,
-    obs_attachments: str = "",
-    attachments_lista: list = None,
-) -> Tuple[Dict, Dict, str, str, str]:
-    """
-    Procesa un item: extrae datos, valida y genera reporte
-    Returns: (datos_texto, validaciones, reporte, estado_final, observaciones)
-    """
-
-    # 1. Extraer datos del texto
-    datos_texto = ExtraerDatosTexto(texto)
-
-    # 2. Validar contra tabla (pasando el numero de item para busqueda especifica)
-    validaciones = ValidarContraTabla(datos_texto, df_items, item_num)
-
-    # 3. Determinar estado final y observaciones
-    estado_final, observaciones = DeterminarEstadoFinal(datos_texto, validaciones)
-    # Evitar generar reportes completos cuando el texto no tiene estructura
-    if datos_texto.get("tipo_texto") in ["vacio", "solo_descripcion", "tabla_sap"]:
-        observaciones = (
-            f"Texto sin estructura completa ({datos_texto.get('tipo_texto')}). "
-            "Solo contiene descripción."
-        )
-
-    # 4. Generar reporte
-    reporte = GenerarReporteValidacion(
-        solped,
-        item_num,
-        datos_texto,
-        validaciones,
-        tiene_attachments,
-        obs_attachments,
-        attachments_lista,
-    )
-
-    return datos_texto, validaciones, reporte, estado_final, observaciones

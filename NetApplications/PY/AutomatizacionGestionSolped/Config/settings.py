@@ -5,10 +5,11 @@ import os
 
 from dotenv import load_dotenv
 from pathlib import Path
+#from Config.InicializarConfig import inConfig
 
 # Cargar .env
 load_dotenv()
-#from Config.InitConfig import inConfig
+
 
 
 # Ruta base del proyecto
@@ -75,5 +76,5 @@ for key, path in RUTAS.items():
         os.makedirs(path, exist_ok=True)
 
 # Crear carpeta de logs
-os.makedirs(os.path.dirname(RUTAS["PathLog"]), exist_ok=True)
+#os.makedirs(os.path.dirname(inConfig("PathLog")), exist_ok=True)
 

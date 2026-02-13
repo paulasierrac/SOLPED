@@ -1,4 +1,4 @@
-#repositories.Excel.py
+#Repositories.Excel.py
 
 from Config.database import Database
 from Config.settings import DB_CONFIG
@@ -14,10 +14,7 @@ class ExcelRepo:
     # -----------------------------
     @staticmethod
     def _construir_columnas(columnas: list[str]) -> str:
-        return ",\n".join(
-            f"{col} VARCHAR(MAX) NULL"
-            for col in columnas
-        )
+        return ",\n".join(f"{col} VARCHAR(MAX) NULL" for col in columnas)
 
     # -----------------------------
     # CREAR TABLA TEMPORAL
@@ -28,10 +25,7 @@ class ExcelRepo:
         if not columnas:
             raise ValueError("La lista de columnas está vacía")
 
-        columnas_sql = ",\n".join(
-            f"[{col}] NVARCHAR(MAX)"
-            for col in columnas
-        )
+        columnas_sql = ",\n".join(f"[{col}] NVARCHAR(MAX)" for col in columnas)
 
         query = f"""
         IF OBJECT_ID('{self.schema}.{tabla_temp}', 'U') IS NOT NULL
@@ -86,19 +80,14 @@ class ExcelRepo:
     # -----------------------------
     # BULK A TEMP + TRANSFERENCIA
     # -----------------------------
-    def ejecutar_bulk_dinamico(
-        self,
-        ruta_txt: str,
-        tabla: str,
-        columnas: list[str]
-    ):
+    def ejecutarBulkDinamico(self, rutaTXT: str, tabla: str, columnas: list[str]):
 
         tabla_temp = f"{tabla}_temp"
         columnas_sql = ", ".join(columnas)
 
         bulk_query = f"""
         BULK INSERT {self.schema}.{tabla_temp}
-        FROM '{ruta_txt}'
+        FROM '{rutaTXT}'
         WITH (
             FIRSTROW = 2,
             FIELDTERMINATOR = ';',
@@ -141,11 +130,10 @@ class ExcelRepo:
         except Exception as e:
             print(f"Error durante BULK dinámico en {tabla}: {e}")
 
-
     # -----------------------------
     # OBTENER SOLO PENDIENTES
     # -----------------------------
-    def obtener_valores(self, tabla: str):
+    def obtenerValores(self, tabla: str):
 
         query = f"""
         SELECT*

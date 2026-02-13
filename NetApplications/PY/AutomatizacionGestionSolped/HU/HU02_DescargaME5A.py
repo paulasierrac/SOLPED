@@ -1,6 +1,6 @@
 # ============================================
 # HU02: Descargar Solicitudes de Pedido ME5A
-# Autor: Tu Nombre - Configurador RPA
+# Autor: Henry - Configurador RPA
 # Descripcion: Descarga las solicitudes de pedido filtradas por estado.
 # Ultima modificacion: 24/11/2025
 # Propiedad de Colsubsidio
@@ -8,6 +8,7 @@
 # ============================================
 from Funciones.DescargarSolpedME5A import DescargarSolpedME5A
 from Funciones.EscribirLog import WriteLog
+from Funciones.ControlHU import ControlHU
 import traceback
 from Config.settings import RUTAS
 
@@ -20,23 +21,25 @@ def EjecutarHU02(session):
     descarga de SOLPED desde la transacción ME5A.
     """
     try:
+        nombreTarea = "HU02_DescargaME5A"
+        ControlHU(nombreTarea, estado=0)
         WriteLog(
             mensaje="Inicia HU02",
             estado="INFO",
-            task_name="HU2_DescargaME5A",
-            path_log=RUTAS["PathLog"],
+            nombreTarea="HU2_DescargaME5A",
+            rutaRegistro=inConfig("PathLog"),
         )
         estado = "03"
         DescargarSolpedME5A(session, estado)
         estado = "05"
         DescargarSolpedME5A(session, estado)
-
+        ControlHU(nombreTarea, estado=100)
     except Exception as e:
-        error_text = traceback.format_exc()
+        ControlHU(nombreTarea, estado=99)
         WriteLog(
-            mensaje=f"ERROR GLOBAL: {e} | {error_text}",
+            mensaje=f"ERROR GLOBAL: {e}",
             estado="ERROR",
-            task_name="HU2_DescargaME5A",
-            path_log=RUTAS["PathLogError"],
+            nombreTarea="HU2_DescargaME5A",
+            rutaRegistro=RUTAS["PathLogError"],
         )
         raise

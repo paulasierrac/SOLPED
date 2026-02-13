@@ -1,16 +1,16 @@
-from repositories.ControlHU import ControlHURepo
+from Repositories.ControlHU import ControlHURepo
 import socket
 import re
 
-def extraer_hu(nombre_hu: str) -> int:
-    match = re.match(r'HU(\d+)', nombre_hu.upper())
+def ExtraerHU(iNombreHU: str) -> int:
+    match = re.match(r'HU(\d+)', iNombreHU.upper())
     if not match:
-        raise ValueError(f"Nombre de HU invalido: {nombre_hu}")
+        raise ValueError(f"Nombre de HU invalido: {iNombreHU}")
     return int(match.group(1))
 
-def control_hu(nombre_hu: str, estado: int):
+def ControlHU(iNombreHU: str, estado: int):
     
-    hu_id = extraer_hu(nombre_hu)
+    iHuId = ExtraerHU(iNombreHU)
 
     if estado == 0:
         activa = 1
@@ -21,10 +21,14 @@ def control_hu(nombre_hu: str, estado: int):
     
     maquina = socket.gethostname()
 
-    ControlHURepo.actualizar_estado_hu(
-        hu_id=hu_id,
-        nombre_hu=nombre_hu,
-        estado=estado,
-        activa=activa,
-        maquina=maquina
-    )
+    #repo = ControlHURepo(schema="GestionSolped")
+    repo = ControlHURepo(schema=None)
+
+
+    Prueba1 = repo.ActualizarEstadoHU(iHuId=iHuId, iNombreHU=iNombreHU, estado=estado, activa=activa, maquina=maquina)
+
+    if Prueba1:
+        print(f"Verdadero HU Actualizada {iHuId}")
+    else:
+        print(f"Falso HU Actualizada {iHuId}")
+ 

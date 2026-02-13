@@ -10,76 +10,76 @@
 #   - Manejo de excepciones y log por día
 # ================================
 
-import time
-import pyautogui
-import traceback
-import sys
+from Funciones.EscribirLog import WriteLog
+from Funciones.EmailSender import EnviarNotificacionCorreo
+
+# from Funciones.GeneralME53N import AppendHipervinculoObservaciones
 
 from Config.settings import RUTAS, SAP_CONFIG
-from Config.InitConfig import inConfig
-
-from Funciones.GeneralME53N import (
-    EnviarNotificacionCorreo,
-    EnviarCorreoPersonalizado,
-    NotificarRevisionManualSolped,
-    convertir_txt_a_excel,
-    NotificarRevisionManualSolped,
-)
-from Funciones.EscribirLog import WriteLog
-from Funciones.GuiShellFunciones import leer_solpeds_desde_archivo
-
 from HU.HU00_DespliegueAmbiente import EjecutarHU00
-from HU.HU01_LoginSAP import ConectarSAP
+from HU.HU01_LoginSAP import ConectarSAP, ObtenerSesionActiva
 from HU.HU02_DescargaME5A import EjecutarHU02
 from HU.HU03_ValidacionME53N import EjecutarHU03
 from HU.HU04_GeneracionOC import EjecutarHU04
 from HU.HU05_DescargaOC import EjecutarHU05
 
+from Config.InicializarConfig import inConfig
+from Config.settings import RUTAS, SAP_CONFIG
+
+
 def Main_GestionSolped():
     try:
-        task_name = "Main_GestionSOLPED"
+        nombreTarea = "Main_GestionSOLPED"
+
+        EjecutarHU00()
 
         # ================================
+
         # Inicio de Main
         # ================================
+
+        # Enviar correo de inicio
         WriteLog(
             mensaje="Inicio ejecución Main GestionSolped.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
         )
+
+        # EnviarNotificacionCorreo(codigoCorreo=1, nombreTarea=nombreTarea)
 
         # ================================
         # 1. Despliegue de ambiente
-        # ================================
+        # ================================sssss
         WriteLog(
-            mensaje="Inicia HU00_DespliegueAmbiente.",
+            mensaje="Finaliza HU00_DespliegueAmbiente.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
         )
-        EjecutarHU00()
-
         # ================================
         # 2. Obtener sesión SAP
         # ================================
         WriteLog(
-            mensaje="Obteniendo sesión SAP...",
+            mensaje="Inicia HU01_LoginSAP.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
+        )
+        session = ConectarSAP(
+            inConfig("SapSistema"),
+            inConfig("SapMandante"),
+            SAP_CONFIG["user"],
+            SAP_CONFIG["password"],
         )
 
-        session = ConectarSAP(inConfig("SapSistema"),inConfig("SapMandante") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
-
-        time.sleep(3)
-     
+        # session = ObtenerSesionActiva()
 
         WriteLog(
-            mensaje="Sesión SAP obtenida correctamente.",
+            mensaje="Finaliza HU01_LoginSAP.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # ================================
@@ -88,35 +88,17 @@ def Main_GestionSolped():
         WriteLog(
             mensaje="Inicia HU02 - Descarga ME5A.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
         )
-        ordenes_de_compra = ["4200339200", "4200339201", "4200339202", "4200339203", "4200339204", "4200339205", "4200339206","4001155884","4001155889","4001155889","4001155852"]
-        #EjecutarHU05(session,ordenes_de_compra)
-        #sys.exit()
-        #*********************************
-        # Se debe remplazar con guardar OC 
-        #*********************************
-        # /Salir para pruebas 
 
-        # pyautogui.hotkey("shift","F3")
-        # time.sleep(2)
-        # pyautogui.hotkey("alt","TAB")
-        # time.sleep(2)   
-        # pyautogui.hotkey("enter")
-
-        #
-              
-        # /Salir para pruebas 
-        #********************************* 
-
-
+        # EjecutarHU02(session)
 
         WriteLog(
             mensaje="HU02 finalizada correctamente.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # ================================
@@ -126,113 +108,96 @@ def Main_GestionSolped():
         archivos_validar = [
             "expSolped03.txt"
         ]  # Dos solped para prueba 1300139393  1300139394
+        WriteLog(
+            mensaje=f"Inicia HU03 - Validación ME53N para archivo.",
+            estado="INFO",
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
+        )
+        # for archivo in archivos_validar:
+        #     EjecutarHU03(session, archivo)
 
-        for archivo in archivos_validar:
-            WriteLog(
-                mensaje=f"Inicia HU03 - Validación ME53N para archivo {archivo}.",
-                estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
-            )
-
-            #EjecutarHU03(session, archivo)
-            # convertir_txt_a_excel(archivo)
-
-            WriteLog(
-                mensaje=f"HU03 finalizada correctamente para archivo {archivo}.",
-                estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
-            )
-
-            # Notificación de finalización HU02 con archivo descargado (código 2)
-
-            # ================================
-            # 5. Ejecutar HU04 – Creacion de OC
-            # ================================
-            # TODO - revisar si es necesario EL LOG DE INICIO HU04 por cada archivo o solo una vez
-
-            # WriteLog(
-            #     mensaje="Inicia HU04 - Creacion de OC desde ME21N.",
-            #     estado="INFO",
-            #     task_name=task_name,
-            #     path_log=RUTAS["PathLog"],
-            # )
-
-            #session = ConectarSAP(inConfig("SAP_SISTEMA"),inConfig("SAP_MANDANTE") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
-
-            # archivos_validar = ["expSolped05 1.txt"] # 1300139271,1300139272
-            archivos_validar = [
-                "expSolped03 copy.txt"
-            ]  # CAMBIAR A 05 PARA SOLPED LIBERADAS
-            # archivos_validar = ["expSolped03.txt"] # CAMBIAR A 05 PARA SOLPED LIBERADAS
-            # archivos_validar = ["expSolped03.txt"] # Dos solped para prueba 1300139393  1300139394 / se daño
-
-            for archivo in archivos_validar:
-                EjecutarHU04(session, archivo)
-
-            # WriteLog(
-            #     mensaje=f"HU04 finalizada correctamente para archivo {archivo}.",
-            #     estado="INFO",
-            #     task_name=task_name,
-            #     path_log=RUTAS["PathLog"],
-            # )
-
-        # Finalizacion de HU4 generacion de OC
+        WriteLog(
+            mensaje=f"Finaliza HU03 - Validación ME53N para archivo.",
+            estado="INFO",
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
+        )
 
         # ================================
-        # 5. Ejecutar HU05 – Descarga de OC y envio de correo
+        # 5. Ejecutar HU04 – Generación de OC
         # ================================
+        WriteLog(
+            mensaje="Inicia HU04 - Generación OC.",
+            estado="INFO",
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
+        )
 
-        archivos_validar = ["expSolped05 1.txt", "expSolped05.txt"]
+        # archivos_validar = ["expSolped03 copy.txt"]
+        # for archivo in archivos_validar:
+        #     EjecutarHU04(session, archivo)
 
-        for archivo in archivos_validar:
-            WriteLog(
-                mensaje=f"Inicia HU05 - Descarga de OC y envio de correo  {archivo}.",
-                estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
-            )
-            ruta = rf"{RUTAS["PathInsumo"]}{archivo}"
-            print("Esta es la ruta: ", ruta)
-            dataSolpeds = leer_solpeds_desde_archivo(ruta)
-
-            # for solped, info in dataSolpeds.items():
-            #     #print(f"Solped {solped} tiene {info['items']} items")
-            #     # Cambiar por funcion de descarga de OC
-            dataOC = leer_solpeds_desde_archivo(ruta)
-            print(type(dataOC))
-
-            # for OrdenCompra, info in dataOC.items():
-            # print(f"OrdenCompra {OrdenCompra} tiene {info['items']} items")
-            # Cambiar por funcion de descarga de OC
-
-            WriteLog(
-                mensaje=f"HU05 finalizada correctamente para archivo {archivo}.",
-                estado="INFO",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
-            )
-
-        # Finalizacion de HU5 generacion de OC
+        WriteLog(
+            mensaje="HU04 - Generación OC finalizada correctamente.",
+            estado="INFO",
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
+        )
 
         # ================================
-        # Fin de Main
+        # 5. Ejecutar HU05 – Descarga de OC
         # ================================
+        WriteLog(
+            mensaje="Inicia HU05 - Descarga OC generadas.",
+            estado="INFO",
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
+        )
+
+        # EjecutarHU05(session)
+
+        WriteLog(
+            mensaje="HU05 - Descarga OC finalizada correctamente.",
+            estado="INFO",
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
+        )
+
+        # ================================
+        # 5. Ejecutar HU06 – Envío de OC por correo
+        # ================================
+        WriteLog(
+            mensaje="Inicia HU06 - Envío OC por correo.",
+            estado="INFO",
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
+        )
+
+        # EjecutarHU06(session)
+
+        WriteLog(
+            mensaje="HU06 - Envío OC por correo finalizada correctamente.",
+            estado="INFO",
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
+        )
+
+        EnviarNotificacionCorreo(codigoCorreo=2, nombreTarea=nombreTarea, adjuntos=[])
+
         WriteLog(
             mensaje="Main GestionSolped finalizado correctamente.",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
         )
 
     except Exception as e:
-        error_stack = traceback.format_exc()
         WriteLog(
-            mensaje=f"Error Global en Main: {e} | {error_stack}",
+            mensaje=f"Error Global en Main: {e}",
             estado="ERROR",
-            task_name=task_name,
-            path_log=RUTAS["PathLogError"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
         )
         raise
 

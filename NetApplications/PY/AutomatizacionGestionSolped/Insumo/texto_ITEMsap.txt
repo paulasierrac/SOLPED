@@ -1,782 +1,2813 @@
 
-=====Solped: 1300139390 Item: 10 Registro: 2025-12-23 10:12:10 =====
-GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
-NIT: 900526437-8
-Correo: facturacionexpressclean@gmail.com
-POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
-FECHA DE EVENTO: 31 de enero de 2024
-EMPRESA: COLSUBSIDIO EL CUBO
-MATERIAL: Mantel Grande
-VALOR UNITARIO: $ 6.994
-CANTIDAD: 231
-SUBTOTAL: $ 1.615.614
-IVA: $ 306.967
-TOTAL: $ 1.922.581
-CECO: 302201003
-COORDINADOR: LUIS EDUARDO VALENZUELA
-ELABORA: MARCELA PIZA GUERRERO
+
+=====Solped: 1300139390 Item: 10 Registro: 2026-02-05 12:19:26 =====
+GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
+
+NIT: 900526437-8
+
+Correo: facturacionexpressclean@gmail.com
+
+POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
+
+FECHA DE EVENTO: 31 de enero de 2024
+
+EMPRESA: COLSUBSIDIO EL CUBO
+
+MATERIAL: Mantel Grande
+
+VALOR UNITARIO: $ 6.994
+
+CANTIDAD: 231
+
+SUBTOTAL: $ 1.615.614
+
+IVA: $ 306.967
+
+TOTAL: $ 1.922.581
+
+CECO: 302201003
+
+COORDINADOR: LUIS EDUARDO VALENZUELA
+
+ELABORA: MARCELA PIZA GUERRERO
+
 CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139390 Item: 20 Registro: 2025-12-23 10:12:14 =====
-GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
-NIT: 900526437-8
-Correo: facturacionexpressclean@gmail.com
-POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
-FECHA DE EVENTO: 31 de enero de 2024
-EMPRESA: COLSUBSIDIO EL CUBO
-MATERIAL: Muletón
-VALOR UNITARIO: $ 3.278
-CANTIDAD: 20
-SUBTOTAL: $ 65.560
-IVA: $ 12.456
-TOTAL: $ 78.016
-CECO: 302201003
-COORDINADOR: LUIS EDUARDO VALENZUELA
-ELABORA: MARCELA PIZA GUERRERO
+=====Solped: 1300139390 Item: 20 Registro: 2026-02-05 12:19:30 =====
+GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
+
+NIT: 900526437-8
+
+Correo: facturacionexpressclean@gmail.com
+
+POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
+
+FECHA DE EVENTO: 31 de enero de 2024
+
+EMPRESA: COLSUBSIDIO EL CUBO
+
+MATERIAL: Muletón
+
+VALOR UNITARIO: $ 3.278
+
+CANTIDAD: 20
+
+SUBTOTAL: $ 65.560
+
+IVA: $ 12.456
+
+TOTAL: $ 78.016
+
+CECO: 302201003
+
+COORDINADOR: LUIS EDUARDO VALENZUELA
+
+ELABORA: MARCELA PIZA GUERRERO
+
 CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139390 Item: 30 Registro: 2025-12-23 10:12:17 =====
-GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
-NIT: 900526437-8
-Correo: facturacionexpressclean@gmail.com
-POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
-FECHA DE EVENTO: 31 de enero de 2024
-EMPRESA: COLSUBSIDIO EL CUBO
-MATERIAL: Tapa Grande
-VALOR UNITARIO: $ 5.245
-CANTIDAD: 71
-SUBTOTAL: $ 372.395
-IVA: $ 70.755
-TOTAL: $ 443.150
-CECO: 302201003
-COORDINADOR: LUIS EDUARDO VALENZUELA
-ELABORA: MARCELA PIZA GUERRERO
+=====Solped: 1300139390 Item: 30 Registro: 2026-02-05 12:19:33 =====
+GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
+
+NIT: 900526437-8
+
+Correo: facturacionexpressclean@gmail.com
+
+POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
+
+FECHA DE EVENTO: 31 de enero de 2024
+
+EMPRESA: COLSUBSIDIO EL CUBO
+
+MATERIAL: Tapa Grande
+
+VALOR UNITARIO: $ 5.245
+
+CANTIDAD: 71
+
+SUBTOTAL: $ 372.395
+
+IVA: $ 70.755
+
+TOTAL: $ 443.150
+
+CECO: 302201003
+
+COORDINADOR: LUIS EDUARDO VALENZUELA
+
+ELABORA: MARCELA PIZA GUERRERO
+
 CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139390 Item: 40 Registro: 2025-12-23 10:12:21 =====
-GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
-NIT: 900526437-8
-Correo: facturacionexpressclean@gmail.com
-POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
-FECHA DE EVENTO: 31 de enero de 2024
-EMPRESA: COLSUBSIDIO EL CUBO
-MATERIAL: Tapa Licra
-VALOR UNITARIO: $ 5.245
-CANTIDAD: 59
-SUBTOTAL: $ 309.455
-IVA: $ 58.796
-TOTAL: $ 368.251
-CECO: 302201003
-COORDINADOR: LUIS EDUARDO VALENZUELA
-ELABORA: MARCELA PIZA GUERRERO
+=====Solped: 1300139390 Item: 40 Registro: 2026-02-05 12:19:36 =====
+GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
+
+NIT: 900526437-8
+
+Correo: facturacionexpressclean@gmail.com
+
+POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
+
+FECHA DE EVENTO: 31 de enero de 2024
+
+EMPRESA: COLSUBSIDIO EL CUBO
+
+MATERIAL: Tapa Licra
+
+VALOR UNITARIO: $ 5.245
+
+CANTIDAD: 59
+
+SUBTOTAL: $ 309.455
+
+IVA: $ 58.796
+
+TOTAL: $ 368.251
+
+CECO: 302201003
+
+COORDINADOR: LUIS EDUARDO VALENZUELA
+
+ELABORA: MARCELA PIZA GUERRERO
+
 CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139390 Item: 50 Registro: 2025-12-23 10:12:24 =====
-GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
-NIT: 900526437-8
-Correo: facturacionexpressclean@gmail.com
-POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
-FECHA DE EVENTO: 31 de enero de 2024
-EMPRESA: COLSUBSIDIO EL CUBO
-MATERIAL: Chaqueta de capitan
-VALOR UNITARIO: $ 9.500
-CANTIDAD: 1
-SUBTOTAL: $ 9.500
-IVA: $ 1.805
-TOTAL: $ 11.305
-CECO: 302201003
-COORDINADOR: LUIS EDUARDO VALENZUELA
-ELABORA: MARCELA PIZA GUERRERO
+=====Solped: 1300139390 Item: 50 Registro: 2026-02-05 12:19:39 =====
+GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
+
+NIT: 900526437-8
+
+Correo: facturacionexpressclean@gmail.com
+
+POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
+
+FECHA DE EVENTO: 31 de enero de 2024
+
+EMPRESA: COLSUBSIDIO EL CUBO
+
+MATERIAL: Chaqueta de capitan
+
+VALOR UNITARIO: $ 9.500
+
+CANTIDAD: 1
+
+SUBTOTAL: $ 9.500
+
+IVA: $ 1.805
+
+TOTAL: $ 11.305
+
+CECO: 302201003
+
+COORDINADOR: LUIS EDUARDO VALENZUELA
+
+ELABORA: MARCELA PIZA GUERRERO
+
 CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139390 Item: 60 Registro: 2025-12-23 10:12:27 =====
-GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
-NIT: 900526437-8
-Correo: facturacionexpressclean@gmail.com
-POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
-FECHA DE EVENTO: 31 de enero de 2024
-EMPRESA: COLSUBSIDIO EL CUBO
-MATERIAL: Servilletas
-VALOR UNITARIO: $ 544
-CANTIDAD: 229
-SUBTOTAL: $ 124.576
-IVA: $ 23.669
-TOTAL: $ 148.245
-CECO: 302201003
-COORDINADOR: LUIS EDUARDO VALENZUELA
-ELABORA: MARCELA PIZA GUERRERO
+=====Solped: 1300139390 Item: 60 Registro: 2026-02-05 12:19:42 =====
+GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
+
+NIT: 900526437-8
+
+Correo: facturacionexpressclean@gmail.com
+
+POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
+
+FECHA DE EVENTO: 31 de enero de 2024
+
+EMPRESA: COLSUBSIDIO EL CUBO
+
+MATERIAL: Servilletas
+
+VALOR UNITARIO: $ 544
+
+CANTIDAD: 229
+
+SUBTOTAL: $ 124.576
+
+IVA: $ 23.669
+
+TOTAL: $ 148.245
+
+CECO: 302201003
+
+COORDINADOR: LUIS EDUARDO VALENZUELA
+
+ELABORA: MARCELA PIZA GUERRERO
+
 CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139390 Item: 70 Registro: 2025-12-23 10:12:31 =====
-GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
-NIT: 900526437-8
-Correo: facturacionexpressclean@gmail.com
-POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
-FECHA DE EVENTO: 31 de enero de 2024
-EMPRESA: COLSUBSIDIO EL CUBO
-MATERIAL: Petos de cocina
-VALOR UNITARIO: $ 2.800
-CANTIDAD: 78
-SUBTOTAL: $ 218.400
-IVA: $ 41.496
-TOTAL: $ 259.896
-CECO: 302201003
-COORDINADOR: LUIS EDUARDO VALENZUELA
-ELABORA: MARCELA PIZA GUERRERO
+=====Solped: 1300139390 Item: 70 Registro: 2026-02-05 12:19:45 =====
+GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
+
+NIT: 900526437-8
+
+Correo: facturacionexpressclean@gmail.com
+
+POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
+
+FECHA DE EVENTO: 31 de enero de 2024
+
+EMPRESA: COLSUBSIDIO EL CUBO
+
+MATERIAL: Petos de cocina
+
+VALOR UNITARIO: $ 2.800
+
+CANTIDAD: 78
+
+SUBTOTAL: $ 218.400
+
+IVA: $ 41.496
+
+TOTAL: $ 259.896
+
+CECO: 302201003
+
+COORDINADOR: LUIS EDUARDO VALENZUELA
+
+ELABORA: MARCELA PIZA GUERRERO
+
 CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 10 Registro: 2025-12-23 10:12:54 =====
-GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
-
-NIT: 900917369
-
-
-CORREO:  camilo.torres@acua.com.co
-
-POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
-
-MES DE JUNIO
-
-
-HTH. PULSAR BRIQUETTES
-
-CANTIDAD   317,520 KILOS
-
-
-VALOR UNIDAD: 25.000
-
-VALOR SIN IVA  7.938.000
-
-IVA:  1.508.220
-
-VALOR TOTAL  9.446.220
-
-COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
-
-ELABORO
-CONTACTO: JOSE A PUENTES LEAL
-Tel  Movil : 3138803106
-CORREO:RecibidorHotel.penaliza@colsubsidio.com
-DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+=====Solped: 1300139391 Item: 10 Registro: 2026-02-05 12:20:04 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE JUNIO
+
+
+
+
+
+HTH. PULSAR BRIQUETTES
+
+
+
+CANTIDAD   317,520 KILOS
+
+
+
+
+
+VALOR UNIDAD: 25.000
+
+
+
+VALOR SIN IVA  7.938.000
+
+
+
+IVA:  1.508.220
+
+
+
+VALOR TOTAL  9.446.220
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
 HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 20 Registro: 2025-12-23 10:12:58 =====
-GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
-
-NIT: 900917369
-
-
-CORREO:  camilo.torres@acua.com.co
-
-POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
-
-MES DE  JUNIO
-
-
-WATERCHLOR BOLSA x 1 KILO
-
-CANTIDAD  20 KILOS
-
-
-VALOR UNIDAD: 18.000
-
-VALOR SIN IVA  360.000
-
-IVA:  68.400
-
-VALOR TOTAL 428.400
-
-COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
-
-ELABORO
-CONTACTO: JOSE A PUENTES LEAL
-Tel  Movil : 3138803106
-CORREO:RecibidorHotel.penaliza@colsubsidio.com
-DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+=====Solped: 1300139391 Item: 20 Registro: 2026-02-05 12:20:08 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE  JUNIO
+
+
+
+
+
+WATERCHLOR BOLSA x 1 KILO
+
+
+
+CANTIDAD  20 KILOS
+
+
+
+
+
+VALOR UNIDAD: 18.000
+
+
+
+VALOR SIN IVA  360.000
+
+
+
+IVA:  68.400
+
+
+
+VALOR TOTAL 428.400
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
 HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 30 Registro: 2025-12-23 10:13:01 =====
-GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
-
-NIT: 900917369
-
-
-CORREO:  camilo.torres@acua.com.co
-
-POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
-
-MES DE   JUNIO
-
-
-BICARBONATO DE SODIO C. ALCALINIDAD
-
-CANTIDAD  50 KILOS
-
-
-VALOR UNIDAD: 5.500
-
-VALOR SIN IVA  275.000
-
-IVA:  52,250
-
-VALOR TOTAL  327.250
-
-COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
-
-ELABORO
-CONTACTO: JOSE A PUENTES LEAL
-Tel  Movil : 3138803106
-CORREO:RecibidorHotel.penaliza@colsubsidio.com
-DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
-HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
-
+=====Solped: 1300139391 Item: 30 Registro: 2026-02-05 12:20:11 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE   JUNIO
+
+
+
+
+
+BICARBONATO DE SODIO C. ALCALINIDAD
+
+
+
+CANTIDAD  50 KILOS
+
+
+
+
+
+VALOR UNIDAD: 5.500
+
+
+
+VALOR SIN IVA  275.000
+
+
+
+IVA:  52,250
+
+
+
+VALOR TOTAL  327.250
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
+HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
+
+
+
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 40 Registro: 2025-12-23 10:13:05 =====
-GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
-
-NIT: 900917369
-
-
-CORREO:  camilo.torres@acua.com.co
-
-POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
-
-MES DE  JUNIO
-
-
-CLORO GRANULADO
-
-CANTIDAD  20 KILOS
-
-
-VALOR UNIDAD:  18.000
-
-VALOR SIN IVA  360.000
-
-IVA:  No tiene
-
-VALOR TOTAL 360.000
-
-COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
-
-ELABORO
-CONTACTO: JOSE A PUENTES LEAL
-Tel  Movil : 3138803106
-CORREO:RecibidorHotel.penaliza@colsubsidio.com
-DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+=====Solped: 1300139391 Item: 40 Registro: 2026-02-05 12:20:14 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE  JUNIO
+
+
+
+
+
+CLORO GRANULADO
+
+
+
+CANTIDAD  20 KILOS
+
+
+
+
+
+VALOR UNIDAD:  18.000
+
+
+
+VALOR SIN IVA  360.000
+
+
+
+IVA:  No tiene
+
+
+
+VALOR TOTAL 360.000
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
 HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 50 Registro: 2025-12-23 10:13:08 =====
-GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
-
-NIT: 900917369
-
-
-CORREO:  camilo.torres@acua.com.co
-
-POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
-
-MES DE   JUNIO
-CRISTALIN ALGICIDA
-
-
-CANTIDAD  20 KILOS
-
-
-VALOR UNIDAD:  48.000
-
-VALOR SIN IVA  960.000
-
-IVA:   NO TIENE
-
-VALOR TOTAL 960.000
-
-COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
-
-ELABORO
-CONTACTO: JOSE A PUENTES LEAL
-Tel  Movil : 3138803106
-CORREO:RecibidorHotel.penaliza@colsubsidio.com
-DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
-HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
+=====Solped: 1300139391 Item: 50 Registro: 2026-02-05 12:20:17 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE   JUNIO
+
+CRISTALIN ALGICIDA
+
+
+
+
+
+CANTIDAD  20 KILOS
+
+
+
+
+
+VALOR UNIDAD:  48.000
+
+
+
+VALOR SIN IVA  960.000
+
+
+
+IVA:   NO TIENE
+
+
+
+VALOR TOTAL 960.000
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
+HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
+
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 60 Registro: 2025-12-23 10:13:11 =====
-GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
-
-NIT: 900917369
-
-
-CORREO:  camilo.torres@acua.com.co
-
-POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
-
-MES DE   JUNIO
-
-CLORO SHOCK
-
-CANTIDAD  20 KILOS
-
-
-VALOR UNIDAD: 20.000
-
-VALOR SIN IVA  400.000
-
-IVA:   NO TIENE
-
-VALOR TOTAL   400.000
-
-COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
-
-ELABORO
-CONTACTO: JOSE A PUENTES LEAL
-Tel  Movil : 3138803106
-CORREO:RecibidorHotel.penaliza@colsubsidio.com
-DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
-HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
+=====Solped: 1300139391 Item: 60 Registro: 2026-02-05 12:20:20 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE   JUNIO
+
+
+
+CLORO SHOCK
+
+
+
+CANTIDAD  20 KILOS
+
+
+
+
+
+VALOR UNIDAD: 20.000
+
+
+
+VALOR SIN IVA  400.000
+
+
+
+IVA:   NO TIENE
+
+
+
+VALOR TOTAL   400.000
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
+HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
+
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 70 Registro: 2025-12-23 10:13:14 =====
-GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
-
-NIT: 900917369
-
-
-CORREO:  camilo.torres@acua.com.co
-
-POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
-
-MES DE   JUNIO
-
-
-REACTIVO TAYLOR N. 10
-
-CANTIDAD  2
-
-VALOR UNIDAD: 24.260
-
-VALOR SIN IVA  48.520
-
-IVA: 9218
-
-VALOR TOTAL 57.738
-
-COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
-
-ELABORO
-CONTACTO: JOSE A PUENTES LEAL
-Tel  Movil : 3138803106
-CORREO:RecibidorHotel.penaliza@colsubsidio.com
-DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
-HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
-
+=====Solped: 1300139391 Item: 70 Registro: 2026-02-05 12:20:23 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE   JUNIO
+
+
+
+
+
+REACTIVO TAYLOR N. 10
+
+
+
+CANTIDAD  2
+
+
+
+VALOR UNIDAD: 24.260
+
+
+
+VALOR SIN IVA  48.520
+
+
+
+IVA: 9218
+
+
+
+VALOR TOTAL 57.738
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
+HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
+
+
+
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 80 Registro: 2025-12-23 10:13:18 =====
-GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
-
-NIT: 900917369
-
-
-CORREO:  camilo.torres@acua.com.co
-
-POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
-
-MES DE  JUNIO
-
-
-REACTIVO TAYLOR N. 12
-
-CANTIDAD  2
-
-VALOR UNIDAD: 24.700
-
-VALOR SIN IVA  49.400
-
-IVA: 9.386
-
-VALOR TOTAL 58.786
-
-COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
-
-ELABORO
-CONTACTO: JOSE A PUENTES LEAL
-Tel  Movil : 3138803106
-CORREO:RecibidorHotel.penaliza@colsubsidio.com
-DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
-HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
-
+=====Solped: 1300139391 Item: 80 Registro: 2026-02-05 12:20:26 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE  JUNIO
+
+
+
+
+
+REACTIVO TAYLOR N. 12
+
+
+
+CANTIDAD  2
+
+
+
+VALOR UNIDAD: 24.700
+
+
+
+VALOR SIN IVA  49.400
+
+
+
+IVA: 9.386
+
+
+
+VALOR TOTAL 58.786
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
+HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
+
+
+
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item: 90 Registro: 2025-12-23 10:13:21 =====
-GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
-
-NIT: 900917369
-
-
-CORREO:  camilo.torres@acua.com.co
-
-POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
-
-MES DE   JUNIO
-
-REACTIVO TAYLOR ROJO FENOL # 4 (INNV WA)
-
-
-CANTIDAD  2
-
-VALOR UNIDAD: 39,100
-
-VALOR SIN IVA  78.200
-
-IVA: 14.858
-
-VALOR TOTAL 93.058
-
-COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
-
-ELABORO
-CONTACTO: JOSE A PUENTES LEAL
-Tel  Movil : 3138803106
-CORREO:RecibidorHotel.penaliza@colsubsidio.com
-DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
-HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
-
+=====Solped: 1300139391 Item: 90 Registro: 2026-02-05 12:20:29 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE   JUNIO
+
+
+
+REACTIVO TAYLOR ROJO FENOL # 4 (INNV WA)
+
+
+
+
+
+CANTIDAD  2
+
+
+
+VALOR UNIDAD: 39,100
+
+
+
+VALOR SIN IVA  78.200
+
+
+
+IVA: 14.858
+
+
+
+VALOR TOTAL 93.058
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
+HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
+
+
+
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139391 Item:  Registro: 2025-12-23 10:13:25 =====
-GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
-
-NIT: 900917369
-
-
-CORREO:  camilo.torres@acua.com.co
-
-POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
-
-MES DE   JUNIO
-
-REACTIVO TAYLOR ROJO FENOL # 4 (INNV WA)
-
-
-CANTIDAD  2
-
-VALOR UNIDAD: 39,100
-
-VALOR SIN IVA  78.200
-
-IVA: 14.858
-
-VALOR TOTAL 93.058
-
-COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
-
-ELABORO
-CONTACTO: JOSE A PUENTES LEAL
-Tel  Movil : 3138803106
-CORREO:RecibidorHotel.penaliza@colsubsidio.com
-DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
-HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
-
+=====Solped: 1300139392 Item: 10 Registro: 2026-02-05 12:20:48 =====
+GENERAR ORDEN DE COMPRA A:
+
+PROVEEDOR  SONAR  Nit. 900988827
+
+CORREO ELECTRONICO  "andresnavarro@sonarunisono.com
+
+andreinajimenez@sonarunisono.com
+
+andrea.hernandez@sonarunisono.com"
+
+PARA LA EMPRESA   DAVIVIENDA S.A.
+
+EL DIA  17 de enero del 2024
+
+HORA MONTAJE (CUNDO APLIQUE)  DE  HASTA  Presentarse 30 Minutos en actividades virtuales y 1 Hora antes del evento en presencialidad
+
+HORA EVENTO  DE 8:00 a. m. HASTA 5:00 p. m.
+
+DIRECCIÓN ENTREGA   AV. EL DORADO No. 68 B - 85 AL LADO EN EL DOMO
+
+TIPO DE SERVICIO  Actor y Plataforma 360
+
+PAX (ASISTENTES)  100
+
+VALOR TOTAL  PROVEEDOR ANTES DE IMPUESTOS   $ 2.750.000
+
+VALOR TOTAL  PROVEEDOR CON IMPUESTOS   $ 3.272.500
+
+CANTIDAD ITEM/concepto   V.Unitario    V.Total sin Impuestos   V.Total con Impuestos   Impuesto aplicado (%) 19,8,0
+
+1 Servicio actoral:Actor Andres Santana, con vestuario de pilotoActriz a escoger, con vestuario de azafata, ver imágenes de referencia  $ 1.100.000  $ 1.100.000  $ 1.309.000  19%
+
+1 Plataforma de video cámara 360 grados con dos operarios. El envío de videos se hace a través de WhatsApp.  $ 1.200.000  $ 1.200.000  $ 1.428.000  19%
+
+1 Coordinador(a) del evento  $ 200.000  $ 200.000  $ 238.000  19%
+
+1 Transporte de equipos y/o elementos  $ 250.000  $ 250.000  $ 297.500  19%
+
+"CECO: 302110029
+
+COORDINADOR DE EVENTOS: MARCELA DELGADO
+
+ELABORO: CRISTIAN CORTES"
+
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139392 Item: 10 Registro: 2025-12-23 10:13:48 =====
-GENERAR ORDEN DE COMPRA A:
-PROVEEDOR  SONAR  Nit. 900988827
-CORREO ELECTRONICO  "andresnavarro@sonarunisono.com
-andreinajimenez@sonarunisono.com
-andrea.hernandez@sonarunisono.com"
-PARA LA EMPRESA   DAVIVIENDA S.A.
-EL DIA  17 de enero del 2024
-HORA MONTAJE (CUNDO APLIQUE)  DE  HASTA  Presentarse 30 Minutos en actividades virtuales y 1 Hora antes del evento en presencialidad
-HORA EVENTO  DE 8:00 a. m. HASTA 5:00 p. m.
-DIRECCIÓN ENTREGA   AV. EL DORADO No. 68 B - 85 AL LADO EN EL DOMO
-TIPO DE SERVICIO  Actor y Plataforma 360
-PAX (ASISTENTES)  100
-VALOR TOTAL  PROVEEDOR ANTES DE IMPUESTOS   $ 2.750.000
-VALOR TOTAL  PROVEEDOR CON IMPUESTOS   $ 3.272.500
-CANTIDAD ITEM/concepto   V.Unitario    V.Total sin Impuestos   V.Total con Impuestos   Impuesto aplicado (%) 19,8,0
-1 Servicio actoral:Actor Andres Santana, con vestuario de pilotoActriz a escoger, con vestuario de azafata, ver imágenes de referencia  $ 1.100.000  $ 1.100.000  $ 1.309.000  19%
-1 Plataforma de video cámara 360 grados con dos operarios. El envío de videos se hace a través de WhatsApp.  $ 1.200.000  $ 1.200.000  $ 1.428.000  19%
-1 Coordinador(a) del evento  $ 200.000  $ 200.000  $ 238.000  19%
-1 Transporte de equipos y/o elementos  $ 250.000  $ 250.000  $ 297.500  19%
-"CECO: 302110029
-COORDINADOR DE EVENTOS: MARCELA DELGADO
-ELABORO: CRISTIAN CORTES"
-
---------------------------------------------------------------------------------
-
-=====Solped: 1300139392 Item: 20 Registro: 2025-12-23 10:13:51 =====
+=====Solped: 1300139392 Item: 20 Registro: 2026-02-05 12:20:51 =====
 REMITIR A POSICION 10
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139392 Item: 30 Registro: 2025-12-23 10:13:54 =====
+=====Solped: 1300139392 Item: 30 Registro: 2026-02-05 12:20:54 =====
 REMITIR A POSICION 10
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139392 Item: 40 Registro: 2025-12-23 10:13:57 =====
+=====Solped: 1300139392 Item: 40 Registro: 2026-02-05 12:20:57 =====
 REMITIR A POSICION 10
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139393 Item: 10 Registro: 2025-12-23 10:14:18 =====
-GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
-NIT: 900592400-7.
-CORREO: onproduccionessas@live.com
-POR CONCEPTO DE: MODULOS PABELLON IMPORTADO 12X3 CON LATERALES
-EMPRESA: PAREX
-FECHA DE EVENTO: 7 DE DICIEMBRE 2025
-CANTIDAD UNITARIA:9
-VALOR UNIDAD: $ 406.389
-VALOR SUBTOTAL (sin impuestos) $ 3.657.501
-IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
-CECO:  302090202
-COORDINADOR: YEIMY TORRES
+=====Solped: 1300139393 Item: 10 Registro: 2026-02-05 12:21:16 =====
+GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
+
+NIT: 900592400-7.
+
+CORREO: onproduccionessas@live.com
+
+POR CONCEPTO DE: MODULOS PABELLON IMPORTADO 12X3 CON LATERALES
+
+EMPRESA: PAREX
+
+FECHA DE EVENTO: 7 DE DICIEMBRE 2025
+
+CANTIDAD UNITARIA:9
+
+VALOR UNIDAD: $ 406.389
+
+VALOR SUBTOTAL (sin impuestos) $ 3.657.501
+
+IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
+
+CECO:  302090202
+
+COORDINADOR: YEIMY TORRES
+
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139393 Item: 20 Registro: 2025-12-23 10:14:22 =====
-GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
-NIT: 900592400-7.
-CORREO: onproduccionessas@live.com
-POR CONCEPTO DE: CARPAS PAGHODAS 6X6 CON LATERALES
-EMPRESA: PAREX
-FECHA DE EVENTO: 7 DE DICIEMBRE 2025
-CANTIDAD: 11
-VALOR UNITARIO: $ 357.632
-VALOR SUBTOTAL (sin impuestos):$ 3.933.952
-IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
-CECO:  302090202
-COORDINADOR: YEIMY TORRES
+=====Solped: 1300139393 Item: 20 Registro: 2026-02-05 12:21:19 =====
+GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
+
+NIT: 900592400-7.
+
+CORREO: onproduccionessas@live.com
+
+POR CONCEPTO DE: CARPAS PAGHODAS 6X6 CON LATERALES
+
+EMPRESA: PAREX
+
+FECHA DE EVENTO: 7 DE DICIEMBRE 2025
+
+CANTIDAD: 11
+
+VALOR UNITARIO: $ 357.632
+
+VALOR SUBTOTAL (sin impuestos):$ 3.933.952
+
+IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
+
+CECO:  302090202
+
+COORDINADOR: YEIMY TORRES
+
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139393 Item: 30 Registro: 2025-12-23 10:14:25 =====
-GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
-NIT: 900592400-7.
-CORREO: onproduccionessas@live.com
-POR CONCEPTO DE: SONIDO COMBO #3
-EMPRESA: PAREX
-FECHA DE EVENTO: 7 DE DICIEMBRE 2025
-CANTIDAD UNITARIA: 1
-VALOR UNIDAD: $ 1.269.572
-VALOR SUBTOTAL : $ 1.269.572
-IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
-CECO:  302090202
-COORDINADOR: YEIMY TORRES
+=====Solped: 1300139393 Item: 30 Registro: 2026-02-05 12:21:22 =====
+GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
+
+NIT: 900592400-7.
+
+CORREO: onproduccionessas@live.com
+
+POR CONCEPTO DE: SONIDO COMBO #3
+
+EMPRESA: PAREX
+
+FECHA DE EVENTO: 7 DE DICIEMBRE 2025
+
+CANTIDAD UNITARIA: 1
+
+VALOR UNIDAD: $ 1.269.572
+
+VALOR SUBTOTAL : $ 1.269.572
+
+IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
+
+CECO:  302090202
+
+COORDINADOR: YEIMY TORRES
+
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139393 Item: 40 Registro: 2025-12-23 10:14:28 =====
-GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
-NIT: 900592400-7.
-CORREO: onproduccionessas@live.com
-POR CONCEPTO DE: TRANSPORTE
-EMPRESA: PAREX
-FECHA DE EVENTO: 7 DE DICIEMBRE 2025
-CANTIDAD 2
-VALOR UNIT:  $400.000
-VALOR SUBTOTAL : $ 800.000
-IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
-CECO:  302090202
-COORDINADOR: YEIMY TORRES
+=====Solped: 1300139393 Item: 40 Registro: 2026-02-05 12:21:26 =====
+GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
+
+NIT: 900592400-7.
+
+CORREO: onproduccionessas@live.com
+
+POR CONCEPTO DE: TRANSPORTE
+
+EMPRESA: PAREX
+
+FECHA DE EVENTO: 7 DE DICIEMBRE 2025
+
+CANTIDAD 2
+
+VALOR UNIT:  $400.000
+
+VALOR SUBTOTAL : $ 800.000
+
+IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
+
+CECO:  302090202
+
+COORDINADOR: YEIMY TORRES
+
 ELABORA: JOSE ROJAS
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139393 Item: 50 Registro: 2025-12-23 10:14:31 =====
-GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
-NIT: 900592400-7.
-CORREO: onproduccionessas@live.com
-POR CONCEPTO DE: COORDINADOR DE ALTURA MONTAJE Y DESMONTAJE PABELLON MONTAJE Y DESMONTAJE
-EMPRESA: PAREX
-FECHA DE EVENTO: 7 DE DICIEMBRE 2025
-CANTIDAD 2
-VALOR UNIT:  $280.000
-VALOR SUBTOTAL : $ 560.000
-IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
-CECO:  302090202
-COORDINADOR: YEIMY TORRES
+=====Solped: 1300139393 Item: 50 Registro: 2026-02-05 12:21:29 =====
+GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
+
+NIT: 900592400-7.
+
+CORREO: onproduccionessas@live.com
+
+POR CONCEPTO DE: COORDINADOR DE ALTURA MONTAJE Y DESMONTAJE PABELLON MONTAJE Y DESMONTAJE
+
+EMPRESA: PAREX
+
+FECHA DE EVENTO: 7 DE DICIEMBRE 2025
+
+CANTIDAD 2
+
+VALOR UNIT:  $280.000
+
+VALOR SUBTOTAL : $ 560.000
+
+IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
+
+CECO:  302090202
+
+COORDINADOR: YEIMY TORRES
+
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139393 Item: 60 Registro: 2025-12-23 10:14:35 =====
-GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
-NIT: 900592400-7.
-CORREO: onproduccionessas@live.com
-POR CONCEPTO DE: ANIMADOR
-EMPRESA: PAREX
-FECHA DE EVENTO: 7 DE DICIEMBRE 2025
-CANTIDAD 1
-VALOR UNIT:  $400.000
-VALOR SUBTOTAL : $ 400.000
-IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
-CECO:  302090202
-COORDINADOR: YEIMY TORRES
+=====Solped: 1300139393 Item: 60 Registro: 2026-02-05 12:21:32 =====
+GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
+
+NIT: 900592400-7.
+
+CORREO: onproduccionessas@live.com
+
+POR CONCEPTO DE: ANIMADOR
+
+EMPRESA: PAREX
+
+FECHA DE EVENTO: 7 DE DICIEMBRE 2025
+
+CANTIDAD 1
+
+VALOR UNIT:  $400.000
+
+VALOR SUBTOTAL : $ 400.000
+
+IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
+
+CECO:  302090202
+
+COORDINADOR: YEIMY TORRES
+
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139393 Item: 70 Registro: 2025-12-23 10:14:38 =====
-GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
-NIT: 900592400-7.
-CORREO: onproduccionessas@live.com
-POR CONCEPTO DE: PLANTA ELECTRICA
-EMPRESA: PAREX
-FECHA DE EVENTO: 7 DE DICIEMBRE 2025
-CANTIDAD 1
-VALOR UNIT:  $1.514.950
-VALOR SUBTOTAL : $ 1.514.233
-IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
-CECO:  302090202
-
+=====Solped: 1300139393 Item: 70 Registro: 2026-02-05 12:21:35 =====
+GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
+
+NIT: 900592400-7.
+
+CORREO: onproduccionessas@live.com
+
+POR CONCEPTO DE: PLANTA ELECTRICA
+
+EMPRESA: PAREX
+
+FECHA DE EVENTO: 7 DE DICIEMBRE 2025
+
+CANTIDAD 1
+
+VALOR UNIT:  $1.514.950
+
+VALOR SUBTOTAL : $ 1.514.233
+
+IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
+
+CECO:  302090202
+
+
+
 
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139394 Item: 10 Registro: 2025-12-23 10:14:59 =====
-GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
-NIT:830.143.877-7
-CORREO: tecniserviciosbeltran@hotmail.com
-POR CONCEPTO DE: HARAGANES
-FECHA:19-12-2025
-CANTIDAD:2
-VALOR UNITARIO:170.000
-VALOR TOTAL:340.00
-(IMPUESTO QUE APLICA IVA/IMPO/NA):
-CECO:302090201
-CORDINADOR:VICTOR MANUEL PEÑUELA
-ELABORA VICTOR MANUEL PEÑUELA
-CORREO:victor.penuelacas@colsubsidio.com
-PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
-ENTREGA EN EL CLUB BELLAVISTA
+=====Solped: 1300139394 Item: 10 Registro: 2026-02-05 12:21:54 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+
+NIT:830.143.877-7
+
+CORREO: tecniserviciosbeltran@hotmail.com
+
+POR CONCEPTO DE: HARAGANES
+
+FECHA:19-12-2025
+
+CANTIDAD:2
+
+VALOR UNITARIO:170.000
+
+VALOR TOTAL:340.000
+
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+
+CECO:302090201
+
+CORDINADOR:VICTOR MANUEL PEÑUELA
+
+ELABORA VICTOR MANUEL PEÑUELA
+
+CORREO:victor.penuelacas@colsubsidio.com
+
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+
+ENTREGA EN EL CLUB BELLAVISTA
+
 FACTURADO
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139394 Item: 20 Registro: 2025-12-23 10:15:02 =====
-GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
-NIT:830.143.877-7
-CORREO: tecniserviciosbeltran@hotmail.com
-POR CONCEPTO DE: ESPUMA DE ABSORCION 50X50
-FECHA:19-12-2025
-CANTIDAD:5
-VALOR UNITARIO:160.000
-VALOR TOTAL:800.000
-(IMPUESTO QUE APLICA IVA/IMPO/NA):
-CECO:302090201
-CORDINADOR:VICTOR MANUEL PEÑUELA
-ELABORA VICTOR MANUEL PEÑUELA
-CORREO:victor.penuelacas@colsubsidio.com
-PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
-FACTURADO
+=====Solped: 1300139394 Item: 20 Registro: 2026-02-05 12:21:57 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+
+NIT:830.143.877-7
+
+CORREO: tecniserviciosbeltran@hotmail.com
+
+POR CONCEPTO DE: ESPUMA DE ABSORCION 50X50
+
+FECHA:19-12-2025
+
+CANTIDAD:5
+
+VALOR UNITARIO:160.000
+
+VALOR TOTAL:800.000
+
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+
+CECO:302090201
+
+CORDINADOR:VICTOR MANUEL PEÑUELA
+
+ELABORA VICTOR MANUEL PEÑUELA
+
+CORREO:victor.penuelacas@colsubsidio.com
+
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+
+FACTURADO
+
 ENTREGA EN EL CLUB BELLAVISTA
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139394 Item: 30 Registro: 2025-12-23 10:15:05 =====
-GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
-NIT:830.143.877-7
-CORREO: tecniserviciosbeltran@hotmail.com
-POR CONCEPTO DE: CEPILLO CAMPO TENIS
-FECHA:19-12-2025
-CANTIDAD:2
-VALOR UNITARIO:140.000
-VALOR TOTAL:280.000
-(IMPUESTO QUE APLICA IVA/IMPO/NA):
-CECO:302090201
-CORDINADOR:VICTOR MANUEL PEÑUELA
-ELABORA VICTOR MANUEL PEÑUELA
-CORREO:victor.penuelacas@colsubsidio.com
-PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
-ENTREGA EN EL CLUB BELLAVISTA
+=====Solped: 1300139394 Item: 30 Registro: 2026-02-05 12:22:00 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+
+NIT:830.143.877-7
+
+CORREO: tecniserviciosbeltran@hotmail.com
+
+POR CONCEPTO DE: CEPILLO CAMPO TENIS
+
+FECHA:19-12-2025
+
+CANTIDAD:2
+
+VALOR UNITARIO:140.000
+
+VALOR TOTAL:280.000
+
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+
+CECO:302090201
+
+CORDINADOR:VICTOR MANUEL PEÑUELA
+
+ELABORA VICTOR MANUEL PEÑUELA
+
+CORREO:victor.penuelacas@colsubsidio.com
+
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+
+ENTREGA EN EL CLUB BELLAVISTA
+
 SAA
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139394 Item: 40 Registro: 2025-12-23 10:15:09 =====
-GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
-NIT:830.143.877-7
-CORREO: tecniserviciosbeltran@hotmail.com
-POR CONCEPTO DE: CEPILLO LIMPIA LINEAS
-FECHA:19-12-2025
-CANTIDAD:2
-VALOR UNITARIO:480.000
-VALOR TOTAL:960.000
-(IMPUESTO QUE APLICA IVA/IMPO/NA):
-CECO:302090201
-CORDINADOR:VICTOR MANUEL PEÑUELA
-ELABORA VICTOR MANUEL PEÑUELA
-CORREO:victor.penuelacas@colsubsidio.com
-PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
-ENTREGA EN EL CLUB BELLAVISTA
+=====Solped: 1300139394 Item: 40 Registro: 2026-02-05 12:22:03 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+
+NIT:830.143.877-7
+
+CORREO: tecniserviciosbeltran@hotmail.com
+
+POR CONCEPTO DE: CEPILLO LIMPIA LINEAS
+
+FECHA:19-12-2025
+
+CANTIDAD:2
+
+VALOR UNITARIO:480.000
+
+VALOR TOTAL:960.000
+
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+
+CECO:302090201
+
+CORDINADOR:VICTOR MANUEL PEÑUELA
+
+ELABORA VICTOR MANUEL PEÑUELA
+
+CORREO:victor.penuelacas@colsubsidio.com
+
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+
+ENTREGA EN EL CLUB BELLAVISTA
+
 SAA
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139394 Item: 50 Registro: 2025-12-23 10:15:12 =====
-GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
-NIT:830.143.877-7
-CORREO: tecniserviciosbeltran@hotmail.com
-POR CONCEPTO DE: MANGUERA DE RIEGO DE 20 MTS
-FECHA:19-12-2025
-CANTIDAD:1
-VALOR UNITARIO:840.000
-VALOR TOTAL:840.000
-(IMPUESTO QUE APLICA IVA/IMPO/NA):
-CECO:302090201
-CORDINADOR:VICTOR MANUEL PEÑUELA
-ELABORA VICTOR MANUEL PEÑUELA
-CORREO:victor.penuelacas@colsubsidio.com
-PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
-ENTREGA EN EL CLUB BELLAVISTA
+=====Solped: 1300139394 Item: 50 Registro: 2026-02-05 12:22:06 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+
+NIT:830.143.877-7
+
+CORREO: tecniserviciosbeltran@hotmail.com
+
+POR CONCEPTO DE: MANGUERA DE RIEGO DE 20 MTS
+
+FECHA:19-12-2025
+
+CANTIDAD:1
+
+VALOR UNITARIO:840.000
+
+VALOR TOTAL:840.000
+
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+
+CECO:302090201
+
+CORDINADOR:VICTOR MANUEL PEÑUELA
+
+ELABORA VICTOR MANUEL PEÑUELA
+
+CORREO:victor.penuelacas@colsubsidio.com
+
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+
+ENTREGA EN EL CLUB BELLAVISTA
+
 GASTO PROPIO
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139394 Item: 60 Registro: 2025-12-23 10:15:15 =====
-GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
-NIT:830.143.877-7
-CORREO: tecniserviciosbeltran@hotmail.com
-POR CONCEPTO DE: ACOPLES E INSTALACIONES
-FECHA:19-12-2025
-CANTIDAD:1
-VALOR UNITARIO:200.000
-VALOR TOTAL:200.000
-(IMPUESTO QUE APLICA IVA/IMPO/NA):
-CECO:302090201
-CORDINADOR:VICTOR MANUEL PEÑUELA
-ELABORA VICTOR MANUEL PEÑUELA
-CORREO:victor.penuelacas@colsubsidio.com
-PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
-ENTREGA EN EL CLUB BELLAVISTA
+=====Solped: 1300139394 Item: 60 Registro: 2026-02-05 12:22:09 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+
+NIT:830.143.877-7
+
+CORREO: tecniserviciosbeltran@hotmail.com
+
+POR CONCEPTO DE: ACOPLES E INSTALACIONES
+
+FECHA:19-12-2025
+
+CANTIDAD:1
+
+VALOR UNITARIO:200.000
+
+VALOR TOTAL:200.000
+
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+
+CECO:302090201
+
+CORDINADOR:VICTOR MANUEL PEÑUELA
+
+ELABORA VICTOR MANUEL PEÑUELA
+
+CORREO:victor.penuelacas@colsubsidio.com
+
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+
+ENTREGA EN EL CLUB BELLAVISTA
+
 GASTO PROPIO
 --------------------------------------------------------------------------------
 
-=====Solped: 1300139394 Item: 70 Registro: 2025-12-23 10:15:18 =====
-GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
-NIT:830.143.877-7
-CORREO: tecniserviciosbeltran@hotmail.com
-POR CONCEPTO DE: CANCHEROS
-FECHA:19-12-2025
-CANTIDAD:40
-VALOR UNITARIO:151.027
-VALOR TOTAL:6.041.080
-(IMPUESTO QUE APLICA IVA/IMPO/NA): 1.147.805
-CECO:302090201
-CORDINADOR:VICTOR MANUEL PEÑUELA
-ELABORA VICTOR MANUEL PEÑUELA
-CORREO:victor.penuelacas@colsubsidio.com
-PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
-ENTREGA EN EL CLUB BELLAVISTA
+=====Solped: 1300139394 Item: 70 Registro: 2026-02-05 12:22:12 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+
+NIT:830.143.877-7
+
+CORREO: tecniserviciosbeltran@hotmail.com
+
+POR CONCEPTO DE: CANCHEROS
+
+FECHA:19-12-2025
+
+CANTIDAD:40
+
+VALOR UNITARIO:151.027
+
+VALOR TOTAL:6.041.080
+
+(IMPUESTO QUE APLICA IVA/IMPO/NA): 1.147.805
+
+CECO:302090201
+
+CORDINADOR:VICTOR MANUEL PEÑUELA
+
+ELABORA VICTOR MANUEL PEÑUELA
+
+CORREO:victor.penuelacas@colsubsidio.com
+
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+
+ENTREGA EN EL CLUB BELLAVISTA
+
 GASTO PROPIO
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139390 Item: 10 Registro: 2026-02-05 13:16:49 =====
+GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
+
+NIT: 900526437-8
+
+Correo: facturacionexpressclean@gmail.com
+
+POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
+
+FECHA DE EVENTO: 31 de enero de 2024
+
+EMPRESA: COLSUBSIDIO EL CUBO
+
+MATERIAL: Mantel Grande
+
+VALOR UNITARIO: $ 6.994
+
+CANTIDAD: 231
+
+SUBTOTAL: $ 1.615.614
+
+IVA: $ 306.967
+
+TOTAL: $ 1.922.581
+
+CECO: 302201003
+
+COORDINADOR: LUIS EDUARDO VALENZUELA
+
+ELABORA: MARCELA PIZA GUERRERO
+
+CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139390 Item: 20 Registro: 2026-02-05 13:16:52 =====
+GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
+
+NIT: 900526437-8
+
+Correo: facturacionexpressclean@gmail.com
+
+POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
+
+FECHA DE EVENTO: 31 de enero de 2024
+
+EMPRESA: COLSUBSIDIO EL CUBO
+
+MATERIAL: Muletón
+
+VALOR UNITARIO: $ 3.278
+
+CANTIDAD: 20
+
+SUBTOTAL: $ 65.560
+
+IVA: $ 12.456
+
+TOTAL: $ 78.016
+
+CECO: 302201003
+
+COORDINADOR: LUIS EDUARDO VALENZUELA
+
+ELABORA: MARCELA PIZA GUERRERO
+
+CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139390 Item: 30 Registro: 2026-02-05 13:16:55 =====
+GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
+
+NIT: 900526437-8
+
+Correo: facturacionexpressclean@gmail.com
+
+POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
+
+FECHA DE EVENTO: 31 de enero de 2024
+
+EMPRESA: COLSUBSIDIO EL CUBO
+
+MATERIAL: Tapa Grande
+
+VALOR UNITARIO: $ 5.245
+
+CANTIDAD: 71
+
+SUBTOTAL: $ 372.395
+
+IVA: $ 70.755
+
+TOTAL: $ 443.150
+
+CECO: 302201003
+
+COORDINADOR: LUIS EDUARDO VALENZUELA
+
+ELABORA: MARCELA PIZA GUERRERO
+
+CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139390 Item: 40 Registro: 2026-02-05 13:16:58 =====
+GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
+
+NIT: 900526437-8
+
+Correo: facturacionexpressclean@gmail.com
+
+POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
+
+FECHA DE EVENTO: 31 de enero de 2024
+
+EMPRESA: COLSUBSIDIO EL CUBO
+
+MATERIAL: Tapa Licra
+
+VALOR UNITARIO: $ 5.245
+
+CANTIDAD: 59
+
+SUBTOTAL: $ 309.455
+
+IVA: $ 58.796
+
+TOTAL: $ 368.251
+
+CECO: 302201003
+
+COORDINADOR: LUIS EDUARDO VALENZUELA
+
+ELABORA: MARCELA PIZA GUERRERO
+
+CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139390 Item: 50 Registro: 2026-02-05 13:17:01 =====
+GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
+
+NIT: 900526437-8
+
+Correo: facturacionexpressclean@gmail.com
+
+POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
+
+FECHA DE EVENTO: 31 de enero de 2024
+
+EMPRESA: COLSUBSIDIO EL CUBO
+
+MATERIAL: Chaqueta de capitan
+
+VALOR UNITARIO: $ 9.500
+
+CANTIDAD: 1
+
+SUBTOTAL: $ 9.500
+
+IVA: $ 1.805
+
+TOTAL: $ 11.305
+
+CECO: 302201003
+
+COORDINADOR: LUIS EDUARDO VALENZUELA
+
+ELABORA: MARCELA PIZA GUERRERO
+
+CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139390 Item: 60 Registro: 2026-02-05 13:17:04 =====
+GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
+
+NIT: 900526437-8
+
+Correo: facturacionexpressclean@gmail.com
+
+POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
+
+FECHA DE EVENTO: 31 de enero de 2024
+
+EMPRESA: COLSUBSIDIO EL CUBO
+
+MATERIAL: Servilletas
+
+VALOR UNITARIO: $ 544
+
+CANTIDAD: 229
+
+SUBTOTAL: $ 124.576
+
+IVA: $ 23.669
+
+TOTAL: $ 148.245
+
+CECO: 302201003
+
+COORDINADOR: LUIS EDUARDO VALENZUELA
+
+ELABORA: MARCELA PIZA GUERRERO
+
+CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139390 Item: 70 Registro: 2026-02-05 13:17:07 =====
+GENERAR ORDEN DE COMPRA A EXPRESS AND CLEAN LAVANDERIA S.A.S.
+
+NIT: 900526437-8
+
+Correo: facturacionexpressclean@gmail.com
+
+POR CONCEPTO DE: Servicio de lavandería segunda quincena del mes de enero de 2024.
+
+FECHA DE EVENTO: 31 de enero de 2024
+
+EMPRESA: COLSUBSIDIO EL CUBO
+
+MATERIAL: Petos de cocina
+
+VALOR UNITARIO: $ 2.800
+
+CANTIDAD: 78
+
+SUBTOTAL: $ 218.400
+
+IVA: $ 41.496
+
+TOTAL: $ 259.896
+
+CECO: 302201003
+
+COORDINADOR: LUIS EDUARDO VALENZUELA
+
+ELABORA: MARCELA PIZA GUERRERO
+
+CORREO: auxiliaroficinaeventosyalimentos.elcubo@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139391 Item: 10 Registro: 2026-02-05 13:17:27 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE JUNIO
+
+
+
+
+
+HTH. PULSAR BRIQUETTES
+
+
+
+CANTIDAD   317,520 KILOS
+
+
+
+
+
+VALOR UNIDAD: 25.000
+
+
+
+VALOR SIN IVA  7.938.000
+
+
+
+IVA:  1.508.220
+
+
+
+VALOR TOTAL  9.446.220
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
+HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139391 Item: 20 Registro: 2026-02-05 13:17:30 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE  JUNIO
+
+
+
+
+
+WATERCHLOR BOLSA x 1 KILO
+
+
+
+CANTIDAD  20 KILOS
+
+
+
+
+
+VALOR UNIDAD: 18.000
+
+
+
+VALOR SIN IVA  360.000
+
+
+
+IVA:  68.400
+
+
+
+VALOR TOTAL 428.400
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
+HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139391 Item: 30 Registro: 2026-02-05 13:17:32 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE   JUNIO
+
+
+
+
+
+BICARBONATO DE SODIO C. ALCALINIDAD
+
+
+
+CANTIDAD  50 KILOS
+
+
+
+
+
+VALOR UNIDAD: 5.500
+
+
+
+VALOR SIN IVA  275.000
+
+
+
+IVA:  52,250
+
+
+
+VALOR TOTAL  327.250
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
+HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
+
+
+
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139391 Item: 40 Registro: 2026-02-05 13:17:36 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE  JUNIO
+
+
+
+
+
+CLORO GRANULADO
+
+
+
+CANTIDAD  20 KILOS
+
+
+
+
+
+VALOR UNIDAD:  18.000
+
+
+
+VALOR SIN IVA  360.000
+
+
+
+IVA:  No tiene
+
+
+
+VALOR TOTAL 360.000
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
+HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139391 Item: 50 Registro: 2026-02-05 13:17:39 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE   JUNIO
+
+CRISTALIN ALGICIDA
+
+
+
+
+
+CANTIDAD  20 KILOS
+
+
+
+
+
+VALOR UNIDAD:  48.000
+
+
+
+VALOR SIN IVA  960.000
+
+
+
+IVA:   NO TIENE
+
+
+
+VALOR TOTAL 960.000
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
+HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
+
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139391 Item: 60 Registro: 2026-02-05 13:17:42 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE   JUNIO
+
+
+
+CLORO SHOCK
+
+
+
+CANTIDAD  20 KILOS
+
+
+
+
+
+VALOR UNIDAD: 20.000
+
+
+
+VALOR SIN IVA  400.000
+
+
+
+IVA:   NO TIENE
+
+
+
+VALOR TOTAL   400.000
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
+HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
+
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139391 Item: 70 Registro: 2026-02-05 13:17:45 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE   JUNIO
+
+
+
+
+
+REACTIVO TAYLOR N. 10
+
+
+
+CANTIDAD  2
+
+
+
+VALOR UNIDAD: 24.260
+
+
+
+VALOR SIN IVA  48.520
+
+
+
+IVA: 9218
+
+
+
+VALOR TOTAL 57.738
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
+HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
+
+
+
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139391 Item: 80 Registro: 2026-02-05 13:17:48 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE  JUNIO
+
+
+
+
+
+REACTIVO TAYLOR N. 12
+
+
+
+CANTIDAD  2
+
+
+
+VALOR UNIDAD: 24.700
+
+
+
+VALOR SIN IVA  49.400
+
+
+
+IVA: 9.386
+
+
+
+VALOR TOTAL 58.786
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
+HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
+
+
+
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139391 Item: 90 Registro: 2026-02-05 13:17:51 =====
+GENERAR ORDEN DE COMPRA A:GRUPO ACUA SAS
+
+
+
+NIT: 900917369
+
+
+
+
+
+CORREO:  camilo.torres@acua.com.co
+
+
+
+POR CONCEPTO DE COMPRA DE PRODUCTOS PARA EL AREA DE PISCINA  HOTEL PEÑALISA
+
+
+
+MES DE   JUNIO
+
+
+
+REACTIVO TAYLOR ROJO FENOL # 4 (INNV WA)
+
+
+
+
+
+CANTIDAD  2
+
+
+
+VALOR UNIDAD: 39,100
+
+
+
+VALOR SIN IVA  78.200
+
+
+
+IVA: 14.858
+
+
+
+VALOR TOTAL 93.058
+
+
+
+COORDINADOR ADMINISTRATIVO  WILSON GOMEZ
+
+
+
+ELABORO
+
+CONTACTO: JOSE A PUENTES LEAL
+
+Tel  Movil : 3138803106
+
+CORREO:RecibidorHotel.penaliza@colsubsidio.com
+
+DIRECCION: Carrera  11 # 9-95 |Ricaurte Cundinamarca
+
+HOTEL PEÑALISA COLSUBSIDIO  ( ALMACEN PRINCIPAL)
+
+
+
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139392 Item: 10 Registro: 2026-02-05 13:18:10 =====
+GENERAR ORDEN DE COMPRA A:
+
+PROVEEDOR  SONAR  Nit. 900988827
+
+CORREO ELECTRONICO  "andresnavarro@sonarunisono.com
+
+andreinajimenez@sonarunisono.com
+
+andrea.hernandez@sonarunisono.com"
+
+PARA LA EMPRESA   DAVIVIENDA S.A.
+
+EL DIA  17 de enero del 2024
+
+HORA MONTAJE (CUNDO APLIQUE)  DE  HASTA  Presentarse 30 Minutos en actividades virtuales y 1 Hora antes del evento en presencialidad
+
+HORA EVENTO  DE 8:00 a. m. HASTA 5:00 p. m.
+
+DIRECCIÓN ENTREGA   AV. EL DORADO No. 68 B - 85 AL LADO EN EL DOMO
+
+TIPO DE SERVICIO  Actor y Plataforma 360
+
+PAX (ASISTENTES)  100
+
+VALOR TOTAL  PROVEEDOR ANTES DE IMPUESTOS   $ 2.750.000
+
+VALOR TOTAL  PROVEEDOR CON IMPUESTOS   $ 3.272.500
+
+CANTIDAD ITEM/concepto   V.Unitario    V.Total sin Impuestos   V.Total con Impuestos   Impuesto aplicado (%) 19,8,0
+
+1 Servicio actoral:Actor Andres Santana, con vestuario de pilotoActriz a escoger, con vestuario de azafata, ver imágenes de referencia  $ 1.100.000  $ 1.100.000  $ 1.309.000  19%
+
+1 Plataforma de video cámara 360 grados con dos operarios. El envío de videos se hace a través de WhatsApp.  $ 1.200.000  $ 1.200.000  $ 1.428.000  19%
+
+1 Coordinador(a) del evento  $ 200.000  $ 200.000  $ 238.000  19%
+
+1 Transporte de equipos y/o elementos  $ 250.000  $ 250.000  $ 297.500  19%
+
+"CECO: 302110029
+
+COORDINADOR DE EVENTOS: MARCELA DELGADO
+
+ELABORO: CRISTIAN CORTES"
+
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139392 Item: 20 Registro: 2026-02-05 13:18:13 =====
+REMITIR A POSICION 10
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139392 Item: 30 Registro: 2026-02-05 13:18:16 =====
+REMITIR A POSICION 10
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139392 Item: 40 Registro: 2026-02-05 13:18:19 =====
+REMITIR A POSICION 10
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139393 Item: 10 Registro: 2026-02-05 13:18:38 =====
+GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
+
+NIT: 900592400-7.
+
+CORREO: onproduccionessas@live.com
+
+POR CONCEPTO DE: MODULOS PABELLON IMPORTADO 12X3 CON LATERALES
+
+EMPRESA: PAREX
+
+FECHA DE EVENTO: 7 DE DICIEMBRE 2025
+
+CANTIDAD UNITARIA:9
+
+VALOR UNIDAD: $ 406.389
+
+VALOR SUBTOTAL (sin impuestos) $ 3.657.501
+
+IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
+
+CECO:  302090202
+
+COORDINADOR: YEIMY TORRES
+
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139393 Item: 20 Registro: 2026-02-05 13:18:41 =====
+GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
+
+NIT: 900592400-7.
+
+CORREO: onproduccionessas@live.com
+
+POR CONCEPTO DE: CARPAS PAGHODAS 6X6 CON LATERALES
+
+EMPRESA: PAREX
+
+FECHA DE EVENTO: 7 DE DICIEMBRE 2025
+
+CANTIDAD: 11
+
+VALOR UNITARIO: $ 357.632
+
+VALOR SUBTOTAL (sin impuestos):$ 3.933.952
+
+IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
+
+CECO:  302090202
+
+COORDINADOR: YEIMY TORRES
+
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139393 Item: 30 Registro: 2026-02-05 13:18:44 =====
+GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
+
+NIT: 900592400-7.
+
+CORREO: onproduccionessas@live.com
+
+POR CONCEPTO DE: SONIDO COMBO #3
+
+EMPRESA: PAREX
+
+FECHA DE EVENTO: 7 DE DICIEMBRE 2025
+
+CANTIDAD UNITARIA: 1
+
+VALOR UNIDAD: $ 1.269.572
+
+VALOR SUBTOTAL : $ 1.269.572
+
+IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
+
+CECO:  302090202
+
+COORDINADOR: YEIMY TORRES
+
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139393 Item: 40 Registro: 2026-02-05 13:18:48 =====
+GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
+
+NIT: 900592400-7.
+
+CORREO: onproduccionessas@live.com
+
+POR CONCEPTO DE: TRANSPORTE
+
+EMPRESA: PAREX
+
+FECHA DE EVENTO: 7 DE DICIEMBRE 2025
+
+CANTIDAD 2
+
+VALOR UNIT:  $400.000
+
+VALOR SUBTOTAL : $ 800.000
+
+IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
+
+CECO:  302090202
+
+COORDINADOR: YEIMY TORRES
+
+ELABORA: JOSE ROJAS
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139393 Item: 50 Registro: 2026-02-05 13:18:51 =====
+GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
+
+NIT: 900592400-7.
+
+CORREO: onproduccionessas@live.com
+
+POR CONCEPTO DE: COORDINADOR DE ALTURA MONTAJE Y DESMONTAJE PABELLON MONTAJE Y DESMONTAJE
+
+EMPRESA: PAREX
+
+FECHA DE EVENTO: 7 DE DICIEMBRE 2025
+
+CANTIDAD 2
+
+VALOR UNIT:  $280.000
+
+VALOR SUBTOTAL : $ 560.000
+
+IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
+
+CECO:  302090202
+
+COORDINADOR: YEIMY TORRES
+
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139393 Item: 60 Registro: 2026-02-05 13:18:54 =====
+GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
+
+NIT: 900592400-7.
+
+CORREO: onproduccionessas@live.com
+
+POR CONCEPTO DE: ANIMADOR
+
+EMPRESA: PAREX
+
+FECHA DE EVENTO: 7 DE DICIEMBRE 2025
+
+CANTIDAD 1
+
+VALOR UNIT:  $400.000
+
+VALOR SUBTOTAL : $ 400.000
+
+IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
+
+CECO:  302090202
+
+COORDINADOR: YEIMY TORRES
+
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139393 Item: 70 Registro: 2026-02-05 13:18:57 =====
+GENERAR ORDEN DE COMPRA A: ON PRODUCCIONES
+
+NIT: 900592400-7.
+
+CORREO: onproduccionessas@live.com
+
+POR CONCEPTO DE: PLANTA ELECTRICA
+
+EMPRESA: PAREX
+
+FECHA DE EVENTO: 7 DE DICIEMBRE 2025
+
+CANTIDAD 1
+
+VALOR UNIT:  $1.514.950
+
+VALOR SUBTOTAL : $ 1.514.233
+
+IVA (IMPUESTO QUE APLICA IVA/IMPO/NA): 19%
+
+CECO:  302090202
+
+
+
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139394 Item: 10 Registro: 2026-02-05 13:19:16 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+
+NIT:830.143.877-7
+
+CORREO: tecniserviciosbeltran@hotmail.com
+
+POR CONCEPTO DE: HARAGANES
+
+FECHA:19-12-2025
+
+CANTIDAD:2
+
+VALOR UNITARIO:170.000
+
+VALOR TOTAL:340.000
+
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+
+CECO:302090201
+
+CORDINADOR:VICTOR MANUEL PEÑUELA
+
+ELABORA VICTOR MANUEL PEÑUELA
+
+CORREO:victor.penuelacas@colsubsidio.com
+
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+
+ENTREGA EN EL CLUB BELLAVISTA
+
+FACTURADO
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139394 Item: 20 Registro: 2026-02-05 13:19:19 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+
+NIT:830.143.877-7
+
+CORREO: tecniserviciosbeltran@hotmail.com
+
+POR CONCEPTO DE: ESPUMA DE ABSORCION 50X50
+
+FECHA:19-12-2025
+
+CANTIDAD:5
+
+VALOR UNITARIO:160.000
+
+VALOR TOTAL:800.000
+
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+
+CECO:302090201
+
+CORDINADOR:VICTOR MANUEL PEÑUELA
+
+ELABORA VICTOR MANUEL PEÑUELA
+
+CORREO:victor.penuelacas@colsubsidio.com
+
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+
+FACTURADO
+
+ENTREGA EN EL CLUB BELLAVISTA
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139394 Item: 30 Registro: 2026-02-05 13:19:22 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+
+NIT:830.143.877-7
+
+CORREO: tecniserviciosbeltran@hotmail.com
+
+POR CONCEPTO DE: CEPILLO CAMPO TENIS
+
+FECHA:19-12-2025
+
+CANTIDAD:2
+
+VALOR UNITARIO:140.000
+
+VALOR TOTAL:280.000
+
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+
+CECO:302090201
+
+CORDINADOR:VICTOR MANUEL PEÑUELA
+
+ELABORA VICTOR MANUEL PEÑUELA
+
+CORREO:victor.penuelacas@colsubsidio.com
+
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+
+ENTREGA EN EL CLUB BELLAVISTA
+
+SAA
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139394 Item: 40 Registro: 2026-02-05 13:19:25 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+
+NIT:830.143.877-7
+
+CORREO: tecniserviciosbeltran@hotmail.com
+
+POR CONCEPTO DE: CEPILLO LIMPIA LINEAS
+
+FECHA:19-12-2025
+
+CANTIDAD:2
+
+VALOR UNITARIO:480.000
+
+VALOR TOTAL:960.000
+
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+
+CECO:302090201
+
+CORDINADOR:VICTOR MANUEL PEÑUELA
+
+ELABORA VICTOR MANUEL PEÑUELA
+
+CORREO:victor.penuelacas@colsubsidio.com
+
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+
+ENTREGA EN EL CLUB BELLAVISTA
+
+SAA
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139394 Item: 50 Registro: 2026-02-05 13:19:28 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+
+NIT:830.143.877-7
+
+CORREO: tecniserviciosbeltran@hotmail.com
+
+POR CONCEPTO DE: MANGUERA DE RIEGO DE 20 MTS
+
+FECHA:19-12-2025
+
+CANTIDAD:1
+
+VALOR UNITARIO:840.000
+
+VALOR TOTAL:840.000
+
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+
+CECO:302090201
+
+CORDINADOR:VICTOR MANUEL PEÑUELA
+
+ELABORA VICTOR MANUEL PEÑUELA
+
+CORREO:victor.penuelacas@colsubsidio.com
+
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+
+ENTREGA EN EL CLUB BELLAVISTA
+
+GASTO PROPIO
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139394 Item: 60 Registro: 2026-02-05 13:19:31 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+
+NIT:830.143.877-7
+
+CORREO: tecniserviciosbeltran@hotmail.com
+
+POR CONCEPTO DE: ACOPLES E INSTALACIONES
+
+FECHA:19-12-2025
+
+CANTIDAD:1
+
+VALOR UNITARIO:200.000
+
+VALOR TOTAL:200.000
+
+(IMPUESTO QUE APLICA IVA/IMPO/NA):
+
+CECO:302090201
+
+CORDINADOR:VICTOR MANUEL PEÑUELA
+
+ELABORA VICTOR MANUEL PEÑUELA
+
+CORREO:victor.penuelacas@colsubsidio.com
+
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+
+ENTREGA EN EL CLUB BELLAVISTA
+
+GASTO PROPIO
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139394 Item: 70 Registro: 2026-02-05 13:19:34 =====
+GENERAR ORDEN DE COMPRA A TECNISERVICIOS BELTAN
+
+NIT:830.143.877-7
+
+CORREO: tecniserviciosbeltran@hotmail.com
+
+POR CONCEPTO DE: CANCHEROS
+
+FECHA:19-12-2025
+
+CANTIDAD:40
+
+VALOR UNITARIO:151.027
+
+VALOR TOTAL:6.041.080
+
+(IMPUESTO QUE APLICA IVA/IMPO/NA): 1.147.805
+
+CECO:302090201
+
+CORDINADOR:VICTOR MANUEL PEÑUELA
+
+ELABORA VICTOR MANUEL PEÑUELA
+
+CORREO:victor.penuelacas@colsubsidio.com
+
+PROMOTOR A CARGO: recreacion.deportesbellavista@colsubsidio.com
+
+ENTREGA EN EL CLUB BELLAVISTA
+
+GASTO PROPIO
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139397 Item: 10 Registro: 2026-02-12 15:49:12 =====
+POR FAVOR GENERAR ORDEN DE COMPRA A: WINDOBIS SAS.
+NIT: 901067142
+Email: winbodis.yur@gmail.com
+
+POR CONCEPTO DE: Estuche de plumones doble punta pincel para actividades recreativas Bloc 20 de julio.
+FECHA DE EVENTO: diciembre 26 de 2025
+SERVICIO POR FACTURA
+CANTIDAD UNITARIA:                    1
+CANTIDAD TOTAL:                       1
+VALOR UNIDAD:                $   27.000
+VALOR TOTAL:                 $   27.000
+IVA (19%):                   $    5.130
+VALOR MÁS IVA:               $   32.130
+
+
+CECO: 302040026
+COORDINADOR: LAURA MELISSA CAICEDO ESPINOSA
+PROMOTOR: VANESSA RUIZ
+CORREO COORDINADOR Y/O PROMOTOR: laura.caicedo@colsubidio.com
+ELABORA: JDDM
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139274 Item: 10 Registro: 2026-02-12 15:49:32 =====
+GENERAR ORDEN DE COMPRA A: D BARON LOGISTICA Y EVENTOS S.A.S
+NIT: 900562347
+Correo: info@dbaroneventos.com
+
+POR CONCEPTO DE      :SONIDO PROFESIONAL STAKING
+EMPRESA              : RAMA JUDICIAL
+FECHA DEL EVENTO:      25 DE MAYO DE 2024
+
+*SE  ADJUNTA COTIZACION*
+
+CANTIDAD:                        1
+VALOR UNITARIO:             $ 2.207.427
+VALOR TOTAL:                $ 2.207.427
+VALOR + IVA:                $ 2.626.838
+
+
+CECO:302040023
+COORDINADOR: LAURA ALVAREZ
+PROMOTOR: SMTM
+ELABORO: LAURA ALVAREZ
+CORREO COORDINADOR Y/O PROMOTOR: sandra.torresma@colsubsidio.com - laura.alvarezh@colsubsidio.com
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139173 Item: 10 Registro: 2026-02-12 15:49:52 =====
+Prueba de programa
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139103 Item: 10 Registro: 2026-02-12 15:50:12 =====
+13° seminario Internacional Presencial en seguridad en medios de pago
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139104 Item: 10 Registro: 2026-02-12 15:50:32 =====
+13° seminario Internacional Presencial en seguridad en medios de pago
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139099 Item: 10 Registro: 2026-02-12 15:50:52 =====
+13° seminario Internacional Presencial en seguridad en medios de pago
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139102 Item: 10 Registro: 2026-02-12 15:51:12 =====
+13° seminario Internacional Presencial en seguridad en medios de pago
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139090 Item: 10 Registro: 2026-02-12 15:51:32 =====
+Prueba de programa
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139093 Item: 10 Registro: 2026-02-12 15:51:51 =====
+13° seminario Internacional Presencial en seguridad en medios de pago
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139089 Item: 10 Registro: 2026-02-12 15:52:11 =====
+13° seminario Internacional Presencial en seguridad en medios de pago
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139086 Item: 10 Registro: 2026-02-12 15:52:32 =====
+Prueba de programa
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139073 Item: 20 Registro: 2026-02-12 15:52:52 =====
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139074 Item: 10 Registro: 2026-02-12 15:53:11 =====
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300139076 Item: 10 Registro: 2026-02-12 15:53:32 =====
+
+--------------------------------------------------------------------------------
+
+=====Solped: 1300138923 Item: 10 Registro: 2026-02-12 15:53:52 =====
+Tortilla Bimbo,carne Zenú, Lechuga, tomate, queso, salsas
+frico: tomate, mayonesa ,mostaza y piña
+Tortilla Bimbo,carne Zenú, Lechuga, tomate, queso, salsas
+frico: tomate, mayonesa ,mostaza y piña
+Tortilla Bimbo,carne Zenú, Lechuga, tomate, queso, salsas
+frico: tomate, mayonesa ,mostaza y piña
 --------------------------------------------------------------------------------
