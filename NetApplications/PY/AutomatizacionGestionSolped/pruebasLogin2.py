@@ -40,7 +40,7 @@ def Main_Pruebas3():
             mensaje=f"ERROR GLOBAL: {e} | {errorText}",
             estado="ERROR",
             nombreTarea="Main_GestionSOLPED",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         raise
 

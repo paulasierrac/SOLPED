@@ -180,6 +180,6 @@ def EjecutarHU04(session, archivo):
             mensaje=f"ERROR GLOBAL en HU04: {e}",
             estado="ERROR",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         raise

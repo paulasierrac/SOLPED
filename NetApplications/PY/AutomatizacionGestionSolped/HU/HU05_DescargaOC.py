@@ -116,6 +116,6 @@ def EjecutarHU05(session, ordenesDeCompra: list):
             mensaje=f"ERROR GLOBAL en HU05: {e} | {errorText}",
             estado="ERROR",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         raise

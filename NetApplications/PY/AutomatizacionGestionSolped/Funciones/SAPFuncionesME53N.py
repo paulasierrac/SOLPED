@@ -132,7 +132,7 @@ def ObtenerItemTextME53N(session, numeroSolped, numeroItem):
             mensaje=f"Error en ObtenerItemTextME53N: {e}",
             estado="ERROR",
             nombreTarea="ObtenerItemTextME53N",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         return ""
 
@@ -369,7 +369,7 @@ def ProcesarTablaME5A(name, dias=None):
             mensaje=f"Error en ProcesarTablaME5A: {e}",
             estado="ERROR",
             nombreTarea="ProcesarTablaME5A",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         print(f"ERROR en ProcesarTablaME5A: {e}")
         traceback.print_exc()
@@ -472,7 +472,7 @@ def TablaItemsDataFrame(name) -> pd.DataFrame:
             mensaje=f"Error en TablaItemsDataFrame: {e}",
             estado="ERROR",
             nombreTarea="TablaItemsDataFrame",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         print(f"ERROR: {e}")
         return pd.DataFrame()
@@ -577,7 +577,7 @@ def ObtenerItemsME53N(session, numeroSolped):
             mensaje=f"Error en ObtenerItemsME53N: {e}",
             estado="ERROR",
             nombreTarea="ObtenerItemsME53N",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         print(f"ERROR en ObtenerItemsME53N: {e}")
         return pd.DataFrame()
@@ -649,7 +649,7 @@ def GuardarTablaME5A(df, name):
             mensaje=f"Error al guardar {name}: {e}",
             estado="ERROR",
             nombreTarea="GuardarTablaME5A",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         print(f"ERROR al guardar archivo: {e}")
         return False
@@ -743,7 +743,7 @@ def ParsearTablaAttachments(contenido: str) -> list:
             mensaje=f"Error parseando tabla de archivosAdjuntos: {e}",
             estado="ERROR",
             nombreTarea="ParsearTablaAttachments",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         traceback.print_exc()
 
@@ -972,7 +972,7 @@ def ValidarAttachmentList(session, numeroSolped):
             mensaje=f"Error inesperado en ValidarAttachmentList: {e}\n{error_trace}",
             estado="ERROR",
             nombreTarea="ValidarAttachmentList",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         # Intentar cerrar cualquier ventana abierta
         try:

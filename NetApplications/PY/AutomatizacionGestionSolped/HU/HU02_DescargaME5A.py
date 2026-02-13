@@ -40,6 +40,6 @@ def EjecutarHU02(session):
             mensaje=f"ERROR GLOBAL: {e}",
             estado="ERROR",
             nombreTarea="HU2_DescargaME5A",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         raise

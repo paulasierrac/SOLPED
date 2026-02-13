@@ -21,7 +21,7 @@ def DescargarSolpedME5A(session, estado):
 
     # Ruta destino – ejemplo estándar Colsubsidio
     # rutaGuardar = rf"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
-    rutaGuardar = rf"{RUTAS["PathInsumo"]}\expSolped{estado}.txt"
+    rutaGuardar = rf"{inConfig("PathInsumo")}\expSolped{estado}.txt"
     # ============================
     # Abrir transacción ME5A
     # ============================
@@ -95,7 +95,7 @@ def DescargarSolpedME5A(session, estado):
     # ============================
 
     # rutaGuardar = rf"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
-    rutaGuardar = rf"{RUTAS["PathInsumo"]}\expSolped{estado}.txt"
+    rutaGuardar = rf"{inConfig("PathInsumo")}\expSolped{estado}.txt"
 
     if os.path.exists(rutaGuardar):
         os.remove(rutaGuardar)
@@ -104,10 +104,10 @@ def DescargarSolpedME5A(session, estado):
 
     session.findById("wnd[1]/usr/ctxtDY_PATH").text = (
         # r"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo"
-        rf"{RUTAS["PathInsumo"]}"
+        rf"{inConfig("PathInsumo")}"
     )
 
-    rutaGuardar = rf"{RUTAS["PathInsumo"]}\expSolped{estado}.txt"
+    rutaGuardar = rf"{inConfig("PathInsumo")}\expSolped{estado}.txt"
     session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = rf"expSolped{estado}.txt"
     session.findById("wnd[1]/usr/ctxtDY_FILENAME").caretPosition = 10
     session.findById("wnd[1]/tbar[0]/btn[0]").press

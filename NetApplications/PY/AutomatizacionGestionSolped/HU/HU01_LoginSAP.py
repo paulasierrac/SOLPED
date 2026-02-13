@@ -6,7 +6,7 @@
 # Propiedad de Colsubsidio
 # Cambios: Ajuste ruta base dinámica + estándar Colsubsidio
 # ================================
-
+import traceback
 
 import win32com.client  # pyright: ignore[reportMissingModuleSource]
 import time
@@ -79,46 +79,48 @@ def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
         session.findById("wnd[0]/usr/txtRSYST-LANGU").text = idioma
         session.findById("wnd[0]").sendVKey(0)
 
-        print("INFO | Credenciales enviadas correctamente")
+        WriteLog( mensaje=f"Credenciales enviadas correctamente",estado="INFO", nombreTarea="Abrir SAP Logon", rutaRegistro=inConfig("PathLog"),)
 
         if ventanaAbierta(session, "Copyrigth"):
             pyautogui.press("enter")
-            print("INFO | Ventana Copyrigth cerrada")
+            WriteLog( mensaje=f"Ventana Copyrigth cerrada",estado="INFO", nombreTarea="Abrir SAP Logon", rutaRegistro=inConfig("PathLog"),)
 
-        try:
-            if validarLoginDiag(
-                ruta_imagen=rf".\img\logindiag.png",
-                confidence=0.5,
-                intentos= int (inConfig("ReIntentos")),
-                espera=0.5,
-            ):
-                print("INFO | Ventana loginDiag superada correctamente")
-        except Exception as e:
-            print(f"no se encontro ventana Copyrigth en login {e}")
 
-        if ventanaAbierta(session, "Info de licencia en entrada al sistema múltiple"):
+        # try:
+        #     if validarLoginDiag(
+        #         ruta_imagen=rf".\img\logindiag.png",
+        #         confidence=0.5,
+        #         intentos= int (inConfig("ReIntentos")),
+        #         espera=0.5,
+        #     ):
+        #         print("INFO | Ventana loginDiag superada correctamente")
+        # except Exception as e:
+        #     print(f"no se encontro ventana Copyrigth en login {e}")
+
+        # if ventanaAbierta(session, "Info de licencia en entrada al sistema múltiple"):
             
-            print("entro a la funcion click")
-            time.sleep(20)  
-            pyautogui.click()
-            pyautogui.press("enter")
+        #     print("entro a la funcion click")
+        #     time.sleep(20)  
+        #     pyautogui.click()
+        #     pyautogui.press("enter")
                
-            try:
-                if validarLoginDiag(
-                    ruta_imagen=rf".\img\Infodelicenciaenentradaalsistemamultiple.png",
-                    confidence=0.8,
-                    intentos=20,
-                    espera=0.5
-                ):  
-                    pyautogui.click()
-                    print("encontro la imagen ")
-                    print("Ventana info de licencia inesperada superada correctamente")
-            except Exception as e:
-                print(f"no se encontro ventana Copyrigth en login {e}")
+        #     try:
+        #         if validarLoginDiag(
+        #             ruta_imagen=rf".\img\Infodelicenciaenentradaalsistemamultiple.png",
+        #             confidence=0.8,
+        #             intentos=20,
+        #             espera=0.5
+        #         ):  
+        #             pyautogui.click()
+        #             print("encontro la imagen ")
+        #             print("Ventana info de licencia inesperada superada correctamente")
+        #     except Exception as e:
+        #         print(f"no se encontro ventana Copyrigth en login {e}")
         return session
 
     except Exception as e:
         ControlHU(nombreTarea, estado=99)
+        traceback.print_exc()
         print(f"ERROR | Error al conectar a SAP: {e}")
         # WriteLog | ERROR | Error grave ConectarSAP
         return None

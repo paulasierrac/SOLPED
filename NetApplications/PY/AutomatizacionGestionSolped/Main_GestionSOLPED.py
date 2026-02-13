@@ -30,11 +30,18 @@ from Config.settings import RUTAS, SAP_CONFIG
 def Main_GestionSolped():
     try:
         nombreTarea = "Main_GestionSOLPED"
-
         EjecutarHU00()
+        # ================================
+        # 1. Despliegue de ambiente
+        # ================================sssss
+        WriteLog(
+            mensaje="Finaliza HU00_DespliegueAmbiente.",
+            estado="INFO",
+            nombreTarea=nombreTarea,
+            rutaRegistro=inConfig("PathLog"),
+        )
 
         # ================================
-
         # Inicio de Main
         # ================================
 
@@ -48,15 +55,7 @@ def Main_GestionSolped():
 
         # EnviarNotificacionCorreo(codigoCorreo=1, nombreTarea=nombreTarea)
 
-        # ================================
-        # 1. Despliegue de ambiente
-        # ================================sssss
-        WriteLog(
-            mensaje="Finaliza HU00_DespliegueAmbiente.",
-            estado="INFO",
-            nombreTarea=nombreTarea,
-            rutaRegistro=inConfig("PathLog"),
-        )
+
         # ================================
         # 2. Obtener sesión SAP
         # ================================
@@ -104,16 +103,13 @@ def Main_GestionSolped():
         # ================================
         # 4. Ejecutar HU03 – Validación Solped ME53N
         # ================================
-        # archivos_validar = ["expSolped03.txt","expSolped03 copy.txt"]
-        archivos_validar = [
-            "expSolped03.txt"
-        ]  # Dos solped para prueba 1300139393  1300139394
         WriteLog(
             mensaje=f"Inicia HU03 - Validación ME53N para archivo.",
             estado="INFO",
             nombreTarea=nombreTarea,
             rutaRegistro=inConfig("PathLog"),
         )
+        archivos_validar = ["expSolped03.txt","expSolped03 copy.txt"]
         # for archivo in archivos_validar:
         #     EjecutarHU03(session, archivo)
 
@@ -134,9 +130,9 @@ def Main_GestionSolped():
             rutaRegistro=inConfig("PathLog"),
         )
 
-        # archivos_validar = ["expSolped03 copy.txt"]
-        # for archivo in archivos_validar:
-        #     EjecutarHU04(session, archivo)
+        archivos_validar = ["expSolped03 copy.txt"]
+        for archivo in archivos_validar:
+            EjecutarHU04(session, archivo)
 
         WriteLog(
             mensaje="HU04 - Generación OC finalizada correctamente.",

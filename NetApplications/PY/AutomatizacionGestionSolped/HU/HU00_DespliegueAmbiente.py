@@ -82,13 +82,8 @@ def EjecutarHU00():
         return config
 
     except Exception as e:
-         print("Error en despliege ")
+         #Sin log ya que no se han cargado las variables desde la base de datos aun 
+         print(f"Error en despliege {e}")
 
          
-    #     WriteLog(
-    #         mensaje=f"Error Global en Main: {e} | {error_stack}",
-    #         estado="ERROR",
-    #         nombreTarea=nombreTarea,
-    #         rutaRegistro=RUTAS["PathLogError"],
-    #     )
-    #     raise
+

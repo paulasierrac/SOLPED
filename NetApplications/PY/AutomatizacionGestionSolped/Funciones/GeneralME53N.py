@@ -366,7 +366,7 @@ def EnviarCorreoPersonalizado(
             mensaje=f"Error fatal en el envío personalizado: {e} | {error_stack}",
             estado="ERROR",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         return False
 
@@ -463,7 +463,7 @@ def AbrirTransaccion(session, transaccion):
             mensaje=f"Error en AbrirTransaccion: {e}",
             estado="ERROR",
             nombreTarea="AbrirTransaccion",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         return False
@@ -527,7 +527,7 @@ def ColsultarSolped(session, numeroSolped):
             mensaje=f"Error en ColsultarSolped: {e}",
             estado="ERROR",
             nombreTarea="ColsultarSolped",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         return False

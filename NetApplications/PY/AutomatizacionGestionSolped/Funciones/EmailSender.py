@@ -8,6 +8,7 @@ from email import encoders
 import os
 from typing import List, Optional
 from pathlib import Path
+from Config.InicializarConfig import inConfig
 from Config.settings import CONFIG_EMAIL, RUTAS, SAP_CONFIG
 from dotenv import load_dotenv
 from Funciones.EscribirLog import WriteLog
@@ -434,7 +435,7 @@ def EnviarNotificacionCorreo(
             mensaje=f"Error al enviar notificación: {e}",
             estado="ERROR",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         return False
 
@@ -516,6 +517,6 @@ def EnviarCorreoPersonalizado(
             mensaje=f"Error fatal en el envío personalizado: {e} | {error_stack}",
             estado="ERROR",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         return False

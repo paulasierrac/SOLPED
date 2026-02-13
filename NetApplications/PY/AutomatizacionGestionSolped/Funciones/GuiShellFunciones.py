@@ -1204,7 +1204,7 @@ def ProcesarTabla(name, dias=None):
             mensaje=f"Error en ProcesarTablaME5A: {e}",
             estado="ERROR",
             nombreTarea="ProcesarTablaME5A",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         print(f"ERROR en ProcesarTablaME5A: {e}")
         traceback.print_exc()
