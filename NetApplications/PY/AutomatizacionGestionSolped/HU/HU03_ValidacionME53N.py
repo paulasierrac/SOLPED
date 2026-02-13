@@ -39,9 +39,6 @@ from Funciones.SAPFuncionesME53N import (
     ValidarAttachmentList,
     ParsearTablaAttachments,
 )
-<<<<<<< HEAD
-from config.settings import RUTAS
-=======
 
 from Config.settings import RUTAS
 from Funciones.FuncionesExcel import ServicioExcel
@@ -57,7 +54,6 @@ from Funciones.ValidacionME53N import (
     LimpiarNumeroRobusto,
     ObtenerValorDesdeFila,
 )
->>>>>>> and
 
 
 def EjecutarHU03(session, nombreArchivo):
@@ -650,51 +646,7 @@ def EjecutarHU03(session, nombreArchivo):
                 )
                 continue
 
-<<<<<<< HEAD
-        # 7. Mostrar resumen final del proceso
-        print(f"\n{'='*80}")
-        print("PROCESO COMPLETADO - RESUMEN FINAL")
-        print(f"{'='*80}")
-
-        # Resumen detallado
-        print(f"\nESTADISTICAS DEL PROCESO:")
-        print(f"  SOLPEDs totales: {contadores['total_solpeds']}")
-        print(
-            f"  SOLPEDs procesadas exitosamente: {contadores['procesadas_exitosamente']}"
-        )
-        print(f"  SOLPEDs con errores: {contadores['con_errores']}")
-        print(f"  SOLPEDs sin items: {contadores['sin_items']}")
-        print(f"  Items procesados: {contadores['items_procesados']}")
-        print(f"  Items validados para OC: {contadores['items_validados']}")
-        print(f"  Items para verificar manual: {contadores['items_verificar_manual']}")
-        print(f"  Items sin texto: {contadores['items_sin_texto']}")
-        print(f"\nNOTIFICACIONES:")
-        print(f"  Notificaciones enviadas: {contadores['notificaciones_enviadas']}")
-        print(f"  Notificaciones fallidas: {contadores['notificaciones_fallidas']}")
-
-        # Recargar archivo para mostrar estados finales
-        df_final = procesarTablaME5A(nombre_archivo)
-        if not df_final.empty and "Estado" in df_final.columns:
-            print("\nDISTRIBUCION FINAL DE ESTADOS:")
-            resumen = df_final["Estado"].value_counts()
-            for estado, cantidad in resumen.items():
-                print(f"  {estado}: {cantidad}")
-
-            # Mostrar algunas observaciones comunes
-            if (
-                "Observaciones" in df_final.columns
-                and not df_final["Observaciones"].isna().all()
-            ):
-                print(f"\nOBSERVACIONES MAS FRECUENTES:")
-                obs_count = df_final["Observaciones"].value_counts().head(5)
-                for obs, count in obs_count.items():
-                    if obs and str(obs).strip():
-                        print(f"  '{obs[:50]}...': {count}")
-
-        print("\n")
-=======
         # Resumen final del proceso
->>>>>>> and
         WriteLog(
             mensaje=f"PROCESO COMPLETADO - SOLPEDs: {contadores['procesadas_exitosamente']}/{contadores['total_solpeds']}, "
             f"Items validados: {contadores['items_validados']}/{contadores['items_procesados']}, "
