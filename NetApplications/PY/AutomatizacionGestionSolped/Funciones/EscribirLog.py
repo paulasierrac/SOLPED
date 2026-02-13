@@ -88,3 +88,4 @@ def WriteLog(mensaje: str, estado: str, nombreTarea: str, rutaRegistro: str):
     except Exception as e:
         # Nunca debe romper el bot por logging
         print(f"ERROR | Fallo WriteLog: {e}")
+        # TODO : pasar error a la funcion writelog 
