@@ -170,9 +170,7 @@ class EmailSender:
             parte.set_payload(archivo.read())
 
         encoders.encode_base64(parte)
-        parte.add_header(
-            "Content-Disposition", f"attachment; filename={nombreArchivo}"
-        )
+        parte.add_header("Content-Disposition", f"attachment; filename={nombreArchivo}")
         mensaje.attach(parte)
 
     def procesar_excel_y_enviar(
@@ -434,7 +432,7 @@ def EnviarNotificacionCorreo(
             mensaje=f"Error al enviar notificación: {e}",
             estado="ERROR",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         return False
 
@@ -516,6 +514,6 @@ def EnviarCorreoPersonalizado(
             mensaje=f"Error fatal en el envío personalizado: {e} | {error_stack}",
             estado="ERROR",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         return False

@@ -26,6 +26,7 @@ from Funciones.EmailSender import EmailSender
 from typing import List, Union
 import sys
 from openpyxl import load_workbook
+from Funciones.ValidacionHU3 import ValidarContraTabla
 
 
 def DeterminarEstadoFinal(datosTexto: Dict, validaciones: Dict) -> Tuple[str, str]:
@@ -354,7 +355,8 @@ def GenerarReporteValidacion(
         # Si existe lista estructurada de archivosAdjuntos
         if archivosAdjuntosLista:
             reporte += (
-                f"    Total de archivos: {len(archivosAdjuntosLista)}\n" f"    Ejemplos:\n"
+                f"    Total de archivos: {len(archivosAdjuntosLista)}\n"
+                f"    Ejemplos:\n"
             )
             # Listar hasta 3 para evitar reportes enormes
             for a in archivosAdjuntosLista[:3]:
@@ -424,7 +426,7 @@ def GenerarReporteValidacion(
     # 4. CAMPOS OBLIGATORIOS EXTRAÍDOS DEL TEXTO
     # ===================================================================================
     if "campos_obligatorios" in validaciones:
-        oblig = validaciones["campos_obligatorios"] 
+        oblig = validaciones["campos_obligatorios"]
         reporte += "CAMPOS OBLIGATORIOS (Segun Texto Extraído):\n"
         reporte += f"  Presentes: {oblig['presentes']}/{oblig['total']}\n"
 

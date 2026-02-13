@@ -72,8 +72,9 @@ def EjecutarHU03(session, nombreArchivo):
         )
 
         rutaCompletoArchivo = rf"{RUTAS['PathInsumos']}\{nombreArchivo}"
+        print(f"HU3 - Archivo procesado: {rutaCompletoArchivo}")
         # Tranformar Archivo txt de ME5A a formato procesable para validación en ME53N
-        TransformartxtMe5a(rutaCompletoArchivo)
+        # TransformartxtMe5a(rutaCompletoArchivo)
 
         # Leer el archivo con las SOLPEDs a procesar
         dfSolpeds = ProcesarTablaME5A(nombreArchivo)
@@ -84,7 +85,7 @@ def EjecutarHU03(session, nombreArchivo):
                 mensaje="El archivo expSolped03.txt está vacío o no se pudo cargar",
                 estado="ERROR",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLogError"],
+                rutaRegistro=inConfig("PathLog"),
             )
             return False
 
@@ -96,7 +97,7 @@ def EjecutarHU03(session, nombreArchivo):
                     mensaje=f"Columna requerida '{columna}' no encontrada",
                     estado="ERROR",
                     nombreTarea=nombreTarea,
-                    rutaRegistro=RUTAS["PathLogError"],
+                    rutaRegistro=inConfig("PathLog"),
                 )
                 return False
 
@@ -192,7 +193,7 @@ def EjecutarHU03(session, nombreArchivo):
                         mensaje=f"No se pudo consultar SOLPED {solped} en SAP",
                         estado="ERROR",
                         nombreTarea=nombreTarea,
-                        rutaRegistro=RUTAS["PathLogError"],
+                        rutaRegistro=inConfig("PathLog"),
                     )
                     ActualizarEstadoYObservaciones(
                         dfSolpeds,
@@ -643,7 +644,7 @@ def EjecutarHU03(session, nombreArchivo):
                     mensaje=f"Error procesando SOLPED {solped}: {e}",
                     estado="ERROR",
                     nombreTarea=nombreTarea,
-                    rutaRegistro=RUTAS["PathLogError"],
+                    rutaRegistro=inConfig("PathLog"),
                 )
                 continue
 
@@ -716,7 +717,7 @@ def EjecutarHU03(session, nombreArchivo):
             mensaje=f"Error en EjecutarHU03: {e}",
             estado="ERROR",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         traceback.print_exc()
         return False

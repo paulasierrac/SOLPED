@@ -13,9 +13,19 @@ import time
 import os
 from Config.InicializarConfig import inConfig
 from Config.settings import RUTAS
-from Funciones.GuiShellFunciones import EsperarSAPListo, ObtenerNumeroOC, ProcesarTabla, SetGuiComboBoxkey, CambiarGrupoCompra
+from Funciones.GuiShellFunciones import (
+    EsperarSAPListo,
+    ObtenerNumeroOC,
+    ProcesarTabla,
+    SetGuiComboBoxkey,
+    CambiarGrupoCompra,
+)
 from Funciones.ValidacionME21N import (
-SelectGuiTab, ValidarAjustarSolped,AbrirSolped,MostrarCabecera)
+    SelectGuiTab,
+    ValidarAjustarSolped,
+    AbrirSolped,
+    MostrarCabecera,
+)
 from Funciones.EscribirInforme import EscribirIformeOperacion
 from Funciones.EscribirLog import WriteLog
 from Funciones.GeneralME53N import AbrirTransaccion
@@ -24,6 +34,7 @@ import pyautogui  # Asegúrate de tener pyautogui instaladoi
 from Funciones.ControlHU import ControlHU
 
 from Repositories.Consultas import Querys
+
 
 def EjecutarHU04(session, archivo):
 
@@ -98,29 +109,32 @@ def EjecutarHU04(session, archivo):
                 rutaRegistro=inConfig("PathLog"),
             )
             acciones = []
-            
+
             # print(f"procesando solped: {solped} de items: {itemCount}")
-            AbrirTransaccion(session, "ME21N",)
+            AbrirTransaccion(
+                session,
+                "ME21N",
+            )
             EsperarSAPListo(session)
-            #navegacion por SAP que permite abrir Solped 
-            posiciones = ["10","40","50","60"]
+            # navegacion por SAP que permite abrir Solped
+            posiciones = ["10", "40", "50", "60"]
             AbrirSolped(session, solped, itemCount, posiciones)
 
-            #se selecciona la clase de docuemnto ZRCR, revisar alcance si es necesario cambiar a otra clase dependiendo de algun criterio
+            # se selecciona la clase de docuemnto ZRCR, revisar alcance si es necesario cambiar a otra clase dependiendo de algun criterio
             SetGuiComboBoxkey(session, "TOPLINE-BSART", "ZRCR")
 
             EsperarSAPListo(session)
-            
-            #se ingresa a la pestaña  Dat.org. de cabecera, asegurándonos de que esté visible
-            pyautogui.hotkey("ctrl","F2")
-            SelectGuiTab(session, "TABHDT9") 
+
+            # se ingresa a la pestaña  Dat.org. de cabecera, asegurándonos de que esté visible
+            pyautogui.hotkey("ctrl", "F2")
+            SelectGuiTab(session, "TABHDT9")
             # Se cambia el grupo de compra dependiendo de la org de compra, y se guardan acciones
             acciones.extend(CambiarGrupoCompra(session))
             # Seleccionar la pestaña de textos, asegurándonos de que esté visible
             EsperarSAPListo(session)
-            #time.sleep(0.5)
-            # pestaña textos 
-            pyautogui.hotkey("ctrl","F4")
+            # time.sleep(0.5)
+            # pestaña textos
+            pyautogui.hotkey("ctrl", "F4")
             SelectGuiTab(session, "TABIDT14")
             # Valores y textos se validan y ajustan
             acciones.extend(ValidarAjustarSolped(session, itemCount))
@@ -142,17 +156,16 @@ def EjecutarHU04(session, archivo):
 
             # Stev: validar si se debe hacer algo mas con la OC generada
 
-            
             ruta = EscribirIformeOperacion(
-                    itemCount=itemCount,
-                    solped=solped,
-                    ordenCompra= ordenDeCompra,
-                    acciones=acciones,
-                    estado="EXITOSO",
-                    botName="Resock",
-                    nombreTarea=nombreTarea,
-                    pathInformes=r".\Salida",
-                    observaciones="Proceso ejecutado sin errores."
+                itemCount=itemCount,
+                solped=solped,
+                ordenCompra=ordenDeCompra,
+                acciones=acciones,
+                estado="EXITOSO",
+                botName="Resock",
+                nombreTarea=nombreTarea,
+                pathInformes=r".\Salida",
+                observaciones="Proceso ejecutado sin errores.",
             )
 
             print(f"Informe generado en: {ruta}")
@@ -173,13 +186,12 @@ def EjecutarHU04(session, archivo):
         )
         ControlHU(nombreTarea, estado=100)
 
-
     except Exception as e:
         ControlHU(nombreTarea, estado=99)
         WriteLog(
             mensaje=f"ERROR GLOBAL en HU04: {e}",
             estado="ERROR",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         raise

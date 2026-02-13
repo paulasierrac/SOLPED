@@ -1,9 +1,23 @@
-from HU.HU01_LoginSAP import ObtenerSesionActiva
-from HU.HU01_LoginSAP import ConectarSAP, ObtenerSesionActiva
-from Config.InicializarConfig import inConfig, initConfig
-from Config.settings import RUTAS, SAP_CONFIG
 import pandas as pd
 import os
+
+from Funciones.EscribirLog import WriteLog
+from Funciones.EmailSender import EnviarNotificacionCorreo
+
+# from Funciones.GeneralME53N import AppendHipervinculoObservaciones
+
+from Config.settings import RUTAS, SAP_CONFIG
+
+# from HU.HU00_DespliegueAmbiente import EjecutarHU00
+from HU.HU01_LoginSAP import ConectarSAP, ObtenerSesionActiva
+
+# from HU.HU02_DescargaME5A import EjecutarHU02
+from HU.HU03_ValidacionME53N import EjecutarHU03
+
+# from HU.HU04_GeneracionOC import EjecutarHU04
+# from HU.HU05_DescargaOC import EjecutarHU05
+
+from Config.InicializarConfig import inConfig, initConfig
 
 
 def TransformartxtMe5a(ruta_txt: str):
@@ -135,24 +149,31 @@ def TransformartxtMe5a(ruta_txt: str):
     return rutaSalida
 
 
-# def MainSantiago():
-#     try:
-#         # session = ObtenerSesionActiva()
-#         # session = ConectarSAP(
-#         #     inConfig("SapSistema"),
-#         #     inConfig("SapMandante"),
-#         #     SAP_CONFIG["user"],
-#         #     SAP_CONFIG["password"],
-#         # )
-
-#     except Exception as e:
-#         print(f"\nHa ocurrido un error inesperado durante la ejecución: {e}")
-#         raise
-
-
 if __name__ == "__main__":
     # MainSantiago()
+    nombreTarea = "MainPruebasS"
     initConfig()
-    TransformartxtMe5a(
-        r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped05.txt"
+    # session = ConectarSAP(
+    #     inConfig("SapSistema"),
+    #     inConfig("SapMandante"),
+    #     SAP_CONFIG["user"],
+    #     SAP_CONFIG["password"],
+    # )
+
+    session = ObtenerSesionActiva()
+
+    archivos_validar = [
+        "expSolped05.txt"
+    ]  # Dos solped para prueba 1300139393  1300139394
+    WriteLog(
+        mensaje=f"Inicia Prueba HU3",
+        estado="INFO",
+        nombreTarea=nombreTarea,
+        rutaRegistro=inConfig("PathLog"),
     )
+    for archivo in archivos_validar:
+        EjecutarHU03(session, archivo)
+
+    # TransformartxtMe5a(
+    #     r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped05.txt"
+    # )

@@ -16,16 +16,16 @@ import random
 
 from Config.InicializarConfig import initConfig, inConfig
 from Funciones.FuncionesExcel import ServicioExcel
-from Repositories.TicketInsumo import TicketInsumoRepo 
+from Repositories.TicketInsumo import TicketInsumoRepo
+
 
 def EjecutarHU00():
-
     """
     Prepara el entorno: valida carpetas, carga parámetros y estructura inicial.
     """
-    try : 
-        
-        #Probando GIT 
+    try:
+
+        # Probando GIT
         # ==========================================================
         # 1. Ruta base del proyecto (importante)
         # ==========================================================
@@ -56,20 +56,27 @@ def EjecutarHU00():
         # 3. Cargar parámetros desde o BD
         # ==========================================================
         initConfig()
-    
+
         # ==========================================================
         # 4. Cargar Ecxel con hojas que van a ser las tablas de parametros en la BD
         # ==========================================================
 
+        try:
 
-        try : 
-                 
-            TicketInsumoRepo.crearPCTicketInsumo( estado=0, observaciones= "Cargue de insumo")
-            rutaParametros = os.path.join(inConfig("PathInsumo"),"Parametros SAMIR.xlsx")
+            TicketInsumoRepo.crearPCTicketInsumo(
+                estado=0, observaciones="Cargue de insumo"
+            )
+            rutaParametros = os.path.join(
+                inConfig("PathInsumo"), "Parametros SAMIR.xlsx"
+            )
             ServicioExcel.ejecutarBulkDesdeExcel(rutaParametros)
-            TicketInsumoRepo.crearPCTicketInsumo( estado=100, observaciones= "Cargue de insumo")
-        except: 
-            TicketInsumoRepo.crearPCTicketInsumo( error= 99, observaciones="Carge de insumo " )
+            TicketInsumoRepo.crearPCTicketInsumo(
+                estado=100, observaciones="Cargue de insumo"
+            )
+        except:
+            TicketInsumoRepo.crearPCTicketInsumo(
+                error=99, observaciones="Carge de insumo "
+            )
 
         rutaConfig = os.path.join(rutaBase, "Config.json")
 
@@ -82,13 +89,12 @@ def EjecutarHU00():
         return config
 
     except Exception as e:
-         print("Error en despliege ")
+        print("Error en despliege ")
 
-         
     #     WriteLog(
     #         mensaje=f"Error Global en Main: {e} | {error_stack}",
     #         estado="ERROR",
     #         nombreTarea=nombreTarea,
-    #         rutaRegistro=RUTAS["PathLogError"],
+    #         rutaRegistro=inConfig("PathLog"),
     #     )
     #     raise

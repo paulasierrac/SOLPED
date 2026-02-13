@@ -7,6 +7,7 @@
 # Cambios:
 # ============================================
 import traceback
+from Config.InicializarConfig import inConfig
 import win32com.client
 import time
 import os
@@ -26,18 +27,8 @@ from Funciones.EmailSender import EmailSender
 from typing import List, Union
 import sys
 from openpyxl import load_workbook
-from Funciones.ValidacionME53N import (
-    DeterminarEstadoFinal,
-    ExtraerDatosTexto,
-    GenerarObservaciones,
-    GenerarReporteValidacion,
-    ProcesarYValidarItem,
-    extraerDatosReporte,
-    AppendHipervinculoObservaciones,
-    obtenerFilaExpSolped,
-    LimpiarNumeroRobusto,
-    ObtenerValorDesdeFila,
-)
+
+
 
 def ObtenerTextoDelPortapapeles():
     """Obtener texto del portapapeles con manejo correcto de encoding"""
@@ -53,6 +44,7 @@ def ObtenerTextoDelPortapapeles():
     except Exception as e:
         print(f"Error al leer portapapeles: {e}")
         return ""
+
 
 def ObtenerItemTextME53N(session, numeroSolped, numeroItem):
     """session: objeto de SAP GUI
@@ -132,7 +124,7 @@ def ObtenerItemTextME53N(session, numeroSolped, numeroItem):
             mensaje=f"Error en ObtenerItemTextME53N: {e}",
             estado="ERROR",
             nombreTarea="ObtenerItemTextME53N",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         return ""
 
@@ -369,7 +361,7 @@ def ProcesarTablaME5A(name, dias=None):
             mensaje=f"Error en ProcesarTablaME5A: {e}",
             estado="ERROR",
             nombreTarea="ProcesarTablaME5A",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         print(f"ERROR en ProcesarTablaME5A: {e}")
         traceback.print_exc()
@@ -472,7 +464,7 @@ def TablaItemsDataFrame(name) -> pd.DataFrame:
             mensaje=f"Error en TablaItemsDataFrame: {e}",
             estado="ERROR",
             nombreTarea="TablaItemsDataFrame",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         print(f"ERROR: {e}")
         return pd.DataFrame()
@@ -577,7 +569,7 @@ def ObtenerItemsME53N(session, numeroSolped):
             mensaje=f"Error en ObtenerItemsME53N: {e}",
             estado="ERROR",
             nombreTarea="ObtenerItemsME53N",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         print(f"ERROR en ObtenerItemsME53N: {e}")
         return pd.DataFrame()
@@ -649,7 +641,7 @@ def GuardarTablaME5A(df, name):
             mensaje=f"Error al guardar {name}: {e}",
             estado="ERROR",
             nombreTarea="GuardarTablaME5A",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         print(f"ERROR al guardar archivo: {e}")
         return False
@@ -736,14 +728,16 @@ def ParsearTablaAttachments(contenido: str) -> list:
                 if not title or not creator or not date:
                     continue
 
-                archivosAdjuntos.append({"title": title, "creator": creator, "date": date})
+                archivosAdjuntos.append(
+                    {"title": title, "creator": creator, "date": date}
+                )
 
     except Exception as e:
         WriteLog(
             mensaje=f"Error parseando tabla de archivosAdjuntos: {e}",
             estado="ERROR",
             nombreTarea="ParsearTablaAttachments",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         traceback.print_exc()
 
@@ -972,7 +966,7 @@ def ValidarAttachmentList(session, numeroSolped):
             mensaje=f"Error inesperado en ValidarAttachmentList: {e}\n{error_trace}",
             estado="ERROR",
             nombreTarea="ValidarAttachmentList",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         # Intentar cerrar cualquier ventana abierta
         try:

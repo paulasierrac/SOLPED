@@ -27,6 +27,7 @@ from typing import List, Union
 import sys
 from openpyxl import load_workbook
 
+
 def ValidarContraTabla(
     datosTexto: Dict, df_items: pd.DataFrame, item_num: str = ""
 ) -> Dict:

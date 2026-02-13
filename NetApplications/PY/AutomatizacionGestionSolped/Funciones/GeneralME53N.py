@@ -366,7 +366,7 @@ def EnviarCorreoPersonalizado(
             mensaje=f"Error fatal en el envío personalizado: {e} | {error_stack}",
             estado="ERROR",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
         return False
 
@@ -463,7 +463,7 @@ def AbrirTransaccion(session, transaccion):
             mensaje=f"Error en AbrirTransaccion: {e}",
             estado="ERROR",
             nombreTarea="AbrirTransaccion",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         return False
@@ -527,7 +527,7 @@ def ColsultarSolped(session, numeroSolped):
             mensaje=f"Error en ColsultarSolped: {e}",
             estado="ERROR",
             nombreTarea="ColsultarSolped",
-            rutaRegistro=RUTAS["PathLogError"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         return False
@@ -661,12 +661,10 @@ def LimpiarNumero(valor):
         print(f"ERROR limpiando numero '{valor}': {e}")
         return 0.0
 
-
 def TransformartxtMe5a(ruta_txt: str):
 
     if not os.path.exists(ruta_txt):
         raise FileNotFoundError(f"No existe el archivo: {ruta_txt}")
-
 
     # ===============================
     # 1. LEER Y LIMPIAR ARCHIVO
@@ -722,24 +720,33 @@ def TransformartxtMe5a(ruta_txt: str):
             "Stat.trat.": "ProcState",
         }
     )
+
+    # ===============================
+    # 4. AGREGAR COLUMNA D (VACÍA)
+    # ===============================
+    if "Blank1" not in df.columns:
+        df["Blank1"] = ""
+
+    if "D" not in df.columns:
+        df["D"] = ""
     # ===============================
     # EXTRAER NÚMERO DESDE NOMBRE TXT
     # ===============================
-    nombre_archivo = os.path.basename(ruta_txt)
-
-    numeroProcstate = "".join(filter(str.isdigit, nombre_archivo))
+    nombreArchivo = os.path.basename(ruta_txt)
+    numeroProcstate = "".join(filter(str.isdigit, nombreArchivo))
 
     if not numeroProcstate:
         raise ValueError("No se pudo extraer número del nombre del archivo.")
 
     numeroProcstate = numeroProcstate.zfill(2)
+
     # ===============================
-    # 4. AGREGAR ProcState = "03"
+    # 5. AGREGAR ProcState
     # ===============================
     df["ProcState"] = numeroProcstate
 
     # ===============================
-    # 5. ORDEN FINAL
+    # 6. ORDEN FINAL
     # ===============================
     ordenFinal = [
         "PurchReq",
@@ -752,21 +759,24 @@ def TransformartxtMe5a(ruta_txt: str):
         "Quantity",
         "Plnt",
         "PGr",
+        "Blank1",
         "D",
         "Requisnr",
         "ProcState",
     ]
 
+
+
     df = df[[col for col in ordenFinal if col in df.columns]]
 
     # ===============================
-    # 6. GUARDAR ARCHIVO TRANSFORMADO
+    # 7. GUARDAR ARCHIVO TRANSFORMADO
     # ===============================
-    # rutaSalida = ruta_txt.replace(".txt", "_transformado.txt")
     rutaSalida = ruta_txt
 
     anchos = {
-        col: max(df[col].astype(str).map(len).max(), len(col)) + 3 for col in df.columns
+        col: max(df[col].astype(str).map(len).max(), len(col)) + 3
+        for col in df.columns
     }
 
     with open(rutaSalida, "w", encoding="utf-8") as f:
@@ -790,3 +800,4 @@ def TransformartxtMe5a(ruta_txt: str):
 
     print(f"Archivo transformado correctamente: {rutaSalida}")
     return rutaSalida
+

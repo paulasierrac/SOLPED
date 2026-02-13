@@ -4,7 +4,7 @@ from Config.settings import RUTAS
 from datetime import datetime
 from openpyxl.utils import get_column_letter
 import os
-
+from Config.InicializarConfig import inConfig
 # ======================================================
 # COLUMNAS OFICIALES DEL REPORTE FINAL
 # ======================================================
@@ -268,59 +268,89 @@ def ConstruirFilaReporteFinal(
 
 
 # ======================================================
-# GENERADOR DEL EXCEL FINAL
+# GENERADOR DEL EXCEL FINAL (ACTUALIZA POR ID_REPORTE)
 # ======================================================
 def GenerarReporteFinalExcel(filas_reporte):
     """
-    Genera el archivo Excel con el reporte final consolidado
-
-    Args:
-        filas_reporte: Lista de diccionarios, cada uno representa una fila
-
-    Returns:
-        Ruta del archivo generado o None si hay error
+    Genera o actualiza el archivo Excel con el reporte final consolidado.
+    Si el ID_REPORTE ya existe, actualiza la fila.
+    Si no existe, la agrega.
     """
+
     try:
         if not filas_reporte:
-            print("⚠️ No hay filas para generar el reporte")
+            print("No hay filas para generar el reporte")
             return None
 
-        # Crear DataFrame
-        df = pd.DataFrame(filas_reporte)
+        dfNuevo = pd.DataFrame(filas_reporte)
 
-        # Generar nombre del archivo con timestamp
-        timestamp = datetime.now().strftime("%Y%m%d")
-        nombreArchivo = f"ReporteFinal{timestamp}.xlsx"
-        rutaCompleta = os.path.join(RUTAS["PathResultados"], nombreArchivo)
+        nombreArchivo = "ReporteFinal.xlsx"
+        rutaCompleta = os.path.join(inConfig("PathResultado"), nombreArchivo)
 
-        # Asegurar que existe el directorio
-        os.makedirs(RUTAS["PathResultados"], exist_ok=True)
+        os.makedirs(inConfig("PathResultado"), exist_ok=True)
 
-        # Guardar Excel con formato
+        # ==================================================
+        # SI EXISTE EL ARCHIVO → ACTUALIZAR REGISTROS
+        # ==================================================
+        if os.path.exists(rutaCompleta):
+
+            print("Archivo existente encontrado, actualizando registros...")
+
+            dfExistente = pd.read_excel(rutaCompleta)
+
+            # Si no existe columna ID_REPORTE, lo tratamos como nuevo
+            if "ID_REPORTE" not in dfExistente.columns:
+                dfFinal = pd.concat([dfExistente, dfNuevo], ignore_index=True)
+
+            else:
+                dfExistente["ID_REPORTE"] = dfExistente["ID_REPORTE"].astype(str)
+                dfNuevo["ID_REPORTE"] = dfNuevo["ID_REPORTE"].astype(str)
+
+                # Convertir existente en dict indexado por ID
+                dfExistente = dfExistente.set_index("ID_REPORTE")
+
+                for _, filaNueva in dfNuevo.iterrows():
+                    idReporte = filaNueva["ID_REPORTE"]
+
+                    # Si existe → actualizar
+                    if idReporte in dfExistente.index:
+                        for col in dfNuevo.columns:
+                            dfExistente.at[idReporte, col] = filaNueva[col]
+                    else:
+                        # Si no existe → agregar
+                        dfExistente.loc[idReporte] = filaNueva
+
+                dfFinal = dfExistente.reset_index()
+
+        else:
+            print("No existe archivo previo, creando nuevo reporte...")
+            dfFinal = dfNuevo
+
+        # ==================================================
+        # GUARDAR ARCHIVO FINAL
+        # ==================================================
         with pd.ExcelWriter(rutaCompleta, engine="openpyxl") as writer:
-            df.to_excel(writer, sheet_name="Validación ME53N", index=False)
+            dfFinal.to_excel(writer, sheet_name="Validación ME53N", index=False)
 
-            # Obtener el worksheet para aplicar formato
             worksheet = writer.sheets["Validación ME53N"]
 
-            # Ajustar ancho de columnas
-            for idx, col in enumerate(df.columns, 1):
-                # Calcular ancho basado en el contenido
-                longitudMax = max(df[col].astype(str).apply(len).max(), len(str(col)))
-                # Limitar el ancho máximo
+            # Ajustar ancho columnas
+            for idx, col in enumerate(dfFinal.columns, 1):
+                longitudMax = max(
+                    dfFinal[col].astype(str).apply(len).max(), len(str(col))
+                )
+
                 adjusted_width = min(longitudMax + 2, 50)
                 col_letter = get_column_letter(idx)
                 worksheet.column_dimensions[col_letter].width = adjusted_width
 
-            # Congelar primera fila (encabezados)
             worksheet.freeze_panes = "A2"
 
-        print(f"Reporte Excel generado: {rutaCompleta}")
+        print(f"Reporte Excel actualizado correctamente: {rutaCompleta}")
         return rutaCompleta
 
     except Exception as e:
         print(f"Error generando reporte Excel: {e}")
-        print("ERROR REAL:", e)
         import traceback
 
         traceback.print_exc()
