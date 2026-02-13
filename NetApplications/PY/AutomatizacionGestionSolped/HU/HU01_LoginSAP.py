@@ -11,60 +11,41 @@
 import win32com.client  # pyright: ignore[reportMissingModuleSource]
 import time
 import subprocess
-import os
-from Config.InicializarConfig import inConfig
-from Config.settings import RUTAS, SAP_CONFIG 
-from Funciones.ValidacionME21N import ventanaAbierta
 
 import pyautogui
 
 from Config.InicializarConfig import inConfig
-from Config.settings import RUTAS, SAP_CONFIG
+from Config.settings import RUTAS, SAP_CONFIG 
 from Funciones.ValidacionME21N import ventanaAbierta
+from Funciones.EscribirLog import WriteLog
 from Funciones.ControlHU import ControlHU
+
 
 
 def AbrirSAPLogon():
     """Abre SAP Logon si no está ya abierto."""
-    #SAP_CONFIG = get_sap_config()
     try:
-        # WriteLog | INFO | INICIA abrirSap_logon
-
         win32com.client.GetObject("SAPGUI")
-        print("INFO | SAP Logon ya se encuentra abierto")
-
-        # WriteLog | INFO | FINALIZA abrirSap_logon
         return True
     except:
         # Si no está abierto, se lanza el ejecutable
-        #"logon_path": LeerVariableEntorno("SAP_LOGON_PATH"),
         subprocess.Popen(inConfig("SapRutaLogon"))
-        time.sleep(5)  # Esperar a que abra SAP Logon
+        time.sleep(2)  # Esperar a que abra SAP Logon
         return False
 
 
 def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
 
-    abrirSap = AbrirSAPLogon()
-    time.sleep(3)
-    if abrirSap:
-        print(" SAP Logon 750 ya se encuentra abierto")
-    else:
-        print(" SAP Logon 750 abierto ")
-
     try:
-        # WriteLog | INFO | INICIA ConectarSAP
         nombreTarea = "HU01_LoginSAP"
         ControlHU(nombreTarea, estado=0)
-
         abrirSap = AbrirSAPLogon()
-        time.sleep(3)
-
         if abrirSap:
-            print("INFO | SAP Logon ya se encuentra abierto")
+            WriteLog( mensaje="SAP Logon ya se encuentra abierto",estado="WARN", nombreTarea="Abrir SAP Logon", rutaRegistro=inConfig("PathLog"),)
         else:
-            print("INFO | SAP Logon abierto correctamente")
-
+            WriteLog( mensaje="SAP Logon 750 abierto",estado="INFO", nombreTarea="Abrir SAP Logon", rutaRegistro=inConfig("PathLog"),)
+      
+        
         sapGuiAuto = win32com.client.GetObject("SAPGUI")
         if not sapGuiAuto:
             raise Exception("No se pudo obtener objeto SAPGUI")
@@ -78,18 +59,18 @@ def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
                 break
 
         if not connection:
-            print(f"INFO | Abriendo nueva conexion a {conexion}")
+            WriteLog( mensaje=f"Abriendo nueva conexion a {conexion}",estado="INFO", nombreTarea="Abrir SAP Logon", rutaRegistro=inConfig("PathLog"),)
             connection = application.OpenConnection(conexion, True)
-            time.sleep(3)
         else:
-            print(f"INFO | Conexion existente encontrada con {conexion}")
+            WriteLog( mensaje=f"Conexion existente encontrada con {conexion}",estado="INFO", nombreTarea="Abrir SAP Logon", rutaRegistro=inConfig("PathLog"),)
 
         if connection.Children.Count > 0:
             session = connection.Children(0)
-            print("INFO | Sesion existente reutilizada")
+            WriteLog( mensaje=f"Sesion existente reutilizada",estado="INFO", nombreTarea="Abrir SAP Logon", rutaRegistro=inConfig("PathLog"),)
         else:
             session = connection.Children(0).CreateSession()
-            print("INFO | Nueva sesion creada")
+            WriteLog( mensaje=f"Nueva sesion creada",estado="INFO", nombreTarea="Abrir SAP Logon", rutaRegistro=inConfig("PathLog"),)
+
 
         # Login
         session.findById("wnd[0]/usr/txtRSYST-MANDT").text = mandante

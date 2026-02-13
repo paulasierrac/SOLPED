@@ -27,7 +27,7 @@ def EjecutarHU02(session):
             mensaje="Inicia HU02",
             estado="INFO",
             nombreTarea="HU2_DescargaME5A",
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
         estado = "03"
         DescargarSolpedME5A(session, estado)

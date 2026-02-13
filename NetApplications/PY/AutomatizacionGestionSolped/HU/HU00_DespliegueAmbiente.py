@@ -24,7 +24,8 @@ def EjecutarHU00():
     Prepara el entorno: valida carpetas, carga parámetros y estructura inicial.
     """
     try : 
-            
+        
+        #Probando GIT 
         # ==========================================================
         # 1. Ruta base del proyecto (importante)
         # ==========================================================
@@ -81,7 +82,7 @@ def EjecutarHU00():
         return config
 
     except Exception as e:
-         print("Error")
+         print("Error en despliege ")
 
          
     #     WriteLog(

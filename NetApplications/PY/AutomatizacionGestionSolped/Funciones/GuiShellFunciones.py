@@ -649,7 +649,7 @@ def BuscarYClickear(
                         mensaje=f"Imagen encontrada y clickeada: {ruta_imagen}",
                         estado="INFO",
                         nombreTarea=nombreTarea,
-                        rutaRegistro=RUTAS["PathLog"],
+                        rutaRegistro=inConfig("PathLog"),
                     )
                     # print(f"[INFO] Imagen encontrada y clickeada: {ruta_imagen}")
                 return True
@@ -665,7 +665,7 @@ def BuscarYClickear(
                     mensaje=f"Error inesperado buscando imagen {ruta_imagen}: {e}",
                     estado="ERROR",
                     nombreTarea=nombreTarea,
-                    rutaRegistro=RUTAS["PathLog"],
+                    rutaRegistro=inConfig("PathLog"),
                 )
                 # print(f"[ERROR] Error inesperado buscando imagen {ruta_imagen}: {e}")
             if not fail_silently:
@@ -678,7 +678,7 @@ def BuscarYClickear(
             mensaje=f"Imagen no encontrada tras {intento} intentos: {ruta_imagen}",
             estado="WARNING",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
         # print(f"[WARNING] Imagen no encontrada tras {intento} intentos: {ruta_imagen}")
 
@@ -983,7 +983,7 @@ def ProcesarTabla(name, dias=None):
             mensaje=f"Procesar archivo nombre {name}",
             estado="INFO",
             nombreTarea="ProcesarTablaME5A",
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # path = f".\\AutomatizacionGestionSolped\\Insumo\\{name}"

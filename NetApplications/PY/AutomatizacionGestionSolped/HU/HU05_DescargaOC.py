@@ -62,7 +62,7 @@ def EjecutarHU05(session, ordenesDeCompra: list):
         #fecha_hora = ahora.strftime("%d/%m/%Y %H:%M:%S")
         fechaArchivo = ahora.strftime("%Y%m%d_%H%M%S")
         #Guardar el archivo txt en la ruta especificada
-        rutaGuardar = rf"{inConfig("PathTemp")}"
+        rutaGuardar = rf"{inConfig("PathTemp")}\OC Liberadas"
         session.findById("wnd[1]/usr/ctxtDY_PATH").text = rutaGuardar
         session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = rf"LiberadasOC_{fechaArchivo}.txt"
         session.findById("wnd[1]/usr/ctxtDY_FILENAME").caretPosition = 10
@@ -99,15 +99,15 @@ def EjecutarHU05(session, ordenesDeCompra: list):
         
         print(dfFiltrado)
         # Guardar el DataFrame filtrado en un archivo Excel
-        dfFiltrado.to_excel(rf"{inConfig("PathTemp")}\OC_Liberadas.xlsx", index=False)
+        dfFiltrado.to_excel(rf"{inConfig("PathTemp")}\OC Liberadas\OC_Liberadas.xlsx", index=False)
         #Sube el Excel a la base de datos
-        ServicioExcel.ejecutarBulkDesdeExcel(rf"{inConfig("PathTemp")}\OC_Liberadas.xlsx")
+        ServicioExcel.ejecutarBulkDesdeExcel(rf"{inConfig("PathTemp")}\OC Liberadas\OC_Liberadas.xlsx")
 
         WriteLog(
             mensaje=f"Procesamiento en ME9F completado para la OC: {ordenesDeCompra}",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
     except Exception as e:

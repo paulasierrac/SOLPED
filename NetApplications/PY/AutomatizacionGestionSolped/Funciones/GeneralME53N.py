@@ -11,6 +11,7 @@ import time
 import os
 from Funciones.EscribirLog import WriteLog
 from Config.settings import RUTAS
+from Config.InicializarConfig import inConfig
 import pandas as pd
 import pyautogui
 from datetime import datetime
@@ -317,7 +318,7 @@ def EnviarCorreoPersonalizado(
             mensaje=f"Preparando envío personalizado para {destinatario}...",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # Log de adjuntos
@@ -326,7 +327,7 @@ def EnviarCorreoPersonalizado(
                 mensaje=f"Adjuntos a enviar: {', '.join(adjuntos)}",
                 estado="INFO",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
 
         # Crear EmailSender con configuración por defecto
@@ -347,7 +348,7 @@ def EnviarCorreoPersonalizado(
                 mensaje=f"Correo personalizado enviado exitosamente a {destinatario}.",
                 estado="INFO",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             return True
         else:
@@ -355,7 +356,7 @@ def EnviarCorreoPersonalizado(
                 mensaje=f"Fallo al enviar el correo personalizado a {destinatario}.",
                 estado="WARNING",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             return False
 
@@ -430,7 +431,7 @@ def AbrirTransaccion(session, transaccion):
             mensaje=f"Abrir Transaccion {transaccion}",
             estado="INFO",
             nombreTarea="AbrirTransaccion",
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # Validar sesion SAP
@@ -440,7 +441,7 @@ def AbrirTransaccion(session, transaccion):
                 mensaje="Sesion SAP no disponible",
                 estado="ERROR",
                 nombreTarea="AbrirTransaccion",
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             raise Exception("Sesion SAP no disponible")
 
@@ -453,7 +454,7 @@ def AbrirTransaccion(session, transaccion):
             mensaje=f"Transaccion {transaccion} abierta",
             estado="INFO",
             nombreTarea="AbrirTransaccion",
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
         print(f"Transaccion {transaccion} abierta")
         return True
@@ -478,7 +479,7 @@ def ColsultarSolped(session, numeroSolped):
             mensaje=f"Numero de SOLPED : {numeroSolped}",
             estado="INFO",
             nombreTarea="ColsultarSolped",
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # Validar sesion SAP
@@ -488,7 +489,7 @@ def ColsultarSolped(session, numeroSolped):
                 mensaje="Sesion SAP no disponible",
                 estado="ERROR",
                 nombreTarea="ColsultarSolped",
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             raise Exception("Sesion SAP no disponible")
 
@@ -517,7 +518,7 @@ def ColsultarSolped(session, numeroSolped):
             mensaje=f"Solped {numeroSolped} consultada exitosamente",
             estado="INFO",
             nombreTarea="ColsultarSolped",
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         return True

@@ -65,7 +65,7 @@ def ObtenerItemTextME53N(session, numeroSolped, numeroItem):
             mensaje=f"ObtenerItemTextME53N {numeroSolped} Item {numeroItem}",
             estado="INFO",
             nombreTarea="ObtenerItemTextME53N",
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # Validar sesion SAP
@@ -74,7 +74,7 @@ def ObtenerItemTextME53N(session, numeroSolped, numeroItem):
                 mensaje="Sesion SAP no disponible",
                 estado="ERROR",
                 nombreTarea="ObtenerItemTextME53N",
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             raise Exception("Sesion SAP no disponible")
 
@@ -148,7 +148,7 @@ def ProcesarTablaME5A(name, dias=None):
             mensaje=f"Procesar archivo nombre {name}",
             estado="INFO",
             nombreTarea="ProcesarTablaME5A",
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # path = f".\\AutomatizacionGestionSolped\\Insumo\\{name}"
@@ -385,7 +385,7 @@ def TablaItemsDataFrame(name) -> pd.DataFrame:
             mensaje=f"Nombre de archivo {name}",
             estado="INFO",
             nombreTarea="TablaItemsDataFrame",
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # path = rf"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\TablasME53N\{name}"
@@ -458,7 +458,7 @@ def TablaItemsDataFrame(name) -> pd.DataFrame:
             mensaje=f"DataFrame conversion correcta. Codificacion: {encoding}",
             estado="INFO",
             nombreTarea="TablaItemsDataFrame",
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
         print(f"EXITO: DataFrame conversion correcta")
         print(f"  - Filas: {df.shape[0]}")
@@ -505,7 +505,7 @@ def ObtenerItemsME53N(session, numeroSolped):
             mensaje=f"Solped {numeroSolped} a obtener items",
             estado="INFO",
             nombreTarea="ObtenerItemsME53N",
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # Validar sesion SAP
@@ -514,7 +514,7 @@ def ObtenerItemsME53N(session, numeroSolped):
                 mensaje="Sesion SAP no disponible",
                 estado="ERROR",
                 nombreTarea="ObtenerItemsME53N",
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             raise Exception("Sesion SAP no disponible")
 
@@ -566,7 +566,7 @@ def ObtenerItemsME53N(session, numeroSolped):
             mensaje=f"Solped {numeroSolped} convertido a DF con exito",
             estado="INFO",
             nombreTarea="ObtenerItemsME53N",
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
         print(f"EXITO: Solped {numeroSolped} convertido a DF con exito")
 
@@ -639,7 +639,7 @@ def GuardarTablaME5A(df, name):
             mensaje=f"Archivo {name} actualizado con exito - {len(df)} filas",
             estado="INFO",
             nombreTarea="GuardarTablaME5A",
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
         print(f"EXITO: Archivo guardado: {len(df)} filas, {len(df.columns)} columnas")
         return True
@@ -694,7 +694,7 @@ def ParsearTablaAttachments(contenido: str) -> list:
                 mensaje="No se encontró encabezado en tabla de archivosAdjuntos",
                 estado="WARNING",
                 nombreTarea="ParsearTablaAttachments",
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             return archivosAdjuntos
 
@@ -766,7 +766,7 @@ def ValidarAttachmentList(session, numeroSolped):
             mensaje=f"Validando Attachment List para SOLPED {numeroSolped}",
             estado="INFO",
             nombreTarea="ValidarAttachmentList",
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # 1. Presionar botón de GOS Toolbox
@@ -778,7 +778,7 @@ def ValidarAttachmentList(session, numeroSolped):
                 mensaje=f"Error al abrir GOS Toolbox: {e}",
                 estado="WARNING",
                 nombreTarea="ValidarAttachmentList",
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             return False, "", "No se pudo abrir el menú de servicios GOS"
 
@@ -791,7 +791,7 @@ def ValidarAttachmentList(session, numeroSolped):
                 mensaje=f"No hay archivosAdjuntos disponibles: {e}",
                 estado="WARNING",
                 nombreTarea="ValidarAttachmentList",
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             # Cerrar menú GOS si quedó abierto
             try:
@@ -812,7 +812,7 @@ def ValidarAttachmentList(session, numeroSolped):
                 mensaje=f"Ventana de Attachment List no encontrada: {e}",
                 estado="WARNING",
                 nombreTarea="ValidarAttachmentList",
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             # Cerrar menú GOS
             try:
@@ -849,7 +849,7 @@ def ValidarAttachmentList(session, numeroSolped):
                 mensaje=f"Error al exportar Attachment List: {e}",
                 estado="WARNING",
                 nombreTarea="ValidarAttachmentList",
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             # Intentar cerrar ventanas abiertas
             try:
@@ -873,7 +873,7 @@ def ValidarAttachmentList(session, numeroSolped):
                 mensaje=f"Portapapeles vacío después de exportar archivosAdjuntos",
                 estado="WARNING",
                 nombreTarea="ValidarAttachmentList",
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             # Cerrar ventanas
             try:
@@ -897,7 +897,7 @@ def ValidarAttachmentList(session, numeroSolped):
                 mensaje=f"Advertencia al cerrar ventana de archivosAdjuntos: {e}",
                 estado="WARNING",
                 nombreTarea="ValidarAttachmentList",
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
 
         # 7. Cerrar menú GOS Toolbox (shellcont[1])
@@ -909,7 +909,7 @@ def ValidarAttachmentList(session, numeroSolped):
                 mensaje=f"Advertencia al cerrar menú GOS: {e}",
                 estado="WARNING",
                 nombreTarea="ValidarAttachmentList",
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
 
         # 8. Analizar contenido obtenido
@@ -944,14 +944,14 @@ def ValidarAttachmentList(session, numeroSolped):
                 mensaje=f"Advertencia: No se pudo guardar log de archivosAdjuntos: {e}",
                 estado="WARNING",
                 nombreTarea="ValidarAttachmentList",
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
 
         WriteLog(
             mensaje=f"SOLPED {numeroSolped}: {num_archivosAdjuntos} attachment(s) encontrado(s)",
             estado="INFO",
             nombreTarea="ValidarAttachmentList",
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # Construir observación detallada con nombres de archivos

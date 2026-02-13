@@ -11,6 +11,7 @@ import re
 import subprocess
 import time
 import os
+from Config.InicializarConfig import inConfig
 from Config.settings import RUTAS
 from Funciones.GuiShellFunciones import EsperarSAPListo, ObtenerNumeroOC, ProcesarTabla, SetGuiComboBoxkey, CambiarGrupoCompra
 from Funciones.ValidacionME21N import (
@@ -37,7 +38,7 @@ def EjecutarHU04(session, archivo):
             mensaje=f"HU04 Inicia para el archivo {archivo}",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # ============================
@@ -57,7 +58,7 @@ def EjecutarHU04(session, archivo):
                 mensaje=f"No se encontraron Solpeds para procesar en el archivo {archivo}.",
                 estado="WARNING",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             return
 
@@ -67,7 +68,7 @@ def EjecutarHU04(session, archivo):
             mensaje=f"listado de Solped cargadas : {solpedsUnicas}",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         for (
@@ -84,7 +85,7 @@ def EjecutarHU04(session, archivo):
                     mensaje=f"Solped inválida u omitida: {solped}",
                     estado="WARNING",
                     nombreTarea=nombreTarea,
-                    rutaRegistro=RUTAS["PathLog"],
+                    rutaRegistro=inConfig("PathLog"),
                 )
                 continue  # Saltar a la siguiente solped
             # Contar los items para la solped actual
@@ -94,7 +95,7 @@ def EjecutarHU04(session, archivo):
                 mensaje=f"Procesando Solped: {solped} de items: {itemCount} .",
                 estado="INFO",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             acciones = []
             
@@ -161,14 +162,14 @@ def EjecutarHU04(session, archivo):
                 mensaje=f" para la solped : {solped} Se generó la Orden de Compra: {ordenDeCompra}",
                 estado="INFO",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
 
         WriteLog(
             mensaje=f"HU04 finalizada correctamente para archivo {archivo}.",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
         ControlHU(nombreTarea, estado=100)
 

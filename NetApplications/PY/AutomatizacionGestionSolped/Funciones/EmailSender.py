@@ -395,7 +395,7 @@ def EnviarNotificacionCorreo(
             mensaje=f"Enviando notificación con código {codigoCorreo}...",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         sender = EmailSender()
@@ -417,7 +417,7 @@ def EnviarNotificacionCorreo(
                 mensaje=f"Notificación enviada correctamente. Exitosos: {resultados['exitosos']}",
                 estado="INFO",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             return True
         else:
@@ -425,7 +425,7 @@ def EnviarNotificacionCorreo(
                 mensaje=f"No se pudo enviar la notificación. Fallidos: {resultados['fallidos']}",
                 estado="WARNING",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             return False
 
@@ -468,7 +468,7 @@ def EnviarCorreoPersonalizado(
             mensaje=f"Preparando envío personalizado para {destinatario}...",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # Log de adjuntos
@@ -477,7 +477,7 @@ def EnviarCorreoPersonalizado(
                 mensaje=f"Adjuntos a enviar: {', '.join(adjuntos)}",
                 estado="INFO",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
 
         # Crear EmailSender con configuración por defecto
@@ -498,7 +498,7 @@ def EnviarCorreoPersonalizado(
                 mensaje=f"Correo personalizado enviado exitosamente a {destinatario}.",
                 estado="INFO",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             return True
         else:
@@ -506,7 +506,7 @@ def EnviarCorreoPersonalizado(
                 mensaje=f"Fallo al enviar el correo personalizado a {destinatario}.",
                 estado="WARNING",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             return False
 
