@@ -801,3 +801,144 @@ def TransformartxtMe5a(ruta_txt: str):
     print(f"Archivo transformado correctamente: {rutaSalida}")
     return rutaSalida
 
+def EliminarArchivosPorAntiguedad(iDias: int, iRuta: str) -> dict:
+
+    oResultado = {
+        "Ruta": iRuta,
+        "Dias": iDias,
+        "ArchivosEliminados": 0,
+        "Errores": 0
+    }
+
+    try:
+
+        if not os.path.exists(iRuta):
+            WriteLog(
+                f"La ruta no existe: {iRuta}",
+                "WARN",
+                "EliminarArchivosPorAntiguedad",
+                ""
+            )
+            return oResultado
+
+        pFechaLimite = datetime.now() - timedelta(days=iDias)
+
+        for pArchivo in os.listdir(iRuta):
+
+            pRutaCompleta = os.path.join(iRuta, pArchivo)
+
+            if not os.path.isfile(pRutaCompleta):
+                continue
+
+            try:
+                pFechaModificacion = datetime.fromtimestamp(
+                    os.path.getmtime(pRutaCompleta)
+                )
+
+                if pFechaModificacion < pFechaLimite:
+                    os.remove(pRutaCompleta)
+                    oResultado["ArchivosEliminados"] += 1
+
+            except Exception as pErrorArchivo:
+                WriteLog(
+                    f"Error eliminando {pArchivo}: {pErrorArchivo}",
+                    "WARN",
+                    "EliminarArchivosPorAntiguedad",
+                    ""
+                )
+                oResultado["Errores"] += 1
+
+        WriteLog(
+            f"Limpieza completada | Eliminados: {oResultado['ArchivosEliminados']} | "
+            f"Errores: {oResultado['Errores']}",
+            "INFO",
+            "EliminarArchivosPorAntiguedad",
+            ""
+        )
+
+    except Exception as pErrorGeneral:
+
+        WriteLog(
+            f"Error general limpieza: {pErrorGeneral}",
+            "ERROR",
+            "EliminarArchivosPorAntiguedad",
+            ""
+        )
+
+    return oResultado
+
+
+def EliminarLogsPorFechaNombre(iDias: int, iRuta: str) -> dict:
+
+    oResultado = {
+        "Ruta": iRuta,
+        "Dias": iDias,
+        "ArchivosEliminados": 0,
+        "ArchivosSinFecha": 0,
+        "Errores": 0
+    }
+
+    try:
+
+        if not os.path.exists(iRuta):
+            WriteLog(
+                f"La ruta no existe: {iRuta}",
+                "WARN",
+                "EliminarLogsPorFechaNombre",
+                ""
+            )
+            return oResultado
+
+        pFechaLimite = datetime.now() - timedelta(days=iDias)
+        pPatronFecha = re.compile(r"(\d{8})")
+
+        for pArchivo in os.listdir(iRuta):
+
+            pRutaCompleta = os.path.join(iRuta, pArchivo)
+
+            if not os.path.isfile(pRutaCompleta):
+                continue
+
+            try:
+                pMatch = pPatronFecha.search(pArchivo)
+
+                if not pMatch:
+                    oResultado["ArchivosSinFecha"] += 1
+                    continue
+
+                pFechaStr = pMatch.group(1)
+                pFechaArchivo = datetime.strptime(pFechaStr, "%Y%m%d")
+
+                if pFechaArchivo < pFechaLimite:
+                    os.remove(pRutaCompleta)
+                    oResultado["ArchivosEliminados"] += 1
+
+            except Exception as pErrorArchivo:
+                WriteLog(
+                    f"Error procesando {pArchivo}: {pErrorArchivo}",
+                    "WARN",
+                    "EliminarLogsPorFechaNombre",
+                    ""
+                )
+                oResultado["Errores"] += 1
+
+        WriteLog(
+            f"Limpieza logs completada | "
+            f"Eliminados:{oResultado['ArchivosEliminados']} | "
+            f"SinFecha:{oResultado['ArchivosSinFecha']} | "
+            f"Errores:{oResultado['Errores']}",
+            "INFO",
+            "EliminarLogsPorFechaNombre",
+            ""
+        )
+
+    except Exception as pErrorGeneral:
+
+        WriteLog(
+            f"Error general limpieza logs: {pErrorGeneral}",
+            "ERROR",
+            "EliminarLogsPorFechaNombre",
+            ""
+        )
+
+    return oResultado

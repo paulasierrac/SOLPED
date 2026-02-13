@@ -18,6 +18,7 @@ from HU.HU03_ValidacionME53N import EjecutarHU03
 # from HU.HU05_DescargaOC import EjecutarHU05
 
 from Config.InicializarConfig import inConfig, initConfig
+from Funciones.FuncionesExcel import ServicioExcel
 
 
 def TransformartxtMe5a(ruta_txt: str):
@@ -159,21 +160,10 @@ if __name__ == "__main__":
     #     SAP_CONFIG["user"],
     #     SAP_CONFIG["password"],
     # )
+    pathReporte = r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Resultado\Reportes\ReporteFinal.xlsx"
 
-    session = ObtenerSesionActiva()
-
-    archivos_validar = [
-        "expSolped05.txt"
-    ]  # Dos solped para prueba 1300139393  1300139394
-    WriteLog(
-        mensaje=f"Inicia Prueba HU3",
-        estado="INFO",
-        nombreTarea=nombreTarea,
-        rutaRegistro=inConfig("PathLog"),
-    )
-    for archivo in archivos_validar:
-        EjecutarHU03(session, archivo)
-
+    # Sube el Excel a la base de datos
+    ServicioExcel.ejecutarBulkDesdeExcel(pathReporte)
     # TransformartxtMe5a(
     #     r"C:\Users\CGRPA009\Documents\SOLPED-main\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped05.txt"
     # )
