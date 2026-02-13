@@ -81,7 +81,7 @@ def EjecutarHU00():
         return config
 
     except Exception as e:
-         print("Error")
+         print("Error en despliege ")
 
          
     #     WriteLog(

@@ -39,7 +39,7 @@ from Funciones.SAPFuncionesME53N import (
     ValidarAttachmentList,
     ParsearTablaAttachments,
 )
-
+from Config.InicializarConfig import inConfig
 from Config.settings import RUTAS
 from Funciones.FuncionesExcel import ServicioExcel
 from Funciones.ValidacionME53N import (
@@ -67,7 +67,7 @@ def EjecutarHU03(session, nombreArchivo):
             mensaje="Inicio HU03 - Validación ME53N",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # Leer el archivo con las SOLPEDs a procesar
@@ -123,7 +123,7 @@ def EjecutarHU03(session, nombreArchivo):
                 mensaje="No se encontraron SOLPEDs válidas para procesar",
                 estado="WARNING",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
             return False
 
@@ -131,7 +131,7 @@ def EjecutarHU03(session, nombreArchivo):
             mensaje=f"Procesando {len(solpedUnicos)} SOLPEDs - Total filas: {len(dfSolpeds)}",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # Abrir transaccion ME53N en SAP
@@ -161,7 +161,7 @@ def EjecutarHU03(session, nombreArchivo):
                 mensaje=f"MODO DESARROLLO: Correos redirigidos a {EMAIL_DESARROLLO}",
                 estado="WARNING",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
 
         solpedsConProblemas = []
@@ -603,7 +603,7 @@ def EjecutarHU03(session, nombreArchivo):
                             mensaje=f"Error al enviar notificación para SOLPED {solped}: {e_notif}",
                             estado="WARNING",
                             nombreTarea=nombreTarea,
-                            rutaRegistro=RUTAS["PathLog"],
+                            rutaRegistro=inConfig("PathLog"),
                         )
 
                 elif requiereNotificacion and not correosResponsables:
@@ -611,7 +611,7 @@ def EjecutarHU03(session, nombreArchivo):
                         mensaje=f"SOLPED {solped}: Requiere revisión pero sin correo de responsable",
                         estado="WARNING",
                         nombreTarea=nombreTarea,
-                        rutaRegistro=RUTAS["PathLog"],
+                        rutaRegistro=inConfig("PathLog"),
                     )
 
                     solpedsConProblemas.append(
@@ -655,7 +655,7 @@ def EjecutarHU03(session, nombreArchivo):
             f"Filas reporte: {len(filasReporteFinal)}",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # GENERAR ARCHIVO FINAL
@@ -664,7 +664,7 @@ def EjecutarHU03(session, nombreArchivo):
                 mensaje="Generando reporte final consolidado ME53N",
                 estado="INFO",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
 
             pathReporte = GenerarReporteFinalExcel(filasReporteFinal)
@@ -674,21 +674,21 @@ def EjecutarHU03(session, nombreArchivo):
                     mensaje=f"Reporte final generado: {pathReporte}",
                     estado="OK",
                     nombreTarea=nombreTarea,
-                    rutaRegistro=RUTAS["PathLog"],
+                    rutaRegistro=inConfig("PathLog"),
                 )
             else:
                 WriteLog(
                     mensaje="No se pudo generar el reporte final",
                     estado="WARNING",
                     nombreTarea=nombreTarea,
-                    rutaRegistro=RUTAS["PathLog"],
+                    rutaRegistro=inConfig("PathLog"),
                 )
         else:
             WriteLog(
                 mensaje="No hay filas para generar el reporte final",
                 estado="WARNING",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
 
         # Convertir a Excel y agregar hipervínculos

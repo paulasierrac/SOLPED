@@ -39,7 +39,7 @@ def Main_GestionSolped():
         # ================================
 
         # Enviar correo de inicio
-        WriteLog(mensaje="Inicio ejecución Main GestionSolped.", estado="INFO", nombreTarea=nombreTarea,  rutaRegistro=RUTAS["PathLog"],)
+        WriteLog(mensaje="Inicio ejecución Main GestionSolped.", estado="INFO", nombreTarea=nombreTarea,  rutaRegistro=inConfig("PathLog"),)
 
         #EnviarNotificacionCorreo(codigoCorreo=1, nombreTarea=nombreTarea)
 
@@ -50,14 +50,14 @@ def Main_GestionSolped():
             mensaje="Inicia HU00_DespliegueAmbiente.",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
         
         WriteLog(
             mensaje="Finaliza HU00_DespliegueAmbiente.",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
         # ================================
         # 2. Obtener sesión SAP
@@ -66,17 +66,17 @@ def Main_GestionSolped():
             mensaje="Inicia HU01_LoginSAP.",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
-        #session = ConectarSAP(inConfig("SapSistema"),inConfig("SapMandante") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
+        session = ConectarSAP(inConfig("SapSistema"),inConfig("SapMandante") ,SAP_CONFIG["user"],SAP_CONFIG["password"],)
 
-        session = ObtenerSesionActiva()
+        #session = ObtenerSesionActiva()
 
         WriteLog(
             mensaje="Finaliza HU01_LoginSAP.",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # ================================
@@ -86,7 +86,7 @@ def Main_GestionSolped():
             mensaje="Inicia HU02 - Descarga ME5A.",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
         
         #EjecutarHU02(session)
@@ -95,7 +95,7 @@ def Main_GestionSolped():
             mensaje="HU02 finalizada correctamente.",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # ================================
@@ -109,16 +109,16 @@ def Main_GestionSolped():
                 mensaje=f"Inicia HU03 - Validación ME53N para archivo.",
                 estado="INFO",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
-        for archivo in archivos_validar:
-            EjecutarHU03(session, archivo)
+        # for archivo in archivos_validar:
+        #     EjecutarHU03(session, archivo)
 
         WriteLog(
                 mensaje=f"Finaliza HU03 - Validación ME53N para archivo.",
                 estado="INFO",
                 nombreTarea=nombreTarea,
-                rutaRegistro=RUTAS["PathLog"],
+                rutaRegistro=inConfig("PathLog"),
             )
         
         # ================================
@@ -128,18 +128,18 @@ def Main_GestionSolped():
             mensaje="Inicia HU04 - Generación OC.",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
-        # archivos_validar = ["expSolped03 copy.txt"] 
-        # for archivo in archivos_validar:
-        #     EjecutarHU04(session, archivo)
+        archivos_validar = ["expSolped03 copy.txt"] 
+        for archivo in archivos_validar:
+            EjecutarHU04(session, archivo)
 
         WriteLog(
             mensaje="HU04 - Generación OC finalizada correctamente.",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
         
         # ================================
@@ -149,7 +149,7 @@ def Main_GestionSolped():
             mensaje="Inicia HU05 - Descarga OC generadas.",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         #EjecutarHU05(session)
@@ -158,7 +158,7 @@ def Main_GestionSolped():
             mensaje="HU05 - Descarga OC finalizada correctamente.",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
         
         # ================================
@@ -168,7 +168,7 @@ def Main_GestionSolped():
             mensaje="Inicia HU06 - Envío OC por correo.",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
         # EjecutarHU06(session)
@@ -177,7 +177,7 @@ def Main_GestionSolped():
             mensaje="HU06 - Envío OC por correo finalizada correctamente.",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
         
         EnviarNotificacionCorreo(codigoCorreo=2, nombreTarea=nombreTarea, adjuntos=[])
@@ -186,7 +186,7 @@ def Main_GestionSolped():
             mensaje="Main GestionSolped finalizado correctamente.",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=RUTAS["PathLog"],
+            rutaRegistro=inConfig("PathLog"),
         )
 
     except Exception as e:
