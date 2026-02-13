@@ -1,9 +1,9 @@
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-|PurchReq    |Item  |ReqDate     |Material  |Created     |ShortText                                   |PO      |Quantity  |Plnt  |PGr  |Blank1  |D  |Requisnr   |ProcState   |Estado          |Observaciones                |
------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-|Sol.pedido  |  Pos.|Fe.solic.   |Material  |Creado por  |Texto breve                                 |Pedido  |  Cantidad|Ce.   |GCp  |        |B  |Gestores   |Stat.trat.  |                |                             |
-|  1300139397|    10|  16.12.2025|  80035823|OSCAVILN    |PAQUETE DE PLUMON DOBLE PUNTA               |        |         1|CC04  |BLO  |        |   |           |          05|Error Consulta  |No se pudo consultar en SAP  |
-|  1300139397|    20|  16.12.2025|  80035824|OSCAVILN    |MARCADOR PUNTA PINCEL                       |        |         1|CC04  |BLO  |        |   |           |          05|Error Consulta  |No se pudo consultar en SAP  |
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|PurchReq    |Item  |ReqDate     |Material  |Created     |ShortText                                   |PO      |Quantity  |Plnt  |PGr  |Blank1  |D  |Requisnr   |ProcState   |
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+|Sol.pedido  |  Pos.|Fe.solic.   |Material  |Creado por  |Texto breve                                 |Pedido  |  Cantidad|Ce.   |GCp  |        |B  |Gestores   |Stat.trat.  |
+|  1300139397|    10|  16.12.2025|  80035823|OSCAVILN    |PAQUETE DE PLUMON DOBLE PUNTA               |        |         1|CC04  |BLO  |        |   |           |          05|
+|  1300139397|    20|  16.12.2025|  80035824|OSCAVILN    |MARCADOR PUNTA PINCEL                       |        |         1|CC04  |BLO  |        |   |           |          05|
 |  1300139397|    30|  16.12.2025|  80035825|OSCAVILN    |PAQUETE RESALTADOR ESCARCHADO               |        |         1|CC04  |BLO  |        |   |           |          05|Error Consulta  |No se pudo consultar en SAP  |
 |  1300139397|    40|  16.12.2025|  80035826|OSCAVILN    |KILO DE VINILO                              |        |         6|CC04  |BLO  |        |   |           |          05|Error Consulta  |No se pudo consultar en SAP  |
 |  1300139397|    50|  16.12.2025|  80035827|OSCAVILN    |PAQUETE MARCADOR TIZA LIQUIDA               |        |         2|CC04  |BLO  |        |   |           |          05|Error Consulta  |No se pudo consultar en SAP  |
