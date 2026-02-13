@@ -1,153 +1,197 @@
+# ================================
+# GestionSOLPED – HU00: DespliegueAmbiente
+# Autor: Steven Navarro - NetApplications
+# Descripcion: Carga parámetros, valida carpetas y prepara entorno
+# Ultima modificacion: 30/11/2025
+# Propiedad de Colsubsidio
+# Cambios: Ajuste ruta base dinámica + estándar Colsubsidio
+# ================================
+
+
 import win32com.client  # pyright: ignore[reportMissingModuleSource]
 import time
-import getpass
 import subprocess
 import os
-from config.initconfig import in_config
-from config.settings import RUTAS, SAP_CONFIG 
-from funciones.ValidacionM21N import ventana_abierta
+from Config.InicializarConfig import inConfig
+from Config.settings import RUTAS, SAP_CONFIG 
+from Funciones.ValidacionME21N import ventanaAbierta
 
 import pyautogui
 
+from Config.InicializarConfig import inConfig
+from Config.settings import RUTAS, SAP_CONFIG
+from Funciones.ValidacionME21N import ventanaAbierta
+from Funciones.ControlHU import ControlHU
 
 
-def abrir_sap_logon():
+def AbrirSAPLogon():
     """Abre SAP Logon si no está ya abierto."""
     #SAP_CONFIG = get_sap_config()
     try:
-        # Verificar si SAP ya está abierto
-        sapgui = win32com.client.GetObject("SAPGUI")
+        # WriteLog | INFO | INICIA abrirSap_logon
+
+        win32com.client.GetObject("SAPGUI")
+        print("INFO | SAP Logon ya se encuentra abierto")
+
+        # WriteLog | INFO | FINALIZA abrirSap_logon
         return True
     except:
         # Si no está abierto, se lanza el ejecutable
-        #"logon_path": get_env_variable("SAP_LOGON_PATH"),
-        subprocess.Popen(in_config("SAP_LOGON_PATH"))
+        #"logon_path": LeerVariableEntorno("SAP_LOGON_PATH"),
+        subprocess.Popen(inConfig("SapRutaLogon"))
         time.sleep(5)  # Esperar a que abra SAP Logon
         return False
 
 
-def conectar_sap(conexion, mandante, usuario, password, idioma="ES"):
+def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
 
-    abrir_sap = abrir_sap_logon()
+    abrirSap = AbrirSAPLogon()
     time.sleep(3)
-    if abrir_sap:
+    if abrirSap:
         print(" SAP Logon 750 ya se encuentra abierto")
     else:
         print(" SAP Logon 750 abierto ")
 
     try:
-        print("Iniciando conexion con SAP...")
+        # WriteLog | INFO | INICIA ConectarSAP
+        nombreTarea = "HU01_LoginSAP"
+        ControlHU(nombreTarea, estado=0)
 
-        # 1️⃣ Obtener objeto SAPGUI
-        sap_gui_auto = win32com.client.GetObject("SAPGUI")
-        if not sap_gui_auto:
-            raise Exception(
-                "No se pudo obtener el objeto SAPGUI. Asegúrate de que SAP Logon esté instalado y el scripting habilitado."
-            )
+        abrirSap = AbrirSAPLogon()
+        time.sleep(3)
 
-        application = sap_gui_auto.GetScriptingEngine  # motor de Scripting
+        if abrirSap:
+            print("INFO | SAP Logon ya se encuentra abierto")
+        else:
+            print("INFO | SAP Logon abierto correctamente")
 
-        # 2️⃣ Buscar conexión activa
-        # application.Connections → lista de conexiones (entradas en SAP Logon).
+        sapGuiAuto = win32com.client.GetObject("SAPGUI")
+        if not sapGuiAuto:
+            raise Exception("No se pudo obtener objeto SAPGUI")
+
+        application = sapGuiAuto.GetScriptingEngine
+
         connection = None
         for item in application.Connections:
             if item.Description.strip().upper() == conexion.strip().upper():
                 connection = item
                 break
 
-        # 3️⃣ Si no existe conexión abierta, abrir una nueva
         if not connection:
-            print(f"Abriendo nueva conexion a {conexion}...")
+            print(f"INFO | Abriendo nueva conexion a {conexion}")
             connection = application.OpenConnection(conexion, True)
-            time.sleep(3)  # Esperar que abra
+            time.sleep(3)
         else:
-            print(f"✅ Conexion existente encontrada con {conexion}.")
+            print(f"INFO | Conexion existente encontrada con {conexion}")
 
-        # 4️⃣ Verificar sesión
         if connection.Children.Count > 0:
             session = connection.Children(0)
-            print("Sesion existente reutilizada.")
+            print("INFO | Sesion existente reutilizada")
         else:
             session = connection.Children(0).CreateSession()
-            print(" Nueva sesion creada.")
+            print("INFO | Nueva sesion creada")
 
-        # 5️⃣ Si la pantalla está en login, ingresar credenciales
-        # if "RSYST-BNAME" in session.findById("wnd[0]/usr").Text:
-        #     print("🧩 Ingresando credenciales...")
-        # if password is None:
-        #     password = getpass.getpass("Contraseña SAP: ")
-        # Ingresar datos de login
+        # Login
         session.findById("wnd[0]/usr/txtRSYST-MANDT").text = mandante
         session.findById("wnd[0]/usr/txtRSYST-BNAME").text = usuario
         session.findById("wnd[0]/usr/pwdRSYST-BCODE").text = password
         session.findById("wnd[0]/usr/txtRSYST-LANGU").text = idioma
         session.findById("wnd[0]").sendVKey(0)
-        print(" Conectado correctamente a SAP.")
 
-        if ventana_abierta(session, "Copyrigth"):
+        print("INFO | Credenciales enviadas correctamente")
+
+        if ventanaAbierta(session, "Copyrigth"):
             pyautogui.press("enter")
+            print("INFO | Ventana Copyrigth cerrada")
 
         try:
             if validarLoginDiag(
                 ruta_imagen=rf".\img\logindiag.png",
                 confidence=0.5,
-                intentos=20,
-                espera=0.5
+                intentos= int (inConfig("ReIntentos")),
+                espera=0.5,
             ):
-                print("Ventana loginDiag Copyrigth inesperada superada correctamente")
+                print("INFO | Ventana loginDiag superada correctamente")
         except Exception as e:
             print(f"no se encontro ventana Copyrigth en login {e}")
+
+        if ventanaAbierta(session, "Info de licencia en entrada al sistema múltiple"):
+            
+            print("entro a la funcion click")
+            time.sleep(20)  
+            pyautogui.click()
+            pyautogui.press("enter")
+               
+            try:
+                if validarLoginDiag(
+                    ruta_imagen=rf".\img\Infodelicenciaenentradaalsistemamultiple.png",
+                    confidence=0.8,
+                    intentos=20,
+                    espera=0.5
+                ):  
+                    pyautogui.click()
+                    print("encontro la imagen ")
+                    print("Ventana info de licencia inesperada superada correctamente")
+            except Exception as e:
+                print(f"no se encontro ventana Copyrigth en login {e}")
         return session
 
     except Exception as e:
-        print(f" Error al conectar a SAP: {e}")
+        ControlHU(nombreTarea, estado=99)
+        print(f"ERROR | Error al conectar a SAP: {e}")
+        # WriteLog | ERROR | Error grave ConectarSAP
         return None
 
 
+# ============================================================
+# ObtenerSesionActiva
+# Autor: Automatizacion RPA
+# Descripcion: Obtiene una sesion activa de SAP
+# ============================================================
 def ObtenerSesionActiva():
+
     """Obtiene una sesión SAP ya iniciada (con usuario logueado)."""
     try:
-        sap_gui_auto = win32com.client.GetObject("SAPGUI")
-        application = sap_gui_auto.GetScriptingEngine
+        sapGuiAuto = win32com.client.GetObject("SAPGUI")
+        application = sapGuiAuto.GetScriptingEngine
 
-        # Buscar una conexión activa con sesión
         for conn in application.Connections:
             if conn.Children.Count > 0:
                 session = conn.Children(0)
-                print(f" Sesion encontrada en conexión: {conn.Description}")
+                print(f"INFO | Sesion encontrada en conexión: {conn.Description}")
+
+                # WriteLog | INFO | FINALIZA ObtenerSesionActiva
                 return session
 
-        print(" No se encontró ninguna sesion activa.")
+        print("WARN | No se encontró ninguna sesion activa")
         return None
 
     except Exception as e:
-        print(f" Error al obtener la sesion activa: {e}")
+        print(f"ERROR | Error al obtener la sesion activa: {e}")
+        # WriteLog | ERROR | Error ObtenerSesionActiva
         return None
 
 
 
+
+# ============================================================
+# validarLoginDiag
+# Autor: Automatizacion RPA
+# Descripcion: Valida ventana de dialogo por imagen
+# ============================================================
 def validarLoginDiag(ruta_imagen, confidence=0.5, intentos=3, espera=0.5):
-    """
-    Busca una imagen en pantalla y hace Enter cuando la encuentra.
 
-    Args:
-    
-        ruta_imagen (str): Ruta de la imagen a buscar.
-        confidence (float): Confianza para el match (requiere OpenCV).
-        intentos (int): Número de intentos antes de fallar.
-        espera (float): Tiempo entre intentos en segundos.
+    for intento in range(intentos):
+        try:
+            pos = pyautogui.locateCenterOnScreen(ruta_imagen, confidence=confidence)
+            if pos:
+                pyautogui.press("enter")
+                return True
 
-    Returns:
-        bool: True si hizo click, False si no encontró la imagen.
-    """
+        except Exception as e:
+            print(f"WARN | Error buscando imagen loginDiag: {e}")
 
-    for _ in range(intentos):
-        pos = pyautogui.locateCenterOnScreen(ruta_imagen, confidence=confidence)
-        if pos:
-            pyautogui.press("enter")
-            return True
         time.sleep(espera)
 
-    print(f" No se encontró la ventana login diag: {ruta_imagen}")
+    print(f"WARN | No se encontró la ventana login diag: {ruta_imagen}")
     return False
-

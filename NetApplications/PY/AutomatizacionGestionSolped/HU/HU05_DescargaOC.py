@@ -7,79 +7,115 @@
 # Cambios: Estructura y logs.
 # ============================================
 
+from datetime import datetime
+import pandas as pd
 import pyperclip
+
 from requests import session
-import win32com.client  # pyright: ignore[reportMissingModuleSource]
 import time
 import traceback
-import pyautogui
-from funciones.GuiShellFunciones import set_GuiTextField_text
-from funciones.EscribirLog import WriteLog
-from config.settings import RUTAS
-from funciones.GeneralME53N import AbrirTransaccion
-from funciones.ValidacionM21N import esperar_sap_listo
 
-def EjecutarHU05(session, ordenes_de_compra):
+from Config.settings import RUTAS, DB_CONFIG
+from Config.InicializarConfig import inConfig
+
+from Funciones.GuiShellFunciones import ProcesarTablaMejorada
+from Funciones.EscribirLog import WriteLog
+from Funciones.GeneralME53N import AbrirTransaccion
+from Funciones.ValidacionME21N import EsperarSAPListo
+
+
+from Funciones.FuncionesExcel import ServicioExcel
+
+
+def EjecutarHU05(session, ordenesDeCompra: list):
     """
     Ejecuta la Historia de Usuario 05: Descarga de OC desde ME9F.
     """
-    task_name = "HU05_DescargaOC"
+    nombreTarea = "HU05_DescargaOC"
 
     try:
-        WriteLog(
-            mensaje=f"Inicia HU05 para la Orden de Compra: {ordenes_de_compra}",
-            estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
-        )
-        
+
         if not session:
             raise ValueError("Sesion SAP no valida.")
-
-        if not ordenes_de_compra:
-            raise ValueError("El número de Orden de Compra es inválido o no fue proporcionado.")
-
-        # Abrir transacción ME9F
-        AbrirTransaccion(session, "ME2L")
-        esperar_sap_listo(session)   
-          
-        # Alcance de la lista
-        session.findById("wnd[0]/usr/ctxtP_LSTUB").text = "ALV"
-
-        session.findById("wnd[0]/usr/btn%_S_EBELN_%_APP_%-VALU_PUSH").press()
         
-        # Definir la lista de órdenes de compra
-        ordenes_de_compra = ["4200339200", "4200339201", "4200339202", "4200339203", "4200339204", "4200339205", "4200339206"]
-        # Convertir la lista a una cadena de texto (por ejemplo, separada por saltos de línea)
-        for i in range(len(ordenes_de_compra)):
-            set_GuiTextField_text(session, f"SLOW_I[1,{i}]", ordenes_de_compra[i])
-
-
+        AbrirTransaccion(session, "ME2L")
+        EsperarSAPListo(session)   
+        session.findById("wnd[0]/usr/ctxtLISTU").text = "ALV" # Alcance de la lista
+        session.findById("wnd[0]/usr/btn%_S_EBELN_%_APP_%-VALU_PUSH").press() # Presionar Enter
+        # Alistar Texto para pegar desde el portapapeles, estándar de Windows \r\n (Carriage Return + Line Feed).
+        textoParaCopiar = '\r\n'.join(ordenesDeCompra)
+        pyperclip.copy(textoParaCopiar)
+        EsperarSAPListo(session)
+        #Boton Pegar desde el portapapeles
+        session.findById("wnd[1]/tbar[0]/btn[24]").press()
+        EsperarSAPListo(session) 
         session.findById("wnd[1]/tbar[0]/btn[8]").press()
-      
         # Presionar el botón de ejecutar
         session.findById("wnd[0]/tbar[1]/btn[8]").press()
-        time.sleep(1)
-        
+        time.sleep(0.5)
+        session.findById("wnd[0]/tbar[1]/btn[45]").press()  # Botón de lista de opciones / Fichero local crtl + shift + F9
+        session.findById("wnd[1]/tbar[0]/btn[0]").press()  # Botón de exportar
         # Seleccionar la línea y "Message Output"
-        # session.findById("wnd[0]/usr/chk[1,5]").selected = True
-        # pyautogui.hotkey("shift", "f5") # Botón "Message Output"
 
-        #Adicionar codigo para guardar el PDF resultante, hilo treads para manejo de la ventana emergente 
+        # === Fecha ===
+        ahora = datetime.now()
+        #fecha_hora = ahora.strftime("%d/%m/%Y %H:%M:%S")
+        fechaArchivo = ahora.strftime("%Y%m%d_%H%M%S")
+        #Guardar el archivo txt en la ruta especificada
+        rutaGuardar = rf"{inConfig("PathTemp")}"
+        session.findById("wnd[1]/usr/ctxtDY_PATH").text = rutaGuardar
+        session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = rf"LiberadasOC_{fechaArchivo}.txt"
+        session.findById("wnd[1]/usr/ctxtDY_FILENAME").caretPosition = 10
+        session.findById("wnd[1]/tbar[0]/btn[0]").press
+        session.findById("wnd[1]/tbar[0]/btn[11]").press()  # Guardar
+
+
+
+        archivo = rf"LiberadasOC_{fechaArchivo}.txt"
+
+        dfOcliberadas = ProcesarTablaMejorada(archivo)
+        #print (dfOcliberadas)
+        dfOcliberadas.columns = [col.strip() for col in dfOcliberadas.columns]
+
+        print(dfOcliberadas)
+
+        # Definir las columnas deseadas
+        columnasInteres = ["Doc.compr.", "EstadLib"]
+
+        # Crear el nuevo DataFrame validando que las columnas existan
+        if all(col in dfOcliberadas.columns for col in columnasInteres):
+            dfFiltrado = dfOcliberadas[columnasInteres].copy()
+            print("Nuevo DataFrame creado exitosamente.")
+        else:
+            # Caso alternativo: Si las columnas tienen nombres ligeramente distintos
+            print(f"Columnas encontradas en el archivo: {list(dfOcliberadas.columns)}")
+            # Intento de búsqueda por coincidencia parcial si falla la exacta
+            colDoc = next((c for c in dfOcliberadas.columns if "Doc.compr" in c), None)
+            colEst = next((c for c in dfOcliberadas.columns if "EstadLib" in c), None)
+            
+            if colDoc and colEst:
+                dfFiltrado = dfOcliberadas[[colDoc, colEst]].copy()
+                dfFiltrado.columns = ["Doc.compr.", "EstadLib"] # Renombrar para estandarizar
+        
+        print(dfFiltrado)
+        # Guardar el DataFrame filtrado en un archivo Excel
+        dfFiltrado.to_excel(rf"{inConfig("PathTemp")}\OC_Liberadas.xlsx", index=False)
+        #Sube el Excel a la base de datos
+        ServicioExcel.ejecutarBulkDesdeExcel(rf"{inConfig("PathTemp")}\OC_Liberadas.xlsx")
 
         WriteLog(
-            mensaje=f"Procesamiento en ME9F completado para la OC: {ordenes_de_compra}",
+            mensaje=f"Procesamiento en ME9F completado para la OC: {ordenesDeCompra}",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLog"],
         )
 
     except Exception as e:
-        error_text = traceback.format_exc()
+        errorText = traceback.format_exc()
         WriteLog(
-            mensaje=f"ERROR GLOBAL en HU05: {e} | {error_text}",
+            mensaje=f"ERROR GLOBAL en HU05: {e} | {errorText}",
             estado="ERROR",
-            task_name=task_name,
-            path_log=RUTAS["PathLogError"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLogError"],
         )
         raise

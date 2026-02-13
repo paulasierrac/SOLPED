@@ -2,147 +2,148 @@
 # NombreDeLaIniciativa – HU03: ValidacionME53N
 # Autor: Paula Sierra - NetApplications
 # Descripcion: Ejecuta la búsqueda de una SOLPED en la transacción ME53N
-# Ultima modificacion: 08/12/2025
+# Ultima modificacion: 06/02/2026
 # Propiedad de Colsubsidio
 # Cambios:
 #   - Versión con validación completa y uso correcto de validaciones
 #   - Notificaciones automáticas a responsables de Colsubsidio
+#   - FIX: Corrección de datos faltantes en reporte final
+#   - FIX: Corrección de duplicados en reporte
+#   - FIX: Manejo robusto de errores de conversión
+#   - UPDATE: WriteLog optimizado solo en puntos esenciales
 # =========================================
-import win32com.client  # pyright: ignore[reportMissingModuleSource]
-import time
-import getpass
-import subprocess
-import os
 import time
 import traceback
-from funciones.EscribirLog import WriteLog
-from funciones.GeneralME53N import (
+from Funciones.ControlHU import ControlHU
+from Funciones.EmailSender import EnviarNotificacionCorreo
+from Funciones.ReporteFinalME53N import (
+    ConstruirFilaReporteFinal,
+    GenerarReporteFinalExcel,
+)
+from Funciones.EscribirLog import WriteLog
+from Funciones.GeneralME53N import (
     AbrirTransaccion,
     ColsultarSolped,
-    procesarTablaME5A,
-    ObtenerItemTextME53N,
-    ObtenerItemsME53N,
-    TablaItemsDataFrame,
-    TraerSAPAlFrente_Opcion,
+    TraerSAPAlFrenteOpcion,
     ActualizarEstado,
     ActualizarEstadoYObservaciones,
-    ProcesarYValidarItem,
-    GuardarTablaME5A,
     NotificarRevisionManualSolped,
-    ValidarAttachmentList,
     GenerarReporteAttachments,
-    ParsearTablaAttachments,
-    convertir_txt_a_excel,
-    EnviarNotificacionCorreo,
-    AppendHipervinculoObservaciones,
+    ConvertirTxtAExcel,
 )
+from Funciones.SAPFuncionesME53N import (
+    ProcesarTablaME5A,
+    ObtenerItemTextME53N,
+    ObtenerItemsME53N,
+    GuardarTablaME5A,
+    ValidarAttachmentList,
+    ParsearTablaAttachments,
+)
+<<<<<<< HEAD
 from config.settings import RUTAS
+=======
+
+from Config.settings import RUTAS
+from Funciones.FuncionesExcel import ServicioExcel
+from Funciones.ValidacionME53N import (
+    DeterminarEstadoFinal,
+    ExtraerDatosTexto,
+    GenerarObservaciones,
+    GenerarReporteValidacion,
+    ProcesarYValidarItem,
+    extraerDatosReporte,
+    AppendHipervinculoObservaciones,
+    obtenerFilaExpSolped,
+    LimpiarNumeroRobusto,
+    ObtenerValorDesdeFila,
+)
+>>>>>>> and
 
 
-def EjecutarHU03(session, nombre_archivo):
+def EjecutarHU03(session, nombreArchivo):
     try:
-        # ==========================
-        # CONFIGURACIÓN DEL PROCESO
-        # ==========================
-        task_name = "HU03_ValidacionME53N"
-        # Controla si el proceso debe detener validaciones cuando NO hay adjuntos
-        CANCELAR_SI_NO_HAY_ADJUNTOS = (
-            True  # ← ponlo en False si quieres seguir validando
-        )
+        nombreTarea = "HU03_ValidacionME53N"
+        ControlHU(nombreTarea, estado=0)
 
-        # === Inicio HU03 ===
+        TraerSAPAlFrenteOpcion()
+
         WriteLog(
             mensaje="Inicio HU03 - Validación ME53N",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLog"],
         )
 
-        # Traer SAP al frente
-        # TraerSAPAlFrente_Opcion()
-
         # Leer el archivo con las SOLPEDs a procesar
-        df_solpeds = procesarTablaME5A(nombre_archivo)
-        GuardarTablaME5A(df_solpeds, nombre_archivo)
+        dfSolpeds = ProcesarTablaME5A(nombreArchivo)
+        GuardarTablaME5A(dfSolpeds, nombreArchivo)
 
-        if df_solpeds.empty:
-            print("ERROR: No se pudo cargar el archivo o esta vacio")
+        if dfSolpeds.empty:
             WriteLog(
                 mensaje="El archivo expSolped03.txt está vacío o no se pudo cargar",
                 estado="ERROR",
-                task_name=task_name,
-                path_log=RUTAS["PathLogError"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLogError"],
             )
             return False
 
-        # === Validación de columnas ===
-        columnas_requeridas = ["Estado", "Observaciones"]
-        for columna in columnas_requeridas:
-            if columna not in df_solpeds.columns:
-                print(
-                    f"ERROR: Columna requerida '{columna}' no encontrada en el DataFrame"
-                )
+        # Validación de columnas
+        columnasRequeridas = ["Estado", "Observaciones"]
+        for columna in columnasRequeridas:
+            if columna not in dfSolpeds.columns:
                 WriteLog(
-                    mensaje=f"No se encontró la columna requerida: {columna}",
+                    mensaje=f"Columna requerida '{columna}' no encontrada",
                     estado="ERROR",
-                    task_name=task_name,
-                    path_log=RUTAS["PathLogError"],
+                    nombreTarea=nombreTarea,
+                    rutaRegistro=RUTAS["PathLogError"],
                 )
                 return False
 
-        # === Limpieza de SOLPEDs válidas ===
-        solped_unicos = df_solpeds["PurchReq"].unique().tolist()
+        # Limpieza de SOLPEDs válidas
+        solpedUnicos = dfSolpeds["PurchReq"].unique().tolist()
 
-        # Filtrar SOLPEDs validas (excluir encabezados)
-        solped_unicos_filtradas = []
-        for solped in solped_unicos:
-            solped_str = str(solped).strip()
+        solpedUnicosFiltradas = []
+        for solped in solpedUnicos:
+            solpedStr = str(solped).strip()
 
-            # Excluir encabezados y valores no validos
             if (
-                solped_str
-                and solped_str not in ["Purch.Req.", "PurchReq", "Purch.Req", ""]
+                solpedStr
+                and solpedStr not in ["Purch.Req.", "PurchReq", "Purch.Req", ""]
                 and not any(
-                    header in solped_str for header in ["Purch.Req", "PurchReq"]
+                    header in solpedStr for header in ["Purch.Req", "PurchReq"]
                 )
-                and solped_str.replace(".", "").isdigit()
+                and solpedStr.replace(".", "").isdigit()
             ):
-
-                solped_limpia = solped_str.replace(".", "")
-                if solped_limpia.isdigit():
-                    solped_unicos_filtradas.append(solped_limpia)
+                solpedLimpia = solpedStr.replace(".", "")
+                if solpedLimpia.isdigit():
+                    solpedUnicosFiltradas.append(solpedLimpia)
                 else:
-                    solped_unicos_filtradas.append(solped_str)
-            else:
-                print(f"EXCLUIDO: '{solped_str}' (no es una SOLPED valida)")
+                    solpedUnicosFiltradas.append(solpedStr)
 
-        solped_unicos = solped_unicos_filtradas
+        solpedUnicos = solpedUnicosFiltradas
 
-        if not solped_unicos:
-            print("ERROR: No se encontraron SOLPEDs validas para procesar")
+        if not solpedUnicos:
+            WriteLog(
+                mensaje="No se encontraron SOLPEDs válidas para procesar",
+                estado="WARNING",
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
+            )
             return False
 
-        print(f"Procesando {len(solped_unicos)} SOLPEDs unicas...")
-
-        # Informacion inicial del archivo
-        print("RESUMEN INICIAL DEL ARCHIVO:")
-        print(f"   - Total filas: {len(df_solpeds)}")
-        print(f"   - SOLPEDs unicas validas: {len(solped_unicos)}")
-
-        # Mostrar distribucion inicial de estados
-        if "Estado" in df_solpeds.columns:
-            estados_iniciales = df_solpeds["Estado"].value_counts()
-            print(f"   - Distribucion inicial de estados:")
-            for estado, count in estados_iniciales.items():
-                print(f"     {estado}: {count}")
-        print()
+        WriteLog(
+            mensaje=f"Procesando {len(solpedUnicos)} SOLPEDs - Total filas: {len(dfSolpeds)}",
+            estado="INFO",
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLog"],
+        )
 
         # Abrir transaccion ME53N en SAP
         AbrirTransaccion(session, "ME53N")
 
         # Contadores para resumen final
         contadores = {
-            "total_solpeds": len(solped_unicos),
+            "total_solpeds": len(solpedUnicos),
             "procesadas_exitosamente": 0,
             "con_errores": 0,
             "sin_items": 0,
@@ -152,63 +153,53 @@ def EjecutarHU03(session, nombre_archivo):
             "items_verificar_manual": 0,
             "notificaciones_enviadas": 0,
             "notificaciones_fallidas": 0,
-            "rechazadas_sin_attachments": 0,
+            "rechazadas_sin_archivosAdjuntos": 0,
         }
 
-        # ========================================================
-        # MODO DESARROLLO - REDIRIGIR CORREOS
-        # ========================================================
-        MODO_DESARROLLO = True  # Cambiar a False en producción
+        # Modo desarrollo
+        MODO_DESARROLLO = True
         EMAIL_DESARROLLO = "paula.sierra@netapplications.com.co"
 
         if MODO_DESARROLLO:
-            print(f"\n{'='*60}")
-            print(f"⚠️  MODO DESARROLLO ACTIVO")
-            print(f"📧 Todos los correos se enviarán a: {EMAIL_DESARROLLO}")
-            print(f"{'='*60}\n")
             WriteLog(
                 mensaje=f"MODO DESARROLLO: Correos redirigidos a {EMAIL_DESARROLLO}",
                 estado="WARNING",
-                task_name=task_name,
-                path_log=RUTAS["PathLog"],
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
             )
 
-        # Almacenar SOLPEDs que requirieron revisión para reporte final
-        solpeds_con_problemas = []
-        # ========================================================
-        # PROCESAR CADA SOLPED
-        # ========================================================
-        for solped in solped_unicos:
-            print(f"\n{'='*80}")
-            print(f"PROCESANDO SOLPED: {solped}")
-            print(f"{'='*80}")
+        solpedsConProblemas = []
+        filasReporteFinal = []
 
-            # Variables para notificación
-            correos_responsables = []
-            resumen_validaciones = []
-            requiere_notificacion = False
+        # PROCESAR CADA SOLPED
+        for solped in solpedUnicos:
+            correosResponsables = []
+            resumenValidaciones = []
+            requiereNotificacion = False
 
             try:
-                # 1. Marcar SOLPED como "En Proceso"
-                resultado_estado = ActualizarEstado(
-                    df_solpeds, nombre_archivo, solped, nuevo_estado="En Proceso"
+                # Marcar SOLPED como "En Proceso"
+                resultadoEstado = ActualizarEstado(
+                    dfSolpeds, nombreArchivo, solped, nuevoEstado="En Proceso"
                 )
 
-                if not resultado_estado:
-                    print(
-                        f"ADVERTENCIA: No se pudo actualizar estado de SOLPED {solped}"
-                    )
+                if not resultadoEstado:
                     continue
 
-                # 2. Consultar SOLPED en SAP
-                resultado_consulta = ColsultarSolped(session, solped)
-                if not resultado_consulta:
-                    print(f"ERROR: No se pudo consultar SOLPED {solped} en SAP")
+                # Consultar SOLPED en SAP
+                resultadoConsulta = ColsultarSolped(session, solped)
+                if not resultadoConsulta:
+                    WriteLog(
+                        mensaje=f"No se pudo consultar SOLPED {solped} en SAP",
+                        estado="ERROR",
+                        nombreTarea=nombreTarea,
+                        rutaRegistro=RUTAS["PathLogError"],
+                    )
                     ActualizarEstadoYObservaciones(
-                        df_solpeds,
-                        nombre_archivo,
+                        dfSolpeds,
+                        nombreArchivo,
                         solped,
-                        nuevo_estado="Error Consulta",
+                        nuevoEstado="Error Consulta",
                         observaciones="No se pudo consultar en SAP",
                     )
                     contadores["con_errores"] += 1
@@ -216,568 +207,450 @@ def EjecutarHU03(session, nombre_archivo):
 
                 time.sleep(0.5)
 
-                # ========================================================
-                # ✅ 3. VALIDAR ATTACHMENT LIST (NUEVA VALIDACIÓN)
-                # ========================================================
-                print(f"\n--- Validando Attachment List ---")
-
-                tiene_attachments, contenido_attachments, obs_attachments = (
+                # VALIDAR ATTACHMENT LIST
+                tieneAttachments, contenidoAttachments, obsAttachments = (
                     ValidarAttachmentList(session, solped)
                 )
 
-                # Parsear attachments para información detallada
-                attachments_lista = (
-                    ParsearTablaAttachments(contenido_attachments)
-                    if contenido_attachments
+                archivosAdjuntosLista = (
+                    ParsearTablaAttachments(contenidoAttachments)
+                    if contenidoAttachments
                     else []
                 )
 
-                # Generar reporte de attachments
-                reporte_attachments = GenerarReporteAttachments(
-                    solped, tiene_attachments, contenido_attachments, obs_attachments
+                reporteAttachments = GenerarReporteAttachments(
+                    solped, tieneAttachments, contenidoAttachments, obsAttachments
                 )
-                print(reporte_attachments)
 
-                # Guardar reporte de attachments
-                # Guardar reporte de attachments SOLO si tiene adjuntos
-                if tiene_attachments and contenido_attachments:
-                    path_reporte_attach = (
+                # Guardar reporte de archivosAdjuntos SOLO si tiene adjuntos
+                if archivosAdjuntosLista:
+                    pathReporteAttach = (
                         f"{RUTAS['PathReportes']}\\Attachments_{solped}.txt"
                     )
                     try:
-                        with open(path_reporte_attach, "w", encoding="utf-8") as f:
-                            f.write(reporte_attachments)
-                        print(f"Reporte de attachments guardado: {path_reporte_attach}")
+                        with open(pathReporteAttach, "w", encoding="utf-8") as f:
+                            f.write(reporteAttachments)
                     except Exception as e:
-                        print(
-                            f"Advertencia: No se pudo guardar reporte de attachments: {e}"
-                        )
+                        pass
                 else:
-                    print(
-                        f"⚠️ No se genera archivo de adjuntos para SOLPED {solped} (sin archivos)"
-                    )
                     ActualizarEstadoYObservaciones(
-                        df_solpeds,
-                        nombre_archivo,
+                        dfSolpeds,
+                        nombreArchivo,
                         solped,
-                        nuevo_estado="Sin Adjuntos",
+                        nuevoEstado="Sin Adjuntos",
                         observaciones="No cuenta con lista de Adjuntos",
                     )
 
-                # ⚠️ MARCAR SI NO TIENE ATTACHMENTS (pero continuar validación)
-                solped_rechazada_por_attachments = False
+                # MARCAR SI NO TIENE ATTACHMENTS
+                solpedRechazadaPorAttachments = False
 
-                if not tiene_attachments:
-                    print(f"\n❌ SOLPED {solped} SERÁ RECHAZADA: Sin archivos adjuntos")
-                    print(
-                        f"⚠️  Continuando con validaciones de items para reporte completo..."
-                    )
+                if not archivosAdjuntosLista:
+                    contadores["rechazadas_sin_archivosAdjuntos"] += 1
+                    solpedRechazadaPorAttachments = True
+                    requiereNotificacion = True
 
-                    contadores["rechazadas_sin_attachments"] += 1
-                    solped_rechazada_por_attachments = True
-                    requiere_notificacion = True
-
-                    # Agregar a resumen de validaciones
-                    resumen_validaciones.append(
-                        f"\n🚫 MOTIVO DE RECHAZO PRINCIPAL\n"
-                        f"   ❌ No cuenta con Attachment List\n"
+                    resumenValidaciones.append(
+                        f"\nMOTIVO DE RECHAZO PRINCIPAL\n"
+                        f"   No cuenta con Attachment List\n"
                         f"   Acción requerida: Adjuntar documentación soporte\n"
-                        f"   {obs_attachments}\n"
-                        f"   ⚠️ Aunque se complete el resto de validaciones, la SOLPED queda RECHAZADA\n"
+                        f"   {obsAttachments}\n"
                     )
-
                 else:
-                    print(
-                        f"✅ SOLPED {solped} tiene attachments - Continuando validación"
+                    infoAttachments = (
+                        f"\n📎 ATTACHMENT LIST ({len(archivosAdjuntosLista)} archivo(s))\n"
                     )
+                    infoAttachments += f"   {obsAttachments}\n"
 
-                    # Agregar info detallada de attachments a validaciones
-                    info_attachments = (
-                        f"\n📎 ATTACHMENT LIST ({len(attachments_lista)} archivo(s))\n"
-                    )
-                    info_attachments += f"   {obs_attachments}\n"
+                    if archivosAdjuntosLista:
+                        infoAttachments += f"\n   Archivos adjuntos:\n"
+                        for i, attach in enumerate(archivosAdjuntosLista[:5], 1):
+                            infoAttachments += f"   {i}. {attach['title'][:50]}\n"
+                            infoAttachments += f"      Creado por: {attach['creator']} - {attach['date']}\n"
 
-                    if attachments_lista:
-                        info_attachments += f"\n   Archivos adjuntos:\n"
-                        for i, attach in enumerate(
-                            attachments_lista[:5], 1
-                        ):  # Máximo 5 en resumen
-                            info_attachments += f"   {i}. {attach['title'][:50]}\n"
-                            info_attachments += f"      Creado por: {attach['creator']} - {attach['date']}\n"
+                        if len(archivosAdjuntosLista) > 5:
+                            infoAttachments += f"   ... y {len(archivosAdjuntosLista) - 5} archivo(s) más\n"
 
-                        if len(attachments_lista) > 5:
-                            info_attachments += f"   ... y {len(attachments_lista) - 5} archivo(s) más\n"
+                    resumenValidaciones.append(infoAttachments)
 
-                    resumen_validaciones.append(info_attachments)
-
-                # 3. Obtener items de esta SOLPED
+                # Obtener items de esta SOLPED
                 dtItems = ObtenerItemsME53N(session, solped)
 
                 if dtItems is None or dtItems.empty:
                     contadores["sin_items"] += 1
                     ActualizarEstadoYObservaciones(
-                        df_solpeds,
-                        nombre_archivo,
+                        dfSolpeds,
+                        nombreArchivo,
                         solped,
-                        nuevo_estado="Sin Items",
+                        nuevoEstado="Sin Items",
                         observaciones="No se encontraron items en SAP",
                     )
-                    print(f"ADVERTENCIA: SOLPED {solped}: Sin items en SAP")
                     continue
 
-                print(f"Items encontrados en SAP: {dtItems.shape[0]}")
-
-                # 4. Convertir a lista de diccionarios y filtrar totales
-                lista_dicts = dtItems.to_dict(orient="records")
+                # Convertir a lista de diccionarios y filtrar totales
+                listaDicts = dtItems.to_dict(orient="records")
 
                 # Filtrar: Eliminar la ultima fila si es un total
-                if lista_dicts:
-                    ultima_fila = lista_dicts[-1]
+                if listaDicts:
+                    ultimaFila = listaDicts[-1]
                     if (
-                        ultima_fila.get("Status", "").strip() == "*"
-                        or ultima_fila.get("Item", "").strip() == ""
-                        or ultima_fila.get("Material", "").strip() == ""
+                        ultimaFila.get("Status", "").strip() == "*"
+                        or ultimaFila.get("Item", "").strip() == ""
+                        or ultimaFila.get("Material", "").strip() == ""
                     ):
-                        lista_dicts.pop()
-                        print(f"Fila de total eliminada")
-                # ========================================================
-                # 5. PROCESAR CADA ITEM
-                # ========================================================
-                contador_con_texto = 0
-                contador_validados = 0
-                contador_verificar_manual = 0
-                items_procesados_en_solped = len(lista_dicts)
+                        listaDicts.pop()
 
-                for i, fila in enumerate(lista_dicts):
-                    numero_item = fila.get("Item", str(i)).strip()
+                # PROCESAR CADA ITEM
+                contadorConTexto = 0
+                contadorValidados = 0
+                contadorVerificarManual = 0
+                itemsProcesadosEnSolped = len(listaDicts)
+
+                for i, fila in enumerate(listaDicts):
+                    numeroItem = fila.get("Pos.", str(i)).strip()
                     contadores["items_procesados"] += 1
 
-                    print(f"\n--- Procesando Item {numero_item} ---")
+                    # Obtener datos de expSolped03.txt
+                    filaExp = obtenerFilaExpSolped(dfSolpeds, solped, numeroItem)
+                    if not filaExp:
+                        filaExp = {}
+
+                    # Obtener datos específicos de ME53N
+                    filaMe53n = fila
+
+                    if dtItems is not None and not dtItems.empty:
+                        try:
+                            mascara = (
+                                dtItems["Pos."].astype(str).str.strip()
+                                == str(numeroItem).strip()
+                            )
+                            filasEncontradas = dtItems[mascara]
+
+                            if not filasEncontradas.empty:
+                                filaMe53n = filasEncontradas.iloc[0].to_dict()
+                        except Exception as e:
+                            pass
 
                     # Marcar item como "Procesando"
                     ActualizarEstado(
-                        df_solpeds, nombre_archivo, solped, numero_item, "Procesando"
+                        dfSolpeds, nombreArchivo, solped, numeroItem, "Procesando"
                     )
 
                     time.sleep(0.5)
 
                     # Obtener texto del editor SAP
-                    texto = ObtenerItemTextME53N(session, solped, numero_item)
-                    # print(texto)
+                    texto = ObtenerItemTextME53N(session, solped, numeroItem)
 
                     # Procesar y validar el texto
                     if texto and texto.strip():
-                        contador_con_texto += 1
+                        contadorConTexto += 1
 
                         # VALIDACION COMPLETA DEL TEXTO
                         (
-                            datos_texto,
+                            datosTexto,
                             validaciones,
                             reporte,
-                            estado_final,
+                            estadoFinal,
                             observaciones,
                         ) = ProcesarYValidarItem(
                             session,
                             solped,
-                            numero_item,
+                            numeroItem,
                             texto,
                             dtItems,
-                            tiene_attachments,
-                            obs_attachments,
-                            attachments_lista,
+                            tieneAttachments,
+                            obsAttachments,
+                            archivosAdjuntosLista,
                         )
 
-                        # ========================================================
-                        # CAPTURAR CORREOS DE COLSUBSIDIO PARA NOTIFICACIÓN
-                        # ========================================================
-                        responsable = datos_texto.get("responsable_compra", "")
+                        # CAPTURAR CORREOS DE COLSUBSIDIO
+                        responsable = datosTexto.get("responsable_compra", "")
                         if responsable and "@colsubsidio.com" in responsable.lower():
-                            # Puede venir con múltiples correos separados por coma
-                            correos_encontrados = [
+                            correosEncontrados = [
                                 email.strip()
                                 for email in responsable.split(",")
                                 if "@colsubsidio.com" in email.lower()
                             ]
-                            correos_responsables.extend(correos_encontrados)
-                            print(
-                                f"📧 Correo responsable detectado: {', '.join(correos_encontrados)}"
-                            )
+                            correosResponsables.extend(correosEncontrados)
 
-                        # Imprimir resumen de validacion DETALLADO
-                        print(f"RESULTADO VALIDACION:")
-                        print(f"  Estado: {estado_final}")
-                        print(f"  Observaciones: {observaciones}")
-
-                        # Mostrar resumen de validaciones
-                        print(f"  Validaciones contra SAP:")
-                        if "resumen" in validaciones:
-                            print(f"    - {validaciones['resumen']}")
-
-                        # Mostrar campos obligatorios
-                        if "campos_obligatorios" in validaciones:
-                            obligatorios = validaciones["campos_obligatorios"]
-                            print(
-                                f"    - Campos obligatorios: {obligatorios['presentes']}/{obligatorios['total']} presentes"
-                            )
-                            if obligatorios["faltantes"]:
-                                print(
-                                    f"    - Faltantes: {', '.join(obligatorios['faltantes'])}"
-                                )
-
-                        # Mostrar campos clave extraidos
-                        campos_clave = [
-                            "razon_social",
-                            "nit",
-                            "concepto_compra",
-                            "cantidad",
-                            "valor_total",
-                        ]
-                        print(f"  Campos clave extraidos:")
-                        for campo in campos_clave:
-                            if datos_texto.get(campo):
-                                valor = datos_texto[campo]
-                                if len(valor) > 50:
-                                    valor = valor[:50] + "..."
-                                print(f"    {campo}: {valor}")
-                            else:
-                                print(f"    {campo}: NO ENCONTRADO")
-
-                        # Mostrar detalles de validaciones especificas
-                        campos_validacion = [
-                            "cantidad",
-                            "valor_unitario",
-                            "valor_total",
-                            "fecha_entrega",
-                            "concepto",
-                        ]
-                        print(f"  Detalles de validacion:")
-                        for campo in campos_validacion:
-                            if campo in validaciones and validaciones[campo]["texto"]:
-                                estado_val = (
-                                    "COINCIDE"
-                                    if validaciones[campo]["match"]
-                                    else "NO COINCIDE"
-                                )
-                                print(f"    {campo}: {estado_val}")
-                                print(f"      Texto: {validaciones[campo]['texto']}")
-                                print(f"      Tabla: {validaciones[campo]['tabla']}")
-                                if validaciones[campo].get("diferencia"):
-                                    print(
-                                        f"      Diferencia: {validaciones[campo]['diferencia']}"
-                                    )
-
-                        # Guardar reporte detallado en archivo
-                        path_reporte = f"{RUTAS['PathReportes']}\\Reporte_{solped}_{numero_item}.txt"
+                        # Guardar reporte detallado
+                        pathReporte = f"{RUTAS['PathReportes']}\\Reporte_{solped}_{numeroItem}.txt"
                         try:
-                            with open(path_reporte, "w", encoding="utf-8") as f:
+                            with open(pathReporte, "w", encoding="utf-8") as f:
                                 f.write(reporte)
-                            print(f"Reporte guardado: {path_reporte}")
                         except Exception as e:
-                            print(f"ADVERTENCIA: Error al guardar reporte: {e}")
+                            pass
 
-                        # Actualizar estado y observaciones en el archivo principal
+                        # Actualizar estado y observaciones
                         ActualizarEstadoYObservaciones(
-                            df_solpeds,
-                            nombre_archivo,
+                            dfSolpeds,
+                            nombreArchivo,
                             solped,
-                            numero_item,
-                            estado_final,
+                            numeroItem,
+                            estadoFinal,
                             observaciones,
                         )
 
-                        # ========================================================
+                        # FILTRO CRÍTICO: evitar fila TOTAL
+                        if (
+                            not numeroItem
+                            or not str(numeroItem).strip().isdigit()
+                            or str(numeroItem).strip() in ["", "0"]
+                        ):
+                            continue
+
+                        # CONSTRUIR FILA PARA REPORTE FINAL
+                        filaReporte = ConstruirFilaReporteFinal(
+                            solped=solped,
+                            item=numeroItem,
+                            datos_exp=filaExp,
+                            datosAdjuntos={
+                                "cantidad": len(archivosAdjuntosLista),
+                                "nombres": ", ".join(
+                                    [a["title"] for a in archivosAdjuntosLista]
+                                ),
+                            },
+                            datosMe53n=filaMe53n,
+                            datosTexto=datosTexto,
+                            resultadoValidaciones={
+                                "faltantesMe53n": validaciones.get(
+                                    "campos_obligatorios", {}
+                                ).get("faltantes"),
+                                "faltantesTexto": validaciones.get("faltantesTexto"),
+                                "cantidad": validaciones.get("cantidad", {}).get(
+                                    "match"
+                                ),
+                                "valor_unitario": validaciones.get(
+                                    "valor_unitario", {}
+                                ).get("match"),
+                                "valor_total": validaciones.get("valor_total", {}).get(
+                                    "match"
+                                ),
+                                "concepto": validaciones.get("concepto", {}).get(
+                                    "match"
+                                ),
+                                "estado": estadoFinal,
+                                "observaciones": observaciones,
+                            },
+                        )
+
+                        filasReporteFinal.append(filaReporte)
+
                         # CONSTRUIR RESUMEN PARA NOTIFICACIÓN
-                        # ========================================================
-                        if estado_final != "Registro validado para orden de compra":
-                            requiere_notificacion = True
+                        if estadoFinal != "Aprobado":
+                            requiereNotificacion = True
 
-                            # Construir texto de validación del item
-                            item_info = f"\n ITEM {numero_item}:\n"
-                            item_info += f"   Estado: {estado_final}\n"
-                            item_info += f"   Observaciones: {observaciones}\n"
+                            itemInfo = f"\n📋 ITEM {numeroItem}\n"
+                            itemInfo += f"Estado: {estadoFinal}\n"
+                            itemInfo += f"Observaciones: {observaciones}\n\n"
 
-                            # Agregar campos clave
-                            if datos_texto.get("nit"):
-                                item_info += f"   NIT: {datos_texto['nit']}\n"
-                            if datos_texto.get("razon_social"):
-                                item_info += (
-                                    f"   Razón Social: {datos_texto['razon_social']}\n"
+                            faltantesMe53n = validaciones.get(
+                                "campos_obligatorios", {}
+                            ).get("faltantes", [])
+                            if faltantesMe53n:
+                                itemInfo += (
+                                    f"- ME53N faltantes: {', '.join(faltantesMe53n)}\n"
                                 )
-                            if datos_texto.get("concepto_compra"):
-                                concepto_corto = datos_texto["concepto_compra"][:100]
-                                item_info += f"   Concepto: {concepto_corto}...\n"
+                            else:
+                                itemInfo += "- ME53N faltantes: Ninguno\n"
 
-                            # Agregar problemas de validación
-                            if validaciones.get("campos_obligatorios", {}).get(
-                                "faltantes"
-                            ):
-                                item_info += f"   ⚠️ Campos faltantes: {', '.join(validaciones['campos_obligatorios']['faltantes'])}\n"
+                            faltantesTexto = validaciones.get("faltantesTexto", [])
+                            if faltantesTexto:
+                                itemInfo += (
+                                    f"- Texto faltantes: {', '.join(faltantesTexto)}\n"
+                                )
+                            else:
+                                itemInfo += "- Texto faltantes: Ninguno\n"
 
-                            resumen_validaciones.append(item_info)
+                            def estadoOk(flag):
+                                return "OK" if flag else "ERROR"
 
-                        # Contar segun el resultado
-                        if estado_final == "Registro validado para orden de compra":
-                            contador_validados += 1
+                            itemInfo += "\nValidaciones:\n"
+                            itemInfo += f"  Cantidad: {estadoOk(validaciones.get('cantidad', {}).get('match', False))}\n"
+                            itemInfo += f"  Valor Unitario: {estadoOk(validaciones.get('valor_unitario', {}).get('match', False))}\n"
+                            itemInfo += f"  Valor Total: {estadoOk(validaciones.get('valor_total', {}).get('match', False))}\n"
+                            itemInfo += f"  Concepto: {estadoOk(validaciones.get('concepto', {}).get('match', False))}\n"
+
+                            resumenValidaciones.append(itemInfo)
+
+                        # Contar según resultado
+                        if estadoFinal == "Aprobado":
+                            contadorValidados += 1
                             contadores["items_validados"] += 1
-                            print(
-                                f"EXITO: Item {numero_item} VALIDADO para orden de compra"
-                            )
                         else:
-                            contador_verificar_manual += 1
+                            contadorVerificarManual += 1
                             contadores["items_verificar_manual"] += 1
-                            print(
-                                f"ADVERTENCIA: Item {numero_item} requiere verificacion manual"
-                            )
 
                     else:
                         # Sin texto en el editor
                         contadores["items_sin_texto"] += 1
-                        observaciones_item = (
+                        observacionesItem = (
                             "Texto no encontrado en el editor SAP - No se puede validar"
                         )
                         ActualizarEstadoYObservaciones(
-                            df_solpeds,
-                            nombre_archivo,
+                            dfSolpeds,
+                            nombreArchivo,
                             solped,
-                            numero_item,
+                            numeroItem,
                             "Sin Texto",
-                            observaciones_item,
+                            observacionesItem,
                         )
-                        print(f"Item {numero_item}: Sin texto - No validado")
 
-                        # También requiere notificación
-                        requiere_notificacion = True
-                        resumen_validaciones.append(
-                            f"\n📋 ITEM {numero_item}:\n"
+                        requiereNotificacion = True
+                        resumenValidaciones.append(
+                            f"\n📋 ITEM {numeroItem}:\n"
                             f"   Estado: Sin Texto\n"
-                            f"   Observaciones: {observaciones_item}\n"
+                            f"   Observaciones: {observacionesItem}\n"
                         )
 
-                # ========================================================
-                # 6. ESTADO FINAL DE LA SOLPED (considerando attachments)
-                # ========================================================
-                if solped_rechazada_por_attachments:
-                    # SOLPED rechazada por falta de attachments (independiente de items)
-                    estado_final_solped = "Rechazada"
-                    observaciones_solped = (
-                        f"❌ RECHAZADA por falta de adjuntos | "
-                        f"Items: {contador_validados} validados, "
-                        f"{contador_verificar_manual} requieren revisión, "
-                        f"{items_procesados_en_solped - contador_con_texto} sin texto"
+                # ESTADO FINAL DE LA SOLPED
+                if solpedRechazadaPorAttachments:
+                    estadoFinalSolped = "Rechazada"
+                    observacionesSolped = (
+                        f"RECHAZADA por falta de adjuntos - "
+                        f"Items: {contadorValidados} validados, "
+                        f"{contadorVerificarManual} requieren revisión, "
+                        f"{itemsProcesadosEnSolped - contadorConTexto} sin texto"
                     )
-                    # Ya fue contada en rechazadas_sin_attachments
 
-                elif contador_validados == items_procesados_en_solped:
-                    estado_final_solped = "Registro validado para orden de compra"
-                    observaciones_solped = f"✅ Todos validados ({contador_validados} de {items_procesados_en_solped}) + Contiene Adjuntos"
+                elif contadorValidados == itemsProcesadosEnSolped:
+                    estadoFinalSolped = "Aprobado"
+                    observacionesSolped = f"Todos validados ({contadorValidados} de {itemsProcesadosEnSolped}) + Contiene Adjuntos"
                     contadores["procesadas_exitosamente"] += 1
-                    requiere_notificacion = False
+                    requiereNotificacion = False
 
-                elif contador_verificar_manual > 0:
-                    estado_final_solped = "Verificar manualmente"
-                    observaciones_solped = f"⚠️ {contador_verificar_manual} de {items_procesados_en_solped} items requieren revisión + Contiene Adjuntos"
+                elif contadorVerificarManual > 0:
+                    estadoFinalSolped = "Pendiente"
+                    observacionesSolped = f"{contadorVerificarManual} de {itemsProcesadosEnSolped} items requieren revisión + Contiene Adjuntos"
                     contadores["procesadas_exitosamente"] += 1
 
                 else:
-                    estado_final_solped = "Sin procesar"
-                    observaciones_solped = "No se pudo procesar correctamente"
+                    estadoFinalSolped = "Rechazada"
+                    observacionesSolped = "No se pudo procesar correctamente"
                     contadores["con_errores"] += 1
 
                 ActualizarEstadoYObservaciones(
-                    df_solpeds,
-                    nombre_archivo,
+                    dfSolpeds,
+                    nombreArchivo,
                     solped,
-                    nuevo_estado=estado_final_solped,
-                    observaciones=observaciones_solped,
+                    nuevoEstado=estadoFinalSolped,
+                    observaciones=observacionesSolped,
                 )
-                print(f"\n{'='*60}")
-                if solped_rechazada_por_attachments:
-                    print(f"❌ SOLPED {solped} RECHAZADA (Sin Attachments)")
-                else:
-                    print(f"✅ SOLPED {solped} completada")
-                print(f"  Estado final: {estado_final_solped}")
-                print(f"  Observaciones: {observaciones_solped}")
-                print(f"{'='*60}")
 
-                # ========================================================
-                # ENVIAR NOTIFICACIÓN SI ES NECESARIO (UNA POR SOLPED)
-                # ========================================================
-                if requiere_notificacion and correos_responsables:
-                    # Eliminar duplicados de correos
-                    correos_unicos = list(set(correos_responsables))
+                # ENVIAR NOTIFICACIÓN SI ES NECESARIO
+                if requiereNotificacion and correosResponsables:
+                    correosUnicos = list(set(correosResponsables))
 
-                    # ========================================================
-                    # MODO DESARROLLO - REDIRIGIR CORREOS
-                    # ========================================================
                     if MODO_DESARROLLO:
-                        correos_originales = correos_unicos.copy()
-                        correos_unicos = [EMAIL_DESARROLLO]
-                        print(f"\n{'='*60}")
-                        print(f"📧 NOTIFICACIÓN (MODO DESARROLLO)")
-                        print(f"{'='*60}")
-                        print(
-                            f"Destinatarios originales: {', '.join(correos_originales)}"
-                        )
-                        print(f"Redirigido a: {EMAIL_DESARROLLO}")
-                    else:
-                        print(f"\n{'='*60}")
-                        print(f"📧 ENVIANDO NOTIFICACIÓN DE REVISIÓN MANUAL")
-                        print(f"{'='*60}")
-                        print(f"Destinatarios: {', '.join(correos_unicos)}")
+                        correosOriginales = correosUnicos.copy()
+                        correosUnicos = [EMAIL_DESARROLLO]
 
                     # Construir texto completo de validaciones
-                    texto_validaciones = f"SOLPED: {solped}\n"
+                    textoValidaciones = f"SOLPED: {solped}\n"
 
-                    # Agregar info de modo desarrollo
                     if MODO_DESARROLLO:
-                        texto_validaciones += (
-                            f"\n⚠️ MODO DESARROLLO - CORREO DE PRUEBA\n"
-                        )
-                        texto_validaciones += f"Destinatarios originales: {', '.join(correos_originales)}\n"
-                        texto_validaciones += f"{'='*60}\n\n"
+                        textoValidaciones += f"\nMODO DESARROLLO - CORREO DE PRUEBA\n"
+                        textoValidaciones += f"Destinatarios originales: {', '.join(correosOriginales)}\n"
+                        textoValidaciones += f"{'='*60}\n\n"
 
-                    texto_validaciones += f"Estado Final: {estado_final_solped}\n"
-                    texto_validaciones += f"Total Items: {items_procesados_en_solped}\n"
-                    texto_validaciones += f"Items Validados: {contador_validados}\n"
-                    texto_validaciones += (
-                        f"Items Requieren Revisión: {contador_verificar_manual}\n"
+                    textoValidaciones += f"Estado Final: {estadoFinalSolped}\n"
+                    textoValidaciones += f"Total Items: {itemsProcesadosEnSolped}\n"
+                    textoValidaciones += f"Items Validados: {contadorValidados}\n"
+                    textoValidaciones += (
+                        f"Items Requieren Revisión: {contadorVerificarManual}\n"
                     )
-                    texto_validaciones += f"Items Sin Texto: {items_procesados_en_solped - contador_con_texto}\n"
-                    texto_validaciones += f"\n{'='*60}\n"
-                    texto_validaciones += f"DETALLE POR ITEM:\n"
-                    texto_validaciones += "".join(resumen_validaciones)
+                    textoValidaciones += f"Items Sin Texto: {itemsProcesadosEnSolped - contadorConTexto}\n"
+                    textoValidaciones += f"\n{'='*60}\n"
+                    textoValidaciones += f"DETALLE POR ITEM:\n"
+                    textoValidaciones += "".join(resumenValidaciones)
 
-                    # Enviar notificación
                     try:
-                        exito_notificacion = NotificarRevisionManualSolped(
-                            destinatarios=correos_unicos,
-                            numero_solped=solped,
-                            validaciones=texto_validaciones,
-                            task_name=task_name,
+                        exitoNotificacion = NotificarRevisionManualSolped(
+                            destinatarios=correosUnicos,
+                            numeroSolped=solped,
+                            validaciones=textoValidaciones,
+                            nombreTarea=nombreTarea,
                         )
 
-                        if exito_notificacion:
-                            if MODO_DESARROLLO:
-                                print(
-                                    f"✅ [DESARROLLO] Correo enviado a {EMAIL_DESARROLLO}"
-                                )
-                                print(f"   (Original: {', '.join(correos_originales)})")
-                            else:
-                                print(
-                                    f"✅ Notificación enviada correctamente a {len(correos_unicos)} destinatario(s)"
-                                )
+                        if exitoNotificacion:
                             contadores["notificaciones_enviadas"] += 1
 
-                            # Guardar info para reporte final
-                            solpeds_con_problemas.append(
+                            solpedsConProblemas.append(
                                 {
                                     "solped": solped,
-                                    "estado": estado_final_solped,
-                                    "tiene_attachments": tiene_attachments,
-                                    "obs_attachments": obs_attachments,
-                                    "attachments_detalle": (
-                                        attachments_lista[:10]
-                                        if attachments_lista
+                                    "estado": estadoFinalSolped,
+                                    "tieneAttachments": tieneAttachments,
+                                    "obsAttachments": obsAttachments,
+                                    "archivosAdjuntos_detalle": (
+                                        archivosAdjuntosLista[:10]
+                                        if archivosAdjuntosLista
                                         else []
-                                    ),  # Máximo 10 para el reporte
-                                    "items_total": (
-                                        items_procesados_en_solped
-                                        if "items_procesados_en_solped" in locals()
-                                        else 0
                                     ),
-                                    "items_ok": (
-                                        contador_validados
-                                        if "contador_validados" in locals()
-                                        else 0
-                                    ),
-                                    "items_revisar": (
-                                        contador_verificar_manual
-                                        if "contador_verificar_manual" in locals()
-                                        else 0
-                                    ),
-                                    "items_sin_texto": (
-                                        (
-                                            items_procesados_en_solped
-                                            - contador_con_texto
-                                        )
-                                        if "items_procesados_en_solped" in locals()
-                                        and "contador_con_texto" in locals()
-                                        else 0
-                                    ),
+                                    "items_total": itemsProcesadosEnSolped,
+                                    "items_ok": contadorValidados,
+                                    "items_revisar": contadorVerificarManual,
+                                    "items_sin_texto": itemsProcesadosEnSolped
+                                    - contadorConTexto,
                                     "responsables": (
-                                        correos_originales
+                                        correosOriginales
                                         if MODO_DESARROLLO
-                                        else correos_unicos
+                                        else correosUnicos
                                     ),
-                                    "detalle": resumen_validaciones,
+                                    "detalle": resumenValidaciones,
                                 }
                             )
                         else:
-                            print(f"❌ Error al enviar notificación")
                             contadores["notificaciones_fallidas"] += 1
 
                     except Exception as e_notif:
-                        print(f"❌ Error al enviar notificación: {e_notif}")
                         contadores["notificaciones_fallidas"] += 1
                         WriteLog(
                             mensaje=f"Error al enviar notificación para SOLPED {solped}: {e_notif}",
                             estado="WARNING",
-                            task_name=task_name,
-                            path_log=RUTAS["PathLog"],
+                            nombreTarea=nombreTarea,
+                            rutaRegistro=RUTAS["PathLog"],
                         )
 
-                    print(f"{'='*60}\n")
-
-                elif requiere_notificacion and not correos_responsables:
-                    mensaje_advertencia = f"SOLPED {solped} requiere revisión pero NO se encontró correo @colsubsidio.com"
-
-                    if MODO_DESARROLLO:
-                        print(f"⚠️  [DESARROLLO] {mensaje_advertencia}")
-                        print(f"   Se enviaría notificación genérica en producción")
-                    else:
-                        print(f"⚠️  {mensaje_advertencia}")
-
+                elif requiereNotificacion and not correosResponsables:
                     WriteLog(
                         mensaje=f"SOLPED {solped}: Requiere revisión pero sin correo de responsable",
                         estado="WARNING",
-                        task_name=task_name,
-                        path_log=RUTAS["PathLog"],
+                        nombreTarea=nombreTarea,
+                        rutaRegistro=RUTAS["PathLog"],
                     )
 
-                    # Guardar para reporte final aunque no tenga responsable
-                    solpeds_con_problemas.append(
+                    solpedsConProblemas.append(
                         {
                             "solped": solped,
-                            "estado": estado_final_solped,
-                            "items_total": items_procesados_en_solped,
-                            "items_ok": contador_validados,
-                            "items_revisar": contador_verificar_manual,
-                            "items_sin_texto": items_procesados_en_solped
-                            - contador_con_texto,
+                            "estado": estadoFinalSolped,
+                            "items_total": itemsProcesadosEnSolped,
+                            "items_ok": contadorValidados,
+                            "items_revisar": contadorVerificarManual,
+                            "items_sin_texto": itemsProcesadosEnSolped
+                            - contadorConTexto,
                             "responsables": [],
-                            "detalle": resumen_validaciones,
+                            "detalle": resumenValidaciones,
                         }
                     )
 
             except Exception as e:
                 contadores["con_errores"] += 1
-                observaciones_error = f"Error durante procesamiento: {str(e)[:100]}"
+                observacionesError = f"Error durante procesamiento: {str(e)[:100]}"
                 ActualizarEstadoYObservaciones(
-                    df_solpeds,
-                    nombre_archivo,
+                    dfSolpeds,
+                    nombreArchivo,
                     solped,
-                    nuevo_estado="Error",
-                    observaciones=observaciones_error,
+                    nuevoEstado="Error",
+                    observaciones=observacionesError,
                 )
-                print(f"ERROR procesando {solped}: {e}")
                 WriteLog(
                     mensaje=f"Error procesando SOLPED {solped}: {e}",
                     estado="ERROR",
-                    task_name="EjecutarHU03",
-                    path_log=RUTAS["PathLogError"],
+                    nombreTarea=nombreTarea,
+                    rutaRegistro=RUTAS["PathLogError"],
                 )
                 continue
 
+<<<<<<< HEAD
         # 7. Mostrar resumen final del proceso
         print(f"\n{'='*80}")
         print("PROCESO COMPLETADO - RESUMEN FINAL")
@@ -819,37 +692,78 @@ def EjecutarHU03(session, nombre_archivo):
                         print(f"  '{obs[:50]}...': {count}")
 
         print("\n")
+=======
+        # Resumen final del proceso
+>>>>>>> and
         WriteLog(
-            mensaje=f"HU03 completado exitosamente. "
-            f"SOLPEDs: {contadores['procesadas_exitosamente']}/{contadores['total_solpeds']}, "
+            mensaje=f"PROCESO COMPLETADO - SOLPEDs: {contadores['procesadas_exitosamente']}/{contadores['total_solpeds']}, "
             f"Items validados: {contadores['items_validados']}/{contadores['items_procesados']}, "
-            f"Notificaciones enviadas: {contadores['notificaciones_enviadas']}",
+            f"Notificaciones: {contadores['notificaciones_enviadas']}, "
+            f"Rechazadas sin archivosAdjuntos: {contadores['rechazadas_sin_archivosAdjuntos']}, "
+            f"Filas reporte: {len(filasReporteFinal)}",
             estado="INFO",
-            task_name=task_name,
-            path_log=RUTAS["PathLog"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLog"],
         )
 
-        # Ruta del archivo a convertir
+        # GENERAR ARCHIVO FINAL
+        if filasReporteFinal:
+            WriteLog(
+                mensaje="Generando reporte final consolidado ME53N",
+                estado="INFO",
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
+            )
 
-        convertir_txt_a_excel(nombre_archivo)
-        archivo_descargado = rf"{RUTAS['PathInsumos']}/expSolped03.xlsx"
+            pathReporte = GenerarReporteFinalExcel(filasReporteFinal)
+
+            if pathReporte:
+                WriteLog(
+                    mensaje=f"Reporte final generado: {pathReporte}",
+                    estado="OK",
+                    nombreTarea=nombreTarea,
+                    rutaRegistro=RUTAS["PathLog"],
+                )
+            else:
+                WriteLog(
+                    mensaje="No se pudo generar el reporte final",
+                    estado="WARNING",
+                    nombreTarea=nombreTarea,
+                    rutaRegistro=RUTAS["PathLog"],
+                )
+        else:
+            WriteLog(
+                mensaje="No hay filas para generar el reporte final",
+                estado="WARNING",
+                nombreTarea=nombreTarea,
+                rutaRegistro=RUTAS["PathLog"],
+            )
+
+        # Convertir a Excel y agregar hipervínculos
+        ConvertirTxtAExcel(nombreArchivo)
+        archivoDescargado = rf"{RUTAS['PathInsumos']}/expSolped03.xlsx"
         AppendHipervinculoObservaciones(
-            ruta_excel=archivo_descargado, carpeta_reportes=RUTAS["PathReportes"]
+            rutaExcel=archivoDescargado, carpetaReportes=RUTAS["PathReportes"]
         )
 
-        # Enviar correo de inicio (código 2 adjunto)
+        # Sube el Excel a la base de datos
+        ServicioExcel.ejecutarBulkDesdeExcel(rf"{pathReporte}")
+
+        # Enviar correo de finalización
         EnviarNotificacionCorreo(
-            codigo_correo=54, task_name=task_name, adjuntos=[archivo_descargado]
+            codigoCorreo=3, nombreTarea=nombreTarea, adjuntos=[pathReporte]
         )
 
+        ControlHU(nombreTarea, estado=100)
         return True
 
     except Exception as e:
+        ControlHU(nombreTarea, estado=99)
         WriteLog(
             mensaje=f"Error en EjecutarHU03: {e}",
             estado="ERROR",
-            task_name=task_name,
-            path_log=RUTAS["PathLogError"],
+            nombreTarea=nombreTarea,
+            rutaRegistro=RUTAS["PathLogError"],
         )
         traceback.print_exc()
         return False

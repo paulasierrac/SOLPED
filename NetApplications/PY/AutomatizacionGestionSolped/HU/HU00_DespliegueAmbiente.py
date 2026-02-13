@@ -2,64 +2,92 @@
 # GestionSOLPED – HU00: DespliegueAmbiente
 # Autor: Paula Sierra - NetApplications
 # Descripcion: Carga parámetros, valida carpetas y prepara entorno
-# Ultima modificacion: 30/11/2025
+# Ultima modificacion: 11/02/2026
 # Propiedad de Colsubsidio
-# Cambios: Ajuste ruta base dinámica + estándar Colsubsidio
+# Cambios:
+# - Se agrega manejo de errores
+# - Se agrega trazabilidad
+# - Se validan rutas
 # ================================
 
 import os
 import json
+import random
 
-from config.initconfig import init_config
-
-#from config.initconfig import init_config
-
-
-
+from Config.InicializarConfig import initConfig, inConfig
+from Funciones.FuncionesExcel import ServicioExcel
+from Repositories.TicketInsumo import TicketInsumoRepo 
 
 def EjecutarHU00():
+
     """
     Prepara el entorno: valida carpetas, carga parámetros y estructura inicial.
     """
+    try : 
+            
+        # ==========================================================
+        # 1. Ruta base del proyecto (importante)
+        # ==========================================================
+        rutaBase = os.path.dirname(os.path.abspath(__file__))  # ruta de HU00
+        rutaBase = os.path.abspath(os.path.join(rutaBase, ".."))
+        # Sube un nivel para quedar en /AutomatizacionGestionSolped
 
-    # ==========================================================
-    # 1. Ruta base del proyecto (importante)
-    # ==========================================================
-    ruta_base = os.path.dirname(os.path.abspath(__file__))  # ruta de HU00
-    ruta_base = os.path.abspath(os.path.join(ruta_base, ".."))
-    # Sube un nivel para quedar en /AutomatizacionGestionSolped
+        # ==========================================================
+        # 2. Definir las carpetas obligatorias según estándar
+        # ==========================================================
+        carpetas = [
+            "Audit/Logs",
+            "Audit/Screenshots",
+            "Temp",
+            "Insumo",
+            "Resultado",
+            "Funciones",
+            "HU",
+        ]
 
-    # ==========================================================
-    # 2. Definir las carpetas obligatorias según estándar
-    # ==========================================================
-    carpetas = [
-        "Audit/Logs",
-        "Audit/Screenshots",
-        "Temp",
-        "Insumo",
-        "Resultado",
-        "Funciones",
-        "HU",
-    ]
+        for carpeta in carpetas:
+            rutaCompleta = os.path.join(rutaBase, carpeta)
 
-    for carpeta in carpetas:
-        ruta_completa = os.path.join(ruta_base, carpeta)
+            if not os.path.exists(rutaCompleta):
+                os.makedirs(rutaCompleta)
 
-        if not os.path.exists(ruta_completa):
-            os.makedirs(ruta_completa)
+        # ==========================================================
+        # 3. Cargar parámetros desde o BD
+        # ==========================================================
+        initConfig()
+    
+        # ==========================================================
+        # 4. Cargar Ecxel con hojas que van a ser las tablas de parametros en la BD
+        # ==========================================================
 
-    # ==========================================================
-    # 3. (Opcional) Cargar parámetros desde config.json o BD
-    # ==========================================================
-    init_config()
-   
 
-    ruta_config = os.path.join(ruta_base, "config.json")
+        try : 
+                 
+            TicketInsumoRepo.crearPCTicketInsumo( estado=0, observaciones= "Cargue de insumo")
+            rutaParametros = os.path.join(inConfig("PathInsumo"),"Parametros SAMIR.xlsx")
+            ServicioExcel.ejecutarBulkDesdeExcel(rutaParametros)
+            TicketInsumoRepo.crearPCTicketInsumo( estado=100, observaciones= "Cargue de insumo")
+        except: 
+            TicketInsumoRepo.crearPCTicketInsumo( error= 99, observaciones="Carge de insumo " )
 
-    if os.path.exists(ruta_config):
-        with open(ruta_config, "r", encoding="utf-8") as f:
-            config = json.load(f)
-    else:
-        config = {}
+        rutaConfig = os.path.join(rutaBase, "Config.json")
 
-    return config
+        if os.path.exists(rutaConfig):
+            with open(rutaConfig, "r", encoding="utf-8") as f:
+                config = json.load(f)
+        else:
+            config = {}
+
+        return config
+
+    except Exception as e:
+         print("Error")
+
+         
+    #     WriteLog(
+    #         mensaje=f"Error Global en Main: {e} | {error_stack}",
+    #         estado="ERROR",
+    #         nombreTarea=nombreTarea,
+    #         rutaRegistro=RUTAS["PathLogError"],
+    #     )
+    #     raise

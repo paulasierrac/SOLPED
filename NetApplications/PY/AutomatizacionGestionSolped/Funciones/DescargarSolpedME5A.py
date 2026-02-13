@@ -1,14 +1,14 @@
 # ============================================
 # Función Local: DescargarSolpedME5A
-# Autor: Tu Nombre - Configurador RPA
+# Autor: Steven Navarro - Configurador RPA
 # Descripcion: Ejecuta ME5A y exporta archivo TXT según estado.
 # Ultima modificacion: 24/11/2025
 # Propiedad de Colsubsidio
 # Cambios: (Si Aplica)
 # ============================================
 import pyautogui
-from config.settings import RUTAS
-from funciones.GeneralME53N import AbrirTransaccion
+from Config.settings import RUTAS
+from Funciones.GeneralME53N import AbrirTransaccion
 import win32com.client
 import time
 import os
@@ -18,10 +18,10 @@ def DescargarSolpedME5A(session, estado):
 
     if not session:
         raise ValueError("Sesión SAP no válida.")
-    
+
     # Ruta destino – ejemplo estándar Colsubsidio
-    #ruta_guardar = rf"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
-    ruta_guardar = rf"{RUTAS["PathInsumo"]}\expSolped{estado}.txt"
+    # rutaGuardar = rf"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
+    rutaGuardar = rf"{RUTAS["PathInsumo"]}\expSolped{estado}.txt"
     # ============================
     # Abrir transacción ME5A
     # ============================
@@ -30,7 +30,7 @@ def DescargarSolpedME5A(session, estado):
     session.findById("wnd[0]").maximize()
 
     # ============================
-    # Visual.lista Solicitudes de pedido 
+    # Visual.lista Solicitudes de pedido
     # ============================
 
     # Alcance de la lista
@@ -77,7 +77,7 @@ def DescargarSolpedME5A(session, estado):
     session.findById("wnd[1]/tbar[0]/btn[8]").press()  # Ejecutar
 
     # ============================
-    # Aplicar Filtro de Estado 03 o 05 
+    # Aplicar Filtro de Estado 03 o 05
     # ============================
     session.findById("wnd[0]/usr/ctxtS_BANPR-LOW").text = estado
     session.findById("wnd[0]/usr/ctxtS_BANPR-LOW").setFocus()
@@ -91,35 +91,35 @@ def DescargarSolpedME5A(session, estado):
     session.findById("wnd[0]/tbar[1]/btn[45]").press()
     time.sleep(5)
     # ============================
-    # Guardar archivo , revisar rutas relativas 
+    # Guardar archivo , revisar rutas relativas
     # ============================
 
-    #ruta_guardar = rf"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
-    ruta_guardar = rf"{RUTAS["PathInsumo"]}\expSolped{estado}.txt"  
+    # rutaGuardar = rf"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo\expSolped{estado}.txt"
+    rutaGuardar = rf"{RUTAS["PathInsumo"]}\expSolped{estado}.txt"
 
-    if os.path.exists(ruta_guardar):
-        os.remove(ruta_guardar)
+    if os.path.exists(rutaGuardar):
+        os.remove(rutaGuardar)
     session.findById("wnd[1]/tbar[0]/btn[0]").press()
     time.sleep(1)
 
     session.findById("wnd[1]/usr/ctxtDY_PATH").text = (
-        #r"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo"
+        # r"C:\Users\CGRPA042\Documents\Steven\SOLPED\NetApplications\PY\AutomatizacionGestionSolped\Insumo"
         rf"{RUTAS["PathInsumo"]}"
     )
 
-    ruta_guardar = rf"{RUTAS["PathInsumo"]}\expSolped{estado}.txt"
+    rutaGuardar = rf"{RUTAS["PathInsumo"]}\expSolped{estado}.txt"
     session.findById("wnd[1]/usr/ctxtDY_FILENAME").text = rf"expSolped{estado}.txt"
     session.findById("wnd[1]/usr/ctxtDY_FILENAME").caretPosition = 10
     session.findById("wnd[1]/tbar[0]/btn[0]").press
     session.findById("wnd[1]/tbar[0]/btn[11]").press()  # Guardar
     time.sleep(1)
 
-    # Salir de SAP 
+    # Salir de SAP
     session.findById("wnd[0]").sendVKey(12)
     time.sleep(1)
     pyautogui.press("f3")
     time.sleep(1)
     pyautogui.press("f12")
     print(
-        f"Archivo exportado correctamente: {ruta_guardar}"
+        f"Archivo exportado correctamente: {rutaGuardar}"
     )  # luego reemplazar con WriteLog

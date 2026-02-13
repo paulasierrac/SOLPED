@@ -4,8 +4,8 @@ import win32com.client  # pyright: ignore[reportMissingModuleSource]
 def ObtenerSesionActiva():
     """Obtiene una sesión SAP ya iniciada (con usuario logueado)."""
     try:
-        sap_gui_auto = win32com.client.GetObject("SAPGUI")
-        application = sap_gui_auto.GetScriptingEngine
+        sapGuiAuto = win32com.client.GetObject("SAPGUI")
+        application = sapGuiAuto.GetScriptingEngine
 
         # Buscar una conexión activa con sesión
         for conn in application.Connections:

@@ -6,20 +6,20 @@
 # Propiedad de Colsubsidio
 # Cambios: Ajuste inicial para cumplimiento de estándar
 # ================================
-from HU.HU01_LoginSAP import conectar_sap
+from HU.HU01_LoginSAP import ConectarSAP
 from HU.HU04_GeneracionOC import GenerarOCDesdeSolped
 
 
-# from NetApplications.PY.AutomatizacionGestionSolped.HU.HU03_ValidacionME53N import buscar_SolpedME53N
-from funciones.EscribirLog import WriteLog
+# from HU.HU03_ValidacionME53N import buscar_SolpedME53N
+from Funciones.EscribirLog import WriteLog
 import traceback
-from config.settings import RUTAS, SAP_CONFIG
+from Config.settings import RUTAS, SAP_CONFIG
 
 
 def Main_Pruebas3():
     try:
 
-        session = conectar_sap(
+        session = ConectarSAP(
             SAP_CONFIG["sistema"],
             SAP_CONFIG["mandante"],
             SAP_CONFIG["user"],
@@ -35,12 +35,12 @@ def Main_Pruebas3():
         # GenerarOCDesdeSolped(session, "1300177338", 13)
 
     except Exception as e:
-        error_text = traceback.format_exc()
+        errorText = traceback.format_exc()
         WriteLog(
-            mensaje=f"ERROR GLOBAL: {e} | {error_text}",
+            mensaje=f"ERROR GLOBAL: {e} | {errorText}",
             estado="ERROR",
-            task_name="Main_GestionSOLPED",
-            path_log=RUTAS["PathLogError"],
+            nombreTarea="Main_GestionSOLPED",
+            rutaRegistro=RUTAS["PathLogError"],
         )
         raise
 
