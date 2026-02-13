@@ -21,7 +21,7 @@ from Funciones.EmailSender import EmailSender
 from typing import List, Union
 import sys
 from openpyxl import load_workbook
-from Funciones.SAPFuncionesME53N import GuardarTablaME5A,ParsearTablaAttachments
+from Funciones.SAPFuncionesME53N import GuardarTablaME5A, ParsearTablaAttachments
 import win32clipboard
 
 
@@ -423,7 +423,7 @@ def AbrirTransaccion(session, transaccion):
     session: objeto de SAP GUI
     transaccion: transaccion a buscar
     Realiza la busqueda de la transaccion requerida
-    
+
     """
 
     try:
@@ -560,9 +560,7 @@ def ActualizarEstadoYObservaciones(
                 df.loc[mascara, "Observaciones"] = observaciones
             # Guardar archivo actualizado
             GuardarTablaME5A(df, nombreArchivo)
-            print(
-                f"EXITO: Actualizado: {purchReq}" + (f" Item {item}" if item else "")
-            )
+            print(f"EXITO: Actualizado: {purchReq}" + (f" Item {item}" if item else ""))
             return True
         else:
             print(
@@ -624,7 +622,7 @@ def FormatoMoneda(valor):
         return str(valor)
 
 
-def limpiar_numero(valor):
+def LimpiarNumero(valor):
     """
     Limpia y convierte un valor a número
     Maneja valores None, vacíos, y no numéricos
@@ -662,3 +660,133 @@ def limpiar_numero(valor):
     except (ValueError, AttributeError) as e:
         print(f"ERROR limpiando numero '{valor}': {e}")
         return 0.0
+
+
+def TransformartxtMe5a(ruta_txt: str):
+
+    if not os.path.exists(ruta_txt):
+        raise FileNotFoundError(f"No existe el archivo: {ruta_txt}")
+
+
+    # ===============================
+    # 1. LEER Y LIMPIAR ARCHIVO
+    # ===============================
+    with open(ruta_txt, "r", encoding="latin-1", errors="replace") as f:
+        lineas = f.readlines()
+
+    lineasValidas = [
+        linea.strip()
+        for linea in lineas
+        if linea.strip().startswith("|")
+        and "|" in linea
+        and not set(linea.strip()) == {"-"}
+    ]
+
+    if not lineasValidas:
+        raise ValueError("El archivo no contiene líneas válidas con formato esperado.")
+
+    columnas = [col.strip() for col in lineasValidas[0].split("|")[1:-1]]
+
+    datos = []
+    for linea in lineasValidas[1:]:
+        valores = [v.strip() for v in linea.split("|")[1:-1]]
+        if len(valores) == len(columnas):
+            datos.append(valores)
+
+    df = pd.DataFrame(datos, columns=columnas)
+
+    # ===============================
+    # 2. ELIMINAR COLUMNAS NO NECESARIAS
+    # ===============================
+    columnasEliminar = ["CDoc", "EL", "ProvFijo", "PrecioVal.", "Valor tot.", "Fondo"]
+
+    df = df.drop(
+        columns=[c for c in columnasEliminar if c in df.columns], errors="ignore"
+    )
+
+    # ===============================
+    # 3. RENOMBRAR COLUMNAS A INGLÉS
+    # ===============================
+    df = df.rename(
+        columns={
+            "Sol.pedido": "PurchReq",
+            "Pos.": "Item",
+            "Fe.solic.": "ReqDate",
+            "Creado por": "Created",
+            "Texto breve": "ShortText",
+            "Pedido": "PO",
+            "Cantidad": "Quantity",
+            "Ce.": "Plnt",
+            "GCp": "PGr",
+            "Gestores": "Requisnr",
+            "Stat.trat.": "ProcState",
+        }
+    )
+    # ===============================
+    # EXTRAER NÚMERO DESDE NOMBRE TXT
+    # ===============================
+    nombre_archivo = os.path.basename(ruta_txt)
+
+    numeroProcstate = "".join(filter(str.isdigit, nombre_archivo))
+
+    if not numeroProcstate:
+        raise ValueError("No se pudo extraer número del nombre del archivo.")
+
+    numeroProcstate = numeroProcstate.zfill(2)
+    # ===============================
+    # 4. AGREGAR ProcState = "03"
+    # ===============================
+    df["ProcState"] = numeroProcstate
+
+    # ===============================
+    # 5. ORDEN FINAL
+    # ===============================
+    ordenFinal = [
+        "PurchReq",
+        "Item",
+        "ReqDate",
+        "Material",
+        "Created",
+        "ShortText",
+        "PO",
+        "Quantity",
+        "Plnt",
+        "PGr",
+        "D",
+        "Requisnr",
+        "ProcState",
+    ]
+
+    df = df[[col for col in ordenFinal if col in df.columns]]
+
+    # ===============================
+    # 6. GUARDAR ARCHIVO TRANSFORMADO
+    # ===============================
+    # rutaSalida = ruta_txt.replace(".txt", "_transformado.txt")
+    rutaSalida = ruta_txt
+
+    anchos = {
+        col: max(df[col].astype(str).map(len).max(), len(col)) + 3 for col in df.columns
+    }
+
+    with open(rutaSalida, "w", encoding="utf-8") as f:
+
+        f.write("-" * sum(anchos.values()) + "\n")
+
+        encabezado = "|"
+        for col in df.columns:
+            encabezado += f"{col:<{anchos[col]}}|"
+        f.write(encabezado + "\n")
+
+        f.write("-" * sum(anchos.values()) + "\n")
+
+        for _, row in df.iterrows():
+            linea = "|"
+            for col in df.columns:
+                linea += f"{str(row[col]):<{anchos[col]}}|"
+            f.write(linea + "\n")
+
+        f.write("-" * sum(anchos.values()) + "\n")
+
+    print(f"Archivo transformado correctamente: {rutaSalida}")
+    return rutaSalida

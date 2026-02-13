@@ -30,6 +30,7 @@ from Funciones.GeneralME53N import (
     NotificarRevisionManualSolped,
     GenerarReporteAttachments,
     ConvertirTxtAExcel,
+    TransformartxtMe5a,
 )
 from Funciones.SAPFuncionesME53N import (
     ProcesarTablaME5A,
@@ -70,6 +71,10 @@ def EjecutarHU03(session, nombreArchivo):
             rutaRegistro=inConfig("PathLog"),
         )
 
+        rutaCompletoArchivo = rf"{RUTAS['PathInsumos']}\{nombreArchivo}"
+        # Tranformar Archivo txt de ME5A a formato procesable para validación en ME53N
+        TransformartxtMe5a(rutaCompletoArchivo)
+
         # Leer el archivo con las SOLPEDs a procesar
         dfSolpeds = ProcesarTablaME5A(nombreArchivo)
         GuardarTablaME5A(dfSolpeds, nombreArchivo)
@@ -105,9 +110,7 @@ def EjecutarHU03(session, nombreArchivo):
             if (
                 solpedStr
                 and solpedStr not in ["Purch.Req.", "PurchReq", "Purch.Req", ""]
-                and not any(
-                    header in solpedStr for header in ["Purch.Req", "PurchReq"]
-                )
+                and not any(header in solpedStr for header in ["Purch.Req", "PurchReq"])
                 and solpedStr.replace(".", "").isdigit()
             ):
                 solpedLimpia = solpedStr.replace(".", "")
@@ -252,9 +255,7 @@ def EjecutarHU03(session, nombreArchivo):
                         f"   {obsAttachments}\n"
                     )
                 else:
-                    infoAttachments = (
-                        f"\n📎 ATTACHMENT LIST ({len(archivosAdjuntosLista)} archivo(s))\n"
-                    )
+                    infoAttachments = f"\n📎 ATTACHMENT LIST ({len(archivosAdjuntosLista)} archivo(s))\n"
                     infoAttachments += f"   {obsAttachments}\n"
 
                     if archivosAdjuntosLista:
