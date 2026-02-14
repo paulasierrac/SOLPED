@@ -15,7 +15,7 @@ import subprocess
 import time
 import os
 from Funciones.EscribirLog import WriteLog 
-from Config.settings import RUTAS
+from Config.InicializarConfig import inConfig
 import pyautogui
 from pyautogui import ImageNotFoundException
 from Funciones.Login import ObtenerSesionActiva
@@ -190,7 +190,7 @@ def ValidarAjustarSolped(session, item=1):
         raise
 
 
-def AbrirSolped(session, solped, item=2,posiciones = ["20","30","50","60"]):
+def AbrirSolped(session, solped, item ,posiciones=None):
     """
     Navega en la GUI de SAP para tomar una Solicitud de Pedido (SOLPED) específica
     y prepararla para la creación de una Orden de Compra.
@@ -213,20 +213,9 @@ def AbrirSolped(session, solped, item=2,posiciones = ["20","30","50","60"]):
         while not ventanaAbierta(session, ventana):
             if time.time() > timeout:
                 raise TimeoutError(f"No se abrió la ventana :{ventana}")
-            
             BuscarYClickear(rf".\img\vSeleccion.png", confidence=0.8, intentos=5, espera=0.5)
-            #session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]").pressContextButton("SELECT")
-            # VarianteSeleccion = buscarObjetoPorIdParcial(session, "/shell[0]")
-            # VarianteSeleccion1= buscarObjetoPorIdParcial(session, "SELECT")
-            # VarianteSeleccion.pressContextButton (VarianteSeleccion1.id)
-            # EsperarSAPListo(session)
-            # SolicitudesdePedido = buscarObjetoPorIdParcial(session, ":REQ_QUERY")
-            # VarianteSeleccion.selectContextMenuItem (SolicitudesdePedido.id)
-            #session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[0]").pressContextButton("SELECT")
             time.sleep(2)
-            pyautogui.press(
-                "s"
-            )  # selecciona el campo Solicitudes de pedido en la lista
+            pyautogui.press("s")  # selecciona el campo Solicitudes de pedido en la lista
 
         # ingresa el numero de la solped que va a revisar  #Funciona perfecto
         EsperarSAPListo(session)
@@ -252,19 +241,12 @@ def AbrirSolped(session, solped, item=2,posiciones = ["20","30","50","60"]):
             )  # Stev: cantidad de items a bajar articulos de la solped
             time.sleep(0.5)
         """
-        primerItem = 2 #desde donde se toman las pociciones TODO: que se pase por parametro, segun cliente con posiciones 
-        ultimoItem = item + 2 # Ultima posicion tomada 
+
+        if posiciones == None:
+            posiciones = list(range(10, (item + 1) * 10, 10))
 
         for i in posiciones:   # recordar que en range no incluye el ultimo 
-            print (posiciones)
-            print (type(posiciones))
-            print("Valores a evaluar ")
-            print(i)
-            print (type(i))
             i = int(int(i) / 10) + 1
-            print("Valores a evaluar ")
-            print(i)
-            print (type(i))
             session.findById("wnd[0]/shellcont/shell/shellcont[1]/shell[1]").selectNode(f"          {i}")
 
         EsperarSAPListo(session)
@@ -277,4 +259,10 @@ def AbrirSolped(session, solped, item=2,posiciones = ["20","30","50","60"]):
 
     except Exception as e:
         print(rf"Error en HU05: {e}", "ERROR")
+        WriteLog(
+            mensaje=f"Error en HU05: {e}",
+            estado="ERROR",
+            nombreTarea="AbrirSolped",
+            
+        )
         raise

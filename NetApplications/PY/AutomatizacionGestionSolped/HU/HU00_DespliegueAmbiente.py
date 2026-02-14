@@ -63,7 +63,7 @@ def EjecutarHU00():
 
 
         try : 
-                 
+            #TODO: hacer el bulk por hoja a tabla en base de datos     
             TicketInsumoRepo.crearPCTicketInsumo( estado=0, observaciones= "Cargue de insumo")
             rutaParametros = os.path.join(inConfig("PathInsumo"),"Parametros SAMIR.xlsx")
             ServicioExcel.ejecutarBulkDesdeExcel(rutaParametros)
@@ -80,6 +80,12 @@ def EjecutarHU00():
             config = {}
 
         return config
+    
+        # ==========================================================
+        # 4. hitorias de usuario en base de datos 
+        # ==========================================================
+
+        
 
     except Exception as e:
          #Sin log ya que no se han cargado las variables desde la base de datos aun 

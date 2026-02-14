@@ -238,7 +238,7 @@ def EjecutarHU06():
         mensaje="Inicio ejecución Envio Correo de OC.",
         estado="INFO",
         nombreTarea=nombreTarea,
-        rutaRegistro=inConfig("PathLog"),
+        
     )
 
     # Asegurar que los directorios existen
@@ -293,6 +293,6 @@ def EjecutarHU06():
         mensaje="Fin ejecución Envio Correo de OC.",
         estado="INFO",
         nombreTarea=nombreTarea,
-        rutaRegistro=inConfig("PathLog"),
+        
     )
     log("Fin proceso RPA")

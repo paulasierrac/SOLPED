@@ -38,7 +38,7 @@ def EjecutarHU04(session, archivo):
             mensaje=f"HU04 Inicia para el archivo {archivo}",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=inConfig("PathLog"),
+            
         )
 
         # ============================
@@ -58,7 +58,7 @@ def EjecutarHU04(session, archivo):
                 mensaje=f"No se encontraron Solpeds para procesar en el archivo {archivo}.",
                 estado="WARNING",
                 nombreTarea=nombreTarea,
-                rutaRegistro=inConfig("PathLog"),
+                
             )
             return
 
@@ -68,7 +68,7 @@ def EjecutarHU04(session, archivo):
             mensaje=f"listado de Solped cargadas : {solpedsUnicas}",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=inConfig("PathLog"),
+            
         )
 
         for (
@@ -85,7 +85,7 @@ def EjecutarHU04(session, archivo):
                     mensaje=f"Solped inválida u omitida: {solped}",
                     estado="WARNING",
                     nombreTarea=nombreTarea,
-                    rutaRegistro=inConfig("PathLog"),
+                    
                 )
                 continue  # Saltar a la siguiente solped
             # Contar los items para la solped actual
@@ -95,7 +95,7 @@ def EjecutarHU04(session, archivo):
                 mensaje=f"Procesando Solped: {solped} de items: {itemCount} .",
                 estado="INFO",
                 nombreTarea=nombreTarea,
-                rutaRegistro=inConfig("PathLog"),
+                
             )
             acciones = []
             
@@ -103,7 +103,7 @@ def EjecutarHU04(session, archivo):
             AbrirTransaccion(session, "ME21N",)
             EsperarSAPListo(session)
             #navegacion por SAP que permite abrir Solped 
-            posiciones = ["10","40","50","60"]
+            posiciones = []
             AbrirSolped(session, solped, itemCount, posiciones)
 
             #se selecciona la clase de docuemnto ZRCR, revisar alcance si es necesario cambiar a otra clase dependiendo de algun criterio
@@ -162,14 +162,14 @@ def EjecutarHU04(session, archivo):
                 mensaje=f" para la solped : {solped} Se generó la Orden de Compra: {ordenDeCompra}",
                 estado="INFO",
                 nombreTarea=nombreTarea,
-                rutaRegistro=inConfig("PathLog"),
+                
             )
 
         WriteLog(
             mensaje=f"HU04 finalizada correctamente para archivo {archivo}.",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=inConfig("PathLog"),
+            
         )
         ControlHU(nombreTarea, estado=100)
 
@@ -180,6 +180,6 @@ def EjecutarHU04(session, archivo):
             mensaje=f"ERROR GLOBAL en HU04: {e}",
             estado="ERROR",
             nombreTarea=nombreTarea,
-            rutaRegistro=inConfig("PathLog"),
+            
         )
         raise

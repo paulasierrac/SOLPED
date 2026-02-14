@@ -64,7 +64,7 @@ def ConvertirTxtAExcel(archivo):
     try:
         print(f"Leyendo archivo: {archivo}")
 
-        rutaArchivoTxt = rf"{RUTAS["PathInsumos"]}\{archivo}"
+        rutaArchivoTxt = rf"{inConfig("PathLog")}\{archivo}"
         # Leer el archivo
         with open(rutaArchivoTxt, "r", encoding="utf-8") as f:
             lineas = f.readlines()
@@ -318,7 +318,7 @@ def EnviarCorreoPersonalizado(
             mensaje=f"Preparando envío personalizado para {destinatario}...",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=inConfig("PathLog"),
+            
         )
 
         # Log de adjuntos
@@ -327,7 +327,7 @@ def EnviarCorreoPersonalizado(
                 mensaje=f"Adjuntos a enviar: {', '.join(adjuntos)}",
                 estado="INFO",
                 nombreTarea=nombreTarea,
-                rutaRegistro=inConfig("PathLog"),
+                
             )
 
         # Crear EmailSender con configuración por defecto
@@ -348,7 +348,7 @@ def EnviarCorreoPersonalizado(
                 mensaje=f"Correo personalizado enviado exitosamente a {destinatario}.",
                 estado="INFO",
                 nombreTarea=nombreTarea,
-                rutaRegistro=inConfig("PathLog"),
+                
             )
             return True
         else:
@@ -356,7 +356,7 @@ def EnviarCorreoPersonalizado(
                 mensaje=f"Fallo al enviar el correo personalizado a {destinatario}.",
                 estado="WARNING",
                 nombreTarea=nombreTarea,
-                rutaRegistro=inConfig("PathLog"),
+                
             )
             return False
 
@@ -366,7 +366,7 @@ def EnviarCorreoPersonalizado(
             mensaje=f"Error fatal en el envío personalizado: {e} | {error_stack}",
             estado="ERROR",
             nombreTarea=nombreTarea,
-            rutaRegistro=inConfig("PathLog"),
+            
         )
         return False
 
@@ -431,7 +431,7 @@ def AbrirTransaccion(session, transaccion):
             mensaje=f"Abrir Transaccion {transaccion}",
             estado="INFO",
             nombreTarea="AbrirTransaccion",
-            rutaRegistro=inConfig("PathLog"),
+            
         )
 
         # Validar sesion SAP
@@ -441,7 +441,7 @@ def AbrirTransaccion(session, transaccion):
                 mensaje="Sesion SAP no disponible",
                 estado="ERROR",
                 nombreTarea="AbrirTransaccion",
-                rutaRegistro=inConfig("PathLog"),
+                
             )
             raise Exception("Sesion SAP no disponible")
 
@@ -454,7 +454,7 @@ def AbrirTransaccion(session, transaccion):
             mensaje=f"Transaccion {transaccion} abierta",
             estado="INFO",
             nombreTarea="AbrirTransaccion",
-            rutaRegistro=inConfig("PathLog"),
+            
         )
         print(f"Transaccion {transaccion} abierta")
         return True
@@ -463,7 +463,7 @@ def AbrirTransaccion(session, transaccion):
             mensaje=f"Error en AbrirTransaccion: {e}",
             estado="ERROR",
             nombreTarea="AbrirTransaccion",
-            rutaRegistro=inConfig("PathLog"),
+            
         )
 
         return False
@@ -479,7 +479,7 @@ def ColsultarSolped(session, numeroSolped):
             mensaje=f"Numero de SOLPED : {numeroSolped}",
             estado="INFO",
             nombreTarea="ColsultarSolped",
-            rutaRegistro=inConfig("PathLog"),
+            
         )
 
         # Validar sesion SAP
@@ -489,7 +489,7 @@ def ColsultarSolped(session, numeroSolped):
                 mensaje="Sesion SAP no disponible",
                 estado="ERROR",
                 nombreTarea="ColsultarSolped",
-                rutaRegistro=inConfig("PathLog"),
+                
             )
             raise Exception("Sesion SAP no disponible")
 
@@ -518,7 +518,7 @@ def ColsultarSolped(session, numeroSolped):
             mensaje=f"Solped {numeroSolped} consultada exitosamente",
             estado="INFO",
             nombreTarea="ColsultarSolped",
-            rutaRegistro=inConfig("PathLog"),
+            
         )
 
         return True
@@ -527,7 +527,7 @@ def ColsultarSolped(session, numeroSolped):
             mensaje=f"Error en ColsultarSolped: {e}",
             estado="ERROR",
             nombreTarea="ColsultarSolped",
-            rutaRegistro=inConfig("PathLog"),
+            
         )
 
         return False

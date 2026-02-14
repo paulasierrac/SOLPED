@@ -64,7 +64,7 @@ class EmailSender:
 
             return df
         except Exception as e:
-            print(f"Error al leer el archivo Excel: {e}")
+            WriteLog(mensaje=f"Error al leer el archivo Excel: {e}",estado="ERROR",nombreTarea="EmailSender",)
             return None
 
     def enviar_correo(
@@ -111,7 +111,7 @@ class EmailSender:
                     if os.path.exists(archivo):
                         self._adjuntar_archivo(mensaje, archivo)
                     else:
-                        print(f"Advertencia: El archivo {archivo} no existe")
+                        WriteLog(mensaje=f"Advertencia: El archivo {archivo} no existe",estado="WARN",nombreTarea="enviar_correo",)
 
             # Conectar y enviar
             with smtplib.SMTP(self.smtp_server, self.smtp_port) as server:
@@ -126,12 +126,11 @@ class EmailSender:
                     destinatarios.extend(bcc)
 
                 server.sendmail(self.email, destinatarios, mensaje.as_string())
-
-            print(f"✓ Correo enviado exitosamente a {destinatario}")
+            WriteLog(mensaje=f"Correo enviado exitosamente a {destinatario}",estado="INFO",nombreTarea="enviar_correo",)
             return True
 
         except Exception as e:
-            print(f"✗ Error al enviar correo a {destinatario}: {e}")
+            WriteLog(mensaje=f"Error al enviar correo a {destinatario}: {e}",estado="ERROR",nombreTarea="enviar_correo",)
             return False
 
     def enviar_correo_personalizado(
@@ -146,7 +145,7 @@ class EmailSender:
         """
         Envía un correo con estructura personalizada. Es un alias para enviar_correo.
         """
-        print(f"📧 Iniciando envío personalizado para: {destinatario}")
+        WriteLog(mensaje=f"📧 Iniciando envío personalizado para: {destinatario}",estado="INFO",nombreTarea="enviar_correo",)
         return self.enviar_correo(
             destinatario=destinatario,
             asunto=asunto,
@@ -227,11 +226,11 @@ class EmailSender:
         if codigoCorreo is not None:
             df = df[df[columna_codigo] == codigoCorreo]
             if df.empty:
-                print(f"⚠️  No se encontraron correos con código {codigoCorreo}")
+                #print(f"⚠️  No se encontraron correos con código {codigoCorreo}")
+                WriteLog(mensaje=f"⚠️ No se encontraron correos con código {codigoCorreo}",estado="WARN",nombreTarea="procesar_excel_y_enviar",)
                 return {"exitosos": 0, "fallidos": 0, "total": 0}
-            print(
-                f"📧 Enviando correos con código {codigoCorreo} ({len(df)} correo(s))\n"
-            )
+            #print(f"📧 Enviando correos con código {codigoCorreo} ({len(df)} correo(s))\n")
+            WriteLog(mensaje=f"📧 Enviando correos con código {codigoCorreo} ({len(df)} correo(s))",estado="INFO",nombreTarea="procesar_excel_y_enviar",)
 
         exitosos = 0
         fallidos = 0
@@ -241,8 +240,14 @@ class EmailSender:
             try:
                 destinatario_raw = fila[columna_destinatario]
             except KeyError:
-                print(f"⚠️  ERROR: Columna '{columna_destinatario}' no encontrada")
-                print(f"   Columnas disponibles: {fila.index.tolist()}")
+                # print(f"⚠️  ERROR: Columna '{columna_destinatario}' no encontrada")
+                # print(f"   Columnas disponibles: {fila.index.tolist()}")
+                WriteLog(
+                    mensaje=f"ERROR: Columna '{columna_destinatario}' no encontrada, Columnas disponibles: {fila.index.tolist()}",
+                    estado="ERROR",
+                    nombreTarea="procesar_excel_y_enviar",
+                    
+                )
                 fallidos += 1
                 continue
 
@@ -324,12 +329,17 @@ class EmailSender:
                 fallidos += 1
 
         total = exitosos + fallidos
-        print(f"\n{'='*50}")
-        print(f"Resumen de envío:")
-        print(f"Total de correos: {total}")
-        print(f"Exitosos: {exitosos}")
-        print(f"Fallidos: {fallidos}")
-        print(f"{'='*50}")
+        # print(f"\n{'='*50}")
+        # print(f"Resumen de envío:")
+        # print(f"Total de correos: {total}")
+        # print(f"Exitosos: {exitosos}")
+        # print(f"Fallidos: {fallidos}")
+        # print(f"{'='*50}")
+        WriteLog(
+        mensaje=f"Resumen de envío:[Total:{total},Exitosos:{exitosos},Fallidos:{fallidos}].",
+        estado="INFO",
+        nombreTarea="procesar_excel_y_enviar",
+        )
 
         return {"exitosos": exitosos, "fallidos": fallidos, "total": total}
 
@@ -349,38 +359,38 @@ if __name__ == "__main__":
     # )
 
     # --- PRUEBA 1: Usando el NUEVO método personalizado (enviar_correo_personalizado) ---
-    print("\n--- PRUEBA 1: Envío Personalizado (Método Nuevo) ---")
-    exito_personalizado = sender.enviar_correo_personalizado(
-        destinatario="destinatario_personalizado@ejemplo.com",
-        asunto="Correo de Prueba vía Método Personalizado",
-        cuerpo="<p>Mensaje HTML enviado directamente con el nuevo método.</p>",
-        adjuntos=["archivo1.pdf"],  # Asegúrate de que este archivo exista en la ruta
-        cc=["info@netapplications.com.co"],
-    )
+    # print("\n--- PRUEBA 1: Envío Personalizado (Método Nuevo) ---")
+    # exito_personalizado = sender.enviar_correo_personalizado(
+    #     destinatario="destinatario_personalizado@ejemplo.com",
+    #     asunto="Correo de Prueba vía Método Personalizado",
+    #     cuerpo="<p>Mensaje HTML enviado directamente con el nuevo método.</p>",
+    #     adjuntos=["archivo1.pdf"],  # Asegúrate de que este archivo exista en la ruta
+    #     cc=["info@netapplications.com.co"],
+    # )
 
-    if exito_personalizado:
-        print("Envío personalizado exitoso (Método Nuevo).")
-    else:
-        print("Envío personalizado fallido (Método Nuevo).")
+    # if exito_personalizado:
+    #     print("Envío personalizado exitoso (Método Nuevo).")
+    # else:
+    #     print("Envío personalizado fallido (Método Nuevo).")
 
     # --- PRUEBA 2: Usando el método enviar_correo ORIGINAL (Envío Individual) ---
     # Nota: Esta prueba es redundante si se usa la Prueba 1, pero se incluye para probar la función original.
-    print("\n--- PRUEBA 2: Envío Individual (Método Original) ---")
-    sender.enviar_correo(
-        destinatario="otro_destinatario@example.com",
-        asunto="Prueba de correo Original",
-        cuerpo="<h1>Hola</h1><p>Este es un correo de prueba usando el método 'enviar_correo'.</p>",
-        adjuntos=["archivo1.pdf", "documento.xlsx"],  # Opcional
-    )
+    # print("\n--- PRUEBA 2: Envío Individual (Método Original) ---")
+    # sender.enviar_correo(
+    #     destinatario="otro_destinatario@example.com",
+    #     asunto="Prueba de correo Original",
+    #     cuerpo="<h1>Hola</h1><p>Este es un correo de prueba usando el método 'enviar_correo'.</p>",
+    #     adjuntos=["archivo1.pdf", "documento.xlsx"],  # Opcional
+    # )
 
-    # --- PRUEBA 3: Usando el método de Procesamiento Masivo (procesar_excel_y_enviar) ---
-    print("\n--- PRUEBA 3: Procesamiento Masivo (Excel) ---")
-    resultados = sender.procesar_excel_y_enviar(
-        archivo_excel="correos.xlsx",  # Asegúrate de que este archivo exista
-        codigoCorreo=1,
-        adjuntos_dinamicos=["reporte.pdf", "log.txt"],
-    )
-    print(f"Resumen del procesamiento por Excel: {resultados}")
+    # # --- PRUEBA 3: Usando el método de Procesamiento Masivo (procesar_excel_y_enviar) ---
+    # print("\n--- PRUEBA 3: Procesamiento Masivo (Excel) ---")
+    # resultados = sender.procesar_excel_y_enviar(
+    #     archivo_excel="correos.xlsx",  # Asegúrate de que este archivo exista
+    #     codigoCorreo=1,
+    #     adjuntos_dinamicos=["reporte.pdf", "log.txt"],
+    # )
+    # print(f"Resumen del procesamiento por Excel: {resultados}")
 
 
 # *************************
@@ -396,7 +406,7 @@ def EnviarNotificacionCorreo(
             mensaje=f"Enviando notificación con código {codigoCorreo}...",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=inConfig("PathLog"),
+            
         )
 
         sender = EmailSender()
@@ -418,7 +428,7 @@ def EnviarNotificacionCorreo(
                 mensaje=f"Notificación enviada correctamente. Exitosos: {resultados['exitosos']}",
                 estado="INFO",
                 nombreTarea=nombreTarea,
-                rutaRegistro=inConfig("PathLog"),
+                
             )
             return True
         else:
@@ -426,7 +436,7 @@ def EnviarNotificacionCorreo(
                 mensaje=f"No se pudo enviar la notificación. Fallidos: {resultados['fallidos']}",
                 estado="WARNING",
                 nombreTarea=nombreTarea,
-                rutaRegistro=inConfig("PathLog"),
+                
             )
             return False
 
@@ -435,7 +445,7 @@ def EnviarNotificacionCorreo(
             mensaje=f"Error al enviar notificación: {e}",
             estado="ERROR",
             nombreTarea=nombreTarea,
-            rutaRegistro=inConfig("PathLog"),
+            
         )
         return False
 
@@ -469,7 +479,7 @@ def EnviarCorreoPersonalizado(
             mensaje=f"Preparando envío personalizado para {destinatario}...",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=inConfig("PathLog"),
+            
         )
 
         # Log de adjuntos
@@ -478,7 +488,7 @@ def EnviarCorreoPersonalizado(
                 mensaje=f"Adjuntos a enviar: {', '.join(adjuntos)}",
                 estado="INFO",
                 nombreTarea=nombreTarea,
-                rutaRegistro=inConfig("PathLog"),
+                
             )
 
         # Crear EmailSender con configuración por defecto
@@ -499,7 +509,7 @@ def EnviarCorreoPersonalizado(
                 mensaje=f"Correo personalizado enviado exitosamente a {destinatario}.",
                 estado="INFO",
                 nombreTarea=nombreTarea,
-                rutaRegistro=inConfig("PathLog"),
+                
             )
             return True
         else:
@@ -507,7 +517,7 @@ def EnviarCorreoPersonalizado(
                 mensaje=f"Fallo al enviar el correo personalizado a {destinatario}.",
                 estado="WARNING",
                 nombreTarea=nombreTarea,
-                rutaRegistro=inConfig("PathLog"),
+                
             )
             return False
 
@@ -517,6 +527,6 @@ def EnviarCorreoPersonalizado(
             mensaje=f"Error fatal en el envío personalizado: {e} | {error_stack}",
             estado="ERROR",
             nombreTarea=nombreTarea,
-            rutaRegistro=inConfig("PathLog"),
+            
         )
         return False

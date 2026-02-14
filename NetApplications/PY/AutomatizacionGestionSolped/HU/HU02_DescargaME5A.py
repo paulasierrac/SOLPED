@@ -11,6 +11,7 @@ from Funciones.EscribirLog import WriteLog
 from Funciones.ControlHU import ControlHU
 import traceback
 from Config.settings import RUTAS
+from Config.InicializarConfig import inConfig
 
 
 def EjecutarHU02(session):
@@ -23,23 +24,17 @@ def EjecutarHU02(session):
     try:
         nombreTarea = "HU02_DescargaME5A"
         ControlHU(nombreTarea, estado=0)
-        WriteLog(
-            mensaje="Inicia HU02",
-            estado="INFO",
-            nombreTarea="HU2_DescargaME5A",
-            rutaRegistro=inConfig("PathLog"),
-        )
+        WriteLog(mensaje="Inicia HU02",estado="INFO",nombreTarea="HU2_DescargaME5A",)
+        
         estado = "03"
         DescargarSolpedME5A(session, estado)
         estado = "05"
         DescargarSolpedME5A(session, estado)
         ControlHU(nombreTarea, estado=100)
+
+        WriteLog(mensaje="Finaliza HU02",estado="INFO",nombreTarea="HU2_DescargaME5A",)
+
     except Exception as e:
         ControlHU(nombreTarea, estado=99)
-        WriteLog(
-            mensaje=f"ERROR GLOBAL: {e}",
-            estado="ERROR",
-            nombreTarea="HU2_DescargaME5A",
-            rutaRegistro=inConfig("PathLog"),
-        )
+        WriteLog( mensaje=f"ERROR GLOBAL: {e}",estado="ERROR",nombreTarea="HU2_DescargaME5A",)
         raise

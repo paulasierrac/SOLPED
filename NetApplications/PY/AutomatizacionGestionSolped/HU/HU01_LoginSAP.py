@@ -41,9 +41,9 @@ def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
         ControlHU(nombreTarea, estado=0)
         abrirSap = AbrirSAPLogon()
         if abrirSap:
-            WriteLog( mensaje="SAP Logon ya se encuentra abierto",estado="WARN", nombreTarea="Abrir SAP Logon", rutaRegistro=inConfig("PathLog"),)
+            WriteLog( mensaje="SAP Logon ya se encuentra abierto",estado="WARN", nombreTarea="Abrir SAP Logon", )
         else:
-            WriteLog( mensaje="SAP Logon 750 abierto",estado="INFO", nombreTarea="Abrir SAP Logon", rutaRegistro=inConfig("PathLog"),)
+            WriteLog( mensaje="SAP Logon 750 abierto",estado="INFO", nombreTarea="Abrir SAP Logon", )
       
         
         sapGuiAuto = win32com.client.GetObject("SAPGUI")
@@ -59,17 +59,17 @@ def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
                 break
 
         if not connection:
-            WriteLog( mensaje=f"Abriendo nueva conexion a {conexion}",estado="INFO", nombreTarea="Abrir SAP Logon", rutaRegistro=inConfig("PathLog"),)
+            WriteLog( mensaje=f"Abriendo nueva conexion a {conexion}",estado="INFO", nombreTarea="Abrir SAP Logon", )
             connection = application.OpenConnection(conexion, True)
         else:
-            WriteLog( mensaje=f"Conexion existente encontrada con {conexion}",estado="INFO", nombreTarea="Abrir SAP Logon", rutaRegistro=inConfig("PathLog"),)
+            WriteLog( mensaje=f"Conexion existente encontrada con {conexion}",estado="INFO", nombreTarea="Abrir SAP Logon", )
 
         if connection.Children.Count > 0:
             session = connection.Children(0)
-            WriteLog( mensaje=f"Sesion existente reutilizada",estado="INFO", nombreTarea="Abrir SAP Logon", rutaRegistro=inConfig("PathLog"),)
+            WriteLog( mensaje=f"Sesion existente reutilizada",estado="INFO", nombreTarea="Abrir SAP Logon", )
         else:
             session = connection.Children(0).CreateSession()
-            WriteLog( mensaje=f"Nueva sesion creada",estado="INFO", nombreTarea="Abrir SAP Logon", rutaRegistro=inConfig("PathLog"),)
+            WriteLog( mensaje=f"Nueva sesion creada",estado="INFO", nombreTarea="Abrir SAP Logon", )
 
 
         # Login
@@ -79,49 +79,21 @@ def ConectarSAP(conexion, mandante, usuario, password, idioma="ES"):
         session.findById("wnd[0]/usr/txtRSYST-LANGU").text = idioma
         session.findById("wnd[0]").sendVKey(0)
 
-        WriteLog( mensaje=f"Credenciales enviadas correctamente",estado="INFO", nombreTarea="Abrir SAP Logon", rutaRegistro=inConfig("PathLog"),)
+        WriteLog( mensaje=f"Credenciales enviadas correctamente",estado="INFO", nombreTarea="Abrir SAP Logon", )
 
         if ventanaAbierta(session, "Copyrigth"):
             pyautogui.press("enter")
-            WriteLog( mensaje=f"Ventana Copyrigth cerrada",estado="INFO", nombreTarea="Abrir SAP Logon", rutaRegistro=inConfig("PathLog"),)
+            WriteLog( mensaje=f"Ventana Copyrigth cerrada",estado="INFO", nombreTarea="Abrir SAP Logon", )
+        
+        #Time sleep para el multisecion alcazar a Seleccionar continuar 
+        time.sleep(5)
 
-
-        # try:
-        #     if validarLoginDiag(
-        #         ruta_imagen=rf".\img\logindiag.png",
-        #         confidence=0.5,
-        #         intentos= int (inConfig("ReIntentos")),
-        #         espera=0.5,
-        #     ):
-        #         print("INFO | Ventana loginDiag superada correctamente")
-        # except Exception as e:
-        #     print(f"no se encontro ventana Copyrigth en login {e}")
-
-        # if ventanaAbierta(session, "Info de licencia en entrada al sistema múltiple"):
-            
-        #     print("entro a la funcion click")
-        #     time.sleep(20)  
-        #     pyautogui.click()
-        #     pyautogui.press("enter")
-               
-        #     try:
-        #         if validarLoginDiag(
-        #             ruta_imagen=rf".\img\Infodelicenciaenentradaalsistemamultiple.png",
-        #             confidence=0.8,
-        #             intentos=20,
-        #             espera=0.5
-        #         ):  
-        #             pyautogui.click()
-        #             print("encontro la imagen ")
-        #             print("Ventana info de licencia inesperada superada correctamente")
-        #     except Exception as e:
-        #         print(f"no se encontro ventana Copyrigth en login {e}")
         return session
 
     except Exception as e:
+        #traceback.print_exc()
         ControlHU(nombreTarea, estado=99)
-        traceback.print_exc()
-        print(f"ERROR | Error al conectar a SAP: {e}")
+        WriteLog( mensaje=f"Error al conectar a SAP: {e}",estado="ERROR", nombreTarea="Abrir SAP Logon", )
         # WriteLog | ERROR | Error grave ConectarSAP
         return None
 
@@ -141,21 +113,14 @@ def ObtenerSesionActiva():
         for conn in application.Connections:
             if conn.Children.Count > 0:
                 session = conn.Children(0)
-                print(f"INFO | Sesion encontrada en conexión: {conn.Description}")
-
-                # WriteLog | INFO | FINALIZA ObtenerSesionActiva
+                WriteLog( mensaje=f"Sesion encontrada en conexión: {conn.Description}",estado="INFO", nombreTarea="Abrir SAP Logon", )
                 return session
-
-        print("WARN | No se encontró ninguna sesion activa")
+        WriteLog( mensaje=f"No se encontró ninguna sesion activa",estado="WARN", nombreTarea="Abrir SAP Logon", )
         return None
 
     except Exception as e:
-        print(f"ERROR | Error al obtener la sesion activa: {e}")
-        # WriteLog | ERROR | Error ObtenerSesionActiva
+        WriteLog( mensaje=f"Error al obtener la sesion activa: {e}",estado="ERROR", nombreTarea="Abrir SAP Logon", )
         return None
-
-
-
 
 # ============================================================
 # validarLoginDiag
@@ -172,9 +137,7 @@ def validarLoginDiag(ruta_imagen, confidence=0.5, intentos=3, espera=0.5):
                 return True
 
         except Exception as e:
-            print(f"WARN | Error buscando imagen loginDiag: {e}")
-
+            WriteLog( mensaje=f"buscando imagen de la ruta:{ruta_imagen} Error:{e}",estado="ERROR", nombreTarea="Abrir SAP Logon", )
         time.sleep(espera)
-
-    print(f"WARN | No se encontró la ventana login diag: {ruta_imagen}")
+    WriteLog( mensaje=f"imagen de la ruta:{ruta_imagen} no encontrada",estado="WARN", nombreTarea="Abrir SAP Logon", )
     return False

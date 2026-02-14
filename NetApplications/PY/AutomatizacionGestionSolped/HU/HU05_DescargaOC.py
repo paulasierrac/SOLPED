@@ -107,7 +107,7 @@ def EjecutarHU05(session, ordenesDeCompra: list):
             mensaje=f"Procesamiento en ME9F completado para la OC: {ordenesDeCompra}",
             estado="INFO",
             nombreTarea=nombreTarea,
-            rutaRegistro=inConfig("PathLog"),
+            
         )
 
     except Exception as e:
@@ -116,6 +116,6 @@ def EjecutarHU05(session, ordenesDeCompra: list):
             mensaje=f"ERROR GLOBAL en HU05: {e} | {errorText}",
             estado="ERROR",
             nombreTarea=nombreTarea,
-            rutaRegistro=inConfig("PathLog"),
+            
         )
         raise
